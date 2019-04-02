@@ -1,0 +1,16 @@
+@import "../../../variables";
+
+mat-list-item {
+  opacity: $inactive-item-opacity;
+}
+
+.active-list-item {
+  color: $accent;
+  background: rgba(0, 0, 0, 0.04);
+  opacity: $active-item-opacity;
+}
+
+// .active-list-item p {
+//   font-weight: $font-weight-medium;
+// }
+

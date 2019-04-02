@@ -1,3 +1,19 @@
-<p>
-  sidenav works!
-</p>
+<mat-nav-list>
+  
+  <mat-list-item 
+    routerLinkActive="active-list-item"
+    routerLink="/home"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>home</mat-icon>
+    <p mat-line>Home</p>
+  </mat-list-item>
+
+  <mat-list-item 
+    routerLinkActive="active-list-item"
+    routerLink="/blog"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>explore</mat-icon>
+    <p mat-line>Blog</p>
+  </mat-list-item>
+
+</mat-nav-list>

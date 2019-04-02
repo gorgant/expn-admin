@@ -1,0 +1,50 @@
+// Import material theming functions
+@import '~@angular/material/theming';
+
+$theme-primary: mat-palette($mat-deep-purple);
+$theme-accent:  mat-palette($mat-amber, A200, A100, A400);
+$theme-warn:    mat-palette($mat-red);
+
+// Create your Sass color vars (will be available in all the project)
+$primary: mat-color($theme-primary);
+$accent: mat-color($theme-accent);
+$warn: mat-color($theme-warn);
+
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+$font-weight-black: 900;
+
+$logo-font-family: HarlowSolid;
+
+$max-screen-width: 2500px;
+$min-screen-width: 320px;
+$mobile-cutoff-width: 959px;
+
+$mobile-button-width: 100%;
+$desktop-button-width: 200px;
+$mobile-form-width: 100%;
+$desktop-form-width: 300px;
+
+
+$inactive-item-opacity: 0.8;
+$active-item-opacity: 1;
+
+$opacity-full: 1;
+$opacity-high: 0.87;
+$opacity-medium: 0.60;
+$opacity-light: 0.38;
+$opacity-faded: 0.3;
+
+// $hex-opacity-high-emphasis: DE;
+// $hex-opacity-medium-emphasis: 99;
+// $hex-opacity-light-emphasis: 61;
+// $hex-opacity-faded-emphasis: 4D;
+
+// From https://stackoverflow.com/a/10939797/6572208
+// Sets the background to the stated color and transparency
+@mixin background-opacity($color, $opacity) {
+    background: $color; /* The Fallback */
+    background: rgba($color, $opacity);
+}

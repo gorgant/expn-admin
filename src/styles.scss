@@ -1,4 +1,19 @@
-/* You can add global styles to this file, and also import other style files */
+@import './app/variables';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// Custom brand font (converted at: https://onlinefontconverter.com/)
+@font-face {
+  font-family: 'HarlowSolid';
+  src: url(assets/fonts/HarlowSolid.woff2) format('woff2'),
+       url(assets/fonts/HarlowSolid.woff) format('woff'),
+       url(assets/fonts/HarlowSolid.ttf) format('truetype');
+}
+
+html, body { 
+  height: 100%; 
+  min-width: $min-screen-width;
+}
+
+body { 
+  margin: 0; 
+  font-family: 'Roboto', sans-serif, "Helvetica Neue", arial; 
+}

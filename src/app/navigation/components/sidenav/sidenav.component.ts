@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { UiService } from 'src/app/core/services/ui.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SidenavComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private uiService: UiService
+  ) { }
 
   ngOnInit() {
+  }
+
+  onToggleSideNav() {
+    this.uiService.dispatchSideNavClick();
   }
 
 }
