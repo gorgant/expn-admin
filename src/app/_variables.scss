@@ -2,7 +2,7 @@
 @import '~@angular/material/theming';
 
 $theme-primary: mat-palette($mat-deep-purple);
-$theme-accent:  mat-palette($mat-amber, A200, A100, A400);
+$theme-accent:  mat-palette($mat-red, A200);
 $theme-warn:    mat-palette($mat-red);
 
 // Create your Sass color vars (will be available in all the project)

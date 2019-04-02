@@ -1,0 +1,55 @@
+<div fxLayout="column" fxLayoutAlign="center center">
+
+  <div class="title-container" fxLayout="column" fxLayoutAlign="center center">
+    <div class="title">Explearning</div>
+    <div class="sub-title">Admin</div>
+  </div>
+
+  <div *ngIf="!(userAuth$ | async)" class="login-options" fxLayout="column" fxLayoutAlign="center center">
+    
+    <!-- Email Login Section -->
+    <form 
+      [formGroup]="loginForm"
+      (ngSubmit)="onEmailLogin()"
+      fxLayout="column"
+      fxLayoutAlign="space-evenly center"
+    >
+       <!-- Email -->
+       <mat-form-field>
+          <input formControlName="email" matInput type="email" placeholder="Your email">
+          <mat-error *ngFor="let validation of LOGIN_FORM_VALIDATION_MESSAGES.email">
+            <mat-error *ngIf="email.hasError(validation.type) && email.invalid && (email.dirty || email.touched)">{{ validation.message }}</mat-error>
+          </mat-error>
+        </mat-form-field>
+        
+        <!-- Password -->
+        <div fxLayout="column" fxLayoutAlign="start center">
+          <mat-form-field>
+            <input formControlName="password" matInput type="password" placeholder="Your password">
+            <mat-error *ngFor="let validation of LOGIN_FORM_VALIDATION_MESSAGES.password">
+              <mat-error *ngIf="password.hasError(validation.type) && password.invalid && (password.dirty || password.touched)">{{ validation.message }}</mat-error>
+            </mat-error>
+          </mat-form-field>
+          <div fxFlexAlign="start" class="mat-small" fxLayoutAlign="start center">
+            <button type="button" class="reset-password-button" mat-button color="primary" (click)="onResetPassword()" > 
+              Forgot password?
+            </button>
+          </div>
+        </div>
+  
+        <button 
+          [disabled]="loginForm.invalid"
+          class="submit-button" 
+          type="submit" 
+          mat-raised-button 
+          color="primary">
+            Submit
+      </button>
+    </form>
+  </div>
+
+  <!-- User Loading Spinner -->
+  <div *ngIf="(userAuth$ | async) && !(userLoaded$ | async) " class="user-loading-spinner">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  </div>
+</div>

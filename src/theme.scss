@@ -2,7 +2,7 @@
 @include mat-core();
 
 $admin-palette-primary: mat-palette($mat-deep-purple);
-$admin-palette-accent: mat-palette($mat-amber, A200, A100, A400);
+$admin-palette-accent: mat-palette($mat-red, A200);
 $admin-palette-warn: mat-palette($mat-red);
 
 $admin-theme: mat-light-theme($admin-palette-primary, $admin-palette-accent, $admin-palette-warn);

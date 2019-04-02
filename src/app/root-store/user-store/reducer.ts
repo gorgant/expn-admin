@@ -22,23 +22,7 @@ export function featureReducer(state = initialState, action: Actions): State {
         ...state,
         isLoading: true,
       };
-    case ActionTypes.STORE_USER_DATA_COMPLETE:
-      return {
-        ...state,
-        profileImageLoading: false,
-        error: null,
-      };
     case ActionTypes.UPDATE_PASSWORD_COMPLETE:
-      return {
-        ...state,
-        error: null,
-      };
-    case ActionTypes.UPDATE_PROFILE_IMAGE_REQUESTED:
-      return {
-        ...state,
-        profileImageLoading: true,
-      };
-    case ActionTypes.UPDATE_PROFILE_IMAGE_COMPLETE:
       return {
         ...state,
         error: null,

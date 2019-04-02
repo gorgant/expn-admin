@@ -13,9 +13,6 @@ import { StoreUserDataType } from '../models/store-user-data-type.model';
 })
 export class UserService {
 
-  private imageUploadPercentage$: Observable<number>;
-  downloadUrlSubject = new Subject<string>();
-
   constructor(
     private db: AngularFirestore,
     private storage: AngularFireStorage,
@@ -32,8 +29,9 @@ export class UserService {
         map(docSnapshot => {
           const appUser: AppUser = {
             id: docSnapshot.payload.id,
-            ...docSnapshot.payload.data()
+            ...docSnapshot.payload.data(),
           };
+          console.log('user data retrieved', appUser);
           // Mark new user false bc at this point demo timer request should have already been fired
           if (appUser.isNewUser) {
             this.storeUserData(appUser, appUser.id, StoreUserDataType.TOGGLE_NEW_USER_OFF);
@@ -75,45 +73,9 @@ export class UserService {
     return from(fbResponse);
   }
 
-  uploadProfileImage(imageFile: Blob, appUser: AppUser): Observable<string> {
-    const file = imageFile;
-    const filePath = `graphics/user-profile-images/${appUser.id}/profileImage`;
-    const fileRef = this.storage.ref(filePath);
-    // Metadata used in cloud function (marked true by cloud function after resized)
-    const customMetaData = {
-      resizedImage: 'false'
-    };
-    const task = this.storage.upload(filePath, file, {customMetadata: customMetaData});
-
-    // Observe percentage changes
-    this.imageUploadPercentage$ = task.percentageChanges();
-
-    const fbResponse = task
-      .then(() => {
-        // Do nothing, but this callback provides error handling and moderates the observable query volume
-      })
-      .catch(error => {
-        this.uiService.showSnackBar(error, null, 5000);
-        return throwError(error).toPromise();
-      });
-
-    return from(fbResponse);
-  }
-
-  fetchDownloadUrl(appUser: AppUser): Observable<string> {
-    const filePath = `graphics/user-profile-images/${appUser.id}/profileImage`;
-    const fileRef = this.storage.ref(filePath);
-    return fileRef.getDownloadURL();
-  }
-
-
-
   // Provides easy access to user doc throughout the app
   fetchUserDoc(userId: string) {
     return this.db.doc<AppUser>(`users/${userId}`);
   }
 
-  get imageUploadPercentage() {
-    return this.imageUploadPercentage$;
-  }
 }

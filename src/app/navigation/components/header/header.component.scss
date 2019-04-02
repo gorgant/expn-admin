@@ -72,3 +72,8 @@ a {
 .nav-item-active.nav-item:not(.contact):after {
   width: 100%;
 }
+
+.logout-button {
+  background-color: $accent;
+  color: white;
+}

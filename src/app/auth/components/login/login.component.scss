@@ -1,0 +1,52 @@
+@import "../../../variables";
+
+.title {
+  font-family: $logo-font-family;
+  font-size: 46px;
+  margin-top: 30px;
+  margin-bottom: 16px;
+  color: $primary;
+}
+
+.sub-title {
+  font-size: 32px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  color: $accent;
+}
+
+mat-form-field {
+  width: $desktop-form-width;
+}
+
+.email-button-icon {
+  margin-right: 16px;
+}
+
+.submit-button {
+  margin-top: 20px;
+  width: $desktop-button-width;
+}
+
+.reset-password-button {
+  border-radius: 0;
+  padding: 0;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+@media screen and (max-width: $mobile-cutoff-width) {
+  .description {
+    text-align: center;
+  }
+
+  mat-form-field {
+    width: $mobile-form-width;
+  }
+
+  .submit-button {
+    width: $mobile-button-width;
+  }
+  
+}
+
