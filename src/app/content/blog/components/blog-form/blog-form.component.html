@@ -1,3 +1,35 @@
-<p>
-  blog-form works!
-</p>
+<div class="page-content">
+  <div class="hero-upload-section" fxLayout="column" fxLayoutAlign="center center">
+    <div>
+      <h3>Thumbnail Image (use Youtube dimensions)</h3>
+    </div>
+    <div *ngIf="heroUploadProcessing$ | async">
+      <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
+    </div>
+    <div class="hero-image-input" *ngIf="!(heroUploadProcessing$ | async)">
+      <input #heroImageInput style="display: none" type="file" accept="image/*" id="file" (change)="uploadHeroImage($event)">
+      <button mat-raised-button color="accent" (click)="heroImageInput.click()">Choose Hero Image</button>
+    </div>
+    <div class="hero-image-display" *ngIf="(heroImageProps$ | async) as heroImage">
+      <img [src]="heroImage.src" [srcset]="heroImage.srcset" [sizes]="heroImage.sizes" [width]="heroImage.width" [alt]="title">
+    </div>
+  </div>
+  <div class="blog-content-section" fxLayout="column" fxLayoutAlign="center center">
+    <div *ngIf="inlineUploadProcessing$ | async">
+      <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
+    </div>
+    <form [formGroup]="postForm" (keydown.enter)="$event.preventDefault()">
+      <mat-form-field>
+        <input matInput formControlName="title" type="text" placeholder="Post Title">
+      </mat-form-field>
+      <ckeditor 
+        [editor]="Editor" 
+        [disabled]="(heroUploadProcessing$ | async) || (inlineUploadProcessing$ | async)"
+        formControlName="content"
+        (ready)="onEditorAdaptorPluginRdy($event)"
+        (keydown.enter)="textareaEnterPressed($event)"
+        ></ckeditor>
+      <button class="submit-button" [disabled]="postForm.invalid" mat-raised-button color="accent" type="button" (click)="savePost()">Submit Post</button>
+    </form>
+  </div>
+</div>

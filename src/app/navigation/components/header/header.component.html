@@ -10,10 +10,10 @@
     <div class="nav-items-container" fxHide fxShow.gt-sm="true" >
       <ul fxLayout="row" fxLayoutGap="24px" class="nav-items">
         <li class="nav-list-item">
-          <a class="nav-item" routerLinkActive="nav-item-active" routerLink="/home">Home</a>
+          <a class="nav-item" routerLinkActive="nav-item-active" [routerLink]="appRoutes.HOME">Home</a>
         </li>
         <li class="nav-list-item">
-          <a class="nav-item" routerLinkActive="nav-item-active" routerLink="/blog">Blog</a>
+          <a class="nav-item" routerLinkActive="nav-item-active" [routerLink]="appRoutes.BLOG_DASHBOARD">Blog</a>
         </li>
         <div class="logout-item">
           <button class="logout-button" mat-raised-button (click)="onLogout()">Logout</button>

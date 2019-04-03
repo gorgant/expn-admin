@@ -1,0 +1,29 @@
+@import "../../../../variables";
+
+.create-post-container {
+  margin: 16px;
+}
+
+.create-post-button {
+  background-color: $accent;
+  color: white;
+}
+
+section {
+  // display: grid;
+  // grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  // grid-auto-rows: auto;
+  // grid-gap: 10px;
+  width: 95%;
+  max-width: 1800px;
+  // margin: 0 auto;
+}
+
+mat-card {
+  margin: 10px 0;
+  max-width: 500px;
+}
+
+img {
+  width: 100%;
+}

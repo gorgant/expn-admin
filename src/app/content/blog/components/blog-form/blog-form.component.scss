@@ -1,0 +1,43 @@
+@import "../../../../variables";
+
+.page-content {
+  width: 95%;
+  margin: 0 auto;
+}
+
+.hero-image-input {
+  margin-bottom: 16px;
+}
+
+.blog-content-section {
+  margin-top: 32px;
+}
+
+form {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+img {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.image-style-side {
+  float: right;
+}
+
+figcaption {
+  color: #333;
+  background-color: #f7f7f7;
+  padding: .6em;
+  font-size: .75em;
+  text-align: center;
+}
+
+.submit-button {
+  margin-top: 16px;
+}
