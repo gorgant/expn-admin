@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HeroImageProps } from 'src/app/core/models/posts/hero-image-props.model';
-import { Observable, BehaviorSubject, throwError, merge, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, throwError, merge, Subscription, of } from 'rxjs';
 import { PostService } from 'src/app/core/services/post.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { map, catchError, take, switchMap } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
 import { Post } from 'src/app/core/models/posts/post.model';
@@ -52,19 +52,54 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
   postDiscarded: boolean;
 
+  postData$: Observable<Post>;
+  // postDataSubscription: Subscription;
+
+  newPost: boolean;
+
   constructor(
     private store$: Store<RootStoreState.State>,
     private postService: PostService,
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
 
+    this.newPost = true;
+    this.postId = this.postService.generateNewPostId();
+    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
+
+
     this.postForm = this.fb.group({
       title: ['', Validators.required],
       content: [{value: '', disabled: false }, Validators.required]
+    });
+
+    // Check if id params are available
+    const idParamName = 'id';
+    const idParam = this.route.snapshot.params[idParamName];
+    if (idParam) {
+      this.newPost = false;
+      this.postInitialized = true;
+      this.postId = idParam;
+      this.postData$ = this.postService.getPostData(this.postId);
+    }
+
+    // If post data available, patch values into form
+    this.postData$
+      .pipe(take(1))
+      .subscribe(post => {
+        if (post) {
+          const data = {
+            content: post.content,
+            title: post.title,
+          };
+          this.postForm.patchValue(data);
+          this.heroImageProps$ = of(post.heroImageProps);
+        }
     });
 
     this.imageProcessingSubscription = merge(this.heroUploadProcessing$, this.inlineUploadProcessing$)
@@ -88,8 +123,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
 
 
-    this.postId = this.postService.generateNewPostId();
-    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
+
 
     this.appUser$ = this.store$.select(UserStoreSelectors.selectAppUser);
   }
@@ -299,6 +333,10 @@ export class BlogFormComponent implements OnInit, OnDestroy {
     if (this.autoSavePostSubscription) {
       this.autoSavePostSubscription.unsubscribe();
     }
+
+    // if (this.postDataSubscription) {
+    //   this.postDataSubscription.unsubscribe();
+    // }
 
     if (this.autoSaveTicker) {
       this.killAutoSaveTicker();

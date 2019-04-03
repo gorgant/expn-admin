@@ -11,6 +11,9 @@ const routes: Routes = [
     path: 'new', component: BlogFormComponent
   },
   {
+    path: ':id', component: BlogFormComponent
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full'
