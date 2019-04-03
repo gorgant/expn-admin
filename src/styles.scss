@@ -17,3 +17,8 @@ body {
   margin: 0; 
   font-family: 'Roboto', sans-serif, "Helvetica Neue", arial; 
 }
+
+// Set the ck editor (and not the caption of images) min height
+.ck-editor__editable:not(.ck-editor__nested-editable) {
+  min-height: 400px;
+}

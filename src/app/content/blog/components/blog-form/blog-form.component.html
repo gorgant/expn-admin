@@ -1,4 +1,5 @@
-<div class="page-content">
+<div class="page-content" fxLayout="column" fxLayoutAlign="center center">
+  
   <div class="hero-upload-section" fxLayout="column" fxLayoutAlign="center center">
     <div>
       <h3>Thumbnail Image (use Youtube dimensions)</h3>
@@ -7,29 +8,33 @@
       <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
     </div>
     <div class="hero-image-input" *ngIf="!(heroUploadProcessing$ | async)">
-      <input #heroImageInput style="display: none" type="file" accept="image/*" id="file" (change)="uploadHeroImage($event)">
+      <input #heroImageInput style="display: none" type="file" accept="image/*" id="file" (change)="onUploadHeroImage($event)">
       <button mat-raised-button color="accent" (click)="heroImageInput.click()">Choose Hero Image</button>
     </div>
-    <div class="hero-image-display" *ngIf="(heroImageProps$ | async) as heroImage">
-      <img [src]="heroImage.src" [srcset]="heroImage.srcset" [sizes]="heroImage.sizes" [width]="heroImage.width" [alt]="title">
+    <div *ngIf="(heroImageProps$ | async) as heroImage">
+      <img class="hero-image-display" [src]="heroImage.src" [srcset]="heroImage.srcset" [sizes]="heroImage.sizes" [width]="heroImage.width" [alt]="title">
     </div>
   </div>
+
   <div class="blog-content-section" fxLayout="column" fxLayoutAlign="center center">
     <div *ngIf="inlineUploadProcessing$ | async">
       <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
     </div>
-    <form [formGroup]="postForm" (keydown.enter)="$event.preventDefault()">
-      <mat-form-field>
+    <form [formGroup]="postForm" (keydown.enter)="$event.preventDefault()" fxFlexFill >
+      <mat-form-field class="post-title">
         <input matInput formControlName="title" type="text" placeholder="Post Title">
       </mat-form-field>
-      <ckeditor 
+      <ckeditor
+        class="ck-editor-panel"
         [editor]="Editor" 
-        [disabled]="(heroUploadProcessing$ | async) || (inlineUploadProcessing$ | async)"
         formControlName="content"
         (ready)="onEditorAdaptorPluginRdy($event)"
         (keydown.enter)="textareaEnterPressed($event)"
         ></ckeditor>
-      <button class="submit-button" [disabled]="postForm.invalid" mat-raised-button color="accent" type="button" (click)="savePost()">Submit Post</button>
+      <div class="form-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <button class="submit-button" [disabled]="postForm.invalid" mat-raised-button color="accent" type="button" (click)="onCreatePost()">Submit Post</button>
+        <button class="discard-button" [disabled]="!postInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardPost()">Discard Post</button>
+      </div>
     </form>
   </div>
 </div>

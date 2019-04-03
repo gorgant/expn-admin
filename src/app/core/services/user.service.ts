@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable, from, Subject, throwError } from 'rxjs';
-import { AppUser } from '../models/app-user.model';
+import { AppUser } from '../models/user/app-user.model';
 import { map, takeUntil, catchError } from 'rxjs/operators';
 import { UiService } from './ui.service';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { StoreUserDataType } from '../models/store-user-data-type.model';
+import { StoreUserDataType } from '../models/user/store-user-data-type.model';
 
 @Injectable({
   providedIn: 'root'

@@ -4,9 +4,12 @@ import { MaterialModule } from '../material.module';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { DeleteConfirmDialogueComponent } from './components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    DeleteConfirmDialogueComponent
+  ],
   imports: [
     CommonModule,
     MaterialModule,
@@ -20,6 +23,9 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     RouterModule,
     ReactiveFormsModule,
     FlexLayoutModule,
+  ],
+  entryComponents: [
+    DeleteConfirmDialogueComponent
   ]
 })
 export class SharedModule { }

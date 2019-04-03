@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AuthData } from '../models/auth-data.model';
+import { AuthData } from '../models/auth/auth-data.model';
 import { UiService } from 'src/app/core/services/ui.service';
-import { AppUser } from 'src/app/core/models/app-user.model';
+import { AppUser } from 'src/app/core/models/user/app-user.model';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import { from, Observable, Subject, throwError } from 'rxjs';
-import { AppRouts } from '../models/routes-and-paths/app-routes.model';
+import { AppRoutes } from '../models/routes-and-paths/app-routes.model';
 
 @Injectable({
   providedIn: 'root'
@@ -185,7 +185,7 @@ export class AuthService {
     if (returnUrl && returnUrl !== '/') {
       this.router.navigate([returnUrl]);
     } else {
-      this.router.navigate([AppRouts.HOME]);
+      this.router.navigate([AppRoutes.HOME]);
     }
   }
 
@@ -194,7 +194,7 @@ export class AuthService {
     this.ngUnsubscribe$.complete(); // Send signal to Firebase subscriptions to unsubscribe
     // Reinitialize the unsubscribe subject in case page isn't refreshed after logout (which means auth wouldn't reset)
     this.ngUnsubscribe$ = new Subject<void>();
-    this.router.navigate([AppRouts.LOGIN]);
+    this.router.navigate([AppRoutes.LOGIN]);
   }
 
   private postLogoutActions(): void {

@@ -6,7 +6,7 @@ import * as userFeatureActions from './actions';
 import { switchMap, map, catchError, tap } from 'rxjs/operators';
 import { UserService } from 'src/app/core/services/user.service';
 import { RootStoreState } from '..';
-import { StoreUserDataType } from 'src/app/core/models/store-user-data-type.model';
+import { StoreUserDataType } from 'src/app/core/models/user/store-user-data-type.model';
 
 @Injectable()
 export class UserStoreEffects {

@@ -1,19 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { HeroImageProps } from 'src/app/core/models/post-models/hero-image-props.model';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { AuthService } from 'src/app/core/services/auth.service';
+import { HeroImageProps } from 'src/app/core/models/posts/hero-image-props.model';
+import { Observable, BehaviorSubject, throwError, merge, Subscription } from 'rxjs';
 import { PostService } from 'src/app/core/services/post.service';
 import { Router } from '@angular/router';
 import { map, catchError, take, switchMap } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
-import { Post } from 'src/app/core/models/post-models/post.model';
+import { Post } from 'src/app/core/models/posts/post.model';
 
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Store } from '@ngrx/store';
 import { RootStoreState, UserStoreSelectors } from 'src/app/root-store';
-import { AppUser } from 'src/app/core/models/app-user.model';
-import { AppRouts } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AppUser } from 'src/app/core/models/user/app-user.model';
+import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { MatDialogConfig, MatDialog } from '@angular/material';
+import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
+import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 
 @Component({
   selector: 'app-blog-form',
@@ -40,22 +42,54 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
   heroUploadProcessing$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   inlineUploadProcessing$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  imageProcessingSubscription: Subscription;
+
+  // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
+  autoSaveTicker: NodeJS.Timer;
+  autoSavePostSubscription: Subscription;
+
+  tempPostTitle: string;
+
+  postDiscarded: boolean;
 
   constructor(
     private store$: Store<RootStoreState.State>,
-    private authService: AuthService,
     private postService: PostService,
     private fb: FormBuilder,
     private router: Router,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit() {
+
     this.postForm = this.fb.group({
       title: ['', Validators.required],
-      content: ['', Validators.required]
+      content: [{value: '', disabled: false }, Validators.required]
     });
 
+    this.imageProcessingSubscription = merge(this.heroUploadProcessing$, this.inlineUploadProcessing$)
+      .subscribe((imageProcessing) => {
+        if (imageProcessing) {
+          console.log('Image processing, disabling content');
+          this.content.disable();
+        } else {
+          console.log('Image not processing, enabling content');
+          this.content.enable();
+        }
+      });
+
+    // Auto-init post if it hasn't already been initialized and it has content
+    setTimeout(() => {
+      if (!this.postInitialized) {
+        this.initializePost();
+      }
+      this.createAutoSaveTicker();
+    }, 5000);
+
+
+
     this.postId = this.postService.generateNewPostId();
+    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
 
     this.appUser$ = this.store$.select(UserStoreSelectors.selectAppUser);
   }
@@ -87,50 +121,14 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
       if (!this.postInitialized) {
         this.initializePost();
+      } else {
+        this.savePost();
       }
       return new InlineImageUploadAdapter(loader, this.postId);
     };
   }
 
-  initializePost(): void {
-    this.appUser$
-      .pipe(take(1))
-      .subscribe(appUser => {
-        console.log('Post initialized');
-        const data: Post = {
-          author: appUser.displayName || appUser.id,
-          authorId: appUser.id,
-          content: this.content.value,
-          heroImageProps: this.heroImageProps,
-          published: new Date(),
-          title: this.title.value ? this.title.value : `Temp Title ${this.postId.substr(0, 5)}`,
-          id: this.postId
-        };
-        this.postService.initPost(data, this.postId);
-        this.postInitialized = true;
-      });
-
-  }
-
-  savePost(): void {
-    this.appUser$
-      .pipe(take(1))
-      .subscribe(appUser => {
-        const data: Post = {
-          author: appUser.displayName || appUser.id,
-          authorId: appUser.id,
-          content: this.content.value,
-          published: new Date(),
-          title: this.title.value,
-          id: this.postId
-        };
-        this.postService.updatePost(this.postId, data);
-        this.router.navigate([AppRouts.BLOG_DASHBOARD]);
-        console.log('Post data saved', data);
-      });
-  }
-
-  uploadHeroImage(event: any): void {
+  onUploadHeroImage(event: any): void {
 
     const file: File = event.target.files[0];
 
@@ -144,6 +142,8 @@ export class BlogFormComponent implements OnInit, OnDestroy {
     // Initialize post if not yet done
     if (!this.postInitialized) {
       this.initializePost();
+    } else {
+      this.savePost();
     }
 
     // Upload file
@@ -151,6 +151,110 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
     // Set image props (on db and on this page)
     this.heroImageProps$ = this.setUpdatedHeroImageProps();
+  }
+
+  onCreatePost() {
+    this.savePost();
+    this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
+  }
+
+  onDiscardPost() {
+    const dialogConfig = new MatDialogConfig();
+
+    const deleteConfData: DeleteConfData = {
+      title: 'Discard Post',
+      body: 'Are you sure you want to permanently discard this post?'
+    };
+
+    dialogConfig.data = deleteConfData;
+
+    const dialogRef = this.dialog.open(DeleteConfirmDialogueComponent, dialogConfig);
+
+    dialogRef.afterClosed()
+    .pipe(take(1))
+    .subscribe(userConfirmed => {
+      if (userConfirmed) {
+        this.postDiscarded = true;
+        this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
+        this.postService.deletePost(this.postId);
+      }
+    });
+  }
+
+  private initializePost(): void {
+    this.appUser$
+      .pipe(take(1))
+      .subscribe(appUser => {
+        console.log('Post initialized');
+        const data: Post = {
+          author: appUser.displayName || appUser.id,
+          authorId: appUser.id,
+          content: this.content.value,
+          heroImageProps: this.heroImageProps,
+          published: new Date(),
+          title: this.title.value ? this.title.value : this.tempPostTitle,
+          id: this.postId
+        };
+        this.postService.initPost(data, this.postId);
+        this.postInitialized = true;
+      });
+
+  }
+
+  private savePost(): void {
+    this.appUser$
+      .pipe(take(1))
+      .subscribe(appUser => {
+        const data: Post = {
+          author: appUser.displayName || appUser.id,
+          authorId: appUser.id,
+          content: this.content.value,
+          published: new Date(),
+          title: this.title.value ? this.title.value : this.tempPostTitle,
+          id: this.postId
+        };
+        this.postService.updatePost(this.postId, data);
+        console.log('Post data saved', data);
+      });
+  }
+
+  private createAutoSaveTicker() {
+    console.log('Creating autosave ticker');
+    // Set interval at 1 second
+    const step = 10000;
+
+    this.autoSavePostSubscription = this.postService.getPostData(this.postId)
+      .subscribe(post => {
+        if (this.autoSaveTicker) {
+          // Clear old interval
+          this.killAutoSaveTicker();
+          console.log('clearing old interval');
+        }
+        if (post) {
+          // Refresh interval every 10 seconds
+          this.autoSaveTicker = setInterval(() => {
+            this.autoSave(post);
+          }, step);
+        }
+      });
+
+  }
+
+  private killAutoSaveTicker(): void {
+    clearInterval(this.autoSaveTicker);
+  }
+
+  private autoSave(post: Post) {
+    // Cancel autosave if no changes to content
+    if (
+      post.content === this.content.value &&
+      (post.title === this.title.value || post.title === this.tempPostTitle)
+    ) {
+      console.log('No changes to content, no auto save');
+      return;
+    }
+    this.savePost();
+    console.log('Auto saving post');
   }
 
   private setUpdatedHeroImageProps(): Observable<HeroImageProps> {
@@ -184,9 +288,20 @@ export class BlogFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.postInitialized) {
+    if (this.postInitialized && !this.postDiscarded) {
       this.savePost();
+    }
 
+    if (this.imageProcessingSubscription) {
+      this.imageProcessingSubscription.unsubscribe();
+    }
+
+    if (this.autoSavePostSubscription) {
+      this.autoSavePostSubscription.unsubscribe();
+    }
+
+    if (this.autoSaveTicker) {
+      this.killAutoSaveTicker();
     }
   }
 

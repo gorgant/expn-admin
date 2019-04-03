@@ -1,0 +1,10 @@
+// Must import to use the custom theme classes
+@import "../../../variables";
+
+.section-header {
+  color: $primary;
+}
+
+button {
+  margin: 16px;
+}

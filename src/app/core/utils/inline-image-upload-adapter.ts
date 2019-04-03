@@ -1,10 +1,10 @@
 import * as firebase from 'firebase/app';
 import { throwError } from 'rxjs';
 import { UploadMetadata } from '@angular/fire/storage/interfaces';
-import { SanitizedFileName } from '../models/post-models/sanitized-file-name.model';
-import { PostImageMetadata } from '../models/post-models/post-image-metadata.model';
-import { PostImageType } from '../models/post-models/post-image-type.model';
-import { Post } from '../models/post-models/post.model';
+import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
+import { PostImageMetadata } from '../models/posts/post-image-metadata.model';
+import { PostImageType } from '../models/posts/post-image-type.model';
+import { Post } from '../models/posts/post.model';
 import { FirebasePaths } from '../models/routes-and-paths/firebase-paths.model';
 
 // Adapted from https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html

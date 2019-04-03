@@ -4,13 +4,13 @@ import { map, take, takeUntil, catchError } from 'rxjs/operators';
 import { Observable, throwError, from, forkJoin, Subject } from 'rxjs';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { UploadMetadata } from '@angular/fire/storage/interfaces';
-import { Post } from '../models/post-models/post.model';
-import { PostImage } from '../models/post-models/post-image.model';
-import { PostImageMetadata } from '../models/post-models/post-image-metadata.model';
-import { PostImageType } from '../models/post-models/post-image-type.model';
-import { HeroUrlObject } from '../models/post-models/hero-url-object.model';
-import { HeroImageProps } from '../models/post-models/hero-image-props.model';
-import { SanitizedFileName } from '../models/post-models/sanitized-file-name.model';
+import { Post } from '../models/posts/post.model';
+import { PostImage } from '../models/posts/post-image.model';
+import { PostImageMetadata } from '../models/posts/post-image-metadata.model';
+import { PostImageType } from '../models/posts/post-image-type.model';
+import { HeroUrlObject } from '../models/posts/hero-url-object.model';
+import { HeroImageProps } from '../models/posts/hero-image-props.model';
+import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 
 @Injectable({
   providedIn: 'root'

@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store';
-import { AppUser } from 'src/app/core/models/app-user.model';
-import { AuthenticateUserType } from 'src/app/core/models/authenticate-user-type.model';
-import { AuthData } from 'src/app/core/models/auth-data.model';
+import { AppUser } from 'src/app/core/models/user/app-user.model';
+import { AuthenticateUserType } from 'src/app/core/models/auth/authenticate-user-type.model';
+import { AuthData } from 'src/app/core/models/auth/auth-data.model';
 
 export enum ActionTypes {
   REGISTER_USER_REQUESTED = '[Auth] Register User Requested',
