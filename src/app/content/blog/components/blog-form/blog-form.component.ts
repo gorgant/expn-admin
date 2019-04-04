@@ -27,7 +27,6 @@ export class BlogFormComponent implements OnInit, OnDestroy {
   appUser$: Observable<AppUser>;
 
   postForm: FormGroup;
-  heroImageProps: HeroImageProps = null;
 
   uploadPercent$: Observable<number>;
   heroImageProps$: Observable<HeroImageProps>;
@@ -48,14 +47,13 @@ export class BlogFormComponent implements OnInit, OnDestroy {
   autoSaveTicker: NodeJS.Timer;
   autoSavePostSubscription: Subscription;
 
+  initPostTimeout: NodeJS.Timer;
+
   tempPostTitle: string;
 
   postDiscarded: boolean;
 
   postData$: Observable<Post>;
-  // postDataSubscription: Subscription;
-
-  newPost: boolean;
 
   constructor(
     private store$: Store<RootStoreState.State>,
@@ -68,62 +66,11 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.newPost = true;
-    this.postId = this.postService.generateNewPostId();
-    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
+    this.configureNewPost();
 
+    this.loadExistingPostData(); // Only loads if exists
 
-    this.postForm = this.fb.group({
-      title: ['', Validators.required],
-      content: [{value: '', disabled: false }, Validators.required]
-    });
-
-    // Check if id params are available
-    const idParamName = 'id';
-    const idParam = this.route.snapshot.params[idParamName];
-    if (idParam) {
-      this.newPost = false;
-      this.postInitialized = true;
-      this.postId = idParam;
-      this.postData$ = this.postService.getPostData(this.postId);
-    }
-
-    // If post data available, patch values into form
-    this.postData$
-      .pipe(take(1))
-      .subscribe(post => {
-        if (post) {
-          const data = {
-            content: post.content,
-            title: post.title,
-          };
-          this.postForm.patchValue(data);
-          this.heroImageProps$ = of(post.heroImageProps);
-        }
-    });
-
-    this.imageProcessingSubscription = merge(this.heroUploadProcessing$, this.inlineUploadProcessing$)
-      .subscribe((imageProcessing) => {
-        if (imageProcessing) {
-          console.log('Image processing, disabling content');
-          this.content.disable();
-        } else {
-          console.log('Image not processing, enabling content');
-          this.content.enable();
-        }
-      });
-
-    // Auto-init post if it hasn't already been initialized and it has content
-    setTimeout(() => {
-      if (!this.postInitialized) {
-        this.initializePost();
-      }
-      this.createAutoSaveTicker();
-    }, 5000);
-
-
-
-
+    this.monitorImagesProcessing(); // Used to disable text field while images are processing
 
     this.appUser$ = this.store$.select(UserStoreSelectors.selectAppUser);
   }
@@ -215,6 +162,63 @@ export class BlogFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  private monitorImagesProcessing() {
+    this.imageProcessingSubscription = merge(this.heroUploadProcessing$, this.inlineUploadProcessing$)
+    .subscribe((imageProcessing) => {
+      if (imageProcessing) {
+        console.log('Image processing, disabling content');
+        this.content.disable();
+      } else {
+        console.log('Image not processing, enabling content');
+        this.content.enable();
+      }
+    });
+  }
+
+  private loadExistingPostData() {
+    // Check if id params are available
+    const idParamName = 'id';
+    const idParam = this.route.snapshot.params[idParamName];
+    if (idParam) {
+      this.postInitialized = true;
+      this.postId = idParam;
+      this.postData$ = this.postService.getPostData(this.postId);
+
+      // If post data available, patch values into form
+      this.postData$
+        .pipe(take(1))
+        .subscribe(post => {
+          if (post) {
+            const data = {
+              content: post.content,
+              title: post.title,
+            };
+            this.postForm.patchValue(data);
+            this.heroImageProps$ = of(post.heroImageProps);
+          }
+      });
+    }
+  }
+
+  private configureNewPost() {
+    this.postId = this.postService.generateNewPostId();
+    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
+
+
+    this.postForm = this.fb.group({
+      title: ['', Validators.required],
+      content: [{value: '', disabled: false }, Validators.required]
+    });
+
+    // Auto-init post if it hasn't already been initialized and it has content
+    this.initPostTimeout = setTimeout(() => {
+      if (!this.postInitialized) {
+        this.initializePost();
+      }
+      this.createAutoSaveTicker();
+    }, 5000);
+  }
+
   private initializePost(): void {
     this.appUser$
       .pipe(take(1))
@@ -224,7 +228,6 @@ export class BlogFormComponent implements OnInit, OnDestroy {
           author: appUser.displayName || appUser.id,
           authorId: appUser.id,
           content: this.content.value,
-          heroImageProps: this.heroImageProps,
           published: new Date(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
@@ -278,6 +281,10 @@ export class BlogFormComponent implements OnInit, OnDestroy {
     clearInterval(this.autoSaveTicker);
   }
 
+  private killInitPostTimeout(): void {
+    clearTimeout(this.initPostTimeout);
+  }
+
   private autoSave(post: Post) {
     // Cancel autosave if no changes to content
     if (
@@ -305,11 +312,11 @@ export class BlogFormComponent implements OnInit, OnDestroy {
           return urlObject$;
         }),
         map(urlObject => {
-          this.heroImageProps = this.postService.setHeroImageProps(urlObject); // Update in local memory for when post is created
-          this.postService.storeHeroImageProps(this.postId, this.heroImageProps); // Save in database pre- post creation
+          const heroImageProps = this.postService.setHeroImageProps(urlObject); // Update in local memory for when post is created
+          this.postService.storeHeroImageProps(this.postId, heroImageProps); // Save in database pre- post creation
           console.log('About to parse this set of ulrObjects for default url', urlObject);
           this.heroUploadProcessing$.next(false);
-          return this.heroImageProps; // Set for instant UI update
+          return heroImageProps; // Set for instant UI update
         })
       );
   }
@@ -334,12 +341,12 @@ export class BlogFormComponent implements OnInit, OnDestroy {
       this.autoSavePostSubscription.unsubscribe();
     }
 
-    // if (this.postDataSubscription) {
-    //   this.postDataSubscription.unsubscribe();
-    // }
-
     if (this.autoSaveTicker) {
       this.killAutoSaveTicker();
+    }
+
+    if (this.initPostTimeout) {
+      this.killInitPostTimeout();
     }
   }
 

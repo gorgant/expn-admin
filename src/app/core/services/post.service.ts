@@ -361,8 +361,11 @@ export class PostService {
           existingList = existingList.concat(post.imageFilePathList);
         }
         const updatedList = existingList.concat(imagePaths);
+        const dedupedList = [...Array.from(new Set(updatedList))];
+        console.log('Deduped updated file list', dedupedList);
+
         postDoc.update({
-          imageFilePathList: updatedList
+          imageFilePathList: dedupedList
         });
       }, (error) => {
         console.log('Error updating imageFilePathList', error);
