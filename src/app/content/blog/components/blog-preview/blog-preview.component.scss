@@ -1,0 +1,116 @@
+@import "../../../../variables";
+
+
+
+.blog-container {
+  width: 100vw;
+  max-width: 2000px;
+}
+
+.hero-background-image {
+  width: 100%;
+  background-color: #cccccc;
+  height: 90vh;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hero-title {
+  color: white;
+  font-size: 48px;
+  text-align: center;
+  padding: 16px;
+  max-width: 800px;
+}
+
+.hero-read-more-container {
+  font-size: 22px;
+  color: white;
+  margin-bottom: 16px;
+}
+
+// This component overrides global css, so this font import is required
+@import url( 'https://fonts.googleapis.com/css?family=Roboto:400,700|Material+Icons');
+// To keep icon centered, must also adjust width and height to font-size
+.hero-down-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.text-container {
+  margin-top: 16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
+  max-width: 600px;
+}
+
+h3 {
+  color: $accent;
+}
+
+p {
+  font-size: 22px;
+  font-weight: 300;
+}
+
+figcaption {
+  color: #333;
+  background-color: #f7f7f7;
+  padding: .6em;
+  font-size: .75em;
+  text-align: center;
+}
+
+figure > img {
+  width: 100%;
+}
+
+// Blockquote styling
+// Courtesy of https://codepen.io/cliftwalker/pen/XJaEXY
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400italic);
+blockquote{
+  font-size: 1.4em;
+  width:60%;
+  margin:50px auto;
+  font-family:Open Sans;
+  font-style:italic;
+  color: #555555;
+  padding:1.2em 30px 1.2em 75px;
+  border-left:8px solid $accent ;
+  line-height:1.6;
+  position: relative;
+  background:#EDEDED;
+}
+
+blockquote::before{
+  font-family:Arial;
+  content: "\201C";
+  color: $accent;
+  font-size:4em;
+  position: absolute;
+  left: 10px;
+  top:-10px;
+}
+
+blockquote::after{
+  content: '';
+}
+
+blockquote span{
+  display:block;
+  color:#333333;
+  font-style: normal;
+  font-weight: bold;
+  margin-top:1em;
+}
+
+@media screen and (max-width: $mobile-cutoff-width) {
+
+  .hero-title {
+    font-size: 40px;
+  }
+}
+

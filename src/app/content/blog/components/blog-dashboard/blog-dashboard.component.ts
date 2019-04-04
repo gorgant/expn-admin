@@ -36,6 +36,10 @@ export class BlogDashboardComponent implements OnInit {
     this.router.navigate([AppRoutes.BLOG_EDIT_POST, postId]);
   }
 
+  onPreviewBlogItem(postId) {
+    this.router.navigate([AppRoutes.BLOG_PREVIEW_POST, postId]);
+  }
+
   onDelete(id: string) {
     const dialogConfig = new MatDialogConfig();
 

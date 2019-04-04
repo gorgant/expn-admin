@@ -31,7 +31,7 @@ enum PostImageType {
   INLINE = 'inline-image'
 }
 
-const heroImageSizes = [ 500, 1000, 1500 ]
+const heroImageSizes = [ 500, 1500, 2000 ]
 const inlineImageSizes = [ 300, 500 ]
 const bucketName = 'explearning-admin-blog';
 

@@ -1,0 +1,38 @@
+<!-- <div class="blog-container" *ngIf="(postData$ | async) as post" fxLayout="column" fxLayoutAlign="center center">
+  <div class="hero-image-container">
+    <img [src]="post.heroImageProps.src" [srcset]="post.heroImageProps.srcset" [sizes]="post.heroImageProps.sizes" [width]="post.heroImageProps.width" [alt]="post.title">
+  </div>
+  <div class="text-container" fxLayout="column" fxLayoutAlign="center center">
+    <div class="title">{{ post.title }}</div>
+    <div class="post-body" [innerHTML]="sanitizedPostBody"></div>
+  </div>
+</div> -->
+
+
+<div class="blog-container" *ngIf="(postData$ | async) as post" fxLayout="column" fxLayoutAlign="center center">
+  <div class="hero-background-image" [style.backgroundImage]="stylesObject" fxLayout="column" fxLayoutAlign="end center">
+    <!-- <div class="spacer" fxFlex="32"></div> -->
+    <div class="hero-title" fxFlex="60" fxLayoutAlign="center end">{{ post.title }}</div>
+    <div class="hero-read-more-container" fxFlex="40" fxLayout="column" fxLayoutAlign="end center">
+      <div>Read More</div>
+      <mat-icon class="hero-down-icon">keyboard_arrow_down</mat-icon>
+    </div>
+  </div>
+  <div class="text-container" fxLayout="column" fxLayoutAlign="center center">
+    <div class="post-body" [innerHTML]="sanitizedPostBody"></div>
+  </div>
+</div>
+
+
+<!-- <div class="hero-background-image" fxLayout="column" fxLayoutAlign="center center" fxLayoutAlign.gt-sm="center start">
+    <div class="hero-content-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutAlign.gt-sm="center start">
+      <div class="hero-text" fxLayout="column" fxLayoutAlign.lt-md="center center">
+        <div>Communications Coaching</div>
+        <div>& Strategies</div>
+      </div>
+      <div class="hero-button-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxLayoutGap.gt-sm="64px" >
+        <button routerLink="/services" mat-raised-button class="hero-button">Remote Coach</button>
+        <button routerLink="/services" mat-raised-button class="hero-button">Web Courses</button>
+      </div>
+    </div>
+  </div> -->

@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { BlogDashboardComponent } from '../components/blog-dashboard/blog-dashboard.component';
 import { BlogFormComponent } from '../components/blog-form/blog-form.component';
+import { BlogPreviewComponent } from '../components/blog-preview/blog-preview.component';
 
 const routes: Routes = [
   {
@@ -12,6 +13,9 @@ const routes: Routes = [
   },
   {
     path: ':id', component: BlogFormComponent
+  },
+  {
+    path: 'preview/:id', component: BlogPreviewComponent
   },
   {
     path: '',

@@ -9,7 +9,7 @@ import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model
 })
 export class SidenavComponent implements OnInit {
 
-  appRouts = AppRoutes;
+  appRoutes = AppRoutes;
 
   constructor(
     private uiService: UiService
