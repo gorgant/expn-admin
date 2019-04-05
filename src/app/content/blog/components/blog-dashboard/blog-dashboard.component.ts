@@ -8,6 +8,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
 import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
+import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 
 @Component({
   selector: 'app-blog-dashboard',
@@ -17,6 +18,8 @@ import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model
 export class BlogDashboardComponent implements OnInit {
 
   posts: Observable<Post[]>;
+
+  heroPlaceholderPath = ImagePaths.HERO_PLACEHOLDER;
 
   constructor(
     private postService: PostService,

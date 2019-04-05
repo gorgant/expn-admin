@@ -1,24 +1,31 @@
-<div class="create-post-container" fxLayout="row" fxLayoutAlign="center center">
-  <button class="create-post-button" mat-raised-button (click)="onCreatePost()">Create Post</button>
-</div>
-<div class="blog-container" fxLayoutAlign="center start" fxFill>
-  <section gdColumns="repeat(auto-fit, minmax(300px, 1fr))" gdGap="10px">
-    <mat-card *ngFor="let post of posts | async">
-      <mat-card-content (click)="onSelectBlogItem(post.id)">
-        <div *ngIf="post.heroImageProps">
-          <img [src]="post.heroImageProps.src" [srcset]="post.heroImageProps.srcset" [sizes]="post.heroImageProps.sizes" [width]="post.heroImageProps.width" [alt]="post.title">
-        </div>
-        <h2>{{ post.title }}</h2>
-        <p><small>Posted by {{ post.author }} &bull; {{ post.published['seconds'] * 1000 | date }}</small></p>
-      </mat-card-content>
-      <mat-card-actions align="end">
-        <button mat-icon-button (click)="onPreviewBlogItem(post.id)">
-          <mat-icon>remove_red_eye</mat-icon>
-        </button>
-        <button mat-icon-button (click)="onDelete(post.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </section>
+<div class="page-container">
+  <div class="create-post-container" fxLayout="row" fxLayoutAlign="center center">
+    <button class="create-post-button" mat-raised-button (click)="onCreatePost()">Create Post</button>
+  </div>
+  <div class="blog-container">
+    <div class="grid-container" gdColumns="repeat(auto-fill, minmax(300px, 1fr))" gdAlignRows="center center" gdGap="10px" fxFill>
+      <mat-card *ngFor="let post of posts | async" fxLayout="column" fxLayoutAlign="end start">
+        <mat-card-content (click)="onPreviewBlogItem(post.id)" >
+          <div *ngIf="post.heroImageProps">
+            <img [src]="post.heroImageProps.src" [srcset]="post.heroImageProps.srcset" [sizes]="post.heroImageProps.sizes" [width]="post.heroImageProps.width" [alt]="post.title">
+          </div>
+          <div *ngIf="!post.heroImageProps">
+            <img [src]="heroPlaceholderPath">
+          </div>
+          <div class="card-text">
+            <h2>{{ post.title }}</h2>
+            <p><small>Posted by {{ post.author }} &bull; {{ post.published['seconds'] * 1000 | date }}</small></p>
+          </div>
+        </mat-card-content>
+        <mat-card-actions fxLayout="row" fxLayoutAlign="end end" fxFlexAlign="end">
+          <button mat-icon-button (click)="onSelectBlogItem(post.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="onDelete(post.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
 </div>

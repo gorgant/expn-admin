@@ -1,10 +1,11 @@
-import { Component, OnInit, SecurityContext, HostBinding, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, SecurityContext, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from 'src/app/core/models/posts/post.model';
 import { PostService } from 'src/app/core/services/post.service';
 import { Observable } from 'rxjs';
-import { take, switchMap, map } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 
 @Component({
   selector: 'app-blog-preview',
@@ -16,6 +17,8 @@ export class BlogPreviewComponent implements OnInit {
 
   postId: string;
   postData$: Observable<Post>;
+
+  heroImagePlaceholder = ImagePaths.HERO_PLACEHOLDER;
 
   postTitle: string;
   sanitizedPostBody: SafeHtml;
@@ -40,9 +43,17 @@ export class BlogPreviewComponent implements OnInit {
       .pipe(take(1))
       .subscribe(post => {
         const linearGradient = 'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(9,9,121,0.006) 100%)';
-        const backgroundImageUrl = `url(${post.heroImageProps.src})`;
-        const combinedStyles = `${linearGradient}, ${backgroundImageUrl}`;
-        const safeStyles = this.sanitizer.bypassSecurityTrustStyle(`${combinedStyles}`);
+        let backgroundImageUrl: string;
+
+        // Load image otherwise load placeholder
+        if (post.heroImageProps) {
+          backgroundImageUrl = `url(${post.heroImageProps.src})`;
+        } else {
+          backgroundImageUrl = `url(${this.heroImagePlaceholder})`;
+        }
+
+        const combinedStyles = `${linearGradient}, ${backgroundImageUrl}`; // Layer in the gradient
+        const safeStyles = this.sanitizer.bypassSecurityTrustStyle(`${combinedStyles}`); // Mark string as safe
 
         this.stylesObject = safeStyles;
       });
