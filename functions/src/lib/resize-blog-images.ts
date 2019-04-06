@@ -6,9 +6,7 @@ import { tmpdir } from 'os';
 import * as sharp from 'sharp';
 import * as fs from 'fs-extra'; // Mirrors the existing filesystem methods, but uses Promises
 
-import * as admin from 'firebase-admin';
-admin.initializeApp();
-const db = admin.firestore(); // Set Firestore database
+import firestore from './../db';
 import { now } from 'moment';
 
 interface ResizeImageDataObject {
@@ -211,17 +209,17 @@ async function updateFBPost(imageData: ResizeImageDataObject): Promise<FirebaseF
 
   // Set hero sizes
   if (imageData.existingMetadata.postImageType === PostImageType.HERO) {
-    await db.collection('posts').doc(imageData.postId).update({imageSizes: heroImageSizes})
+    await firestore.collection('posts').doc(imageData.postId).update({imageSizes: heroImageSizes})
   }
 
   // Set inline sizes
   if (imageData.existingMetadata.postImageType === PostImageType.INLINE) {
-    await db.collection('posts').doc(imageData.postId).update({imageSizes: inlineImageSizes})
+    await firestore.collection('posts').doc(imageData.postId).update({imageSizes: inlineImageSizes})
   }
 
   console.log('Marking images updated')
   // Signal to database that blog images have been uploaded
-  const updateResponse = db.collection('posts').doc(imageData.postId).update({imagesUpdated: now()})
+  const updateResponse = firestore.collection('posts').doc(imageData.postId).update({imagesUpdated: now()})
 
   return updateResponse;
 }
