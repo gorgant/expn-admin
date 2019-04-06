@@ -30,6 +30,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
   uploadPercent$: Observable<number>;
   heroImageProps$: Observable<HeroImageProps>;
+  heroImageAdded: boolean; // Helps determine if post is blank
 
   public Editor = ClassicEditor;
 
@@ -125,6 +126,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
       this.initializePost();
     } else {
       this.savePost();
+      this.heroImageAdded = true;
     }
 
     // Upload file
@@ -207,6 +209,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
     this.postForm = this.fb.group({
       title: ['', Validators.required],
+      videoUrl: [''],
       content: [{value: '', disabled: false }, Validators.required]
     });
 
@@ -227,6 +230,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
         const data: Post = {
           author: appUser.displayName || appUser.id,
           authorId: appUser.id,
+          videoUrl: this.videoUrl.value,
           content: this.content.value,
           published: new Date(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
@@ -245,6 +249,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
         const data: Post = {
           author: appUser.displayName || appUser.id,
           authorId: appUser.id,
+          videoUrl: this.videoUrl.value,
           content: this.content.value,
           published: new Date(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
@@ -321,6 +326,14 @@ export class BlogFormComponent implements OnInit, OnDestroy {
       );
   }
 
+  private postIsBlank(): boolean {
+    if (this.title.value || this.videoUrl.value || this.content.value || this.heroImageAdded) {
+      return false;
+    }
+    console.log('Post is blank');
+    return true;
+  }
+
   // This handles a weird error related to lastpass form detection when pressing enter
   // From: https://github.com/KillerCodeMonkey/ngx-quill/issues/351#issuecomment-476017960
   textareaEnterPressed($event: KeyboardEvent) {
@@ -329,8 +342,13 @@ export class BlogFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.postInitialized && !this.postDiscarded) {
+    if (this.postInitialized && !this.postDiscarded && !this.postIsBlank()) {
       this.savePost();
+    }
+
+    if (this.postInitialized && this.postIsBlank() && !this.postDiscarded) {
+      console.log('Deleting blank post');
+      this.postService.deletePost(this.postId);
     }
 
     if (this.imageProcessingSubscription) {
@@ -351,6 +369,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
   }
 
   get title() { return this.postForm.get('title'); }
+  get videoUrl() { return this.postForm.get('videoUrl'); }
   get content() { return this.postForm.get('content'); }
 
 

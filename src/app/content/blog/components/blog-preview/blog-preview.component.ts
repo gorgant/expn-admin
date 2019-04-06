@@ -25,6 +25,8 @@ export class BlogPreviewComponent implements OnInit {
 
   stylesObject: {};
 
+  videoHtml: SafeHtml;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -34,10 +36,10 @@ export class BlogPreviewComponent implements OnInit {
 
   ngOnInit() {
     this.loadExistingPostData();
-    this.backgroundStyleObject();
+    this.configureBackgroundStyleObject();
   }
 
-  backgroundStyleObject() {
+  private configureBackgroundStyleObject() {
     console.log('Styles object being called');
     this.postData$
       .pipe(take(1))
@@ -74,8 +76,21 @@ export class BlogPreviewComponent implements OnInit {
     .subscribe(post => {
       if (post) {
         this.sanitizedPostBody = this.sanitizer.sanitize(SecurityContext.HTML, post.content);
+        if (post.videoUrl) {
+          console.log('Video detected, configuring url', post.videoUrl);
+          this.configureVideoUrl(post.videoUrl);
+        }
       }
-  });
+    });
+  }
+
+  private configureVideoUrl(videoUrl: string) {
+    const videoId = videoUrl.split('/').pop();
+    // tslint:disable-next-line:max-line-length
+    const embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    const safeVideoLink = this.sanitizer.bypassSecurityTrustHtml(embedHtml);
+    this.videoHtml = safeVideoLink;
+    console.log('video data loaded', this.videoHtml);
   }
 
 }

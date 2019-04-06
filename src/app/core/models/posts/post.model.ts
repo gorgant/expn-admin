@@ -11,4 +11,5 @@ export class Post {
   imagesUpdated?: Date;
   imageSizes?: number[];
   imageFilePathList?: string[];
+  videoUrl?: string;
 }
