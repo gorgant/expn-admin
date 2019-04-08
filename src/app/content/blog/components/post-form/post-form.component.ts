@@ -16,6 +16,7 @@ import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model
 import { MatDialogConfig, MatDialog } from '@angular/material';
 import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
+import { now } from 'moment';
 
 @Component({
   selector: 'app-post-form',
@@ -243,7 +244,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           authorId: appUser.id,
           videoUrl: this.videoUrl.value,
           content: this.content.value,
-          modifiedDate: new Date(),
+          modifiedDate: now(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
         };
@@ -262,7 +263,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           authorId: appUser.id,
           videoUrl: this.videoUrl.value,
           content: this.content.value,
-          modifiedDate: new Date(),
+          modifiedDate: now(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
         };

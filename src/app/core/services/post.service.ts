@@ -11,6 +11,7 @@ import { PostImageType } from '../models/posts/post-image-type.model';
 import { HeroUrlObject } from '../models/posts/hero-url-object.model';
 import { HeroImageProps } from '../models/posts/hero-image-props.model';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
+import { now } from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -66,6 +67,30 @@ export class PostService {
       .catch(error => {
         console.log('Error updating post', error);
       });
+  }
+
+  publishPost(postId: string): void {
+    this.getPostDoc(postId).update({
+      published: true,
+      publishedDate: now()
+    })
+    .catch(error => {
+      console.log('Error updating post', error);
+    });
+
+    // TODO: Submit post to frontend database
+  }
+
+  unPublishPost(postId: string): void {
+    this.getPostDoc(postId).update({
+      published: false,
+      publishedDate: null
+    })
+    .catch(error => {
+      console.log('Error updating post', error);
+    });
+
+    // TODO: Submit post to frontend database
   }
 
   generateNewPostId(): string {

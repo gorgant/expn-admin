@@ -1,7 +1,13 @@
 @import "../../../../variables";
 
+// :host {
+//   width: 100%;
+//   max-width: $max-screen-width;
+// }
+
 .page-container {
-  max-width: $max-screen-width;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .create-post-container {
@@ -14,6 +20,6 @@
 }
 
 .blog-container {
-  max-width: $max-screen-width;
+  max-width: 100%;
   padding: 16px;
 }

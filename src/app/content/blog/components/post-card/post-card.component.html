@@ -8,11 +8,12 @@
     </div>
     <div class="card-text">
       <h2>{{ post.title }}</h2>
-      <p><small>Modified by {{ post.author }} &bull; {{ post.modifiedDate['seconds'] * 1000 | date }}</small></p>
+      <p><small>Modified by {{ post.author }} &bull; {{ post.modifiedDate | date }}</small></p>
     </div>
   </mat-card-content>
   <mat-card-actions fxLayout="row">
-    <button mat-raised-button class="publish-button" color="accent">Publish</button>
+    <button *ngIf="!post.published" mat-raised-button class="publish-button" color="accent" (click)="onPublishPost(post.id)">Publish</button>
+    <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onUnPublishPost(post.id)">Un-Publish</button>
     <div class="other-actions" fxFlex fxLayoutAlign="end center">
       <button mat-icon-button class="edit-button" (click)="onSelectBlogItem(post.id)">
         <mat-icon>edit</mat-icon>

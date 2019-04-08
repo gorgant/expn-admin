@@ -5,10 +5,14 @@ import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DeleteConfirmDialogueComponent } from './components/delete-confirm-dialogue/delete-confirm-dialogue.component';
+import { PublishedPostPipe } from './pipes/published-post.pipe';
+import { UnpublishedPostPipe } from './pipes/unpublished-post.pipe';
 
 @NgModule({
   declarations: [
-    DeleteConfirmDialogueComponent
+    DeleteConfirmDialogueComponent,
+    PublishedPostPipe,
+    UnpublishedPostPipe
   ],
   imports: [
     CommonModule,
@@ -23,6 +27,8 @@ import { DeleteConfirmDialogueComponent } from './components/delete-confirm-dial
     RouterModule,
     ReactiveFormsModule,
     FlexLayoutModule,
+    PublishedPostPipe,
+    UnpublishedPostPipe
   ],
   entryComponents: [
     DeleteConfirmDialogueComponent
