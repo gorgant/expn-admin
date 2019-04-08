@@ -9,11 +9,11 @@ import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.mod
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 
 @Component({
-  selector: 'app-blog-preview',
-  templateUrl: './blog-preview.component.html',
-  styleUrls: ['./blog-preview.component.scss'],
+  selector: 'app-post-preview',
+  templateUrl: './post-preview.component.html',
+  styleUrls: ['./post-preview.component.scss'],
 })
-export class BlogPreviewComponent implements OnInit {
+export class PostPreviewComponent implements OnInit {
 
   @ViewChild('contentStartTag') ContentStartTag: ElementRef;
 

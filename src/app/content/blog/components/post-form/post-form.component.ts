@@ -18,11 +18,11 @@ import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 
 @Component({
-  selector: 'app-blog-form',
-  templateUrl: './blog-form.component.html',
-  styleUrls: ['./blog-form.component.scss']
+  selector: 'app-post-form',
+  templateUrl: './post-form.component.html',
+  styleUrls: ['./post-form.component.scss']
 })
-export class BlogFormComponent implements OnInit, OnDestroy {
+export class PostFormComponent implements OnInit, OnDestroy {
 
   appUser$: Observable<AppUser>;
 
