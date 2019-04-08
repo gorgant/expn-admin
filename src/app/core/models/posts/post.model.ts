@@ -5,7 +5,9 @@ export class Post {
   author: string;
   authorId: string;
   content: string;
-  published: Date;
+  modifiedDate: Date;
+  published?: boolean;
+  publishedDate?: Date;
   heroImageProps?: HeroImageProps;
   id?: string;
   imagesUpdated?: Date;

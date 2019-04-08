@@ -32,7 +32,7 @@ export class PostService {
     private afs: AngularFirestore,
     private storage: AngularFireStorage,
   ) {
-    this.postsCollection = this.afs.collection('posts', ref => ref.orderBy('published', 'desc'));
+    this.postsCollection = this.afs.collection('posts', ref => ref.orderBy('modifiedDate', 'desc'));
    }
 
   getPosts(): Observable<Post[]> {
@@ -61,7 +61,7 @@ export class PostService {
       });
   }
 
-  updatePost(postId: string, data): void {
+  updatePost(postId: string, data: Post): void {
     this.getPostDoc(postId).update(data)
       .catch(error => {
         console.log('Error updating post', error);

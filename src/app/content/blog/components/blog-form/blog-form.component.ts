@@ -56,6 +56,9 @@ export class BlogFormComponent implements OnInit, OnDestroy {
 
   postData$: Observable<Post>;
 
+  isNewPost: boolean;
+  originalPost: Post;
+
   constructor(
     private store$: Store<RootStoreState.State>,
     private postService: PostService,
@@ -141,12 +144,12 @@ export class BlogFormComponent implements OnInit, OnDestroy {
     this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
   }
 
-  onDiscardPost() {
+  onDiscardEdits() {
     const dialogConfig = new MatDialogConfig();
 
     const deleteConfData: DeleteConfData = {
-      title: 'Discard Post',
-      body: 'Are you sure you want to permanently discard this post?'
+      title: 'Discard Edits',
+      body: 'Are you sure you want to discard your edits?'
     };
 
     dialogConfig.data = deleteConfData;
@@ -159,7 +162,11 @@ export class BlogFormComponent implements OnInit, OnDestroy {
       if (userConfirmed) {
         this.postDiscarded = true;
         this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
-        this.postService.deletePost(this.postId);
+        if (this.isNewPost) {
+          this.postService.deletePost(this.postId);
+        } else {
+          this.postService.updatePost(this.postId, this.originalPost);
+        }
       }
     });
   }
@@ -192,17 +199,21 @@ export class BlogFormComponent implements OnInit, OnDestroy {
         .subscribe(post => {
           if (post) {
             const data = {
-              content: post.content,
               title: post.title,
+              videoUrl: post.videoUrl,
+              content: post.content,
             };
             this.postForm.patchValue(data);
             this.heroImageProps$ = of(post.heroImageProps);
+            this.isNewPost = false;
+            this.originalPost = post;
           }
       });
     }
   }
 
   private configureNewPost() {
+    this.isNewPost = true;
     this.postId = this.postService.generateNewPostId();
     this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
 
@@ -232,7 +243,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
           authorId: appUser.id,
           videoUrl: this.videoUrl.value,
           content: this.content.value,
-          published: new Date(),
+          modifiedDate: new Date(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
         };
@@ -251,7 +262,7 @@ export class BlogFormComponent implements OnInit, OnDestroy {
           authorId: appUser.id,
           videoUrl: this.videoUrl.value,
           content: this.content.value,
-          published: new Date(),
+          modifiedDate: new Date(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
         };
