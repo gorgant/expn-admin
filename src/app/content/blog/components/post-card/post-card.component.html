@@ -1,0 +1,25 @@
+<mat-card fxLayout="column" fxLayoutAlign="end start">
+  <mat-card-content (click)="onPreviewBlogItem(post.id)" >
+    <div *ngIf="post.heroImageProps">
+      <img class="post-image" [src]="post.heroImageProps.src" [srcset]="post.heroImageProps.srcset" [sizes]="post.heroImageProps.sizes" [width]="post.heroImageProps.width" [alt]="post.title">
+    </div>
+    <div *ngIf="!post.heroImageProps">
+      <img class="post-image" [src]="heroPlaceholderPath">
+    </div>
+    <div class="card-text">
+      <h2>{{ post.title }}</h2>
+      <p><small>Modified by {{ post.author }} &bull; {{ post.modifiedDate['seconds'] * 1000 | date }}</small></p>
+    </div>
+  </mat-card-content>
+  <mat-card-actions fxLayout="row">
+    <button mat-raised-button class="publish-button" color="accent">Publish</button>
+    <div class="other-actions" fxFlex fxLayoutAlign="end center">
+      <button mat-icon-button class="edit-button" (click)="onSelectBlogItem(post.id)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button class="delete-button" (click)="onDelete(post.id)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </mat-card-actions>
+</mat-card>

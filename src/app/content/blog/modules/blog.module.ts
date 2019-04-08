@@ -5,12 +5,14 @@ import { BlogDashboardComponent } from '../components/blog-dashboard/blog-dashbo
 import { PostFormComponent } from '../components/post-form/post-form.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { PostPreviewComponent } from '../components/post-preview/post-preview.component';
+import { PostCardComponent } from '../components/post-card/post-card.component';
 
 @NgModule({
   declarations: [
     BlogDashboardComponent,
     PostFormComponent,
     PostPreviewComponent,
+    PostCardComponent,
   ],
   imports: [
     SharedModule,
