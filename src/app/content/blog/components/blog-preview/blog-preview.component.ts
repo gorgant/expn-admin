@@ -1,4 +1,4 @@
-import { Component, OnInit, SecurityContext, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, SecurityContext, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from 'src/app/core/models/posts/post.model';
 import { PostService } from 'src/app/core/services/post.service';
@@ -6,14 +6,18 @@ import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
+import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-blog-preview',
   templateUrl: './blog-preview.component.html',
   styleUrls: ['./blog-preview.component.scss'],
-  encapsulation: ViewEncapsulation.ShadowDom, // This allows the css styling to apply to injected html
 })
 export class BlogPreviewComponent implements OnInit {
+
+  @ViewChild('contentStartTag') ContentStartTag: ElementRef;
+
+  appRoutes = AppRoutes;
 
   postId: string;
   postData$: Observable<Post>;
@@ -27,16 +31,20 @@ export class BlogPreviewComponent implements OnInit {
 
   videoHtml: SafeHtml;
 
-
   constructor(
     private route: ActivatedRoute,
     private postService: PostService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) { }
 
   ngOnInit() {
     this.loadExistingPostData();
     this.configureBackgroundStyleObject();
+  }
+
+
+  scrollToTextStart() {
+    this.ContentStartTag.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   private configureBackgroundStyleObject() {

@@ -12,7 +12,7 @@ const routes: Routes = [
     path: 'new', component: BlogFormComponent
   },
   {
-    path: ':id', component: BlogFormComponent
+    path: 'existing/:id', component: BlogFormComponent
   },
   {
     path: 'preview/:id', component: BlogPreviewComponent

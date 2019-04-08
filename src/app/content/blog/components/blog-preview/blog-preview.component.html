@@ -1,16 +1,17 @@
-<div class="blog-container" *ngIf="(postData$ | async) as post" fxLayout="column" fxLayoutAlign="center center">
-  <div class="hero-background-image" [style.backgroundImage]="stylesObject" fxLayout="column" fxLayoutAlign="end center">
-    <!-- <div class="spacer" fxFlex="32"></div> -->
+<div class="blog-container" fxLayout="column" fxLayoutAlign="center center">
+  <div *ngIf="(postData$ | async) as post"  class="hero-background-image" [style.backgroundImage]="stylesObject" fxLayout="column" fxLayoutAlign="end center">
     <div class="hero-title" fxFlex="60" fxLayoutAlign="center end">{{ post.title }}</div>
     <div class="hero-read-more-container" fxFlex="40" fxLayout="column" fxLayoutAlign="end center">
-      <div>Read More</div>
+      <div (click)=scrollToTextStart()>Read More</div>
       <mat-icon class="hero-down-icon">keyboard_arrow_down</mat-icon>
     </div>
   </div>
-  <div *ngIf="videoHtml" class="video-container" fxLayout="column" fxLayoutAlign="center center">
-    <div class="video-body" [innerHTML]="videoHtml"></div>
-  </div>
-  <div class="text-container" fxLayout="column" fxLayoutAlign="center center">
-    <div class="post-body" [innerHTML]="sanitizedPostBody"></div>
+  <div #contentStartTag>
+    <div *ngIf="videoHtml" class="video-container" fxLayout="column" fxLayoutAlign="center center">
+      <div class="video-body" [innerHTML]="videoHtml"></div>
+    </div>
+    <div  class="text-container" fxLayout="column" fxLayoutAlign="center center">
+      <div class="post-body" [innerHTML]="sanitizedPostBody"></div>
+    </div>
   </div>
 </div>
