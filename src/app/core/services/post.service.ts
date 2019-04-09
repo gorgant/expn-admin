@@ -12,7 +12,6 @@ import { HeroUrlObject } from '../models/posts/hero-url-object.model';
 import { HeroImageProps } from '../models/posts/hero-image-props.model';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 import { now } from 'moment';
-import { AngularfirestoreAdminStoreService, AngularfirestorePublicStoreService } from './angular-firestore-extension.service';
 import { PublicService } from './public.service';
 
 @Injectable({
@@ -33,8 +32,6 @@ export class PostService {
 
   constructor(
     private afs: AngularFirestore,
-    // private afs: AngularfirestoreAdminStoreService,
-    private afsPublic: AngularfirestorePublicStoreService,
     private storage: AngularFireStorage,
     private publicService: PublicService
   ) {

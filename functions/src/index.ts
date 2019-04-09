@@ -5,3 +5,6 @@ export { resizeBlogImages };
 
 import { createAdminUser } from './lib/create-admin-user';
 export { createAdminUser };
+
+import { publishBlogPost } from './lib/publish-blog-post';
+export { publishBlogPost };

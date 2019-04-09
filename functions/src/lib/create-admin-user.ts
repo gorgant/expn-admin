@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import firestore from './../db';
+import adminFirestore from './../db';
 
 interface AppUser {
   displayName: string;
@@ -25,6 +25,6 @@ async function addUserToDb(authUser: admin.auth.UserRecord) {
     id: authUser.uid,
   }
 
-  await firestore.collection('users').doc(authUser.uid).set(appUser);
+  await adminFirestore.collection('users').doc(authUser.uid).set(appUser);
   console.log('Admin user created', appUser);
 }
