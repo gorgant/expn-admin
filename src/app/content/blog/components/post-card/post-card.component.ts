@@ -32,12 +32,12 @@ export class PostCardComponent implements OnInit {
     this.router.navigate([AppRoutes.BLOG_EDIT_POST, postId]);
   }
 
-  onPublishPost(postId) {
-    this.postService.publishPost(postId);
+  onPublishPost() {
+    this.postService.publishPost(this.post);
   }
 
-  onUnPublishPost(postId) {
-    this.postService.unPublishPost(postId);
+  onUnPublishPost() {
+    this.postService.unPublishPost(this.post.id);
   }
 
   onPreviewBlogItem(postId) {

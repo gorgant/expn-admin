@@ -12,6 +12,8 @@ import { HeroUrlObject } from '../models/posts/hero-url-object.model';
 import { HeroImageProps } from '../models/posts/hero-image-props.model';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 import { now } from 'moment';
+import { AngularfirestoreAdminStoreService, AngularfirestorePublicStoreService } from './angular-firestore-extension.service';
+import { PublicService } from './public.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +33,10 @@ export class PostService {
 
   constructor(
     private afs: AngularFirestore,
+    // private afs: AngularfirestoreAdminStoreService,
+    private afsPublic: AngularfirestorePublicStoreService,
     private storage: AngularFireStorage,
+    private publicService: PublicService
   ) {
     this.postsCollection = this.afs.collection('posts', ref => ref.orderBy('modifiedDate', 'desc'));
    }
@@ -69,16 +74,16 @@ export class PostService {
       });
   }
 
-  publishPost(postId: string): void {
-    this.getPostDoc(postId).update({
+  publishPost(post: Post): void {
+    this.getPostDoc(post.id).update({
       published: true,
       publishedDate: now()
     })
     .catch(error => {
-      console.log('Error updating post', error);
+      console.log('Error publishing post in admin', error);
     });
 
-    // TODO: Submit post to frontend database
+    this.publicService.publishPublicPost(post);
   }
 
   unPublishPost(postId: string): void {
