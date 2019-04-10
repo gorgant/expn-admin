@@ -14,7 +14,7 @@
   <mat-card-actions fxLayout="row">
     <button *ngIf="!post.published" mat-raised-button class="publish-button" color="accent" (click)="onPublishPost()">Publish</button>
     <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onUnPublishPost()">Un-Publish</button>
-    <div class="other-actions" fxFlex fxLayoutAlign="end center">
+    <div *ngIf="!post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
       <button mat-icon-button class="edit-button" (click)="onSelectBlogItem(post.id)">
         <mat-icon>edit</mat-icon>
       </button>

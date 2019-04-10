@@ -6,7 +6,7 @@
   <mat-tab-group *ngIf="posts | async as loadedPosts" mat-stretch-tabs>
     <mat-tab label="Drafts" >
       <div class="blog-container">
-        <div class="grid-container" gdColumns="repeat(auto-fill, minmax(300px, 1fr))" gdAlignRows="center center" gdGap="10px" fxFill>
+        <div class="grid-container" gdColumns="repeat(auto-fill, minmax(300px, 1fr))" gdAlignRows="center center" gdGap="10px">
           <app-post-card *ngFor="let post of loadedPosts | unpublishedPostFilter" [post]="post" fxLayout="column"></app-post-card>
         </div>
       </div>

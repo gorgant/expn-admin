@@ -34,10 +34,11 @@ export class PostCardComponent implements OnInit {
 
   onPublishPost() {
     this.postService.publishPost(this.post);
+    console.log('Published this post', this.post);
   }
 
   onUnPublishPost() {
-    this.postService.unPublishPost(this.post.id);
+    this.postService.unPublishPost(this.post);
   }
 
   onPreviewBlogItem(postId) {

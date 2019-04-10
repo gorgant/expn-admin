@@ -72,27 +72,33 @@ export class PostService {
   }
 
   publishPost(post: Post): void {
-    this.getPostDoc(post.id).update({
+    const publishedPost: Post = {
+      ...post,
       published: true,
-      publishedDate: now()
-    })
-    .catch(error => {
-      console.log('Error publishing post in admin', error);
-    });
+      publishedDate: post.publishedDate ? post.publishedDate : now() // Only add publish date if doesn't already exist
+    };
 
-    this.publicService.publishPublicPost(post);
+    this.getPostDoc(post.id).update(publishedPost)
+      .catch(error => {
+        console.log('Error publishing post in admin', error);
+      });
+
+    this.publicService.updatePublicPost(publishedPost); // Will publish post on public server (because published = true)
   }
 
-  unPublishPost(postId: string): void {
-    this.getPostDoc(postId).update({
+  unPublishPost(post: Post): void {
+
+    const unPublishedPost: Post = {
+      ...post,
       published: false,
-      publishedDate: null
-    })
+    };
+
+    this.getPostDoc(post.id).update(unPublishedPost)
     .catch(error => {
       console.log('Error updating post', error);
     });
 
-    // TODO: Submit post to frontend database
+    this.publicService.updatePublicPost(unPublishedPost); // Will delete post on public server (because published = false)
   }
 
   generateNewPostId(): string {

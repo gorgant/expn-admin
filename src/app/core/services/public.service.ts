@@ -14,13 +14,13 @@ export class PublicService {
     private fns: AngularFireFunctions
   ) { }
 
-  // Submit http request to cloud functions to publish post
-  publishPublicPost(post: Post): void {
+  // Submit http request to cloud functions to publish or unpublish post
+  updatePublicPost(post: Post): void {
     const callable = this.fns.httpsCallable('publishBlogPost');
     callable(post)
       .pipe(
         take(1),
-        tap(response => console.log('Post published', response)),
+        tap(response => console.log('Public post updated', response)),
         catchError(error => {
           console.log('Error publishing post', error);
           return throwError(error);
