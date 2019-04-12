@@ -79,11 +79,14 @@ export class PostService {
     };
 
     this.getPostDoc(post.id).update(publishedPost)
+      .then(res => {
+        // If the local update is successful, update on other server
+        this.publicService.updatePublicPost(publishedPost); // Will publish post on public server (because published = true)
+      })
       .catch(error => {
         console.log('Error publishing post in admin', error);
       });
 
-    this.publicService.updatePublicPost(publishedPost); // Will publish post on public server (because published = true)
   }
 
   unPublishPost(post: Post): void {
@@ -94,11 +97,42 @@ export class PostService {
     };
 
     this.getPostDoc(post.id).update(unPublishedPost)
-    .catch(error => {
-      console.log('Error updating post', error);
-    });
+      .then(res => {
+        // If the local update is successful, update on other server
+        this.publicService.updatePublicPost(unPublishedPost); // Will delete post on public server (because published = false)
+      })
+      .catch(error => {
+        console.log('Error updating post', error);
+      });
+  }
 
-    this.publicService.updatePublicPost(unPublishedPost); // Will delete post on public server (because published = false)
+  togglePostFeatured(post: Post): void {
+    const postDoc = this.getPostDoc(post.id);
+    let updatedPost: Post = {
+      ...post
+    };
+    if (post.featured) {
+      updatedPost = {
+        ...updatedPost,
+        featured: false
+      };
+    } else {
+      updatedPost = {
+        ...updatedPost,
+        featured: true
+      };
+    }
+
+    console.log('Toggling post featured', updatedPost);
+
+    postDoc.update(updatedPost)
+      .then(res => {
+        // If the local update is successful, update on other server
+        this.publicService.updatePublicPost(updatedPost);
+      })
+      .catch(error => {
+        console.log('Error updating post', error);
+      });
   }
 
   generateNewPostId(): string {

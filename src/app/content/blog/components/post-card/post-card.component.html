@@ -12,8 +12,16 @@
     </div>
   </mat-card-content>
   <mat-card-actions fxLayout="row">
-    <button *ngIf="!post.published" mat-raised-button class="publish-button" color="accent" (click)="onPublishPost()">Publish</button>
+    <button *ngIf="!post.published" [disabled]="!post.heroImageProps || !post.content" mat-raised-button class="publish-button" color="accent" (click)="onPublishPost()">Publish</button>
     <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onUnPublishPost()">Un-Publish</button>
+    <div *ngIf="post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
+      <button *ngIf="post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
+        <mat-icon>star</mat-icon>
+      </button>
+      <button *ngIf="!post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
+        <mat-icon>star_border</mat-icon>
+      </button>
+    </div>
     <div *ngIf="!post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
       <button mat-icon-button class="edit-button" (click)="onSelectBlogItem(post.id)">
         <mat-icon>edit</mat-icon>

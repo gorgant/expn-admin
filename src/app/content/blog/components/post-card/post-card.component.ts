@@ -41,6 +41,10 @@ export class PostCardComponent implements OnInit {
     this.postService.unPublishPost(this.post);
   }
 
+  onTogglePostFeatured() {
+    this.postService.togglePostFeatured(this.post);
+  }
+
   onPreviewBlogItem(postId) {
     this.router.navigate([AppRoutes.BLOG_PREVIEW_POST, postId]);
   }

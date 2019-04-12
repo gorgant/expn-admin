@@ -14,4 +14,5 @@ export class Post {
   imageSizes?: number[];
   imageFilePathList?: string[];
   videoUrl?: string;
+  featured?: boolean;
 }

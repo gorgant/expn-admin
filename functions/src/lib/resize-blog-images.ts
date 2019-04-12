@@ -29,8 +29,8 @@ enum PostImageType {
   INLINE = 'inline-image'
 }
 
-const heroImageSizes = [ 500, 1500, 2000 ]
-const inlineImageSizes = [ 300, 500 ]
+const heroImageSizes = [ 500 ]
+const inlineImageSizes = [ 600 ]
 const bucketName = 'explearning-admin-blog';
 
 // Courtesty of https://angularfirebase.com/lessons/image-thumbnail-resizer-cloud-function/
