@@ -16,4 +16,12 @@
     <p mat-line>Blog</p>
   </mat-list-item>
 
+  <mat-list-item 
+    routerLinkActive="active-list-item"
+    [routerLink]="appRoutes.DATA_IMPORTS"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>cloud_upload</mat-icon>
+    <p mat-line>Data Imports</p>
+  </mat-list-item>
+
 </mat-nav-list>

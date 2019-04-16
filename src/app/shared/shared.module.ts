@@ -7,6 +7,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { DeleteConfirmDialogueComponent } from './components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { PublishedPostPipe } from './pipes/published-post.pipe';
 import { UnpublishedPostPipe } from './pipes/unpublished-post.pipe';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { UnpublishedPostPipe } from './pipes/unpublished-post.pipe';
     RouterModule,
     ReactiveFormsModule,
     FlexLayoutModule,
+    HttpClientModule,
   ],
   exports: [
     CommonModule,
@@ -28,7 +30,8 @@ import { UnpublishedPostPipe } from './pipes/unpublished-post.pipe';
     ReactiveFormsModule,
     FlexLayoutModule,
     PublishedPostPipe,
-    UnpublishedPostPipe
+    UnpublishedPostPipe,
+    HttpClientModule
   ],
   entryComponents: [
     DeleteConfirmDialogueComponent
