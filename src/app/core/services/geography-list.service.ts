@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Country } from '../models/data-imports/country.model';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { map, take, tap } from 'rxjs/operators';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { UsState } from '../models/data-imports/us-state.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CountryListService {
+export class GeographyListService {
 
 
   constructor(
@@ -23,20 +24,44 @@ export class CountryListService {
       .pipe(
         map(countryList => countryList),
         tap(countryList => {
-          this.updateDataLocally(countryList);
+          this.updateCountryDataLocally(countryList);
         })
       );
 
   }
 
-  private updateDataLocally(countryList: Country[]) {
-    const countryDataDoc = this.afs.collection('publicResources').doc('countryData');
+  updateStateData(): Observable<UsState[]> {
+
+    const usStateData$ = this.fetchUsStateData(); // This is a local http call
+    return usStateData$
+      .pipe(
+        map(stateList => stateList),
+        tap(stateList => {
+          this.updateUsStateDataLocally(stateList);
+        })
+      );
+
+  }
+
+  private updateCountryDataLocally(countryList: Country[]) {
+    const countryDataDoc = this.getPublicCollection().doc('countryData');
     countryDataDoc.set({
       countryList
     }).then(res => {
       console.log('Country data updated', countryList);
     }).catch(error => {
       console.log('Error updating country data', error);
+    });
+  }
+
+  private updateUsStateDataLocally(stateList: UsState[]) {
+    const stateDataDoc = this.getPublicCollection().doc('usStateData');
+    stateDataDoc.set({
+      stateList
+    }).then(res => {
+      console.log('US state data updated', stateList);
+    }).catch(error => {
+      console.log('Error updating US state data', error);
     });
   }
 
@@ -48,6 +73,18 @@ export class CountryListService {
           const parsedContent = this.parseCSV(data);
           const countryObjectArray = this.convertToCountryObjects(parsedContent);
           return countryObjectArray;
+        })
+      );
+  }
+
+  // Data courtesy of: https://statetable.com/
+  private fetchUsStateData(): Observable<UsState[]> {
+    return this.http.get('assets/data/state-list-updated.csv', {responseType: 'text'})
+      .pipe(
+        map(data => {
+          const parsedContent = this.parseCSV(data);
+          const stateObjectArray = this.convertToStateObjects(parsedContent);
+          return stateObjectArray;
         })
       );
   }
@@ -103,6 +140,25 @@ export class CountryListService {
     });
 
     return countryObjectArray;
+  }
+
+  private convertToStateObjects(stateArray: any[]): UsState[] {
+    const objectArray: UsState[] = [];
+
+    stateArray.map(state => {
+      const countryObject: UsState = {
+        name: state[0],
+        abbr: state[1],
+        order: Number(state[2])
+      };
+      objectArray.push(countryObject);
+    });
+
+    return objectArray;
+  }
+
+  private getPublicCollection(): AngularFirestoreCollection<{}> {
+    return this.afs.collection('publicResources');
   }
 
 

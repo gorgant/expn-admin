@@ -4,7 +4,7 @@ import { catchError, tap, take } from 'rxjs/operators';
 
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { throwError } from 'rxjs';
-import { CountryListService } from './country-list.service';
+import { GeographyListService } from './geography-list.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ export class PublicService {
 
   constructor(
     private fns: AngularFireFunctions,
-    private countryListService: CountryListService
+    private geographyListService: GeographyListService
   ) { }
 
   // Submit http request to cloud functions to publish or unpublish post
@@ -32,7 +32,7 @@ export class PublicService {
 
   updateCountryList() {
     const callable = this.fns.httpsCallable('updateCountryList');
-    this.countryListService.updateCountryData()
+    this.geographyListService.updateCountryData()
       .pipe(take(1))
       .subscribe(countryList => {
         console.log('List to send to server', countryList);
@@ -42,6 +42,24 @@ export class PublicService {
             tap(response => console.log('Country list updated on public server', response)),
             catchError(error => {
               console.log('Error updating country list on public server', error);
+              return throwError(error);
+            })
+          ).subscribe();
+      });
+  }
+
+  updateUsStateList() {
+    const callable = this.fns.httpsCallable('updateUsStateList');
+    this.geographyListService.updateStateData()
+      .pipe(take(1))
+      .subscribe(stateList => {
+        console.log('List to send to server', stateList);
+        callable(stateList)
+          .pipe(
+            take(1),
+            tap(response => console.log('US state list updated on public server', response)),
+            catchError(error => {
+              console.log('Error updating US state list on public server', error);
               return throwError(error);
             })
           ).subscribe();

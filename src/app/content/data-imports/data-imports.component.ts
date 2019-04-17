@@ -19,4 +19,8 @@ export class DataImportsComponent implements OnInit {
     this.publicService.updateCountryList();
   }
 
+  onUpdateUsStateList() {
+    this.publicService.updateUsStateList();
+  }
+
 }
