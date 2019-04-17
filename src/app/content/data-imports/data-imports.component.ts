@@ -15,12 +15,8 @@ export class DataImportsComponent implements OnInit {
   ngOnInit() {
   }
 
-  onUpdateCountryList() {
-    this.publicService.updateCountryList();
-  }
-
-  onUpdateUsStateList() {
-    this.publicService.updateUsStateList();
+  onUpdateGeographicData() {
+    this.publicService.updateGeographicData();
   }
 
 }

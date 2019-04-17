@@ -8,13 +8,24 @@ interface Country {
   order: number;
 }
 
-export const updateCountryList = functions.https.onCall(async (data: Country[], context) => {
-  const outcome = await updateList(data);
+interface UsState {
+  name: string;
+  abbr: string;
+  order: number;
+}
+
+interface GeographicData {
+  countryList: Country[];
+  usStateList: UsState[];
+}
+
+export const updateGeographicData = functions.https.onCall(async (data: GeographicData, context) => {
+  const outcome = await updateGeoLists(data);
   return {outcome}
 });
 
 
-async function updateList(countryList: Country[]) {
+async function updateGeoLists(geographicData: GeographicData) {
 
   let publicApp: admin.app.App;
 
@@ -41,9 +52,9 @@ async function updateList(countryList: Country[]) {
 
   const publicFirestore = publicApp.firestore();
 
-  console.log('About to set countryList', countryList);
-  const fbRes = await publicFirestore.collection('publicResources').doc('countryData').set({countryList})
+  console.log('About to set geographic data', geographicData);
+  const fbRes = await publicFirestore.collection('publicResources').doc('geographicData').set(geographicData)
     .catch(error => console.log(error));
-    console.log('Countries updated');
+    console.log('Geographic data updated');
     return fbRes;
 }

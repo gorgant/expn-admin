@@ -30,39 +30,23 @@ export class PublicService {
       ).subscribe();
   }
 
-  updateCountryList() {
-    const callable = this.fns.httpsCallable('updateCountryList');
-    this.geographyListService.updateCountryData()
+  updateGeographicData() {
+    const geographicHttpCall = this.fns.httpsCallable('updateGeographicData');
+
+    this.geographyListService.updateGeographicData()
       .pipe(take(1))
-      .subscribe(countryList => {
-        console.log('List to send to server', countryList);
-        callable(countryList)
+      .subscribe(geographicData => {
+        console.log('Data to send to server', geographicData);
+        geographicHttpCall(geographicData)
           .pipe(
             take(1),
-            tap(response => console.log('Country list updated on public server', response)),
+            tap(response => console.log('Geographic data updated on public server', response)),
             catchError(error => {
-              console.log('Error updating country list on public server', error);
+              console.log('Error updating geographic data on public server', error);
               return throwError(error);
             })
           ).subscribe();
       });
   }
 
-  updateUsStateList() {
-    const callable = this.fns.httpsCallable('updateUsStateList');
-    this.geographyListService.updateStateData()
-      .pipe(take(1))
-      .subscribe(stateList => {
-        console.log('List to send to server', stateList);
-        callable(stateList)
-          .pipe(
-            take(1),
-            tap(response => console.log('US state list updated on public server', response)),
-            catchError(error => {
-              console.log('Error updating US state list on public server', error);
-              return throwError(error);
-            })
-          ).subscribe();
-      });
-  }
 }

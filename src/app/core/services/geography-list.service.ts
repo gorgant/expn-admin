@@ -3,8 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Country } from '../models/data-imports/country.model';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { map, tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, zip } from 'rxjs';
 import { UsState } from '../models/data-imports/us-state.model';
+import { GeographicData } from '../models/data-imports/geographic-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,51 +18,31 @@ export class GeographyListService {
     private afs: AngularFirestore,
   ) { }
 
-  updateCountryData(): Observable<Country[]> {
+  updateGeographicData(): Observable<GeographicData> {
+    const countryData$ = this.fetchCountryData();
+    const usStateData$ = this.fetchUsStateData();
 
-    const countryData$ = this.fetchCountryData(); // This is a local http call
-    return countryData$
+    return zip(countryData$, usStateData$)
       .pipe(
-        map(countryList => countryList),
-        tap(countryList => {
-          this.updateCountryDataLocally(countryList);
+        map(([countryList, usStateList]) => {
+          const geographicData: GeographicData = {
+            countryList,
+            usStateList
+          };
+          return geographicData;
+        }),
+        tap(geographicData => {
+          this.updateGeographicDataLocally(geographicData);
         })
       );
-
   }
 
-  updateStateData(): Observable<UsState[]> {
-
-    const usStateData$ = this.fetchUsStateData(); // This is a local http call
-    return usStateData$
-      .pipe(
-        map(stateList => stateList),
-        tap(stateList => {
-          this.updateUsStateDataLocally(stateList);
-        })
-      );
-
-  }
-
-  private updateCountryDataLocally(countryList: Country[]) {
-    const countryDataDoc = this.getPublicCollection().doc('countryData');
-    countryDataDoc.set({
-      countryList
-    }).then(res => {
-      console.log('Country data updated', countryList);
+  private updateGeographicDataLocally(geographicData: GeographicData) {
+    const geographicDataDoc = this.getPublicCollection().doc<GeographicData>('geographicData');
+    geographicDataDoc.set(geographicData).then(res => {
+      console.log('Geographic data updated locally', geographicData);
     }).catch(error => {
-      console.log('Error updating country data', error);
-    });
-  }
-
-  private updateUsStateDataLocally(stateList: UsState[]) {
-    const stateDataDoc = this.getPublicCollection().doc('usStateData');
-    stateDataDoc.set({
-      stateList
-    }).then(res => {
-      console.log('US state data updated', stateList);
-    }).catch(error => {
-      console.log('Error updating US state data', error);
+      console.log('Error updating local geographic data', error);
     });
   }
 
@@ -71,7 +52,7 @@ export class GeographyListService {
       .pipe(
         map(data => {
           const parsedContent = this.parseCSV(data);
-          const countryObjectArray = this.convertToCountryObjects(parsedContent);
+          const countryObjectArray = this.convertArrayToCountryObjectsArray(parsedContent);
           return countryObjectArray;
         })
       );
@@ -83,7 +64,7 @@ export class GeographyListService {
       .pipe(
         map(data => {
           const parsedContent = this.parseCSV(data);
-          const stateObjectArray = this.convertToStateObjects(parsedContent);
+          const stateObjectArray = this.convertArrayToStateObjectsArray(parsedContent);
           return stateObjectArray;
         })
       );
@@ -127,7 +108,7 @@ export class GeographyListService {
     return arr;
   }
 
-  private convertToCountryObjects(countryArray: any[]): Country[] {
+  private convertArrayToCountryObjectsArray(countryArray: any[]): Country[] {
     const countryObjectArray: Country[] = [];
 
     countryArray.map(country => {
@@ -142,7 +123,7 @@ export class GeographyListService {
     return countryObjectArray;
   }
 
-  private convertToStateObjects(stateArray: any[]): UsState[] {
+  private convertArrayToStateObjectsArray(stateArray: any[]): UsState[] {
     const objectArray: UsState[] = [];
 
     stateArray.map(state => {

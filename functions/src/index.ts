@@ -9,8 +9,5 @@ export { createAdminUser };
 import { publishBlogPost } from './lib/publish-blog-post';
 export { publishBlogPost };
 
-import { updateCountryList } from './lib/update-country-list';
-export { updateCountryList };
-
-import { updateUsStateList } from './lib/update-us-state-list';
-export { updateUsStateList };
+import { updateGeographicData } from './lib/update-geographic-data';
+export { updateGeographicData };
