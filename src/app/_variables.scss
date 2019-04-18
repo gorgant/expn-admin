@@ -24,8 +24,18 @@ $mobile-cutoff-width: 959px;
 
 $mobile-button-width: 100%;
 $desktop-button-width: 200px;
+$desktop-buy-button-width: 400px;
+$mobile-buy-button-height: 3em;
+$desktop-buy-button-height: 2em;
+
 $mobile-form-width: 100%;
 $desktop-form-width: 300px;
+$form-border-color: #EEEEEE;
+
+$text-block-font-weight: $font-weight-regular;
+$text-block-font-size: 22px;
+$text-block-mobile-font-size: 16px;
+$text-block-max-width: 670px;
 
 
 $inactive-item-opacity: 0.8;
@@ -36,6 +46,8 @@ $opacity-high: 0.87;
 $opacity-medium: 0.60;
 $opacity-light: 0.38;
 $opacity-faded: 0.3;
+$opacity-minimal: 0.1;
+
 
 // $hex-opacity-high-emphasis: DE;
 // $hex-opacity-medium-emphasis: 99;
@@ -47,4 +59,78 @@ $opacity-faded: 0.3;
 @mixin background-opacity($color, $opacity) {
     background: $color; /* The Fallback */
     background: rgba($color, $opacity);
+}
+
+@mixin collection-container-bounds {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+// Courtesty of https://stackoverflow.com/a/26634773/6572208
+@mixin line-clamp($numLines : 1, $lineHeight: 1.412) {
+    overflow: hidden;
+    text-overflow: -o-ellipsis-lastline;
+    text-overflow: ellipsis;
+    display: block;
+    /* autoprefixer: off */
+    display: -webkit-box;
+    -webkit-line-clamp: $numLines;
+    -webkit-box-orient: vertical;
+    max-height: $numLines * $lineHeight + unquote('em');
+}
+
+@mixin tooltiptext() {
+    .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -60px;
+        }
+        
+    .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: black transparent transparent transparent;
+        }
+}
+
+@mixin textBlockBullets() {
+    ul {
+        list-style: none;
+        padding: 0px;
+        margin: 1em 0;
+    }
+      
+    ul li {
+        list-style-type: none;
+        background-image: url('/assets/icons/text/bullet_icon.png');
+        background-size: 16px;
+        background-repeat: no-repeat;
+        background-position: 0px 8px;
+        padding-left: 40px;
+        margin: 1em;
+    }
+
+    @media screen and (max-width: $mobile-cutoff-width) {
+        ul li {
+            background-size: 12px;
+            background-position: 0px 6px;
+            padding-left: 30px;
+        }
+    }
 }

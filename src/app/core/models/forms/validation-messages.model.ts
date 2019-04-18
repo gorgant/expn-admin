@@ -21,3 +21,27 @@ export const resetPasswordFormValidationMessages = {
     { type: 'email', message: 'Not a valid email.'},
   ],
 };
+
+export const PRODUCT_FORM_VALIDATION_MESSAGES = {
+  name: [
+    { type: 'required', message: 'Name is required.'},
+  ],
+  price: [
+    { type: 'required', message: 'Price is required.'},
+  ],
+  imageUrl: [
+    { type: 'required', message: 'Image url is required.'},
+  ],
+  checkoutHeader: [
+    { type: 'required', message: 'Checkout header is required.'},
+  ],
+  description: [
+    { type: 'required', message: 'Description is required.'},
+  ],
+  mdBlurb: [
+    { type: 'required', message: 'Blurb is required.'},
+  ],
+  highlight: [
+    { type: 'required', message: 'Highlight cannot be blank.'},
+  ],
+};

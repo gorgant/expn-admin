@@ -84,7 +84,7 @@ export class ProductService {
     return from(fbResponse);
   }
 
-  private generateNewId(): string {
+  generateNewId(): string {
     return this.afs.createId();
   }
 

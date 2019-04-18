@@ -1,1 +1,42 @@
 @import '../../../../../variables';
+
+:host {
+  width: 100%;
+}
+
+.title {
+  margin-top: 32px;
+  margin-bottom: 32px;
+  font-size: 40px;
+}
+
+.product-form-container {
+  width: 100%;
+  max-width: 800px;
+  
+}
+
+.product-form {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+  max-width: 480px;
+}
+
+.highlights-array-container {
+  width: 100%;
+}
+
+.highlight-container {
+  width: 100%;
+  max-width: 480px;
+}
+
+.add-highlight-button {
+  width: 100%;
+  max-width: 200px;
+  text-align: center;
+}
+

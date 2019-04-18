@@ -1,3 +1,67 @@
-<p>
-  product-form works!
-</p>
+<div class="page-container" fxLayout="column" fxLayoutAlign="center center">
+  <div class="title">Product Form</div>
+  <div class="product-form-container" fxLayout="column" fxLayoutAlign="center center">
+    <form 
+      class="product-form" 
+      [formGroup]="productForm"
+      (ngSubmit)="onSave()"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      fxLayoutGap="16px"
+      >
+      <mat-form-field class="name">
+        <input matInput formControlName="name" type="text" placeholder="Product Name">
+        <mat-error *ngFor="let validation of productValidationMessages.name">
+          <mat-error *ngIf="name.hasError(validation.type) && name.invalid && (name.dirty || name.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="price">
+        <input matInput formControlName="price" type="number" placeholder="Product Price">
+        <mat-error *ngFor="let validation of productValidationMessages.price">
+          <mat-error *ngIf="price.hasError(validation.type) && price.invalid && (price.dirty || price.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="imageUrl">
+        <input matInput formControlName="imageUrl" type="text" placeholder="Product ImageUrl">
+        <mat-error *ngFor="let validation of productValidationMessages.imageUrl">
+          <mat-error *ngIf="imageUrl.hasError(validation.type) && imageUrl.invalid && (imageUrl.dirty || imageUrl.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="checkoutHeader">
+        <input matInput formControlName="checkoutHeader" type="text" placeholder="Product Checkout Header">
+        <mat-error *ngFor="let validation of productValidationMessages.checkoutHeader">
+          <mat-error *ngIf="checkoutHeader.hasError(validation.type) && checkoutHeader.invalid && (checkoutHeader.dirty || checkoutHeader.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="description">
+        <textarea matInput (keydown.enter)="$event.stopPropagation()" formControlName="description" type="text" placeholder="Product Description"></textarea>
+        <mat-error *ngFor="let validation of productValidationMessages.description">
+          <mat-error *ngIf="description.hasError(validation.type) && description.invalid && (description.dirty || description.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="mdBlurb">
+        <textarea matInput (keydown.enter)="$event.stopPropagation()" formControlName="mdBlurb" type="text" placeholder="Product Blurb"></textarea>
+        <mat-error *ngFor="let validation of productValidationMessages.mdBlurb">
+          <mat-error *ngIf="mdBlurb.hasError(validation.type) && mdBlurb.invalid && (mdBlurb.dirty || mdBlurb.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <div class="highlights-array-container" fxLayout="column" fxLayoutAlign="center center">
+        <button class="add-highlight-button" mat-raised-button color="primary" type="button" (click)="onAddHighlight()">
+          <mat-icon>add</mat-icon> Add Highlight
+        </button>
+        <div class="highlight-container" formArrayName="highlights" *ngFor="let highlight of highlights.controls; let i = index;" fxLayout="row" fxLayoutAlign="center center">
+          <mat-form-field class="highlight">
+            <input matInput [formControl]="highlight" type="text" placeholder="Product Highlight">
+            <mat-error *ngFor="let validation of productValidationMessages.highlight">
+              <mat-error *ngIf="highlight.hasError(validation.type) && highlight.invalid && (highlight.dirty || highlight.touched)">{{ validation.message }}</mat-error>
+            </mat-error>
+          </mat-form-field>
+          <button *ngIf="i > 2" class="remove-highlight-button" mat-icon-button color="primary" type="button" (click)="onRemoveHighlight(i)">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </div>
+      </div>
+      <button class="save-button" mat-raised-button [disabled]="productForm.invalid" color="primary" type="submit">Save Product</button>
+    </form>
+  </div>
+</div>
