@@ -18,6 +18,14 @@
 
   <mat-list-item 
     routerLinkActive="active-list-item"
+    [routerLink]="appRoutes.PRODUCT_DASHBOARD"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>video_label</mat-icon>
+    <p mat-line>Products</p>
+  </mat-list-item>
+
+  <mat-list-item 
+    routerLinkActive="active-list-item"
     [routerLink]="appRoutes.DATA_IMPORTS"
     (click)="onToggleSideNav()">
     <mat-icon mat-list-icon>cloud_upload</mat-icon>

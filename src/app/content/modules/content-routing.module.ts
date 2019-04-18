@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { HomeComponent } from '../home/home.component';
-import { DataImportsComponent } from '../data-imports/data-imports.component';
+import { HomeComponent } from '../components/home/home.component';
+import { DataImportsComponent } from '../components/data-imports/data-imports.component';
 
 const routes: Routes = [
   {
@@ -9,7 +9,11 @@ const routes: Routes = [
   },
   {
     path: 'blog',
-    loadChildren: '../blog/modules/blog.module#BlogModule',
+    loadChildren: '../components/blog/modules/blog.module#BlogModule',
+  },
+  {
+    path: 'products',
+    loadChildren: '../components/products/modules/products.module#ProductsModule',
   },
   {
     path: 'data-imports',
