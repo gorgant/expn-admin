@@ -38,7 +38,10 @@ export class ProductService {
     return productDoc.valueChanges()
       .pipe(
         takeUntil(this.authService.unsubTrigger$),
-        map(product => product),
+        map(product => {
+          console.log('Fetched this product', product);
+          return product;
+        }),
         catchError(error => {
           this.uiService.showSnackBar(error, null, 5000);
           return throwError(error);
@@ -47,8 +50,7 @@ export class ProductService {
   }
 
   createProduct(product: Product): Observable<Product> {
-    const productId = this.generateNewId();
-    const fbResponse = this.getProductDoc(productId).set(product)
+    const fbResponse = this.getProductDoc(product.id).set(product)
       .then(empty => {
         console.log('Product created', product);
         return product;
@@ -72,10 +74,10 @@ export class ProductService {
     return from(fbResponse);
   }
 
-  deleteProduct(product: Product): Observable<Product> {
-    const fbResponse = this.getProductDoc(product.id).delete()
+  deleteProduct(productId: string): Observable<string> {
+    const fbResponse = this.getProductDoc(productId).delete()
       .then(empty => {
-        return product;
+        return productId;
       })
       .catch(error => {
         return throwError(error).toPromise();

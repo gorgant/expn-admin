@@ -1,0 +1,40 @@
+@import '../../../../../variables';
+
+.product-card {
+  padding: 32px;
+}
+
+.card-title {
+  font-size: 2em;
+  font-weight: $font-weight-medium;
+}
+
+.card-action {
+  width: 100%;
+}
+
+.card-image {
+  max-width: 250px;
+}
+
+.action-button {
+  width: $desktop-button-width;
+  font-size: 1em;
+}
+
+@include textBlockBullets();
+
+ul li {
+  background-position: 0px 3px;
+}
+
+@media screen and (max-width: $mobile-cutoff-width) {
+  .product-card {
+    pointer-events: all;
+    padding: 16px;
+  }
+
+  .action-button {
+    width: 100%;
+  }
+}

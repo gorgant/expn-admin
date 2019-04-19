@@ -7,5 +7,5 @@ export interface Product {
   description: string;
   mdBlurb: string;
   highlights: string[];
-  active: boolean;
+  active?: boolean;
 }

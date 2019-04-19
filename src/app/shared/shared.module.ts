@@ -8,12 +8,14 @@ import { DeleteConfirmDialogueComponent } from './components/delete-confirm-dial
 import { PublishedPostPipe } from './pipes/published-post.pipe';
 import { UnpublishedPostPipe } from './pipes/unpublished-post.pipe';
 import { HttpClientModule } from '@angular/common/http';
+import { MatElevationDirective } from './directives/mat-elevation.directive';
 
 @NgModule({
   declarations: [
     DeleteConfirmDialogueComponent,
     PublishedPostPipe,
-    UnpublishedPostPipe
+    UnpublishedPostPipe,
+    MatElevationDirective
   ],
   imports: [
     CommonModule,
@@ -31,7 +33,8 @@ import { HttpClientModule } from '@angular/common/http';
     FlexLayoutModule,
     PublishedPostPipe,
     UnpublishedPostPipe,
-    HttpClientModule
+    HttpClientModule,
+    MatElevationDirective
   ],
   entryComponents: [
     DeleteConfirmDialogueComponent

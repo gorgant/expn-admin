@@ -274,7 +274,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   private createAutoSaveTicker() {
     console.log('Creating autosave ticker');
-    // Set interval at 1 second
+    // Set interval at 10 seconds
     const step = 10000;
 
     this.autoSavePostSubscription = this.postService.getPostData(this.postId)

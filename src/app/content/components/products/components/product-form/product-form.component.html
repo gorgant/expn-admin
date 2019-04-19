@@ -34,13 +34,13 @@
         </mat-error>
       </mat-form-field>
       <mat-form-field class="description">
-        <textarea matInput (keydown.enter)="$event.stopPropagation()" formControlName="description" type="text" placeholder="Product Description"></textarea>
+        <textarea matInput (keydown.enter)="textareaEnterPressed($event)" formControlName="description" type="text" placeholder="Product Description"></textarea>
         <mat-error *ngFor="let validation of productValidationMessages.description">
           <mat-error *ngIf="description.hasError(validation.type) && description.invalid && (description.dirty || description.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
       <mat-form-field class="mdBlurb">
-        <textarea matInput (keydown.enter)="$event.stopPropagation()" formControlName="mdBlurb" type="text" placeholder="Product Blurb"></textarea>
+        <textarea matInput (keydown.enter)="textareaEnterPressed($event)" formControlName="mdBlurb" type="text" placeholder="Product Blurb"></textarea>
         <mat-error *ngFor="let validation of productValidationMessages.mdBlurb">
           <mat-error *ngIf="mdBlurb.hasError(validation.type) && mdBlurb.invalid && (mdBlurb.dirty || mdBlurb.touched)">{{ validation.message }}</mat-error>
         </mat-error>
@@ -61,7 +61,11 @@
           </button>
         </div>
       </div>
-      <button class="save-button" mat-raised-button [disabled]="productForm.invalid" color="primary" type="submit">Save Product</button>
+      <div class="form-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <button class="submit-button" [disabled]="productForm.invalid || !productInitialized" mat-raised-button color="accent" type="button" (click)="onSave()">Save Product</button>
+        <button *ngIf="isNewProduct" class="discard-button" [disabled]="!productInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Product</button>
+        <button *ngIf="!isNewProduct" class="discard-button" [disabled]="!productInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Edits</button>
+      </div>
     </form>
   </div>
 </div>
