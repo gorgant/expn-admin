@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { HeroImageProps } from 'src/app/core/models/posts/hero-image-props.model';
+import { ImageProps } from 'src/app/core/models/images/image-props.model';
 import { Observable, BehaviorSubject, throwError, merge, Subscription, of } from 'rxjs';
 import { PostService } from 'src/app/core/services/post.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -30,7 +30,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   postForm: FormGroup;
 
   uploadPercent$: Observable<number>;
-  heroImageProps$: Observable<HeroImageProps>;
+  heroImageProps$: Observable<ImageProps>;
   heroImageAdded: boolean; // Helps determine if post is blank
 
   public Editor = ClassicEditor;
@@ -315,7 +315,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     console.log('Auto saving post');
   }
 
-  private setUpdatedHeroImageProps(): Observable<HeroImageProps> {
+  private setUpdatedHeroImageProps(): Observable<ImageProps> {
     return this.postService.imageSizesRetrieved
       .pipe(
         take(1),

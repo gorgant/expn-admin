@@ -1,4 +1,6 @@
-<div class="products-container">
+<div class="page-container" fxLayout="column" fxLayoutAlign="center center">
   <button class="create-product-button" color="primary" mat-raised-button (click)="onCreateProduct()">Create Product</button>
-  <app-product-card *ngFor="let product of productList$ | async" [product]="product"></app-product-card>
+  <div class="products-container" >
+    <app-product-card *ngFor="let product of productList$ | async" [product]="product"></app-product-card>
+  </div>
 </div>

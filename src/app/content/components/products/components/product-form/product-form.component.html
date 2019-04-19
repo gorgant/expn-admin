@@ -1,5 +1,22 @@
 <div class="page-container" fxLayout="column" fxLayoutAlign="center center">
   <div class="title">Product Form</div>
+
+  <div class="product-image-upload-section" fxLayout="column" fxLayoutAlign="center center">
+    <div>
+      <h3>Product Image (500x200)</h3>
+    </div>
+    <div *ngIf="imageUploadProcessing$ | async">
+      <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
+    </div>
+    <div class="product-image-input" *ngIf="!(imageUploadProcessing$ | async)">
+      <input #imageInput style="display: none" type="file" accept="image/*" id="file" (change)="onUploadProductImage($event)">
+      <button mat-raised-button color="accent" (click)="imageInput.click()">Choose Thumbnail Image</button>
+    </div>
+    <div *ngIf="(imageProps$ | async) as imageData">
+      <img class="product-image-display" [src]="imageData.src" [alt]="(productData$ | async)?.name">
+    </div>
+  </div>
+
   <div class="product-form-container" fxLayout="column" fxLayoutAlign="center center">
     <form 
       class="product-form" 
@@ -21,26 +38,20 @@
           <mat-error *ngIf="price.hasError(validation.type) && price.invalid && (price.dirty || price.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
-      <mat-form-field class="imageUrl">
-        <input matInput formControlName="imageUrl" type="text" placeholder="Product ImageUrl">
-        <mat-error *ngFor="let validation of productValidationMessages.imageUrl">
-          <mat-error *ngIf="imageUrl.hasError(validation.type) && imageUrl.invalid && (imageUrl.dirty || imageUrl.touched)">{{ validation.message }}</mat-error>
-        </mat-error>
-      </mat-form-field>
       <mat-form-field class="checkoutHeader">
-        <input matInput formControlName="checkoutHeader" type="text" placeholder="Product Checkout Header">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="checkoutHeader" type="text" placeholder="Product Checkout Header"></textarea>
         <mat-error *ngFor="let validation of productValidationMessages.checkoutHeader">
           <mat-error *ngIf="checkoutHeader.hasError(validation.type) && checkoutHeader.invalid && (checkoutHeader.dirty || checkoutHeader.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
       <mat-form-field class="description">
-        <textarea matInput (keydown.enter)="textareaEnterPressed($event)" formControlName="description" type="text" placeholder="Product Description"></textarea>
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="description" type="text" placeholder="Product Description"></textarea>
         <mat-error *ngFor="let validation of productValidationMessages.description">
           <mat-error *ngIf="description.hasError(validation.type) && description.invalid && (description.dirty || description.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
       <mat-form-field class="mdBlurb">
-        <textarea matInput (keydown.enter)="textareaEnterPressed($event)" formControlName="mdBlurb" type="text" placeholder="Product Blurb"></textarea>
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="mdBlurb" type="text" placeholder="Product Blurb"></textarea>
         <mat-error *ngFor="let validation of productValidationMessages.mdBlurb">
           <mat-error *ngIf="mdBlurb.hasError(validation.type) && mdBlurb.invalid && (mdBlurb.dirty || mdBlurb.touched)">{{ validation.message }}</mat-error>
         </mat-error>
@@ -56,7 +67,7 @@
               <mat-error *ngIf="highlight.hasError(validation.type) && highlight.invalid && (highlight.dirty || highlight.touched)">{{ validation.message }}</mat-error>
             </mat-error>
           </mat-form-field>
-          <button *ngIf="i > 2" class="remove-highlight-button" mat-icon-button color="primary" type="button" (click)="onRemoveHighlight(i)">
+          <button *ngIf="i > minHighlightsLength - 1" class="remove-highlight-button" mat-icon-button color="primary" type="button" (click)="onRemoveHighlight(i)">
             <mat-icon>cancel</mat-icon>
           </button>
         </div>

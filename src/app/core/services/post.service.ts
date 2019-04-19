@@ -2,20 +2,21 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { map, take, takeUntil, catchError } from 'rxjs/operators';
 import { Observable, throwError, from, forkJoin, Subject } from 'rxjs';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { UploadMetadata } from '@angular/fire/storage/interfaces';
 import { Post } from '../models/posts/post.model';
 import { PostImage } from '../models/posts/post-image.model';
 import { PostImageMetadata } from '../models/posts/post-image-metadata.model';
-import { PostImageType } from '../models/posts/post-image-type.model';
-import { HeroUrlObject } from '../models/posts/hero-url-object.model';
-import { HeroImageProps } from '../models/posts/hero-image-props.model';
+import { ImageType } from '../models/images/image-type.model';
+import { ImageUrlObject } from '../models/images/image-url-object.model';
+import { ImageProps } from '../models/images/image-props.model';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 import { now } from 'moment';
 import { PublicService } from './public.service';
+import { CoreModule } from '../modules/core.module';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: CoreModule
 })
 export class PostService {
   postsCollection: AngularFirestoreCollection<Post>;
@@ -186,7 +187,7 @@ export class PostService {
       contentType: file.type,
       customMetadata: {
         postId,
-        postImageType: PostImageType.HERO
+        postImageType: ImageType.BLOG_HERO
       }
     };
 
@@ -219,7 +220,7 @@ export class PostService {
       });
   }
 
-  fetchHeroUrlObject(postId, imageSizes): Observable<HeroUrlObject> {
+  fetchHeroUrlObject(postId, imageSizes): Observable<ImageUrlObject> {
 
     const resizedImagesPath = `${this.imageDirectory}/resized`;
     const resizedFileNamePrefix = `${this.sanitizedFileName.fileNameNoExt}_thumb@`;
@@ -295,7 +296,7 @@ export class PostService {
     console.log('Post image data cleared');
   }
 
-  storeHeroImageProps(postId: string, heroImageProps: HeroImageProps) {
+  storeHeroImageProps(postId: string, heroImageProps: ImageProps) {
     const postDoc = this.getPostDoc(postId);
 
     postDoc.update({
@@ -306,7 +307,7 @@ export class PostService {
     console.log('Url object data stored');
   }
 
-  setHeroImageProps(urlObject: HeroUrlObject): HeroImageProps {
+  setHeroImageProps(urlObject: ImageUrlObject): ImageProps {
 
     const defaultImageKey = 'default';
 
@@ -332,7 +333,7 @@ export class PostService {
     const sizes = '100vw';
     const width = largestKey.toString();
 
-    const heroImageProps: HeroImageProps = {
+    const heroImageProps: ImageProps = {
       src,
       srcset,
       sizes,
@@ -361,7 +362,11 @@ export class PostService {
       );
   }
 
-  private insertDefaultUrl(imageUrls: {}): HeroUrlObject {
+  fetchStorageRef(imagePath: string): AngularFireStorageReference {
+    return this.storage.ref(imagePath);
+  }
+
+  private insertDefaultUrl(imageUrls: {}): ImageUrlObject {
 
     // Get the largest image size
     const keyArray = Object.keys(imageUrls);
@@ -376,7 +381,7 @@ export class PostService {
     return updatedObject;
   }
 
-  private getPostDoc(id: string): AngularFirestoreDocument<Post> {
+  getPostDoc(id: string): AngularFirestoreDocument<Post> {
     return this.afs.doc<Post>(`posts/${id}`);
   }
 

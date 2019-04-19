@@ -1,18 +1,23 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { Observable, throwError, from } from 'rxjs';
+import { Observable, throwError, from, Subject } from 'rxjs';
 import { Product } from '../models/products/product.model';
 import { AuthService } from './auth.service';
 import { takeUntil, map, catchError } from 'rxjs/operators';
 import { UiService } from './ui.service';
+import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
+import { ProductServiceModule } from '../modules/product-service.module';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: ProductServiceModule
 })
 export class ProductService {
 
+  private imageProcessing$ = new Subject<boolean>();
+
   constructor(
     private afs: AngularFirestore,
+    private storage: AngularFireStorage,
     private authService: AuthService,
     private uiService: UiService
   ) { }
@@ -86,15 +91,23 @@ export class ProductService {
     return from(fbResponse);
   }
 
+  fetchStorageRef(imagePath: string): AngularFireStorageReference {
+    return this.storage.ref(imagePath);
+  }
+
   generateNewId(): string {
     return this.afs.createId();
+  }
+
+  getImageProcessing(): Subject<boolean> {
+    return this.imageProcessing$;
   }
 
   private getProductsCollection(): AngularFirestoreCollection<Product> {
     return this.afs.collection<Product>('products');
   }
 
-  private getProductDoc(productId: string): AngularFirestoreDocument<Product> {
+  getProductDoc(productId: string): AngularFirestoreDocument<Product> {
     return this.getProductsCollection().doc<Product>(productId);
   }
 }

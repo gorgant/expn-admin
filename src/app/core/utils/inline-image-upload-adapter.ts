@@ -3,7 +3,7 @@ import { throwError } from 'rxjs';
 import { UploadMetadata } from '@angular/fire/storage/interfaces';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 import { PostImageMetadata } from '../models/posts/post-image-metadata.model';
-import { PostImageType } from '../models/posts/post-image-type.model';
+import { ImageType } from '../models/images/image-type.model';
 import { Post } from '../models/posts/post.model';
 import { FirebasePaths } from '../models/routes-and-paths/firebase-paths.model';
 
@@ -64,7 +64,7 @@ export class InlineImageUploadAdapter {
       contentType: file.type,
       customMetadata: {
         postId: this.postId,
-        postImageType: PostImageType.INLINE
+        postImageType: ImageType.BLOG_INLINE
       }
     };
 

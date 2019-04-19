@@ -147,8 +147,7 @@ async function resizeImages(imageData: ResizeImageDataObject) {
     }
 
     
-    // Currently this is configured to REPLACE origin file (rather than multiple files with unique names), meaning only final output will exist
-    // To properly store multiple sizes without replacing origin file, change desitantion 'fileName' to 'thumbName'
+    // Currently this is configured to REPLACE origin file, meaning only final output will exist
     const createMultiSizes = sizes.map(async size => {
       const thumbName = `${imageData.fileNameNoExt}_thumb@${size}.${imageData.fileExt}`;
       const thumbPath = join(imageData.workingDir, thumbName);

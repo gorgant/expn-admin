@@ -13,6 +13,7 @@ import { NavigationModule } from './navigation/modules/navigation.module';
 import { RootStoreModule } from './root-store';
 import { CoreModule } from './core/modules/core.module';
 import { SharedModule } from './shared/shared.module';
+import { ProductServiceModule } from './core/modules/product-service.module';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { SharedModule } from './shared/shared.module';
     BrowserAnimationsModule,
     CoreModule,
     SharedModule,
+    ProductServiceModule,
     AngularFireModule.initializeApp(environment.admin),
     AngularFirestoreModule,
     AngularFireAuthModule,

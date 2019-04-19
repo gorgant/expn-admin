@@ -1,4 +1,4 @@
-import { HeroImageProps } from './hero-image-props.model';
+import { ImageProps } from '../images/image-props.model';
 
 export class Post {
   title: string;
@@ -8,7 +8,7 @@ export class Post {
   modifiedDate: number;
   published?: boolean;
   publishedDate?: number;
-  heroImageProps?: HeroImageProps;
+  heroImageProps?: ImageProps;
   id?: string;
   imagesUpdated?: Date;
   imageSizes?: number[];

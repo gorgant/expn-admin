@@ -1,4 +1,4 @@
-export interface HeroImageProps {
+export interface ImageProps {
   src: string;
   srcset: string;
   sizes: string;

@@ -9,17 +9,26 @@
   font-weight: $font-weight-medium;
 }
 
-.card-action {
+.card-actions {
   width: 100%;
 }
 
-.card-image {
-  max-width: 250px;
+.user-actions {
+  width: 100%;
+}
+
+.admin-actions {
+  width: 100%;
+  pointer-events: all;
 }
 
 .action-button {
   width: $desktop-button-width;
   font-size: 1em;
+}
+
+.card-image {
+  max-width: 100%;
 }
 
 @include textBlockBullets();
@@ -32,6 +41,10 @@ ul li {
   .product-card {
     pointer-events: all;
     padding: 16px;
+  }
+
+  .card-image {
+    margin-bottom: 16px;
   }
 
   .action-button {

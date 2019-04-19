@@ -4,12 +4,15 @@ import { ProductService } from 'src/app/core/services/product.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms/validation-messages.model';
-import { Subscription, Observable, of } from 'rxjs';
+import { Subscription, Observable, of, BehaviorSubject, Subject } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
-import { take } from 'rxjs/operators';
+import { take, takeUntil, switchMap, map } from 'rxjs/operators';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
+import { ImageType } from 'src/app/core/models/images/image-type.model';
+import { ImageProps } from 'src/app/core/models/images/image-props.model';
+import { ImageService } from 'src/app/core/services/image.service';
 
 @Component({
   selector: 'app-product-form',
@@ -24,6 +27,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   productId: string;
   tempProductTitle: string;
 
+  minHighlightsLength = 3;
+
   originalProduct: Product;
 
   productValidationMessages = PRODUCT_FORM_VALIDATION_MESSAGES;
@@ -32,7 +37,11 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   productInitialized: boolean;
   productDiscarded: boolean;
 
+  imageProps$: Observable<ImageProps>;
+  imageUploadProcessing$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
   heroImageUrl$: Observable<string>;
+  altImageUploadProcessing$: Observable<boolean>;
   imageAdded: boolean;
 
   initProductTimeout: NodeJS.Timer;
@@ -40,14 +49,13 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   autoSaveTicker: NodeJS.Timer;
   autoSaveSubscription: Subscription;
 
-
-
   constructor(
     private productService: ProductService,
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private imageService: ImageService,
   ) { }
 
   ngOnInit() {
@@ -58,8 +66,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   onSave() {
     this.saveProduct();
     this.router.navigate([AppRoutes.PRODUCT_DASHBOARD]);
-    // console.log('Product form', this.productForm.value);
-    // console.log('Highlights array', this.highlightsArray);
   }
 
   onDiscardEdits() {
@@ -97,6 +103,62 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     this.highlights.removeAt(index);
   }
 
+  onUploadProductImage(event: any): void {
+    const file: File = event.target.files[0];
+
+    this.altImageUploadProcessing$ = this.imageService.getImageProcessing();
+
+    // Confirm valid file type
+    if (file.type.split('/')[0] !== 'image') {
+      return alert('only images allowed');
+    }
+
+    // Initialize product if not yet done
+    if (!this.productInitialized) {
+      this.initializeProduct();
+    } else {
+      this.saveProduct();
+      this.imageAdded = true;
+    }
+
+    // Upload file
+    this.imageService.uploadProductImage(file, this.productId, ImageType.PRODUCT);
+
+    this.imageProps$ = this.setUpdatedImageProps();
+
+    // this.productService.fetchSingleProduct(this.productId)
+    //   .pipe(takeUntil(this.imageUploadProcessing$))
+    //   .subscribe(product => {
+    //     console.log('Updated form image url with this value', product.imageUrl);
+    //     this.imageUrl.patchValue(product.imageUrl);
+    //   });
+
+  }
+
+  // This fires once image props are detected on item
+  private setUpdatedImageProps(): Observable<ImageProps> {
+    return this.imageService.imageSizesRetrieved
+      .pipe(
+        take(1),
+        switchMap(imageSizes => {
+          // Clear images sizes as they have been retrieved (so available for updates by other images)
+          console.log('Images sizes to clear', imageSizes);
+          console.log('Item to clear them on', this.productId);
+          this.imageService.clearImageSizes(this.productId, ImageType.PRODUCT);
+          console.log('Image sizes received, fetching download urls', imageSizes);
+          const urlObject$ = this.imageService.fetchImageUrlObject(this.productId, imageSizes, ImageType.PRODUCT);
+          return urlObject$;
+        }),
+        map(urlObject => {
+          const imageProps = this.imageService.setImageProps(urlObject); // Update in local memory for when post is created
+          this.imageService.storeImageProps(this.productId, ImageType.PRODUCT, imageProps, ); // Save in database pre- post creation
+          console.log('About to parse this set of ulrObjects for default url', urlObject);
+          this.imageUploadProcessing$.next(false);
+          return imageProps; // Set for instant UI update
+        })
+      );
+  }
+
   // This handles a weird error related to lastpass form detection when pressing enter
   // From: https://github.com/KillerCodeMonkey/ngx-quill/issues/351#issuecomment-476017960
   textareaEnterPressed($event: KeyboardEvent) {
@@ -123,14 +185,24 @@ export class ProductFormComponent implements OnInit, OnDestroy {
               id: product.id,
               name: product.name,
               price: product.price,
-              imageUrl: product.imageUrl,
               checkoutHeader: product.checkoutHeader,
               description: product.description,
               mdBlurb: product.mdBlurb,
               highlights: product.highlights
             };
+
+            // Add additional highlight form controls if more than min amount
+            const highlightsLength = productObject.highlights.length;
+            if (highlightsLength > this.minHighlightsLength) {
+              const numberOfControlsToAdd = highlightsLength - this.minHighlightsLength;
+              for (let i = 0; i < numberOfControlsToAdd; i++ ) {
+                this.onAddHighlight();
+              }
+            }
+
             this.productForm.patchValue(productObject);
-            this.heroImageUrl$ = of(product.imageUrl);
+            console.log('Initializing with these image props', product.imageProps);
+            this.imageProps$ = of(product.imageProps);
             this.isNewProduct = false;
             this.originalProduct = product;
           }
@@ -171,7 +243,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       id: this.productId,
       name: this.name.value ? this.name.value : this.tempProductTitle,
       price: this.price.value,
-      imageUrl: this.imageUrl.value,
       checkoutHeader: this.checkoutHeader.value,
       description: this.description.value,
       mdBlurb: this.mdBlurb.value,
@@ -185,6 +256,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private createAutoSaveTicker() {
     // Set interval at 10 seconds
     const step = 10000;
+
+
+    // TODO: FIGURE OUT WHY THIS IS FETCHING THE PRODUCT A SECOND TIME
 
     this.autoSaveSubscription = this.productService.fetchSingleProduct(this.productId)
       .subscribe(product => {
@@ -218,7 +292,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     if (
       (product.name === this.name.value || product.name === this.tempProductTitle) &&
       product.price === this.price.value &&
-      product.imageUrl === this.imageUrl.value &&
       product.checkoutHeader === this.checkoutHeader.value &&
       product.description === this.description.value &&
       product.mdBlurb === this.mdBlurb.value &&
@@ -233,7 +306,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     if (
       this.name.value ||
       this.price.value ||
-      this.imageUrl.value ||
       this.checkoutHeader.value ||
       this.description.value ||
       this.mdBlurb.value ||
@@ -245,16 +317,32 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     return true;
   }
 
+  private readyToActivate(): boolean {
+    if (
+      !this.name.value ||
+      !this.price.value ||
+      !this.checkoutHeader.value ||
+      !this.description.value ||
+      !this.mdBlurb.value ||
+      this.highlightsArrayHasBlankValue()
+    ) {
+      console.log('Post not ready to activate');
+      return false;
+    }
+    console.log('Post is ready to activate');
+    return true;
+  }
+
   private saveProduct() {
     const product: Product = {
       id: this.productId,
       name: this.name.value ? this.name.value : this.tempProductTitle,
       price: this.price.value,
-      imageUrl: this.imageUrl.value,
       checkoutHeader: this.checkoutHeader.value,
       description: this.description.value,
       mdBlurb: this.mdBlurb.value,
       highlights: this.highlights.value,
+      readyToActivate: this.readyToActivate(),
     };
     this.productService.updateProduct(product);
     console.log('Product saved', product);
@@ -284,6 +372,17 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     return isBlank;
   }
 
+  private highlightsArrayHasBlankValue(): boolean {
+    let hasBlankValue = false;
+    this.highlightsArray.map(highlight => {
+      if (!highlight) {
+        console.log('Blank highlight value detected');
+        hasBlankValue = true;
+      }
+    });
+    return hasBlankValue;
+  }
+
   private createHighlight(): FormControl {
     return this.fb.control('', Validators.required);
   }
@@ -300,7 +399,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   get id() { return this.productForm.get('id'); }
   get name() { return this.productForm.get('name'); }
   get price() { return this.productForm.get('price'); }
-  get imageUrl() { return this.productForm.get('imageUrl'); }
   get checkoutHeader() { return this.productForm.get('checkoutHeader'); }
   get description() { return this.productForm.get('description'); }
   get mdBlurb() { return this.productForm.get('mdBlurb'); }

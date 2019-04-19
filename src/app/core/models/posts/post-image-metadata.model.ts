@@ -1,10 +1,10 @@
-import { PostImageType } from './post-image-type.model';
+import { ImageType } from '../images/image-type.model';
 
 export interface PostImageMetadata {
   contentType: File['type'];
   customMetadata: {
     postId: string;
-    postImageType: PostImageType;
+    postImageType: ImageType;
     resizedImage?: boolean;
     imageSize?: number;
   };
