@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Subject, throwError, Observable, forkJoin } from 'rxjs';
+import { Subject, throwError, Observable, forkJoin, BehaviorSubject } from 'rxjs';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 import { ImageType } from '../models/images/image-type.model';
 import { ImageMetadata } from '../models/images/image-metadata.model';
-import { map, catchError, takeUntil, take, tap } from 'rxjs/operators';
+import { map, catchError, takeUntil, take, tap, switchMap } from 'rxjs/operators';
 import { UploadMetadata } from '@angular/fire/storage/interfaces';
 import { AngularFireStorageReference } from '@angular/fire/storage';
 import { PostService } from './post.service';
@@ -14,16 +14,15 @@ import { Product } from '../models/products/product.model';
 import { ImageUrlObject } from '../models/images/image-url-object.model';
 import { ImageProps } from '../models/images/image-props.model';
 import { AngularFireFunctions } from '@angular/fire/functions';
+import { ImageDirectoryData } from '../models/images/image-directory-data.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageService {
 
-  private sanitizedFileName: SanitizedFileName;
-  private imageDirectory: string;
-  private imageProcessing$ = new Subject<boolean>();
-  imageSizesRetrieved: Subject<number[]> = new Subject();
+  private imageProcessing$ = new BehaviorSubject<boolean>(false);
+  private imageSizesRetrieved: Subject<number[]> = new Subject();
 
   constructor(
     private postService: PostService,
@@ -31,15 +30,15 @@ export class ImageService {
     private fns: AngularFireFunctions,
   ) { }
 
+  getImageProcessing(): Subject<boolean> {
+    return this.imageProcessing$;
+  }
+
   uploadProductImage(file: File, itemId: string, imageType: ImageType): void {
 
     this.imageProcessing$.next(true);
-
-    this.sanitizedFileName = this.sanitizeFileName(file);
-    this.imageDirectory = `products/${itemId}/${this.sanitizedFileName.fileNameNoExt}`;
-
-    const path = `products/${itemId}/${this.sanitizedFileName.fileNameNoExt}/${this.sanitizedFileName.fullFileName}`;
-
+    const imageDirectoryData = this.setImageDirectoryData(file, itemId, imageType);
+    const path = imageDirectoryData.imagePath;
     const fileRef = this.getItemFileRef(path, imageType);
 
     const metadata: ImageMetadata = {
@@ -85,7 +84,7 @@ export class ImageService {
 
   }
 
-  getImageSizes(itemId: string, imageType: ImageType): Observable<number[]> {
+  private getImageSizes(itemId: string, imageType: ImageType): Observable<number[]> {
 
     const itemDoc = this.getItemDoc(itemId, imageType);
 
@@ -107,7 +106,49 @@ export class ImageService {
       );
   }
 
-  clearImageSizes(itemId: string, imageType: ImageType) {
+  private resizeImagesOnServer(metadata: ImageMetadata) {
+    const resizeImageHttpCall = this.fns.httpsCallable('resizeImages');
+
+    resizeImageHttpCall(metadata)
+      .pipe(
+        take(1),
+        tap(response => {
+          this.imageProcessing$.next(false);
+          console.log('Resized image url set on product', response);
+        }),
+        catchError(error => {
+          console.log('Error updating product data on server', error);
+          return throwError(error);
+        })
+      ).subscribe();
+
+  }
+
+  // This is the final core operation of image upload
+  fetchUpdatedImageProps(file: File, itemId: string, imageType: ImageType): Observable<ImageProps> {
+    return this.imageSizesRetrieved
+      .pipe(
+        take(1),
+        switchMap(imageSizes => {
+          // Clear images sizes as they have been retrieved (so available for updates by other images)
+          console.log('Images sizes to clear', imageSizes);
+          console.log('Item to clear them on', itemId);
+          this.clearImageSizes(itemId, imageType);
+          console.log('Image sizes received, fetching download urls', imageSizes);
+          const urlObject$ = this.fetchImageUrlObject(file, itemId, imageSizes, ImageType.PRODUCT);
+          return urlObject$;
+        }),
+        map(urlObject => {
+          const imageProps = this.setImageProps(urlObject); // Update in local memory for when post is created
+          this.storeImageProps(itemId, ImageType.PRODUCT, imageProps, ); // Save in database pre- post creation
+          console.log('About to parse this set of ulrObjects for default url', urlObject);
+          this.imageProcessing$.next(false); // Marks the final core operation of image upload
+          return imageProps; // Set for instant UI update
+        })
+      );
+  }
+
+  private clearImageSizes(itemId: string, imageType: ImageType) {
     const itemDoc = this.getItemDoc(itemId, imageType);
 
     itemDoc.update({
@@ -119,16 +160,17 @@ export class ImageService {
     console.log('Image data cleared');
   }
 
-  fetchImageUrlObject(itemId: string, imageSizes, imageType: ImageType): Observable<ImageUrlObject> {
+  private fetchImageUrlObject(file: File, itemId: string, imageSizes, imageType: ImageType): Observable<ImageUrlObject> {
 
-    const resizedImagesPath = `${this.imageDirectory}/resized`;
-    const resizedFileNamePrefix = `${this.sanitizedFileName.fileNameNoExt}_thumb@`;
-    const resizedFileNameExt = `.${this.sanitizedFileName.fileExt}`;
+    const imageDirectoryData = this.setImageDirectoryData(file, itemId, imageType);
 
     // Generate a set of image paths based on imageSizes
     const imagePathKeyPairs = [];
     imageSizes.map(size => {
-      const pathdict = {[size]: `${resizedImagesPath}/${resizedFileNamePrefix}${size}${resizedFileNameExt}`};
+      const pathdict = {
+        // tslint:disable-next-line:max-line-length
+        [size]: `${imageDirectoryData.resizedImagesPath}/${imageDirectoryData.resizedFileNamePrefix}${size}${imageDirectoryData.resizedFileNameExt}`
+      };
       imagePathKeyPairs.push(pathdict);
     });
     console.log('Image paths retrieved', imagePathKeyPairs);
@@ -183,6 +225,55 @@ export class ImageService {
       );
   }
 
+  // Assign image props values from url object
+  private setImageProps(urlObject: ImageUrlObject): ImageProps {
+
+    const defaultImageKey = 'default';
+
+    // Get array of valid keys (excluding default)
+    const keyArray = Object.keys(urlObject); // Generate array
+    keyArray.sort((a, b) => Number(a)  - Number(b)); // Ensure largest key is at end
+    keyArray.pop(); // Remove the default value
+
+    // Identify largest key
+    const largestKey = keyArray[keyArray.length - 1];
+
+    // Build array of srcSet attributes
+    const srcSetArray = keyArray.map(key => {
+      const url: string = urlObject[key];
+      const size: string = key;
+      const srcSetItem = `${url} ${size}w`;
+      return srcSetItem;
+    });
+
+    // Build hero image props object
+    const src: string = urlObject[defaultImageKey];
+    const srcset = srcSetArray.join(', ').toString();
+    const sizes = '100vw';
+    const width = largestKey.toString();
+
+    const heroImageProps: ImageProps = {
+      src,
+      srcset,
+      sizes,
+      width
+    };
+    console.log('Hero image props', heroImageProps);
+    return heroImageProps;
+  }
+
+  // Update image props on server
+  private storeImageProps(itemId: string, imageType: ImageType, imageProps: ImageProps) {
+    const itemDoc = this.getItemDoc(itemId, imageType);
+
+    itemDoc.update({
+      imageProps
+    }).catch(error => {
+      console.log('Error updating image props', error);
+    });
+    console.log('Url object data stored');
+  }
+
   // Be sure to initiate this before inserting default url into keyPair
   private storeImagePaths(itemId, pathKeyPairArray, imageType: ImageType) {
 
@@ -232,58 +323,7 @@ export class ImageService {
     return updatedObject;
   }
 
-  // Assign image props values from url object
-  setImageProps(urlObject: ImageUrlObject): ImageProps {
-
-    const defaultImageKey = 'default';
-
-    // Get array of valid keys (excluding default)
-    const keyArray = Object.keys(urlObject); // Generate array
-    keyArray.sort((a, b) => Number(a)  - Number(b)); // Ensure largest key is at end
-    keyArray.pop(); // Remove the default value
-
-    // Identify largest key
-    const largestKey = keyArray[keyArray.length - 1];
-
-    // Build array of srcSet attributes
-    const srcSetArray = keyArray.map(key => {
-      const url: string = urlObject[key];
-      const size: string = key;
-      const srcSetItem = `${url} ${size}w`;
-      return srcSetItem;
-    });
-
-    // Build hero image props object
-    const src: string = urlObject[defaultImageKey];
-    const srcset = srcSetArray.join(', ').toString();
-    const sizes = '100vw';
-    const width = largestKey.toString();
-
-    const heroImageProps: ImageProps = {
-      src,
-      srcset,
-      sizes,
-      width
-    };
-    console.log('Hero image props', heroImageProps);
-    return heroImageProps;
-  }
-
-  // Update image props on server
-  storeImageProps(itemId: string, imageType: ImageType, imageProps: ImageProps) {
-    const itemDoc = this.getItemDoc(itemId, imageType);
-
-    itemDoc.update({
-      imageProps
-    }).catch(error => {
-      console.log('Error updating image props', error);
-    });
-    console.log('Url object data stored');
-  }
-
-  getImageProcessing(): Subject<boolean> {
-    return this.imageProcessing$;
-  }
+  // The following are helper function used in both core functions
 
   private getItemDoc(itemId: string, imageType: ImageType): AngularFirestoreDocument<Post | Product> {
     switch (imageType) {
@@ -319,21 +359,37 @@ export class ImageService {
     };
   }
 
-  private resizeImagesOnServer(metadata: ImageMetadata) {
-    const resizeImageHttpCall = this.fns.httpsCallable('resizeImages');
+  private setImageDirectoryData(file: File, itemId: string, imageType: ImageType): ImageDirectoryData {
+    const sanitizedFileName = this.sanitizeFileName(file);
+    let imagePath: string;
+    let imageDirectory: string;
+    switch (imageType) {
+      case ImageType.BLOG_HERO || ImageType.BLOG_INLINE:
+        imagePath = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        break;
+      case ImageType.PRODUCT:
+        imagePath = `products/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `products/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        break;
+      default:
+        imagePath = `products/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `products/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+    }
+    const resizedImagesPath = `${imageDirectory}/resized`;
+    const resizedFileNamePrefix = `${sanitizedFileName.fileNameNoExt}_thumb@`;
+    const resizedFileNameExt = `.${sanitizedFileName.fileExt}`;
 
-    resizeImageHttpCall(metadata)
-      .pipe(
-        take(1),
-        tap(response => {
-          this.imageProcessing$.next(false);
-          console.log('Resized image url set on product', response);
-        }),
-        catchError(error => {
-          console.log('Error updating product data on server', error);
-          return throwError(error);
-        })
-      ).subscribe();
+    const imageDirectoryData: ImageDirectoryData = {
+      imagePath,
+      imageDirectory,
+      resizedImagesPath,
+      resizedFileNamePrefix,
+      resizedFileNameExt,
+    };
+
+    return imageDirectoryData;
 
   }
+
 }

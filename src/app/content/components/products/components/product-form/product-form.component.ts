@@ -124,39 +124,13 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     // Upload file
     this.imageService.uploadProductImage(file, this.productId, ImageType.PRODUCT);
 
-    this.imageProps$ = this.setUpdatedImageProps();
-
-    // this.productService.fetchSingleProduct(this.productId)
-    //   .pipe(takeUntil(this.imageUploadProcessing$))
-    //   .subscribe(product => {
-    //     console.log('Updated form image url with this value', product.imageUrl);
-    //     this.imageUrl.patchValue(product.imageUrl);
-    //   });
+    this.imageProps$ = this.setUpdatedImageProps(file);
 
   }
 
   // This fires once image props are detected on item
-  private setUpdatedImageProps(): Observable<ImageProps> {
-    return this.imageService.imageSizesRetrieved
-      .pipe(
-        take(1),
-        switchMap(imageSizes => {
-          // Clear images sizes as they have been retrieved (so available for updates by other images)
-          console.log('Images sizes to clear', imageSizes);
-          console.log('Item to clear them on', this.productId);
-          this.imageService.clearImageSizes(this.productId, ImageType.PRODUCT);
-          console.log('Image sizes received, fetching download urls', imageSizes);
-          const urlObject$ = this.imageService.fetchImageUrlObject(this.productId, imageSizes, ImageType.PRODUCT);
-          return urlObject$;
-        }),
-        map(urlObject => {
-          const imageProps = this.imageService.setImageProps(urlObject); // Update in local memory for when post is created
-          this.imageService.storeImageProps(this.productId, ImageType.PRODUCT, imageProps, ); // Save in database pre- post creation
-          console.log('About to parse this set of ulrObjects for default url', urlObject);
-          this.imageUploadProcessing$.next(false);
-          return imageProps; // Set for instant UI update
-        })
-      );
+  private setUpdatedImageProps(file: File): Observable<ImageProps> {
+    return this.imageService.fetchUpdatedImageProps(file, this.productId, ImageType.PRODUCT);
   }
 
   // This handles a weird error related to lastpass form detection when pressing enter
