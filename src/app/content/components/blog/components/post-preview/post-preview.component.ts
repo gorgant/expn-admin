@@ -56,8 +56,8 @@ export class PostPreviewComponent implements OnInit {
         let backgroundImageUrl: string;
 
         // Load image otherwise load placeholder
-        if (post.heroImageProps) {
-          backgroundImageUrl = `url(${post.heroImageProps.src})`;
+        if (post.imageProps) {
+          backgroundImageUrl = `url(${post.imageProps.src})`;
         } else {
           backgroundImageUrl = `url(${this.heroImagePlaceholder})`;
         }
@@ -75,7 +75,7 @@ export class PostPreviewComponent implements OnInit {
     const idParam = this.route.snapshot.params[idParamName];
     if (idParam) {
       this.postId = idParam;
-      this.postData$ = this.postService.getPostData(this.postId);
+      this.postData$ = this.postService.fetchSinglePost(this.postId);
     }
 
     // If post data available, patch values into form

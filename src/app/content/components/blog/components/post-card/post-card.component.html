@@ -1,9 +1,9 @@
 <mat-card fxLayout="column" fxLayoutAlign="end start">
   <mat-card-content (click)="onPreviewBlogItem(post.id)" >
-    <div *ngIf="post.heroImageProps">
-      <img class="post-image" [src]="post.heroImageProps.src" [srcset]="post.heroImageProps.srcset" [sizes]="post.heroImageProps.sizes" [width]="post.heroImageProps.width" [alt]="post.title">
+    <div *ngIf="post.imageProps">
+      <img class="post-image" [src]="post.imageProps.src" [srcset]="post.imageProps.srcset" [sizes]="post.imageProps.sizes" [width]="post.imageProps.width" [alt]="post.title">
     </div>
-    <div *ngIf="!post.heroImageProps">
+    <div *ngIf="!post.imageProps">
       <img class="post-image" [src]="heroPlaceholderPath">
     </div>
     <div class="card-text">
@@ -12,7 +12,7 @@
     </div>
   </mat-card-content>
   <mat-card-actions fxLayout="row">
-    <button *ngIf="!post.published" [disabled]="!post.heroImageProps || !post.content" mat-raised-button class="publish-button" color="accent" (click)="onPublishPost()">Publish</button>
+    <button *ngIf="!post.published" [disabled]="!post.imageProps || !post.content" mat-raised-button class="publish-button" color="accent" (click)="onPublishPost()">Publish</button>
     <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onUnPublishPost()">Un-Publish</button>
     <div *ngIf="post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
       <button *ngIf="post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">

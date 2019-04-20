@@ -4,9 +4,9 @@ import { ProductService } from 'src/app/core/services/product.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms/validation-messages.model';
-import { Subscription, Observable, of, BehaviorSubject, Subject } from 'rxjs';
+import { Subscription, Observable, of, from } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
-import { take, takeUntil, switchMap, map } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
@@ -22,32 +22,26 @@ import { ImageService } from 'src/app/core/services/image.service';
 export class ProductFormComponent implements OnInit, OnDestroy {
 
   productData$: Observable<Product>;
+  imageProps$: Observable<ImageProps>;
+  imageUploadProcessing$: Observable<boolean>;
 
   productForm: FormGroup;
-  productId: string;
-  tempProductTitle: string;
-
   minHighlightsLength = 3;
-
-  originalProduct: Product;
-
   productValidationMessages = PRODUCT_FORM_VALIDATION_MESSAGES;
-
   isNewProduct: boolean;
-  productInitialized: boolean;
-  productDiscarded: boolean;
 
-  imageProps$: Observable<ImageProps>;
-  imageUploadProcessing$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private productId: string;
+  private tempProductTitle: string;
+  private originalProduct: Product;
+  private productInitialized: boolean;
+  private productDiscarded: boolean;
+  private imageAdded: boolean;
+  private manualSave: boolean;
 
-  heroImageUrl$: Observable<string>;
-  altImageUploadProcessing$: Observable<boolean>;
-  imageAdded: boolean;
-
-  initProductTimeout: NodeJS.Timer;
+  private initProductTimeout: NodeJS.Timer;
   // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
-  autoSaveTicker: NodeJS.Timer;
-  autoSaveSubscription: Subscription;
+  private autoSaveTicker: NodeJS.Timer;
+  private autoSaveSubscription: Subscription;
 
   constructor(
     private productService: ProductService,
@@ -55,7 +49,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: MatDialog,
     private route: ActivatedRoute,
-    private imageService: ImageService,
+    private imageService: ImageService
   ) { }
 
   ngOnInit() {
@@ -64,6 +58,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   onSave() {
+    this.manualSave = true;
     this.saveProduct();
     this.router.navigate([AppRoutes.PRODUCT_DASHBOARD]);
   }
@@ -106,31 +101,23 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   onUploadProductImage(event: any): void {
     const file: File = event.target.files[0];
 
-    this.altImageUploadProcessing$ = this.imageService.getImageProcessing();
-
     // Confirm valid file type
     if (file.type.split('/')[0] !== 'image') {
       return alert('only images allowed');
     }
+
+    this.imageUploadProcessing$ = this.imageService.getImageProcessing();
 
     // Initialize product if not yet done
     if (!this.productInitialized) {
       this.initializeProduct();
     } else {
       this.saveProduct();
-      this.imageAdded = true;
     }
 
-    // Upload file
-    this.imageService.uploadProductImage(file, this.productId, ImageType.PRODUCT);
+    // Upload file and get image props
+    this.imageProps$ = from(this.imageService.uploadImageAndGetProps(file, this.productId, ImageType.PRODUCT));
 
-    this.imageProps$ = this.setUpdatedImageProps(file);
-
-  }
-
-  // This fires once image props are detected on item
-  private setUpdatedImageProps(file: File): Observable<ImageProps> {
-    return this.imageService.fetchUpdatedImageProps(file, this.productId, ImageType.PRODUCT);
   }
 
   // This handles a weird error related to lastpass form detection when pressing enter
@@ -177,6 +164,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
             this.productForm.patchValue(productObject);
             console.log('Initializing with these image props', product.imageProps);
             this.imageProps$ = of(product.imageProps);
+            if (product.imageProps) {
+              this.imageAdded = true;
+            }
             this.isNewProduct = false;
             this.originalProduct = product;
           }
@@ -278,6 +268,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private productIsBlank(): boolean {
     if (
+      this.imageAdded ||
       this.name.value ||
       this.price.value ||
       this.checkoutHeader.value ||
@@ -293,6 +284,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private readyToActivate(): boolean {
     if (
+      !this.imageAdded ||
       !this.name.value ||
       !this.price.value ||
       !this.checkoutHeader.value ||
@@ -384,7 +376,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.productInitialized && !this.productDiscarded && !this.productIsBlank()) {
+    if (this.productInitialized && !this.productDiscarded && !this.manualSave && !this.productIsBlank()) {
       this.saveProduct();
     }
 

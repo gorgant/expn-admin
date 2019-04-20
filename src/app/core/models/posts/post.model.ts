@@ -8,7 +8,7 @@ export class Post {
   modifiedDate: number;
   published?: boolean;
   publishedDate?: number;
-  heroImageProps?: ImageProps;
+  imageProps?: ImageProps;
   id?: string;
   imagesUpdated?: Date;
   imageSizes?: number[];

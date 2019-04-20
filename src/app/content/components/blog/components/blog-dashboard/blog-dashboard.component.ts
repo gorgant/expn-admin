@@ -20,7 +20,7 @@ export class BlogDashboardComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.posts = this.postService.getPosts();
+    this.posts = this.postService.fetchAllPosts();
   }
 
   onCreatePost() {

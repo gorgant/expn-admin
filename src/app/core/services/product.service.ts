@@ -7,6 +7,8 @@ import { takeUntil, map, catchError } from 'rxjs/operators';
 import { UiService } from './ui.service';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { ProductServiceModule } from '../modules/product-service.module';
+import { ImageService } from './image.service';
+import { ImageType } from '../models/images/image-type.model';
 
 @Injectable({
   providedIn: ProductServiceModule
@@ -19,7 +21,8 @@ export class ProductService {
     private afs: AngularFirestore,
     private storage: AngularFireStorage,
     private authService: AuthService,
-    private uiService: UiService
+    private uiService: UiService,
+    private imageService: ImageService,
   ) { }
 
   fetchAllProducts(): Observable<Product[]> {
@@ -32,6 +35,7 @@ export class ProductService {
           return products;
         }),
         catchError(error => {
+          console.log('Error getting products', error);
           this.uiService.showSnackBar(error, null, 5000);
           return throwError(error);
         })
@@ -70,25 +74,29 @@ export class ProductService {
   updateProduct(product: Product): Observable<Product> {
     const fbResponse = this.getProductDoc(product.id).update(product)
       .then(empty => {
+        console.log('Product updated', product);
         return product;
       })
       .catch(error => {
+        console.log('Error updating product', error);
         return throwError(error).toPromise();
       });
 
     return from(fbResponse);
   }
 
-  deleteProduct(productId: string): Observable<string> {
+  async deleteProduct(productId: string): Promise<string> {
+    await this.imageService.deleteAllItemImages(productId, ImageType.PRODUCT); // Be sure to delete images before deleting the item doc
     const fbResponse = this.getProductDoc(productId).delete()
       .then(empty => {
+        console.log('Product deleted', productId);
         return productId;
       })
       .catch(error => {
         return throwError(error).toPromise();
       });
 
-    return from(fbResponse);
+    return fbResponse;
   }
 
   fetchStorageRef(imagePath: string): AngularFireStorageReference {

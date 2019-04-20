@@ -4,7 +4,7 @@
     <div>
       <h3>Thumbnail Image (use Youtube dimensions)</h3>
     </div>
-    <div *ngIf="heroUploadProcessing$ | async">
+    <div *ngIf="imageUploadProcessing$ | async">
       <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
     </div>
     <div class="hero-image-input" *ngIf="!(heroUploadProcessing$ | async)">
@@ -17,9 +17,6 @@
   </div>
 
   <div class="blog-content-section" fxLayout="column" fxLayoutAlign="center center">
-    <div *ngIf="inlineUploadProcessing$ | async">
-      <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
-    </div>
     <form [formGroup]="postForm" (keydown.enter)="$event.preventDefault()" fxFlexFill >
       <mat-form-field class="post-title">
         <input matInput formControlName="title" type="text" placeholder="Post Title">
@@ -32,12 +29,13 @@
       <ckeditor
         class="ck-editor-panel"
         [editor]="Editor" 
+        [disabled]="imageUploadProcessing$ | async"
         formControlName="content"
         (ready)="onEditorAdaptorPluginRdy($event)"
         (keydown.enter)="textareaEnterPressed($event)"
         ></ckeditor>
       <div class="form-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
-        <button class="submit-button" [disabled]="postForm.invalid || !postInitialized" mat-raised-button color="accent" type="button" (click)="onCreatePost()">Submit Post</button>
+        <button class="submit-button" [disabled]="postForm.invalid || !postInitialized" mat-raised-button color="accent" type="button" (click)="onSave()">Submit Post</button>
         <button *ngIf="isNewPost" class="discard-button" [disabled]="!postInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Post</button>
         <button *ngIf="!isNewPost" class="discard-button" [disabled]="!postInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Edits</button>
       </div>

@@ -5,7 +5,7 @@
     <div>
       <h3>Product Image (500x200)</h3>
     </div>
-    <div *ngIf="altImageUploadProcessing$ | async">
+    <div *ngIf="imageUploadProcessing$ | async">
       <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
     </div>
     <div class="product-image-input" *ngIf="!(altImageUploadProcessing$ | async)">

@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, PLATFORM_ID, NgZone } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -14,6 +14,11 @@ import { RootStoreModule } from './root-store';
 import { CoreModule } from './core/modules/core.module';
 import { SharedModule } from './shared/shared.module';
 import { ProductServiceModule } from './core/modules/product-service.module';
+import { PostServiceModule } from './core/modules/post-service.module';
+import {
+  AngularfirestoreAdminFunctionsService,
+  AngularfirestoreAdminFunctionsFactory
+} from './core/services/angular-firestore-extension.service';
 
 @NgModule({
   declarations: [
@@ -23,8 +28,9 @@ import { ProductServiceModule } from './core/modules/product-service.module';
     BrowserModule,
     BrowserAnimationsModule,
     CoreModule,
-    SharedModule,
     ProductServiceModule,
+    PostServiceModule,
+    SharedModule,
     AngularFireModule.initializeApp(environment.admin),
     AngularFirestoreModule,
     AngularFireAuthModule,
@@ -33,7 +39,9 @@ import { ProductServiceModule } from './core/modules/product-service.module';
     NavigationModule,
     AppRoutingModule,
   ],
-  providers: [],
+  providers: [
+    { provide: AngularfirestoreAdminFunctionsService, deps: [PLATFORM_ID, NgZone], useFactory: AngularfirestoreAdminFunctionsFactory },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

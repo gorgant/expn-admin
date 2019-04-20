@@ -1,20 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Subject, throwError, Observable, forkJoin, BehaviorSubject } from 'rxjs';
+import * as firebase from 'firebase/app';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
+import { FirebasePaths } from '../models/routes-and-paths/firebase-paths.model';
+import { throwError, BehaviorSubject, Subject } from 'rxjs';
 import { ImageType } from '../models/images/image-type.model';
+import { ImageDirectoryData } from '../models/images/image-directory-data.model';
 import { ImageMetadata } from '../models/images/image-metadata.model';
-import { map, catchError, takeUntil, take, tap, switchMap } from 'rxjs/operators';
 import { UploadMetadata } from '@angular/fire/storage/interfaces';
-import { AngularFireStorageReference } from '@angular/fire/storage';
-import { PostService } from './post.service';
-import { ProductService } from './product.service';
-import { AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Post } from '../models/posts/post.model';
 import { Product } from '../models/products/product.model';
 import { ImageUrlObject } from '../models/images/image-url-object.model';
-import { ImageProps } from '../models/images/image-props.model';
 import { AngularFireFunctions } from '@angular/fire/functions';
-import { ImageDirectoryData } from '../models/images/image-directory-data.model';
+import { take, tap, catchError } from 'rxjs/operators';
+import { ImageProps } from '../models/images/image-props.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,207 +20,37 @@ import { ImageDirectoryData } from '../models/images/image-directory-data.model'
 export class ImageService {
 
   private imageProcessing$ = new BehaviorSubject<boolean>(false);
-  private imageSizesRetrieved: Subject<number[]> = new Subject();
+
+  private blogStorageRef = firebase.app().storage(FirebasePaths.BLOG_STORAGE_FB).ref();
+  private productsStorageRef = firebase.app().storage(FirebasePaths.PRODUCTS_STORAGE_FB).ref();
+
+  private db = firebase.firestore(); // Firebase database
 
   constructor(
-    private postService: PostService,
-    private productService: ProductService,
     private fns: AngularFireFunctions,
   ) { }
+
+  // Starts the upload process.
+  async uploadImageAndGetProps(file: File, itemId: string, imageType: ImageType): Promise<ImageProps> {
+
+    this.imageProcessing$.next(true);
+
+    const imageDirectoryData = this.setImageDirectoryData(file, itemId, imageType);
+    const urlObject = await this.uploadImageAndFetchUrls(file, itemId, imageDirectoryData, imageType);
+    const imageProps = await this.getImageProps(urlObject, itemId, imageType);
+    return imageProps;
+
+  }
 
   getImageProcessing(): Subject<boolean> {
     return this.imageProcessing$;
   }
 
-  uploadProductImage(file: File, itemId: string, imageType: ImageType): void {
-
-    this.imageProcessing$.next(true);
-    const imageDirectoryData = this.setImageDirectoryData(file, itemId, imageType);
-    const path = imageDirectoryData.imagePath;
-    const fileRef = this.getItemFileRef(path, imageType);
-
-    const metadata: ImageMetadata = {
-      contentType: file.type,
-      customMetadata: {
-        imageType,
-        itemId,
-        filePath: path,
-      }
-    };
-
-    // Need to convert to unkown first to adhere to Firebase api
-    const fbFriendlyMetaData: unknown = {
-      ...metadata
-    };
-
-    // Retreive file image sizes
-    this.getImageSizes(itemId, imageType)
-    .pipe(
-      map(imageSizes => {
-        console.log('No image sizes detected');
-        if (imageSizes) {
-          // Signal arrival of image sizes
-          console.log('Image sizes retrieved, pinging subject', imageSizes);
-          this.imageSizesRetrieved.next(imageSizes);
-        }
-      }),
-      catchError(error => {
-        console.log('Error getting image sizes', error);
-        return throwError(error);
-      })
-    ).subscribe();
-
-    // Upload file to server and trigger cloud function once complete
-    fileRef.put(file, fbFriendlyMetaData as UploadMetadata)
-    .then(res => {
-      console.log('Original image uploaded, triggering cloud function resize');
-      this.resizeImagesOnServer(metadata);
-    })
-    .catch(error => {
-      console.log('Error uploading file', error);
-    });
-
-  }
-
-  private getImageSizes(itemId: string, imageType: ImageType): Observable<number[]> {
-
-    const itemDoc = this.getItemDoc(itemId, imageType);
-
-    return itemDoc.snapshotChanges()
-      .pipe(
-        takeUntil(this.imageSizesRetrieved), // Unsubscribe once data is retrieved
-        map(action => {
-          console.log('Item doc change detected');
-          const item = action.payload.data();
-          if (item && item.imagesUpdated) {
-            console.log('returning image sizes', item.imageSizes);
-            return item.imageSizes;
-          }
-        }),
-        catchError(error => {
-          console.log('Error getting image sizes', error);
-          return throwError(error);
-        })
-      );
-  }
-
-  private resizeImagesOnServer(metadata: ImageMetadata) {
-    const resizeImageHttpCall = this.fns.httpsCallable('resizeImages');
-
-    resizeImageHttpCall(metadata)
-      .pipe(
-        take(1),
-        tap(response => {
-          this.imageProcessing$.next(false);
-          console.log('Resized image url set on product', response);
-        }),
-        catchError(error => {
-          console.log('Error updating product data on server', error);
-          return throwError(error);
-        })
-      ).subscribe();
-
-  }
-
-  // This is the final core operation of image upload
-  fetchUpdatedImageProps(file: File, itemId: string, imageType: ImageType): Observable<ImageProps> {
-    return this.imageSizesRetrieved
-      .pipe(
-        take(1),
-        switchMap(imageSizes => {
-          // Clear images sizes as they have been retrieved (so available for updates by other images)
-          console.log('Images sizes to clear', imageSizes);
-          console.log('Item to clear them on', itemId);
-          this.clearImageSizes(itemId, imageType);
-          console.log('Image sizes received, fetching download urls', imageSizes);
-          const urlObject$ = this.fetchImageUrlObject(file, itemId, imageSizes, ImageType.PRODUCT);
-          return urlObject$;
-        }),
-        map(urlObject => {
-          const imageProps = this.setImageProps(urlObject); // Update in local memory for when post is created
-          this.storeImageProps(itemId, ImageType.PRODUCT, imageProps, ); // Save in database pre- post creation
-          console.log('About to parse this set of ulrObjects for default url', urlObject);
-          this.imageProcessing$.next(false); // Marks the final core operation of image upload
-          return imageProps; // Set for instant UI update
-        })
-      );
-  }
-
-  private clearImageSizes(itemId: string, imageType: ImageType) {
-    const itemDoc = this.getItemDoc(itemId, imageType);
-
-    itemDoc.update({
-      imageSizes: null,
-      imagesUpdated: null
-    }).catch(error => {
-      console.log('Error clearing images sizes', error);
-    });
-    console.log('Image data cleared');
-  }
-
-  private fetchImageUrlObject(file: File, itemId: string, imageSizes, imageType: ImageType): Observable<ImageUrlObject> {
-
-    const imageDirectoryData = this.setImageDirectoryData(file, itemId, imageType);
-
-    // Generate a set of image paths based on imageSizes
-    const imagePathKeyPairs = [];
-    imageSizes.map(size => {
-      const pathdict = {
-        // tslint:disable-next-line:max-line-length
-        [size]: `${imageDirectoryData.resizedImagesPath}/${imageDirectoryData.resizedFileNamePrefix}${size}${imageDirectoryData.resizedFileNameExt}`
-      };
-      imagePathKeyPairs.push(pathdict);
-    });
-    console.log('Image paths retrieved', imagePathKeyPairs);
-
-    this.storeImagePaths(itemId, imagePathKeyPairs, imageType);
-
-    // Collect images into object array using forkJoin
-    const urlKeyPairArray$: Observable<[]> = forkJoin(...imagePathKeyPairs.map(
-      dict => {
-        const keyArray = Object.keys(dict);
-        const key = keyArray[0];
-        const filePath = dict[key];
-        console.log('Fetching file with this path', filePath);
-
-        const fileRef = this.getItemFileRef(filePath, imageType);
-
-        const urlKeyPair = fileRef.getDownloadURL()
-          .pipe(
-            map(url => {
-              return {[key]: url};
-            }),
-            catchError(error => {
-              console.log('Error fetching download url', error);
-              return throwError(error);
-            })
-          );
-        return urlKeyPair;
-      }
-    ));
-
-    return urlKeyPairArray$
-      .pipe(
-        take(1),
-        map(keyPairArray => {
-          console.log('mapping this key-pair array', keyPairArray);
-          // Convert array to {[size] : url} object
-          const urlObject: {} = {};
-          keyPairArray.map(object => {
-            const keyArray = Object.keys(object);
-            const key = keyArray[0];
-            const url = object[key];
-            urlObject[key] = url;
-          });
-          const urlsWithDefault = this.insertDefaultUrl(urlObject);
-          console.log('Returning url object array');
-          return urlsWithDefault;
-        }),
-        catchError(error => {
-          console.log('Error mapping keyPairArray', error);
-          return throwError(error);
-        })
-      );
+  private async getImageProps(urlObject: ImageUrlObject, itemId: string, imageType: ImageType) {
+    const imageProps = this.setImageProps(urlObject); // Create an image props object
+    await this.storeImageProps(itemId, imageType, imageProps); // Store object in database
+    this.imageProcessing$.next(false); // Marks the final core operation of image upload
+    return imageProps; // Set for instant UI update
   }
 
   // Assign image props values from url object
@@ -252,30 +80,230 @@ export class ImageService {
     const sizes = '100vw';
     const width = largestKey.toString();
 
-    const heroImageProps: ImageProps = {
+    const imageProps: ImageProps = {
       src,
       srcset,
       sizes,
       width
     };
-    console.log('Hero image props', heroImageProps);
-    return heroImageProps;
+    console.log('Image props set', imageProps);
+    return imageProps;
   }
 
   // Update image props on server
-  private storeImageProps(itemId: string, imageType: ImageType, imageProps: ImageProps) {
-    const itemDoc = this.getItemDoc(itemId, imageType);
+  private async storeImageProps(itemId: string, imageType: ImageType, imageProps: ImageProps): Promise<void> {
+    const itemRef = this.getItemRef(itemId, imageType);
 
-    itemDoc.update({
+    console.log('Fetching item doc', itemId, imageType, imageProps);
+
+    const updateResponse = await itemRef.update({
       imageProps
-    }).catch(error => {
+    }).then(res => {
+      console.log('Url object data stored');
+      return res;
+    })
+    .catch(error => {
       console.log('Error updating image props', error);
+      return error;
     });
-    console.log('Url object data stored');
+
+    return updateResponse;
   }
 
-  // Be sure to initiate this before inserting default url into keyPair
-  private storeImagePaths(itemId, pathKeyPairArray, imageType: ImageType) {
+
+  private uploadImageAndFetchUrls(
+    file: File,
+    itemId: string,
+    imageDirectoryData: ImageDirectoryData,
+    imageType: ImageType
+  ): Promise<ImageUrlObject> {
+
+    const path = imageDirectoryData.imagePath;
+    const imagePathRef = this.getItemFileRef(path, imageType);
+
+    const metadata: ImageMetadata = {
+      contentType: file.type,
+      customMetadata: {
+        imageType,
+        itemId,
+        filePath: path,
+      }
+    };
+
+    // Need to convert to unkown first to adhere to Firebase api
+    const fbFriendlyMetaData: unknown = {
+      ...metadata
+    };
+
+    const uploadTask = imagePathRef.put(file, fbFriendlyMetaData as UploadMetadata);
+
+    console.log('About to commence upload', imagePathRef, file);
+
+
+    const urlObject = new Promise<ImageUrlObject> ( (resolve, reject) => {
+      uploadTask.on('state_changed', (snapshot) => {
+
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log('Upload is paused');
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log('Upload is running');
+            break;
+        }
+
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+
+
+      }, (error) => {
+        console.log('Error uploading file', error);
+        return reject(`Error uploading file: ${error}`);
+      }, async () => {
+
+        // // Generate a temporary download url (not actually used)
+        // const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL()
+        //   .catch(error => console.log(error));
+        // console.log('File temporarily available at', downloadUrl);
+
+        // Trigger cloud function to resize images
+        this.resizeImagesOnServer(metadata);
+        console.log('Triggering cloud function image reiszing', metadata);
+
+        // Wait for image resizing to complete, then fetch the sizes
+        const imageSizes = await this.fetchImageSizes(itemId, imageType);
+        console.log('Post updated, fetching download urls');
+
+        // Construct a url object using those sizes
+        const urlObj = await this.fetchDownloadUrls(imageDirectoryData, itemId, imageType, imageSizes);
+        console.log('Retrieved this url object', urlObj);
+
+        resolve(urlObj);
+      });
+    });
+
+    return urlObject;
+
+  }
+
+  private resizeImagesOnServer(metadata: ImageMetadata) {
+    const resizeImageHttpCall = this.fns.httpsCallable('resizeImages');
+
+    resizeImageHttpCall(metadata)
+      .pipe(
+        take(1),
+        tap(response => {
+          console.log('Resized image url set on item', response);
+        }),
+        catchError(error => {
+          console.log('Error updating item data on server', error);
+          return throwError(error);
+        })
+      ).subscribe();
+  }
+
+  // Listen for item update and then fetch image sizes when available
+  private fetchImageSizes(itemId: string, imageType: ImageType): Promise<number[]> {
+    console.log('About to listen for post with id', itemId);
+
+    const imageSizeArray: Promise<number[]> = new Promise((resolve, reject) => {
+
+      const itemListener = this.getItemRef(itemId, imageType)
+      .onSnapshot( async (doc) => {
+        console.log('Listening for item update. Current data: ', doc.data());
+        const docData = doc.data() as Post | Product;
+        if (docData.imagesUpdated) {
+          const imageSizes = docData.imageSizes;
+          await this.clearImageSizes(itemId, imageType);
+          resolve(imageSizes); // Signal next step in logic once resized images have been processed
+          itemListener(); // Unsubscribe
+          console.log('images updated, dbListener unsubscribed');
+        }
+      }, (error) => {
+        console.log('Error getting post snapshot', error);
+      });
+
+    });
+
+    return imageSizeArray;
+
+  }
+
+  private async fetchDownloadUrls(
+    imageDirectoryData: ImageDirectoryData,
+    itemId: string,
+    imageType: ImageType,
+    imageSizes: number[]
+  ): Promise<ImageUrlObject> {
+
+    // Generate a set of image paths based on imageSizes
+    const imagePathKeyPairs = [];
+    imageSizes.map(size => {
+      const pathdict = {
+        // tslint:disable-next-line:max-line-length
+        [size]: `${imageDirectoryData.resizedImagesPath}/${imageDirectoryData.resizedFileNamePrefix}${size}${imageDirectoryData.resizedFileNameExt}`
+      };
+      imagePathKeyPairs.push(pathdict);
+    });
+    console.log('Image paths retrieved', imagePathKeyPairs);
+
+    this.storeImagePaths(itemId, imageType, imagePathKeyPairs);
+
+    // Get download urls and map them to their size key
+    const imageUrls: Promise<ImageUrlObject> = imagePathKeyPairs.reduce(async (acc: Promise<{}>, dict) => {
+      // This collection is required to resolve the acc promise in the async
+      const collection: {} = await acc;
+
+      // Get the dict key
+      const keyArray = Object.keys(dict);
+      const key = keyArray[0];
+      const filePath = dict[key];
+
+      console.log('Fetching file with this path', filePath);
+      const url: string = await this.getItemFileRef(filePath, imageType).getDownloadURL()
+        .catch(error => console.log(error));
+      console.log('Url retreivied', url);
+      collection[key] = url;
+      return collection;
+    }, Promise.resolve([]));
+
+    const urlsNoDefault = await imageUrls;
+
+    const urlsWithDefault = this.insertDefaultUrl(urlsNoDefault);
+
+    return urlsWithDefault;
+  }
+
+  private async clearImageSizes(itemId: string, imageType: ImageType): Promise<void> {
+
+    return this.getItemRef(itemId, imageType).update(
+      {
+        imageSizes: null,
+        imagesUpdated: null,
+      }
+    ).then(res => {
+      console.log('Item image data cleared');
+    }).catch(error => {
+      console.log('Error clearning image sizes');
+    });
+  }
+
+  private insertDefaultUrl(imageUrls: ImageUrlObject): ImageUrlObject {
+
+    // Get the largest image size
+    const keyArray = Object.keys(imageUrls);
+    keyArray.sort((a, b) => Number(a)  - Number(b)); // Ensure largest key is at end
+    const largestKey = keyArray[keyArray.length - 1];
+
+    // Insert it into the object as default
+    const updatedObject: ImageUrlObject = {...imageUrls};
+    const defaultKey = 'default';
+    updatedObject[defaultKey] = imageUrls[largestKey];
+    console.log('Updated object with default added', updatedObject);
+    return updatedObject;
+  }
+
+  private async storeImagePaths(itemId: string, imageType: ImageType, pathKeyPairArray: any[]): Promise<void> {
 
     // Isolate image urls and assign paths
     const imagePaths: string[] = pathKeyPairArray.map(keyPair => {
@@ -286,63 +314,86 @@ export class ImageService {
 
     console.log('Image paths to add to item doc', imagePaths);
 
-    // Add image paths to item record
-    const itemDoc = this.getItemDoc(itemId, imageType);
-    itemDoc.valueChanges()
-      .pipe(take(1))
-      .subscribe(item => {
-        let existingList: string[] = [];
-        if (item.imageFilePathList) {
-          console.log('Existing image files detected on item');
-          existingList = existingList.concat(item.imageFilePathList);
-        }
-        const updatedList = existingList.concat(imagePaths);
-        const dedupedList = [...Array.from(new Set(updatedList))];
-        console.log('Deduped updated file list', dedupedList);
+    const itemRef = this.getItemRef(itemId, imageType);
+    const itemDoc = await itemRef.get()
+      .catch(error => {console.log('Error getting item', error); });
+    const item: Post | Product = itemDoc ? itemDoc.data() as Post | Product : null;
 
-        itemDoc.update({
-          imageFilePathList: dedupedList
+    let existingList: string[] = [];
+    if (item.imageFilePathList) {
+      console.log('Existing image files detected on item');
+      existingList = existingList.concat(item.imageFilePathList);
+    }
+    const updatedList = existingList.concat(imagePaths);
+    const dedupedList = [...Array.from(new Set(updatedList))];
+    console.log('Deduped updated file list', dedupedList);
+
+    itemRef.update({
+      imageFilePathList: dedupedList
+    });
+
+  }
+
+  async deleteAllItemImages(itemId: string, imageType: ImageType): Promise<void | void[]> {
+    const itemRef = this.getItemRef(itemId, imageType);
+    let imageCount = 0;
+
+    const itemDoc = await itemRef.get()
+      .catch(error => {console.log('Error getting item', error); });
+    const item: Post | Product = itemDoc ? itemDoc.data() as Post | Product : null;
+
+    const imagePathList = item.imageFilePathList;
+    imageCount = imagePathList ? imagePathList.length : 0;
+
+    if (imageCount === 0) {
+      console.log('No images to delete');
+      return;
+    }
+
+    const deleteAllImages = imagePathList.map(async path => {
+      const fileRef = this.getItemFileRef(path, imageType);
+      await fileRef.delete()
+        .catch(error => {
+          console.log('Error');
+          return error;
         });
-      }, (error) => {
-        console.log('Error updating imageFilePathList', error);
+      console.log('Deleted file', path);
+    });
+
+    const response = await Promise.all(deleteAllImages)
+      .catch(error => {
+        console.log('Error deleting all images', error);
       });
+
+    console.log(`All ${imageCount} images deleted`);
+    return response;
   }
 
-  private insertDefaultUrl(imageUrls: {}): ImageUrlObject {
-
-    // Get the largest image size
-    const keyArray = Object.keys(imageUrls);
-    keyArray.sort((a, b) => Number(a)  - Number(b)); // Ensure largest key is at end
-    const largestKey = keyArray[keyArray.length - 1];
-
-    // Insert it into the object as default
-    const updatedObject = {...imageUrls};
-    const defaultKey = 'default';
-    updatedObject[defaultKey] = imageUrls[largestKey];
-    console.log('Updated object with default added', updatedObject);
-    return updatedObject;
-  }
 
   // The following are helper function used in both core functions
 
-  private getItemDoc(itemId: string, imageType: ImageType): AngularFirestoreDocument<Post | Product> {
+  private getItemRef(itemId: string, imageType: ImageType): firebase.firestore.DocumentReference {
     switch (imageType) {
-      case ImageType.BLOG_HERO || ImageType.BLOG_INLINE:
-        return this.postService.getPostDoc(itemId);
+      case ImageType.BLOG_HERO:
+        return this.db.collection('posts').doc(itemId);
+      case ImageType.BLOG_INLINE:
+        return this.db.collection('posts').doc(itemId);
       case ImageType.PRODUCT:
-        return this.productService.getProductDoc(itemId);
-      default: return this.productService.getProductDoc(itemId);
+        return this.db.collection('products').doc(itemId);
+      default: return this.db.collection('products').doc(itemId);
     }
 
   }
 
-  private getItemFileRef(path: string, imageType: ImageType): AngularFireStorageReference {
+  private getItemFileRef(path: string, imageType: ImageType): firebase.storage.Reference {
     switch (imageType) {
-      case ImageType.BLOG_HERO || ImageType.BLOG_INLINE:
-        return this.postService.fetchStorageRef(path);
+      case ImageType.BLOG_HERO:
+        return this.blogStorageRef.child(path);
+      case ImageType.BLOG_INLINE:
+        return this.blogStorageRef.child(path);
       case ImageType.PRODUCT:
-        return this.productService.fetchStorageRef(path);
-      default: return this.productService.fetchStorageRef(path);
+        return this.productsStorageRef.child(path);
+      default: return this.productsStorageRef.child(path);
     }
   }
 
@@ -352,6 +403,7 @@ export class ImageService {
     // https://stackoverflow.com/a/1203361/6572208
     const fileExt = file.name.split('.').pop();
     const fullFileName = fileNameNoExt + '.' + fileExt;
+
     return {
       fileNameNoExt,
       fileExt,
@@ -364,7 +416,11 @@ export class ImageService {
     let imagePath: string;
     let imageDirectory: string;
     switch (imageType) {
-      case ImageType.BLOG_HERO || ImageType.BLOG_INLINE:
+      case ImageType.BLOG_HERO:
+        imagePath = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        break;
+      case ImageType.BLOG_INLINE:
         imagePath = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
         imageDirectory = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
@@ -391,5 +447,4 @@ export class ImageService {
     return imageDirectoryData;
 
   }
-
 }

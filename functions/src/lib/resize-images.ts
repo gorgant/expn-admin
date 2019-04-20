@@ -77,7 +77,10 @@ async function assignVariables(metadata: ImageMetadata): Promise<ResizeImageData
   
   let bucket: Bucket; // The Storage bucket that contains the file.
   switch (imageType) {
-    case ImageType.BLOG_HERO || ImageType.BLOG_INLINE:
+    case ImageType.BLOG_HERO:
+      bucket = gcs.bucket(BucketName.BLOG);
+      break;
+    case ImageType.BLOG_INLINE:
       bucket = gcs.bucket(BucketName.BLOG);
       break;
     case ImageType.PRODUCT:
@@ -93,7 +96,10 @@ async function assignVariables(metadata: ImageMetadata): Promise<ResizeImageData
   // https://stackoverflow.com/a/1203361/6572208
   const fileExt = <string>fileName.split('.').pop();
   const contentType = metadata.contentType; // File content type, used for upload of new file.
-  const existingMetadata = await bucket.file(filePath).getMetadata().then(([md, res]) => md.metadata);  // Extracts existing metadata
+  const existingMetadata = 
+    await bucket.file(filePath).getMetadata()
+      .then(([md, res]) => md.metadata)
+      .catch(error => console.log(`Error retrieving file of this type ${imageType} at this bucket ${bucket} and this filepath ${filePath}`, error));  // Extracts existing metadata
   console.log('System metadata for image', existingMetadata);
   const itemId = metadata.customMetadata.itemId;
   console.log('Item id for image', itemId);
@@ -139,7 +145,7 @@ async function resizeImgs(imageData: ResizeImageDataObject) {
   // 2. Download Source File
   await imageData.bucket.file(imageData.filePath).download({
     destination: imageData.tmpFilePath
-  });
+  }).catch(error => console.log(`Error retrieving file of this type ${imageData} at ${imageData.filePath}`, error));
   console.log('Image downloaded locally to', imageData.tmpFilePath);
 
   // 3. Resize the images and define an array of upload promises

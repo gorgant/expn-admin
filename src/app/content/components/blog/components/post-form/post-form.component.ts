@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ImageProps } from 'src/app/core/models/images/image-props.model';
-import { Observable, BehaviorSubject, throwError, merge, Subscription, of } from 'rxjs';
+import { Observable, Subscription, of, Subject, from } from 'rxjs';
 import { PostService } from 'src/app/core/services/post.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { map, catchError, take, switchMap } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
 import { Post } from 'src/app/core/models/posts/post.model';
 
@@ -17,6 +17,8 @@ import { MatDialogConfig, MatDialog } from '@angular/material';
 import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { now } from 'moment';
+import { ImageType } from 'src/app/core/models/images/image-type.model';
+import { ImageService } from 'src/app/core/services/image.service';
 
 @Component({
   selector: 'app-post-form',
@@ -26,39 +28,27 @@ import { now } from 'moment';
 export class PostFormComponent implements OnInit, OnDestroy {
 
   appUser$: Observable<AppUser>;
+  postData$: Observable<Post>;
+  heroImageProps$: Observable<ImageProps>;
+  imageUploadProcessing$: Subject<boolean>;
 
   postForm: FormGroup;
+  isNewPost: boolean;
 
-  uploadPercent$: Observable<number>;
-  heroImageProps$: Observable<ImageProps>;
-  heroImageAdded: boolean; // Helps determine if post is blank
+  private postId: string;
+  private tempPostTitle: string;
+  private originalPost: Post;
+  private postInitialized: boolean;
+  private postDiscarded: boolean;
+  private heroImageAdded: boolean; // Helps determine if post is blank
+  private manualSave: boolean;
+
+  private initPostTimeout: NodeJS.Timer;
+  // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
+  private autoSaveTicker: NodeJS.Timer;
+  private autoSavePostSubscription: Subscription;
 
   public Editor = ClassicEditor;
-
-  uploadTaskSnapshot: Observable<firebase.storage.UploadTaskSnapshot>;
-
-  postId: string;
-
-  postInitialized: boolean;
-
-  heroUploadProcessing$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  inlineUploadProcessing$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  imageProcessingSubscription: Subscription;
-
-  // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
-  autoSaveTicker: NodeJS.Timer;
-  autoSavePostSubscription: Subscription;
-
-  initPostTimeout: NodeJS.Timer;
-
-  tempPostTitle: string;
-
-  postDiscarded: boolean;
-
-  postData$: Observable<Post>;
-
-  isNewPost: boolean;
-  originalPost: Post;
 
   constructor(
     private store$: Store<RootStoreState.State>,
@@ -66,7 +56,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private imageService: ImageService
   ) { }
 
   ngOnInit() {
@@ -75,72 +66,11 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
     this.loadExistingPostData(); // Only loads if exists
 
-    this.monitorImagesProcessing(); // Used to disable text field while images are processing
-
     this.appUser$ = this.store$.select(UserStoreSelectors.selectAppUser);
   }
 
-  // Inpsired by https://stackoverflow.com/a/52549978/6572208
-  // Structured on https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
-  onEditorAdaptorPluginRdy(eventData) {
-    console.log('uploadAdapterPlugin ready');
-    eventData.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-      console.log('Plugin fired, will provide this post ID', this.postId);
-
-      this.inlineUploadProcessing$.next(true);
-
-      this.postService.getImageSizes(this.postId)
-        .pipe(
-          map(imageSizes => {
-            console.log('No image sizes detected');
-            if (imageSizes) {
-              // Signal arrival of image sizes
-              console.log('Image sizes retrieved, pinging subject', imageSizes);
-              this.inlineUploadProcessing$.next(false);
-            }
-          }),
-          catchError(error => {
-            console.log('Error getting image sizes', error);
-            return throwError(error);
-          })
-        ).subscribe();
-
-      if (!this.postInitialized) {
-        this.initializePost();
-      } else {
-        this.savePost();
-      }
-      return new InlineImageUploadAdapter(loader, this.postId);
-    };
-  }
-
-  onUploadHeroImage(event: any): void {
-
-    const file: File = event.target.files[0];
-
-    // Confirm valid file type
-    if (file.type.split('/')[0] !== 'image') {
-      return alert('only images allowed');
-    }
-
-    this.heroUploadProcessing$.next(true);
-
-    // Initialize post if not yet done
-    if (!this.postInitialized) {
-      this.initializePost();
-    } else {
-      this.savePost();
-      this.heroImageAdded = true;
-    }
-
-    // Upload file
-    this.postService.uploadHeroImage(file, this.postId);
-
-    // Set image props (on db and on this page)
-    this.heroImageProps$ = this.setUpdatedHeroImageProps();
-  }
-
-  onCreatePost() {
+  onSave() {
+    this.manualSave = true;
     this.savePost();
     this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
   }
@@ -166,23 +96,57 @@ export class PostFormComponent implements OnInit, OnDestroy {
         if (this.isNewPost) {
           this.postService.deletePost(this.postId);
         } else {
-          this.postService.updatePost(this.postId, this.originalPost);
+          this.postService.updatePost(this.originalPost);
         }
       }
     });
   }
 
-  private monitorImagesProcessing() {
-    this.imageProcessingSubscription = merge(this.heroUploadProcessing$, this.inlineUploadProcessing$)
-    .subscribe((imageProcessing) => {
-      if (imageProcessing) {
-        console.log('Image processing, disabling content');
-        this.content.disable();
+  // Inpsired by https://stackoverflow.com/a/52549978/6572208
+  // Structured on https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
+  onEditorAdaptorPluginRdy(eventData) {
+    console.log('uploadAdapterPlugin ready');
+    eventData.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+      console.log('Plugin fired, will provide this post ID', this.postId);
+
+      this.imageUploadProcessing$.next(true);
+
+      if (!this.postInitialized) {
+        this.initializePost();
       } else {
-        console.log('Image not processing, enabling content');
-        this.content.enable();
+        this.savePost();
       }
-    });
+      return new InlineImageUploadAdapter(loader, this.postId);
+    };
+  }
+
+  onUploadHeroImage(event: any): void {
+
+    const file: File = event.target.files[0];
+
+    // Confirm valid file type
+    if (file.type.split('/')[0] !== 'image') {
+      return alert('only images allowed');
+    }
+
+    this.imageUploadProcessing$ = this.imageService.getImageProcessing();
+
+    // Initialize product if not yet done
+    if (!this.postInitialized) {
+      this.initializePost();
+    } else {
+      this.savePost();
+    }
+
+    // Upload file and get image props
+    this.heroImageProps$ = from(this.imageService.uploadImageAndGetProps(file, this.postId, ImageType.BLOG_HERO));
+  }
+
+  // This handles a weird error related to lastpass form detection when pressing enter
+  // From: https://github.com/KillerCodeMonkey/ngx-quill/issues/351#issuecomment-476017960
+  textareaEnterPressed($event: KeyboardEvent) {
+    $event.preventDefault();
+    $event.stopPropagation();
   }
 
   private loadExistingPostData() {
@@ -192,7 +156,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     if (idParam) {
       this.postInitialized = true;
       this.postId = idParam;
-      this.postData$ = this.postService.getPostData(this.postId);
+      this.postData$ = this.postService.fetchSinglePost(this.postId);
 
       // If post data available, patch values into form
       this.postData$
@@ -205,7 +169,10 @@ export class PostFormComponent implements OnInit, OnDestroy {
               content: post.content,
             };
             this.postForm.patchValue(data);
-            this.heroImageProps$ = of(post.heroImageProps);
+            this.heroImageProps$ = of(post.imageProps);
+            if (post.imageProps) {
+              this.heroImageAdded = true;
+            }
             this.isNewPost = false;
             this.originalPost = post;
           }
@@ -248,7 +215,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
         };
-        this.postService.initPost(data, this.postId);
+        this.postService.createPost(data);
         this.postInitialized = true;
       });
 
@@ -258,7 +225,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     this.appUser$
       .pipe(take(1))
       .subscribe(appUser => {
-        const data: Post = {
+        const post: Post = {
           author: appUser.displayName || appUser.id,
           authorId: appUser.id,
           videoUrl: this.videoUrl.value,
@@ -267,8 +234,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
         };
-        this.postService.updatePost(this.postId, data);
-        console.log('Post data saved', data);
+        this.postService.updatePost(post);
       });
   }
 
@@ -277,7 +243,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     // Set interval at 10 seconds
     const step = 10000;
 
-    this.autoSavePostSubscription = this.postService.getPostData(this.postId)
+    this.autoSavePostSubscription = this.postService.fetchSinglePost(this.postId)
       .subscribe(post => {
         if (this.autoSaveTicker) {
           // Clear old interval
@@ -315,29 +281,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
     console.log('Auto saving post');
   }
 
-  private setUpdatedHeroImageProps(): Observable<ImageProps> {
-    return this.postService.imageSizesRetrieved
-      .pipe(
-        take(1),
-        switchMap(imageSizes => {
-          // Clear images sizes as they have been retrieved (so available for updates by other images)
-          console.log('Images sizes to clear', imageSizes);
-          console.log('Post to clear them on', this.postId);
-          this.postService.clearImageSizes(this.postId);
-          console.log('Image sizes received, fetching download urls', imageSizes);
-          const urlObject$ = this.postService.fetchHeroUrlObject(this.postId, imageSizes);
-          return urlObject$;
-        }),
-        map(urlObject => {
-          const heroImageProps = this.postService.setHeroImageProps(urlObject); // Update in local memory for when post is created
-          this.postService.storeHeroImageProps(this.postId, heroImageProps); // Save in database pre- post creation
-          console.log('About to parse this set of ulrObjects for default url', urlObject);
-          this.heroUploadProcessing$.next(false);
-          return heroImageProps; // Set for instant UI update
-        })
-      );
-  }
-
   private postIsBlank(): boolean {
     if (this.title.value || this.videoUrl.value || this.content.value || this.heroImageAdded) {
       return false;
@@ -346,25 +289,14 @@ export class PostFormComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  // This handles a weird error related to lastpass form detection when pressing enter
-  // From: https://github.com/KillerCodeMonkey/ngx-quill/issues/351#issuecomment-476017960
-  textareaEnterPressed($event: KeyboardEvent) {
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
   ngOnDestroy(): void {
-    if (this.postInitialized && !this.postDiscarded && !this.postIsBlank()) {
+    if (this.postInitialized && !this.postDiscarded && !this.manualSave && !this.postIsBlank()) {
       this.savePost();
     }
 
     if (this.postInitialized && this.postIsBlank() && !this.postDiscarded) {
       console.log('Deleting blank post');
       this.postService.deletePost(this.postId);
-    }
-
-    if (this.imageProcessingSubscription) {
-      this.imageProcessingSubscription.unsubscribe();
     }
 
     if (this.autoSavePostSubscription) {
@@ -380,9 +312,9 @@ export class PostFormComponent implements OnInit, OnDestroy {
     }
   }
 
+
   get title() { return this.postForm.get('title'); }
   get videoUrl() { return this.postForm.get('videoUrl'); }
   get content() { return this.postForm.get('content'); }
-
 
 }
