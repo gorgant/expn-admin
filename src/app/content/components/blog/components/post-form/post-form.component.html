@@ -7,7 +7,7 @@
     <div *ngIf="imageUploadProcessing$ | async">
       <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
     </div>
-    <div class="hero-image-input" *ngIf="!(heroUploadProcessing$ | async)">
+    <div class="hero-image-input" *ngIf="!(imageUploadProcessing$ | async)">
       <input #heroImageInput style="display: none" type="file" accept="image/*" id="file" (change)="onUploadHeroImage($event)">
       <button mat-raised-button color="accent" (click)="heroImageInput.click()">Choose Thumbnail Image</button>
     </div>

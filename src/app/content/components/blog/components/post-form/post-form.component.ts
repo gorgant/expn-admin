@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ImageProps } from 'src/app/core/models/images/image-props.model';
-import { Observable, Subscription, of, Subject, from } from 'rxjs';
+import { Observable, Subscription, of, Subject, from, BehaviorSubject } from 'rxjs';
 import { PostService } from 'src/app/core/services/post.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs/operators';
+import { take, takeWhile } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
 import { Post } from 'src/app/core/models/posts/post.model';
 
@@ -88,18 +88,28 @@ export class PostFormComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DeleteConfirmDialogueComponent, dialogConfig);
 
     dialogRef.afterClosed()
-    .pipe(take(1))
-    .subscribe(userConfirmed => {
-      if (userConfirmed) {
-        this.postDiscarded = true;
-        this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
-        if (this.isNewPost) {
-          this.postService.deletePost(this.postId);
-        } else {
-          this.postService.updatePost(this.originalPost);
+      .pipe(take(1))
+      .subscribe(userConfirmed => {
+        if (userConfirmed) {
+          this.postDiscarded = true;
+          this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
+          if (this.isNewPost) {
+            this.postService.deletePost(this.postId);
+          } else {
+            this.postData$
+              .pipe(take(1))
+              .subscribe(post => {
+                const originalItemWithCurrentImageList: Post = {
+                  ...this.originalPost,
+                  imageFilePathList: post.imageFilePathList
+                };
+                console.log('Original post to revert to', this.originalPost);
+                console.log('Original post with current image list', originalItemWithCurrentImageList);
+                this.postService.updatePost(originalItemWithCurrentImageList);
+              });
+          }
         }
-      }
-    });
+      });
   }
 
   // Inpsired by https://stackoverflow.com/a/52549978/6572208
@@ -109,15 +119,32 @@ export class PostFormComponent implements OnInit, OnDestroy {
     eventData.plugins.get('FileRepository').createUploadAdapter = (loader) => {
       console.log('Plugin fired, will provide this post ID', this.postId);
 
-      this.imageUploadProcessing$.next(true);
+      // This manages the imageUpload processing status for inline images
+      // Take while there is no value for post.imagesUpdated
+      // Once that value appears, this observable will complete
+      this.imageUploadProcessing$ = new BehaviorSubject<boolean>(true);
+      this.postData$
+      .pipe(takeWhile(post => {
+        console.log('Listening to post data in plugin');
+        if (post.imagesUpdated) {
+          console.log('Marking image processing complete');
+          this.imageUploadProcessing$.next(false);
+        }
+        return !post.imagesUpdated;
+      }))
+      .subscribe();
 
+      // Mark post initialized
       if (!this.postInitialized) {
         this.initializePost();
       } else {
         this.savePost();
       }
+
+      // Initiate the image upload process
       return new InlineImageUploadAdapter(loader, this.postId);
     };
+
   }
 
   onUploadHeroImage(event: any): void {

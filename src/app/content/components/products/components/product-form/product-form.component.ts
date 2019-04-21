@@ -84,7 +84,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         if (this.isNewProduct) {
           this.productService.deleteProduct(this.productId);
         } else {
-          this.productService.updateProduct(this.originalProduct);
+          this.productData$
+            .pipe(take(1))
+            .subscribe(product => {
+              const originalItemWithCurrentImageList: Product = {
+                ...this.originalProduct,
+                imageFilePathList: product.imageFilePathList
+              };
+              this.productService.updateProduct(originalItemWithCurrentImageList);
+            });
         }
       }
     });
