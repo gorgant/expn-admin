@@ -1,22 +1,7 @@
 import * as functions from 'firebase-functions';
 import { getPublicApp } from '../public-app';
 
-interface Country {
-  name: string;
-  code: string;
-  order: number;
-}
-
-interface UsState {
-  name: string;
-  abbr: string;
-  order: number;
-}
-
-interface GeographicData {
-  countryList: Country[];
-  usStateList: UsState[];
-}
+import { GeographicData } from '../../../shared-models/data-imports/geographic-data.model';
 
 export const updateGeographicData = functions.https.onCall(async (data: GeographicData, context) => {
   const outcome = await updateGeoLists(data);

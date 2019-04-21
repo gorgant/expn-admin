@@ -1,3 +1,4 @@
+
 // Structure courtesy of https://github.com/malikasinger1/firebase-functions-with-typescript
 
 import { resizeImages } from './lib/resize-images';

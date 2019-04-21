@@ -1,21 +1,6 @@
 import * as functions from 'firebase-functions';
 import { getPublicApp } from '../public-app';
-
-interface Post {
-  title: string;
-  author: string;
-  authorId: string;
-  content: string;
-  modifiedDate: number;
-  published?: boolean;
-  publishedDate?: number;
-  heroImageProps?: any;
-  id?: string;
-  imagesUpdated?: Date;
-  imageSizes?: number[];
-  imageFilePathList?: string[];
-  videoUrl?: string;
-}
+import { Post } from '../../../shared-models/posts/post.model';
 
 export const publishBlogPost = functions.https.onCall(async (data: Post, context) => {
   const outcome = await publishPost(data);

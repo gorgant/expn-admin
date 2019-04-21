@@ -2,13 +2,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import adminFirestore from './../db';
 
-interface AppUser {
-  displayName: string;
-  email: string;
-  avatarUrl?: string;
-  id?: string;
-  isNewUser?: boolean;
-}
+import { AppUser } from '../../../shared-models/user/app-user.model';
 
 export const createAdminUser = functions.auth.user()
   .onCreate( async (user) => {

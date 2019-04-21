@@ -9,6 +9,10 @@ import * as fs from 'fs-extra'; // Mirrors the existing filesystem methods, but 
 import adminFirestore from '../db';
 import { now } from 'moment';
 
+import { ImageMetadata } from '../../../shared-models/images/image-metadata.model';
+import { ImageType } from '../../../shared-models/images/image-type.model';
+import { FirebasePaths as BucketName } from '../../../shared-models/routes-and-paths/firebase-paths.model';
+
 interface ResizeImageDataObject {
   fileName: string;
   workingDir: string;
@@ -24,32 +28,9 @@ interface ResizeImageDataObject {
   imageType: ImageType;
 }
 
-interface ImageMetadata {
-  contentType: File['type'];
-  customMetadata: {
-    itemId: string;
-    imageType: ImageType;
-    resizedImage?: boolean;
-    imageSize?: number;
-    filePath?: string;
-  };
-}
-
-enum ImageType {
-  BLOG_HERO = 'blog-hero-image',
-  BLOG_INLINE = 'blog-inline-image',
-  PRODUCT = 'product-image'
-}
-
 const productImageSizes = [ 300 ]
 const heroImageSizes = [ 300, 500 ]
 const inlineImageSizes = [ 150 ]
-
-enum BucketName {
-  DEFAULT = 'explearning-admin.appspot.com',
-  BLOG = 'explearning-admin-blog',
-  PRODUCTS = 'explearning-admin-products',
-}
 
 export const resizeImages = functions.https.onCall(async (metadata: ImageMetadata, context) => {
   console.log('Received this image metadata', metadata);
@@ -78,15 +59,15 @@ async function assignVariables(metadata: ImageMetadata): Promise<ResizeImageData
   let bucket: Bucket; // The Storage bucket that contains the file.
   switch (imageType) {
     case ImageType.BLOG_HERO:
-      bucket = gcs.bucket(BucketName.BLOG);
+      bucket = gcs.bucket(BucketName.BLOG_STORAGE_AF);
       break;
     case ImageType.BLOG_INLINE:
-      bucket = gcs.bucket(BucketName.BLOG);
+      bucket = gcs.bucket(BucketName.BLOG_STORAGE_AF);
       break;
     case ImageType.PRODUCT:
-      bucket = gcs.bucket(BucketName.PRODUCTS);
+      bucket = gcs.bucket(BucketName.PRODUCTS_STORAGE_AF);
       break;
-    default: bucket = gcs.bucket(BucketName.DEFAULT);
+    default: bucket = gcs.bucket(BucketName.PRODUCTS_STORAGE_AF);
   }
 
   const filePath = <string>metadata.customMetadata.filePath; // File path in the bucket.

@@ -1,6 +1,6 @@
 import { ImageProps } from '../images/image-props.model';
 
-export class Post {
+export interface Post {
   title: string;
   author: string;
   authorId: string;
