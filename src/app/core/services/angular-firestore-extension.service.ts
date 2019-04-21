@@ -1,19 +1,16 @@
 // Currently not using this but keeping for potential future use, need to add providers to app.module
 
-import { Injectable, NgZone } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { environment } from 'src/environments/environment';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFireFunctions } from '@angular/fire/functions';
+// import { Injectable, NgZone } from '@angular/core';
+// import { AngularFirestore } from '@angular/fire/firestore';
+// import { environment } from 'src/environments/environment';
+// import { AngularFireAuth } from '@angular/fire/auth';
+// import { AngularFireFunctions } from '@angular/fire/functions';
 
-
-// @Injectable({
-//   providedIn: 'root'
-// })
 
 // Courtesy of https://stackoverflow.com/a/51922426/6572208
 // also consider: https://github.com/angular/angularfire2/issues/1305#issuecomment-361884177
-@Injectable()
+
+// @Injectable()
 // export class AngularfirestoreAdminStoreService extends AngularFirestore {}
 
 // export function AngularfirestoreAdminStoreFactory(platformId: {}, zone: NgZone) {
@@ -34,8 +31,8 @@ import { AngularFireFunctions } from '@angular/fire/functions';
 // }
 
 
-export class AngularfirestoreAdminFunctionsService extends AngularFireFunctions {}
+// export class AngularfirestoreAdminFunctionsService extends AngularFireFunctions {}
 
-export function AngularfirestoreAdminFunctionsFactory(platformId: {}, zone: NgZone) {
-  return new AngularFireFunctions(environment.admin, 'admin', platformId, zone, 'us-east1');
-}
+// export function AngularfirestoreAdminFunctionsFactory(platformId: {}, zone: NgZone) {
+//   return new AngularFireFunctions(environment.admin, 'admin', platformId, zone, 'us-east1');
+// }

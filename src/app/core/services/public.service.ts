@@ -5,6 +5,7 @@ import { catchError, tap, take } from 'rxjs/operators';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { throwError } from 'rxjs';
 import { GeographyListService } from './geography-list.service';
+import { Product } from '../models/products/product.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,9 +23,23 @@ export class PublicService {
     callable(post)
       .pipe(
         take(1),
-        tap(response => console.log('Public post updated on public server', response)),
+        tap(response => console.log('Post updated on public server', response)),
         catchError(error => {
           console.log('Error publishing post on public server', error);
+          return throwError(error);
+        })
+      ).subscribe();
+  }
+
+  // Submit http request to cloud functions to activate or deactivate product
+  updatePublicProduct(product: Product): void {
+    const callable = this.fns.httpsCallable('updateProduct');
+    callable(product)
+      .pipe(
+        take(1),
+        tap(response => console.log('Product updated on public server', response)),
+        catchError(error => {
+          console.log('Error updating product on public server', error);
           return throwError(error);
         })
       ).subscribe();

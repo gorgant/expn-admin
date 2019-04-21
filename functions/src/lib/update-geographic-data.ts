@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
 import { getPublicApp } from '../public-app';
 
 interface Country {
@@ -27,28 +26,7 @@ export const updateGeographicData = functions.https.onCall(async (data: Geograph
 
 async function updateGeoLists(geographicData: GeographicData) {
 
-  let publicApp: admin.app.App;
-
-  // Get list of initialized apps
-  const appList = admin.apps;
-
-  // Identify if the app array includes public app
-  const filteredArray = appList.filter(app => {
-    const appName = app!['name']; // Exclamation mark ensures no null see: https://stackoverflow.com/a/40350534/6572208
-    return appName === 'public';
-  })
-
-  console.log('Current app list (pre custom init)', appList);
-
-  // Ensure only one version of the public app is initialized
-  if (filteredArray.length === 0) {
-    console.log('No public app available, instantiating now');
-    publicApp = await getPublicApp();
-  } else {
-    console.log('Public app already instantiated, using that');
-    publicApp = admin.app('public');
-  }
-
+  const publicApp = await getPublicApp();
 
   const publicFirestore = publicApp.firestore();
 

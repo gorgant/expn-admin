@@ -33,11 +33,11 @@ export class ProductCardComponent implements OnInit {
   }
 
   onActivateProduct() {
-    // TODO: Activate product locally and publicly
+    this.productService.activateProduct(this.product);
   }
 
   onDeactivateProduct() {
-    // TODO: Deactivate product locally and publicly
+    this.productService.deactivateProduct(this.product);
   }
 
   onDelete() {

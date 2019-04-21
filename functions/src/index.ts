@@ -1,8 +1,5 @@
 // Structure courtesy of https://github.com/malikasinger1/firebase-functions-with-typescript
 
-// import { resizeBlogImages } from './lib/resize-blog-images';
-// export { resizeBlogImages };
-
 import { resizeImages } from './lib/resize-images';
 export { resizeImages };
 
@@ -14,3 +11,6 @@ export { publishBlogPost };
 
 import { updateGeographicData } from './lib/update-geographic-data';
 export { updateGeographicData };
+
+import { updateProduct } from './lib/update-product';
+export { updateProduct };

@@ -6,12 +6,12 @@ import { AuthService } from './auth.service';
 import { takeUntil, map, catchError } from 'rxjs/operators';
 import { UiService } from './ui.service';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
-import { ProductServiceModule } from '../modules/product-service.module';
 import { ImageService } from './image.service';
 import { ImageType } from '../models/images/image-type.model';
+import { PublicService } from './public.service';
 
 @Injectable({
-  providedIn: ProductServiceModule
+  providedIn: 'root'
 })
 export class ProductService {
 
@@ -23,6 +23,7 @@ export class ProductService {
     private authService: AuthService,
     private uiService: UiService,
     private imageService: ImageService,
+    private publicService: PublicService,
   ) { }
 
   fetchAllProducts(): Observable<Product[]> {
@@ -97,6 +98,39 @@ export class ProductService {
       });
 
     return fbResponse;
+  }
+
+  activateProduct(product: Product): void {
+    const activatedProduct: Product = {
+      ...product,
+      active: true,
+    };
+
+    this.getProductDoc(product.id).update(activatedProduct)
+      .then(res => {
+        // If the local update is successful, update on other server
+        this.publicService.updatePublicProduct(activatedProduct); // Will activate product on public server
+      })
+      .catch(error => {
+        console.log('Error activating product in admin', error);
+      });
+  }
+
+  deactivateProduct(product: Product): void {
+
+    const deactivatedProduct: Product = {
+      ...product,
+      active: false,
+    };
+
+    this.getProductDoc(product.id).update(deactivatedProduct)
+      .then(res => {
+        // If the local update is successful, update on other server
+        this.publicService.updatePublicProduct(deactivatedProduct); // Will deactivate product on public server
+      })
+      .catch(error => {
+        console.log('Error updating post', error);
+      });
   }
 
   fetchStorageRef(imagePath: string): AngularFireStorageReference {

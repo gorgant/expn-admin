@@ -9,13 +9,12 @@ import { ImageType } from '../models/images/image-type.model';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 import { now } from 'moment';
 import { PublicService } from './public.service';
-import { PostServiceModule } from '../modules/post-service.module';
 import { ImageService } from './image.service';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 
 @Injectable({
-  providedIn: PostServiceModule
+  providedIn: 'root'
 })
 export class PostService {
 
