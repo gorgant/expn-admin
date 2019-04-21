@@ -3,7 +3,7 @@ import { PostService } from 'src/app/core/services/post.service';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
-import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
+import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
 import { Post } from 'src/app/core/models/posts/post.model';

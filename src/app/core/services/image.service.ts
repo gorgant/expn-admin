@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
-import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
+import { SanitizedFileName } from '../models/images/sanitized-file-name.model';
 import { FirebasePaths } from '../models/routes-and-paths/firebase-paths.model';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { ImageType } from '../models/images/image-type.model';

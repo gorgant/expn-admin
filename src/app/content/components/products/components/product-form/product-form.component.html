@@ -38,6 +38,12 @@
           <mat-error *ngIf="price.hasError(validation.type) && price.invalid && (price.dirty || price.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
+      <mat-form-field class="listOrder">
+        <input matInput formControlName="listOrder" type="number" placeholder="Product List Order">
+        <mat-error *ngFor="let validation of productValidationMessages.listOrder">
+          <mat-error *ngIf="listOrder.hasError(validation.type) && listOrder.invalid && (listOrder.dirty || listOrder.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
       <mat-form-field class="checkoutHeader">
         <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="checkoutHeader" type="text" placeholder="Product Checkout Header"></textarea>
         <mat-error *ngFor="let validation of productValidationMessages.checkoutHeader">

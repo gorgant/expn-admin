@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, throwError, Observable, forkJoin, BehaviorSubject } from 'rxjs';
-import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
+import { SanitizedFileName } from '../models/images/sanitized-file-name.model';
 import { ImageType } from '../models/images/image-type.model';
 import { ImageMetadata } from '../models/images/image-metadata.model';
 import { map, catchError, takeUntil, take, tap, switchMap } from 'rxjs/operators';

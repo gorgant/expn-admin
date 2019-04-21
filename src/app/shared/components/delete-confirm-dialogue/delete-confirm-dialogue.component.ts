@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
+import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 
 @Component({
   selector: 'app-delete-confirm-dialogue',

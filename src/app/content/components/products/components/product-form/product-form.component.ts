@@ -3,12 +3,12 @@ import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@ang
 import { ProductService } from 'src/app/core/services/product.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms/validation-messages.model';
+import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/validation-messages.model';
 import { Subscription, Observable, of, from } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
 import { take } from 'rxjs/operators';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
-import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
+import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { ImageType } from 'src/app/core/models/images/image-type.model';
 import { ImageProps } from 'src/app/core/models/images/image-props.model';
@@ -154,6 +154,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
               id: product.id,
               name: product.name,
               price: product.price,
+              listOrder: product.listOrder,
               checkoutHeader: product.checkoutHeader,
               description: product.description,
               mdBlurb: product.mdBlurb,
@@ -190,6 +191,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     this.productForm = this.fb.group({
       name: ['', [Validators.required]],
       price: ['', [Validators.required]],
+      listOrder: ['', [Validators.required]],
       imageUrl: ['', [Validators.required]],
       checkoutHeader: ['', [Validators.required]],
       description: ['', [Validators.required]],
@@ -215,6 +217,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       id: this.productId,
       name: this.name.value ? this.name.value : this.tempProductTitle,
       price: this.price.value,
+      listOrder: this.listOrder.value,
       checkoutHeader: this.checkoutHeader.value,
       description: this.description.value,
       mdBlurb: this.mdBlurb.value,
@@ -279,6 +282,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       this.imageAdded ||
       this.name.value ||
       this.price.value ||
+      this.listOrder.value ||
       this.checkoutHeader.value ||
       this.description.value ||
       this.mdBlurb.value ||
@@ -295,6 +299,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       !this.imageAdded ||
       !this.name.value ||
       !this.price.value ||
+      !this.listOrder.value ||
       !this.checkoutHeader.value ||
       !this.description.value ||
       !this.mdBlurb.value ||
@@ -312,6 +317,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       id: this.productId,
       name: this.name.value ? this.name.value : this.tempProductTitle,
       price: this.price.value,
+      listOrder: this.listOrder.value,
       checkoutHeader: this.checkoutHeader.value,
       description: this.description.value,
       mdBlurb: this.mdBlurb.value,
@@ -373,6 +379,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   get id() { return this.productForm.get('id'); }
   get name() { return this.productForm.get('name'); }
   get price() { return this.productForm.get('price'); }
+  get listOrder() { return this.productForm.get('listOrder'); }
   get checkoutHeader() { return this.productForm.get('checkoutHeader'); }
   get description() { return this.productForm.get('description'); }
   get mdBlurb() { return this.productForm.get('mdBlurb'); }

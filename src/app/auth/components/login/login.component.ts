@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { RootStoreState, AuthStoreSelectors, UserStoreSelectors, AuthStoreActions } from 'src/app/root-store';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { loginValidationMessages } from 'src/app/core/models/forms/validation-messages.model';
+import { loginValidationMessages } from 'src/app/core/models/forms-and-components/validation-messages.model';
 import { Observable } from 'rxjs';
 import { AuthData } from 'src/app/core/models/auth/auth-data.model';
 import { AuthenticateUserType } from 'src/app/core/models/auth/authenticate-user-type.model';

@@ -4,9 +4,7 @@ import { map, takeUntil, catchError } from 'rxjs/operators';
 import { Observable, throwError, from, Subject } from 'rxjs';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { Post } from '../models/posts/post.model';
-import { PostImage } from '../models/posts/post-image.model';
 import { ImageType } from '../models/images/image-type.model';
-import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 import { now } from 'moment';
 import { PublicService } from './public.service';
 import { ImageService } from './image.service';
@@ -18,11 +16,8 @@ import { UiService } from './ui.service';
 })
 export class PostService {
 
-  imagesCollection: AngularFirestoreCollection<PostImage>;
-
   imageSizesRetrieved: Subject<number[]> = new Subject();
 
-  sanitizedFileName: SanitizedFileName;
   imageDirectory: string;
 
   constructor(

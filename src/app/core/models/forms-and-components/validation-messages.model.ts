@@ -29,6 +29,9 @@ export const PRODUCT_FORM_VALIDATION_MESSAGES = {
   price: [
     { type: 'required', message: 'Price is required.'},
   ],
+  listOrder: [
+    { type: 'required', message: 'List order is required.'},
+  ],
   imageUrl: [
     { type: 'required', message: 'Image url is required.'},
   ],

@@ -4,6 +4,7 @@ export interface Product {
   id: string;
   name: string;
   price: number;
+  listOrder: number;
   checkoutHeader: string;
   description: string;
   mdBlurb: string;

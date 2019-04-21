@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { RootStoreState, AuthStoreActions } from 'src/app/root-store';
-import { resetPasswordFormValidationMessages } from 'src/app/core/models/forms/validation-messages.model';
+import { resetPasswordFormValidationMessages } from 'src/app/core/models/forms-and-components/validation-messages.model';
 
 @Component({
   selector: 'app-reset-password',

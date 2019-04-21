@@ -14,7 +14,7 @@ import { RootStoreState, UserStoreSelectors } from 'src/app/root-store';
 import { AppUser } from 'src/app/core/models/user/app-user.model';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { MatDialogConfig, MatDialog } from '@angular/material';
-import { DeleteConfData } from 'src/app/core/models/forms/delete-conf-data.model';
+import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { now } from 'moment';
 import { ImageType } from 'src/app/core/models/images/image-type.model';
