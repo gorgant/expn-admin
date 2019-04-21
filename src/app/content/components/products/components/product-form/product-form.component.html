@@ -8,7 +8,7 @@
     <div *ngIf="imageUploadProcessing$ | async">
       <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
     </div>
-    <div class="product-image-input" *ngIf="!(altImageUploadProcessing$ | async)">
+    <div class="product-image-input" *ngIf="!(imageUploadProcessing$ | async)">
       <input #imageInput style="display: none" type="file" accept="image/*" id="file" (change)="onUploadProductImage($event)">
       <button mat-raised-button color="accent" (click)="imageInput.click()">Choose Thumbnail Image</button>
     </div>

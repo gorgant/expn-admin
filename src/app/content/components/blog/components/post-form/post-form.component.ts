@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ImageProps } from 'src/app/core/models/images/image-props.model';
-import { Observable, Subscription, of, Subject, from, BehaviorSubject } from 'rxjs';
+import { Observable, Subscription, of, Subject, from } from 'rxjs';
 import { PostService } from 'src/app/core/services/post.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { take, takeWhile } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
 import { Post } from 'src/app/core/models/posts/post.model';
 
@@ -47,6 +47,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
   private autoSaveTicker: NodeJS.Timer;
   private autoSavePostSubscription: Subscription;
+  private imageProcessingSubscription: Subscription;
 
   public Editor = ClassicEditor;
 
@@ -62,11 +63,12 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.configureNewPost();
+    this.configurePost();
 
     this.loadExistingPostData(); // Only loads if exists
 
     this.appUser$ = this.store$.select(UserStoreSelectors.selectAppUser);
+
   }
 
   onSave() {
@@ -119,21 +121,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
     eventData.plugins.get('FileRepository').createUploadAdapter = (loader) => {
       console.log('Plugin fired, will provide this post ID', this.postId);
 
-      // This manages the imageUpload processing status for inline images
-      // Take while there is no value for post.imagesUpdated
-      // Once that value appears, this observable will complete
-      this.imageUploadProcessing$ = new BehaviorSubject<boolean>(true);
-      this.postData$
-      .pipe(takeWhile(post => {
-        console.log('Listening to post data in plugin');
-        if (post.imagesUpdated) {
-          console.log('Marking image processing complete');
-          this.imageUploadProcessing$.next(false);
-        }
-        return !post.imagesUpdated;
-      }))
-      .subscribe();
-
       // Mark post initialized
       if (!this.postInitialized) {
         this.initializePost();
@@ -142,7 +129,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       }
 
       // Initiate the image upload process
-      return new InlineImageUploadAdapter(loader, this.postId);
+      return new InlineImageUploadAdapter(loader, this.postId, this.imageService);
     };
 
   }
@@ -155,8 +142,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
     if (file.type.split('/')[0] !== 'image') {
       return alert('only images allowed');
     }
-
-    this.imageUploadProcessing$ = this.imageService.getImageProcessing();
 
     // Initialize product if not yet done
     if (!this.postInitialized) {
@@ -207,17 +192,18 @@ export class PostFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  private configureNewPost() {
-    this.isNewPost = true;
-    this.postId = this.postService.generateNewPostId();
-    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
-
-
+  private configurePost() {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
       videoUrl: [''],
       content: [{value: '', disabled: false }, Validators.required]
     });
+
+    this.imageUploadProcessing$ = this.imageService.getImageProcessing(); // Monitor image processing
+    this.setContentFormStatus();
+    this.isNewPost = true;
+    this.postId = this.postService.generateNewPostId();
+    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
 
     // Auto-init post if it hasn't already been initialized and it has content
     this.initPostTimeout = setTimeout(() => {
@@ -226,6 +212,20 @@ export class PostFormComponent implements OnInit, OnDestroy {
       }
       this.createAutoSaveTicker();
     }, 5000);
+  }
+
+  private setContentFormStatus(): void {
+    this.imageProcessingSubscription = this.imageUploadProcessing$
+      .subscribe(imageProcessing => {
+        switch (imageProcessing) {
+          case true:
+            return this.content.disable();
+          case false:
+            return this.content.enable();
+          default:
+            return this.content.enable();
+        }
+      });
   }
 
   private initializePost(): void {
@@ -328,6 +328,10 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
     if (this.autoSavePostSubscription) {
       this.autoSavePostSubscription.unsubscribe();
+    }
+
+    if (this.imageProcessingSubscription) {
+      this.imageProcessingSubscription.unsubscribe();
     }
 
     if (this.autoSaveTicker) {

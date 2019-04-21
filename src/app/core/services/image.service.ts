@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
 import { SanitizedFileName } from '../models/posts/sanitized-file-name.model';
 import { FirebasePaths } from '../models/routes-and-paths/firebase-paths.model';
-import { throwError, BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { ImageType } from '../models/images/image-type.model';
 import { ImageDirectoryData } from '../models/images/image-directory-data.model';
 import { ImageMetadata } from '../models/images/image-metadata.model';
@@ -10,8 +10,6 @@ import { UploadMetadata } from '@angular/fire/storage/interfaces';
 import { Post } from '../models/posts/post.model';
 import { Product } from '../models/products/product.model';
 import { ImageUrlObject } from '../models/images/image-url-object.model';
-import { AngularFireFunctions } from '@angular/fire/functions';
-import { take, tap, catchError } from 'rxjs/operators';
 import { ImageProps } from '../models/images/image-props.model';
 
 @Injectable({
@@ -25,18 +23,14 @@ export class ImageService {
   private productsStorageRef = firebase.app().storage(FirebasePaths.PRODUCTS_STORAGE_FB).ref();
 
   private db = firebase.firestore(); // Firebase database
+  private fns = firebase.functions(); // Firebase functions
 
-  constructor(
-    private fns: AngularFireFunctions,
-  ) { }
+  constructor() { }
 
   // Starts the upload process.
   async uploadImageAndGetProps(file: File, itemId: string, imageType: ImageType): Promise<ImageProps> {
 
-    this.imageProcessing$.next(true);
-
-    const imageDirectoryData = this.setImageDirectoryData(file, itemId, imageType);
-    const urlObject = await this.uploadImageAndFetchUrls(file, itemId, imageDirectoryData, imageType);
+    const urlObject = await this.uploadImageAndFetchUrls(file, itemId, imageType);
     const imageProps = await this.getImageProps(urlObject, itemId, imageType);
     return imageProps;
 
@@ -46,10 +40,14 @@ export class ImageService {
     return this.imageProcessing$;
   }
 
+  setImageProcessingComplete(): void {
+    this.imageProcessing$.next(false);
+  }
+
   private async getImageProps(urlObject: ImageUrlObject, itemId: string, imageType: ImageType) {
     const imageProps = this.setImageProps(urlObject); // Create an image props object
     await this.storeImageProps(itemId, imageType, imageProps); // Store object in database
-    this.imageProcessing$.next(false); // Marks the final core operation of image upload
+    this.setImageProcessingComplete(); // Marks the final core operation of image upload
     return imageProps; // Set for instant UI update
   }
 
@@ -111,12 +109,15 @@ export class ImageService {
   }
 
 
-  private uploadImageAndFetchUrls(
+  uploadImageAndFetchUrls(
     file: File,
     itemId: string,
-    imageDirectoryData: ImageDirectoryData,
     imageType: ImageType
   ): Promise<ImageUrlObject> {
+
+    const imageDirectoryData = this.setImageDirectoryData(file, itemId, imageType);
+
+    this.imageProcessing$.next(true); // Inform view component that image is processing
 
     const path = imageDirectoryData.imagePath;
     const imagePathRef = this.getItemFileRef(path, imageType);
@@ -161,13 +162,8 @@ export class ImageService {
         return reject(`Error uploading file: ${error}`);
       }, async () => {
 
-        // // Generate a temporary download url (not actually used)
-        // const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL()
-        //   .catch(error => console.log(error));
-        // console.log('File temporarily available at', downloadUrl);
-
         // Trigger cloud function to resize images
-        this.resizeImagesOnServer(metadata);
+        await this.resizeImagesOnServer(metadata);
         console.log('Triggering cloud function image reiszing', metadata);
 
         // Wait for image resizing to complete, then fetch the sizes
@@ -186,20 +182,16 @@ export class ImageService {
 
   }
 
-  private resizeImagesOnServer(metadata: ImageMetadata) {
-    const resizeImageHttpCall = this.fns.httpsCallable('resizeImages');
+  private async resizeImagesOnServer(metadata: ImageMetadata) {
 
-    resizeImageHttpCall(metadata)
-      .pipe(
-        take(1),
-        tap(response => {
-          console.log('Resized image url set on item', response);
-        }),
-        catchError(error => {
-          console.log('Error updating item data on server', error);
-          return throwError(error);
-        })
-      ).subscribe();
+    const resizeImagesHttpCall = this.fns.httpsCallable('resizeImages');
+
+    const response = await resizeImagesHttpCall(metadata)
+      .catch(error =>  console.log('Error updating item data on server', error));
+
+    console.log('Resized image url set on item', response);
+
+    return response;
   }
 
   // Listen for item update and then fetch image sizes when available
@@ -411,7 +403,7 @@ export class ImageService {
     };
   }
 
-  private setImageDirectoryData(file: File, itemId: string, imageType: ImageType): ImageDirectoryData {
+  setImageDirectoryData(file: File, itemId: string, imageType: ImageType): ImageDirectoryData {
     const sanitizedFileName = this.sanitizeFileName(file);
     let imagePath: string;
     let imageDirectory: string;

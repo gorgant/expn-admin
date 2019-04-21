@@ -29,7 +29,6 @@
       <ckeditor
         class="ck-editor-panel"
         [editor]="Editor" 
-        [disabled]="imageUploadProcessing$ | async"
         formControlName="content"
         (ready)="onEditorAdaptorPluginRdy($event)"
         (keydown.enter)="textareaEnterPressed($event)"
