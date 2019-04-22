@@ -28,9 +28,10 @@ interface ResizeImageDataObject {
   imageType: ImageType;
 }
 
-const productImageSizes = [ 300 ]
-const heroImageSizes = [ 300, 500 ]
-const inlineImageSizes = [ 150 ]
+const blogHeroSizes = [ 500, 1500 ]
+const blogInlineImages = [ 150 ]
+const productCardSizes = [ 300 ]
+const productHeroSizes = [ 500, 1500 ]
 
 export const resizeImages = functions.https.onCall(async (metadata: ImageMetadata, context) => {
   console.log('Received this image metadata', metadata);
@@ -64,7 +65,10 @@ async function assignVariables(metadata: ImageMetadata): Promise<ResizeImageData
     case ImageType.BLOG_INLINE:
       bucket = gcs.bucket(BucketName.BLOG_STORAGE_AF);
       break;
-    case ImageType.PRODUCT:
+    case ImageType.PRODUCT_CARD:
+      bucket = gcs.bucket(BucketName.PRODUCTS_STORAGE_AF);
+      break;
+    case ImageType.PRODUCT_HERO:
       bucket = gcs.bucket(BucketName.PRODUCTS_STORAGE_AF);
       break;
     default: bucket = gcs.bucket(BucketName.PRODUCTS_STORAGE_AF);
@@ -133,16 +137,20 @@ async function resizeImgs(imageData: ResizeImageDataObject) {
   let sizes: number[] = [];
   switch (imageData.imageType) {
     case ImageType.BLOG_HERO :
-      console.log('Hero detected, setting hero sizes');
-      sizes = heroImageSizes;
+      console.log('Blog hero detected, setting blog hero sizes');
+      sizes = blogHeroSizes;
       break;
     case ImageType.BLOG_INLINE:
-      console.log('Inline detected, setting inline sizes');
-      sizes = inlineImageSizes;
+      console.log('Blog inline detected, setting blog inline sizes');
+      sizes = blogInlineImages;
       break;
-    case ImageType.PRODUCT:
-      console.log('Product detected, setting product sizes');
-      sizes = productImageSizes;
+    case ImageType.PRODUCT_CARD:
+      console.log('Product card detected, setting product card sizes');
+      sizes = productCardSizes;
+      break;
+    case ImageType.PRODUCT_HERO:
+      console.log('Product hero detected, setting product hero sizes');
+      sizes = productHeroSizes;
       break;
     default: sizes = [500];
   }
@@ -209,16 +217,19 @@ async function updateFBPost(imageData: ResizeImageDataObject): Promise<FirebaseF
   // Set approapriate data in Firestore then signal to database that images have been uploaded
   switch (imageData.imageType) {
     case ImageType.BLOG_HERO:
-      await adminFirestore.collection('posts').doc(imageData.itemId).update({imageSizes: heroImageSizes});
+      await adminFirestore.collection('posts').doc(imageData.itemId).update({imageSizes: blogHeroSizes});
       return adminFirestore.collection('posts').doc(imageData.itemId).update({imagesUpdated: now()})
     case ImageType.BLOG_INLINE:
-      await adminFirestore.collection('posts').doc(imageData.itemId).update({imageSizes: inlineImageSizes});
+      await adminFirestore.collection('posts').doc(imageData.itemId).update({imageSizes: blogInlineImages});
       return adminFirestore.collection('posts').doc(imageData.itemId).update({imagesUpdated: now()})
-    case ImageType.PRODUCT:
-      await adminFirestore.collection('products').doc(imageData.itemId).update({imageSizes: productImageSizes});
+    case ImageType.PRODUCT_CARD:
+      await adminFirestore.collection('products').doc(imageData.itemId).update({imageSizes: productCardSizes});
+      return adminFirestore.collection('products').doc(imageData.itemId).update({imagesUpdated: now()})
+    case ImageType.PRODUCT_HERO:
+      await adminFirestore.collection('products').doc(imageData.itemId).update({imageSizes: productHeroSizes});
       return adminFirestore.collection('products').doc(imageData.itemId).update({imagesUpdated: now()})
     default: 
-      await adminFirestore.collection('products').doc(imageData.itemId).update({imageSizes: productImageSizes});
+      await adminFirestore.collection('products').doc(imageData.itemId).update({imageSizes: productCardSizes});
       return adminFirestore.collection('products').doc(imageData.itemId).update({imagesUpdated: now()})
   }
 }

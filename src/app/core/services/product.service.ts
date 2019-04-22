@@ -87,7 +87,8 @@ export class ProductService {
   }
 
   async deleteProduct(productId: string): Promise<string> {
-    await this.imageService.deleteAllItemImages(productId, ImageType.PRODUCT); // Be sure to delete images before deleting the item doc
+    // Be sure to delete images before deleting the item doc
+    await this.imageService.deleteAllItemImages(productId, ImageType.PRODUCT_CARD); // Any product image type will work here
     const fbResponse = this.getProductDoc(productId).delete()
       .then(empty => {
         console.log('Product deleted', productId);

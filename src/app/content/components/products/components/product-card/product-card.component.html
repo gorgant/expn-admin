@@ -1,14 +1,14 @@
 <div appMatElevation class="product-card" fxLayout="column" fxLayoutGap="16px">
   <div fxLayout="column" fxLayout.gt-sm="row">
     <div class="card-image-container" fxFlex="40" fxLayout="column" fxLayoutAlign="center center" fxFlexOrder.gt-sm="2">
-      <img class="card-image" [src]="imagePaths.PRODUCT_PLACEHOLDER" alt="Remote Coach">
+      <img class="card-image" [src]="product.cardImageProps.src ? product.cardImageProps.src : imagePaths.PRODUCT_PLACEHOLDER" alt="Remote Coach">
     </div>
     <div class="card-text-container" fxFlex="60" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="16px" fxFlexOrder.gt-sm="1">
-      <div class="card-title">{{ product.name }}</div>
-      <div class="card-subtitle">{{ product.mdBlurb }}</div>
+      <div class="card-title">{{ product.productCardData.name }}</div>
+      <div class="card-subtitle">{{ product.productCardData.tagline }}</div>
       <div class="card-description">
         <ul class="description-highlights">
-          <li *ngFor="let highlight of product.highlights">{{ highlight }}</li>
+          <li *ngFor="let highlight of product.productCardData.highlights">{{ highlight }}</li>
         </ul>
       </div>
       <div class="card-actions" fxLayout="column" fxLayoutAlign="center start">

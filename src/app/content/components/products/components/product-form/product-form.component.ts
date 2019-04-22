@@ -13,6 +13,10 @@ import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete
 import { ImageType } from 'src/app/core/models/images/image-type.model';
 import { ImageProps } from 'src/app/core/models/images/image-props.model';
 import { ImageService } from 'src/app/core/services/image.service';
+import { ProductCardData } from 'src/app/core/models/products/product-card-data.model';
+import { PageHeroData } from 'src/app/core/models/forms-and-components/page-hero-data.model';
+import { BuyNowBoxData } from 'src/app/core/models/products/buy-now-box-data.model';
+import { CheckoutData } from 'src/app/core/models/products/checkout-data.model';
 
 @Component({
   selector: 'app-product-form',
@@ -22,7 +26,8 @@ import { ImageService } from 'src/app/core/services/image.service';
 export class ProductFormComponent implements OnInit, OnDestroy {
 
   productData$: Observable<Product>;
-  imageProps$: Observable<ImageProps>;
+  cardImageProps$: Observable<ImageProps>;
+  heroImageProps$: Observable<ImageProps>;
   imageUploadProcessing$: Observable<boolean>;
 
   productForm: FormGroup;
@@ -35,7 +40,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private originalProduct: Product;
   private productInitialized: boolean;
   private productDiscarded: boolean;
-  private imageAdded: boolean;
+  private cardImageAdded: boolean;
+  private heroImageAdded: boolean;
+  private imagesModifiedSinceLastSave: boolean;
   private manualSave: boolean;
 
   private initProductTimeout: NodeJS.Timer;
@@ -84,12 +91,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         if (this.isNewProduct) {
           this.productService.deleteProduct(this.productId);
         } else {
+          // Changes discarded, so revert to original product (with current image list)
           this.productData$
             .pipe(take(1))
             .subscribe(product => {
+              // Insert the latest imageFilePathList so that if item it is deleted, all images are scrubbed
+              // After all, images get uploaded irrespective of if changes are discarded
               const originalItemWithCurrentImageList: Product = {
                 ...this.originalProduct,
-                imageFilePathList: product.imageFilePathList
+                imageFilePathList: product.imageFilePathList,
               };
               this.productService.updateProduct(originalItemWithCurrentImageList);
             });
@@ -106,8 +116,17 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     this.highlights.removeAt(index);
   }
 
-  onUploadProductImage(event: any): void {
+  onUploadCardImage(event: any) {
     const file: File = event.target.files[0];
+    this.uploadProductImage(file, ImageType.PRODUCT_CARD);
+  }
+
+  onUploadHeroImage(event: any) {
+    const file: File = event.target.files[0];
+    this.uploadProductImage(file, ImageType.PRODUCT_HERO);
+  }
+
+  private uploadProductImage(file: File, imageType: ImageType): void {
 
     // Confirm valid file type
     if (file.type.split('/')[0] !== 'image') {
@@ -124,7 +143,25 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     }
 
     // Upload file and get image props
-    this.imageProps$ = from(this.imageService.uploadImageAndGetProps(file, this.productId, ImageType.PRODUCT));
+    this.imageService.uploadImageAndGetProps(file, this.productId, imageType)
+      .then(imageProps => {
+        // Assign image props
+        switch (imageType) {
+          case ImageType.PRODUCT_CARD:
+            this.cardImageProps$ = of(imageProps);
+            this.cardImageAdded = true;
+            break;
+          case ImageType.PRODUCT_HERO:
+            this.heroImageProps$ = of(imageProps);
+            this.heroImageAdded = true;
+            break;
+          default:
+            break;
+        }
+        this.cardImageAdded = true;
+        this.imagesModifiedSinceLastSave = true; // Used for auto-save change detection only after image uploaded
+        return imageProps;
+      });
 
   }
 
@@ -150,19 +187,20 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe(product => {
           if (product) {
-            const productObject: Product = {
-              id: product.id,
+            const productFormObject = {
               name: product.name,
               price: product.price,
               listOrder: product.listOrder,
-              checkoutHeader: product.checkoutHeader,
-              description: product.description,
-              mdBlurb: product.mdBlurb,
-              highlights: product.highlights
+              tagline: product.tagline,
+              highlights: product.productCardData.highlights,
+              heroSubtitle: product.heroData.pageSubtitle,
+              buyNowBoxSubtitle: product.buyNowData.subtitle,
+              checkoutHeader: product.checkoutData.header,
+              checkoutDescription: product.checkoutData.description,
             };
 
             // Add additional highlight form controls if more than min amount
-            const highlightsLength = productObject.highlights.length;
+            const highlightsLength = productFormObject.highlights.length;
             if (highlightsLength > this.minHighlightsLength) {
               const numberOfControlsToAdd = highlightsLength - this.minHighlightsLength;
               for (let i = 0; i < numberOfControlsToAdd; i++ ) {
@@ -170,16 +208,25 @@ export class ProductFormComponent implements OnInit, OnDestroy {
               }
             }
 
-            this.productForm.patchValue(productObject);
-            console.log('Initializing with these image props', product.imageProps);
-            this.imageProps$ = of(product.imageProps);
-            if (product.imageProps) {
-              this.imageAdded = true;
-            }
+            // Patch in form values
+            this.productForm.patchValue(productFormObject);
+            this.setProductImages(product);
             this.isNewProduct = false;
             this.originalProduct = product;
           }
       });
+    }
+  }
+
+  private setProductImages(product: Product): void {
+    this.cardImageProps$ = of(product.cardImageProps);
+    if (product.cardImageProps) {
+      this.cardImageAdded = true;
+    }
+
+    this.heroImageProps$ = of(product.heroImageProps);
+    if (product.heroImageProps) {
+      this.heroImageAdded = true;
     }
   }
 
@@ -192,15 +239,16 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required]],
       price: ['', [Validators.required]],
       listOrder: ['', [Validators.required]],
-      imageUrl: ['', [Validators.required]],
-      checkoutHeader: ['', [Validators.required]],
-      description: ['', [Validators.required]],
-      mdBlurb: ['', [Validators.required]],
+      tagline: ['', [Validators.required]],
       highlights: this.fb.array([
         this.createHighlight(),
         this.createHighlight(),
         this.createHighlight(),
       ]),
+      heroSubtitle: ['', [Validators.required]],
+      buyNowBoxSubtitle: ['', [Validators.required]],
+      checkoutHeader: ['', [Validators.required]],
+      checkoutDescription: ['', [Validators.required]],
     });
 
     // Auto-init post if it hasn't already been initialized and it has content
@@ -213,15 +261,42 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   private initializeProduct(): void {
+
+
+    const productCardData: ProductCardData = {
+      name: this.name.value,
+      tagline: this.tagline.value,
+      highlights: this.highlights.value,
+    };
+
+    const heroData: PageHeroData = {
+      pageTitle: this.name.value,
+      pageSubtitle: this.heroSubtitle.value,
+    };
+
+    const buyNowData: BuyNowBoxData = {
+      title: this.name.value,
+      subtitle: this.buyNowBoxSubtitle.value,
+    };
+
+    const checkoutData: CheckoutData = {
+      header: this.checkoutHeader.value,
+      productName: this.name.value,
+      price: this.price.value,
+      description: this.checkoutDescription.value,
+      tagline: this.tagline.value
+    };
+
     const product: Product = {
       id: this.productId,
       name: this.name.value ? this.name.value : this.tempProductTitle,
       price: this.price.value,
       listOrder: this.listOrder.value,
-      checkoutHeader: this.checkoutHeader.value,
-      description: this.description.value,
-      mdBlurb: this.mdBlurb.value,
-      highlights: this.highlights.value,
+      tagline: this.tagline.value,
+      productCardData,
+      heroData,
+      buyNowData,
+      checkoutData,
     };
     this.productService.createProduct(product);
     this.productInitialized = true;
@@ -267,10 +342,14 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     if (
       (product.name === this.name.value || product.name === this.tempProductTitle) &&
       product.price === this.price.value &&
-      product.checkoutHeader === this.checkoutHeader.value &&
-      product.description === this.description.value &&
-      product.mdBlurb === this.mdBlurb.value &&
-      this.sortedArraysEqual(product.highlights, this.highlights.value)
+      product.listOrder === this.listOrder.value &&
+      product.tagline === this.tagline.value &&
+      this.sortedArraysEqual(product.productCardData.highlights, this.highlights.value) &&
+      product.heroData.pageSubtitle === this.heroSubtitle.value &&
+      product.buyNowData.subtitle === this.buyNowBoxSubtitle.value &&
+      product.checkoutData.header === this.checkoutHeader.value &&
+      product.checkoutData.description === this.checkoutDescription.value &&
+      !this.imagesModifiedSinceLastSave
     ) {
       return false;
     }
@@ -279,14 +358,16 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private productIsBlank(): boolean {
     if (
-      this.imageAdded ||
+      this.cardImageAdded ||
+      this.heroImageAdded ||
       this.name.value ||
       this.price.value ||
       this.listOrder.value ||
+      !this.highlightsArrayIsBlank() ||
+      this.tagline.value ||
       this.checkoutHeader.value ||
-      this.description.value ||
-      this.mdBlurb.value ||
-      !this.highlightsArrayIsBlank()
+      this.checkoutDescription.value ||
+      this.imagesModifiedSinceLastSave
     ) {
       return false;
     }
@@ -296,14 +377,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private readyToActivate(): boolean {
     if (
-      !this.imageAdded ||
-      !this.name.value ||
-      !this.price.value ||
-      !this.listOrder.value ||
-      !this.checkoutHeader.value ||
-      !this.description.value ||
-      !this.mdBlurb.value ||
-      this.highlightsArrayHasBlankValue()
+      !this.cardImageAdded ||
+      !this.heroImageAdded ||
+      this.productForm.invalid
     ) {
       console.log('Post not ready to activate');
       return false;
@@ -313,19 +389,45 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   private saveProduct() {
+    const productCardData: ProductCardData = {
+      name: this.name.value,
+      tagline: this.tagline.value,
+      highlights: this.highlights.value,
+    };
+
+    const heroData: PageHeroData = {
+      pageTitle: this.name.value,
+      pageSubtitle: this.heroSubtitle.value,
+    };
+
+    const buyNowData: BuyNowBoxData = {
+      title: this.name.value,
+      subtitle: this.buyNowBoxSubtitle.value,
+    };
+
+    const checkoutData: CheckoutData = {
+      header: this.checkoutHeader.value,
+      productName: this.name.value,
+      price: this.price.value,
+      description: this.checkoutDescription.value,
+      tagline: this.tagline.value
+    };
+
     const product: Product = {
       id: this.productId,
       name: this.name.value ? this.name.value : this.tempProductTitle,
       price: this.price.value,
       listOrder: this.listOrder.value,
-      checkoutHeader: this.checkoutHeader.value,
-      description: this.description.value,
-      mdBlurb: this.mdBlurb.value,
-      highlights: this.highlights.value,
+      tagline: this.tagline.value,
+      productCardData,
+      heroData,
+      buyNowData,
+      checkoutData,
       readyToActivate: this.readyToActivate(),
     };
     this.productService.updateProduct(product);
     console.log('Product saved', product);
+    this.imagesModifiedSinceLastSave = false; // Reset image change detection
   }
 
   // Courtesy of: https://stackoverflow.com/a/4025958/6572208
@@ -352,16 +454,16 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     return isBlank;
   }
 
-  private highlightsArrayHasBlankValue(): boolean {
-    let hasBlankValue = false;
-    this.highlightsArray.map(highlight => {
-      if (!highlight) {
-        console.log('Blank highlight value detected');
-        hasBlankValue = true;
-      }
-    });
-    return hasBlankValue;
-  }
+  // private highlightsArrayHasBlankValue(): boolean {
+  //   let hasBlankValue = false;
+  //   this.highlightsArray.map(highlight => {
+  //     if (!highlight) {
+  //       console.log('Blank highlight value detected');
+  //       hasBlankValue = true;
+  //     }
+  //   });
+  //   return hasBlankValue;
+  // }
 
   private createHighlight(): FormControl {
     return this.fb.control('', Validators.required);
@@ -376,25 +478,28 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     clearTimeout(this.initProductTimeout);
   }
 
-  get id() { return this.productForm.get('id'); }
   get name() { return this.productForm.get('name'); }
   get price() { return this.productForm.get('price'); }
   get listOrder() { return this.productForm.get('listOrder'); }
-  get checkoutHeader() { return this.productForm.get('checkoutHeader'); }
-  get description() { return this.productForm.get('description'); }
-  get mdBlurb() { return this.productForm.get('mdBlurb'); }
+  get tagline() { return this.productForm.get('tagline'); }
   get highlights() { return this.productForm.get('highlights') as FormArray; }
   get highlightsArray(): string[] {
     return this.highlights.controls.map(control => {
       return control.value;
     });
   }
+  get heroSubtitle() { return this.productForm.get('heroSubtitle'); }
+  get buyNowBoxSubtitle() { return this.productForm.get('buyNowBoxSubtitle'); }
+  get checkoutHeader() { return this.productForm.get('checkoutHeader'); }
+  get checkoutDescription() { return this.productForm.get('checkoutDescription'); }
 
   ngOnDestroy(): void {
+    // Auto save product if navigating away
     if (this.productInitialized && !this.productDiscarded && !this.manualSave && !this.productIsBlank()) {
       this.saveProduct();
     }
 
+    // Delete product if blank
     if (this.productInitialized && this.productIsBlank() && !this.productDiscarded) {
       console.log('Deleting blank product');
       this.productService.deleteProduct(this.productId);

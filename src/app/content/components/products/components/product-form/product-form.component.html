@@ -2,17 +2,27 @@
   <div class="title">Product Form</div>
 
   <div class="product-image-upload-section" fxLayout="column" fxLayoutAlign="center center">
-    <div>
-      <h3>Product Image (500x200)</h3>
-    </div>
     <div *ngIf="imageUploadProcessing$ | async">
       <mat-progress-spinner color="accent" mode="indeterminate"></mat-progress-spinner>
     </div>
-    <div class="product-image-input" *ngIf="!(imageUploadProcessing$ | async)">
-      <input #imageInput style="display: none" type="file" accept="image/*" id="file" (change)="onUploadProductImage($event)">
-      <button mat-raised-button color="accent" (click)="imageInput.click()">Choose Thumbnail Image</button>
+    <div>
+      <h3>Card Image (500x200)</h3>
     </div>
-    <div *ngIf="(imageProps$ | async) as imageData">
+    <div class="product-image-input card-image" *ngIf="!(imageUploadProcessing$ | async)">
+      <input #imageInput style="display: none" type="file" accept="image/*" id="file" (change)="onUploadCardImage($event)">
+      <button mat-raised-button color="accent" (click)="imageInput.click()">Choose Card Image</button>
+    </div>
+    <div *ngIf="(cardImageProps$ | async) as imageData">
+      <img class="product-image-display" [src]="imageData.src" [alt]="(productData$ | async)?.name">
+    </div>
+    <div>
+      <h3>Hero Image (2000x938)</h3>
+    </div>
+    <div class="product-image-input hero-image" *ngIf="!(imageUploadProcessing$ | async)">
+      <input #imageInput style="display: none" type="file" accept="image/*" id="file" (change)="onUploadHeroImage($event)">
+      <button mat-raised-button color="accent" (click)="imageInput.click()">Choose Hero Image</button>
+    </div>
+    <div *ngIf="(heroImageProps$ | async) as imageData">
       <img class="product-image-display" [src]="imageData.src" [alt]="(productData$ | async)?.name">
     </div>
   </div>
@@ -44,22 +54,10 @@
           <mat-error *ngIf="listOrder.hasError(validation.type) && listOrder.invalid && (listOrder.dirty || listOrder.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
-      <mat-form-field class="checkoutHeader">
-        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="checkoutHeader" type="text" placeholder="Product Checkout Header"></textarea>
-        <mat-error *ngFor="let validation of productValidationMessages.checkoutHeader">
-          <mat-error *ngIf="checkoutHeader.hasError(validation.type) && checkoutHeader.invalid && (checkoutHeader.dirty || checkoutHeader.touched)">{{ validation.message }}</mat-error>
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="description">
-        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="description" type="text" placeholder="Product Description"></textarea>
-        <mat-error *ngFor="let validation of productValidationMessages.description">
-          <mat-error *ngIf="description.hasError(validation.type) && description.invalid && (description.dirty || description.touched)">{{ validation.message }}</mat-error>
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="mdBlurb">
-        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="mdBlurb" type="text" placeholder="Product Blurb"></textarea>
-        <mat-error *ngFor="let validation of productValidationMessages.mdBlurb">
-          <mat-error *ngIf="mdBlurb.hasError(validation.type) && mdBlurb.invalid && (mdBlurb.dirty || mdBlurb.touched)">{{ validation.message }}</mat-error>
+      <mat-form-field class="tagline">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="tagline" type="text" placeholder="Product Tagline"></textarea>
+        <mat-error *ngFor="let validation of productValidationMessages.tagline">
+          <mat-error *ngIf="tagline.hasError(validation.type) && tagline.invalid && (tagline.dirty || tagline.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
       <div class="highlights-array-container" fxLayout="column" fxLayoutAlign="center center">
@@ -78,6 +76,30 @@
           </button>
         </div>
       </div>
+      <mat-form-field class="heroSubtitle">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="heroSubtitle" type="text" placeholder="Hero Subtitle"></textarea>
+        <mat-error *ngFor="let validation of productValidationMessages.heroSubtitle">
+          <mat-error *ngIf="heroSubtitle.hasError(validation.type) && heroSubtitle.invalid && (heroSubtitle.dirty || heroSubtitle.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="buyNowBoxSubtitle">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="buyNowBoxSubtitle" type="text" placeholder="Hero Subtitle"></textarea>
+        <mat-error *ngFor="let validation of productValidationMessages.buyNowBoxSubtitle">
+          <mat-error *ngIf="buyNowBoxSubtitle.hasError(validation.type) && buyNowBoxSubtitle.invalid && (buyNowBoxSubtitle.dirty || buyNowBoxSubtitle.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="checkoutHeader">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="checkoutHeader" type="text" placeholder="Checkout Header"></textarea>
+        <mat-error *ngFor="let validation of productValidationMessages.checkoutHeader">
+          <mat-error *ngIf="checkoutHeader.hasError(validation.type) && checkoutHeader.invalid && (checkoutHeader.dirty || checkoutHeader.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="checkoutDescription">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="checkoutDescription" type="text" placeholder="Checkout Description"></textarea>
+        <mat-error *ngFor="let validation of productValidationMessages.checkoutDescription">
+          <mat-error *ngIf="checkoutDescription.hasError(validation.type) && checkoutDescription.invalid && (checkoutDescription.dirty || checkoutDescription.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
       <div class="form-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
         <button class="submit-button" [disabled]="productForm.invalid || !productInitialized" mat-raised-button color="accent" type="button" (click)="onSave()">Save Product</button>
         <button *ngIf="isNewProduct" class="discard-button" [disabled]="!productInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Product</button>

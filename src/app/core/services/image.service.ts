@@ -94,10 +94,28 @@ export class ImageService {
 
     console.log('Fetching item doc', itemId, imageType, imageProps);
 
-    const updateResponse = await itemRef.update({
-      imageProps
-    }).then(res => {
-      console.log('Url object data stored');
+    let updateData: Partial<Post | Product>;
+
+    switch (imageType) {
+      case ImageType.BLOG_HERO:
+        updateData = {imageProps};
+        break;
+      case ImageType.BLOG_INLINE:
+        updateData = {imageProps};
+        break;
+      case ImageType.PRODUCT_CARD:
+          updateData = {cardImageProps: imageProps} as Partial<Product>;
+          break;
+      case ImageType.PRODUCT_HERO:
+        updateData = {heroImageProps: imageProps} as Partial<Product>;
+        break;
+      default:
+        updateData = {cardImageProps: imageProps} as Partial<Product>;
+        break;
+    }
+
+    const updateResponse = await itemRef.update(updateData).then(res => {
+      console.log('Image props stored', updateData);
       return res;
     })
     .catch(error => {
@@ -370,7 +388,9 @@ export class ImageService {
         return this.db.collection('posts').doc(itemId);
       case ImageType.BLOG_INLINE:
         return this.db.collection('posts').doc(itemId);
-      case ImageType.PRODUCT:
+      case ImageType.PRODUCT_CARD:
+        return this.db.collection('products').doc(itemId);
+      case ImageType.PRODUCT_HERO:
         return this.db.collection('products').doc(itemId);
       default: return this.db.collection('products').doc(itemId);
     }
@@ -383,7 +403,9 @@ export class ImageService {
         return this.blogStorageRef.child(path);
       case ImageType.BLOG_INLINE:
         return this.blogStorageRef.child(path);
-      case ImageType.PRODUCT:
+      case ImageType.PRODUCT_CARD:
+        return this.productsStorageRef.child(path);
+      case ImageType.PRODUCT_HERO:
         return this.productsStorageRef.child(path);
       default: return this.productsStorageRef.child(path);
     }
@@ -416,7 +438,11 @@ export class ImageService {
         imagePath = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
         imageDirectory = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
-      case ImageType.PRODUCT:
+      case ImageType.PRODUCT_CARD:
+        imagePath = `products/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `products/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        break;
+      case ImageType.PRODUCT_HERO:
         imagePath = `products/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
         imageDirectory = `products/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;

@@ -32,19 +32,22 @@ export const PRODUCT_FORM_VALIDATION_MESSAGES = {
   listOrder: [
     { type: 'required', message: 'List order is required.'},
   ],
-  imageUrl: [
-    { type: 'required', message: 'Image url is required.'},
+  tagline: [
+    { type: 'required', message: 'Tagline is required.'},
+  ],
+  highlight: [
+    { type: 'required', message: 'Highlight cannot be blank.'},
+  ],
+  heroSubtitle: [
+    { type: 'required', message: 'Hero subtitle required.'},
+  ],
+  buyNowBoxSubtitle: [
+    { type: 'required', message: 'Buy now box subtitle required.'},
   ],
   checkoutHeader: [
     { type: 'required', message: 'Checkout header is required.'},
   ],
-  description: [
-    { type: 'required', message: 'Description is required.'},
-  ],
-  mdBlurb: [
-    { type: 'required', message: 'Blurb is required.'},
-  ],
-  highlight: [
-    { type: 'required', message: 'Highlight cannot be blank.'},
+  checkoutDescription: [
+    { type: 'required', message: 'Checkout description is required.'},
   ],
 };
