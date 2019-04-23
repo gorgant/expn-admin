@@ -2,7 +2,7 @@ import { BillingDetails } from './billing-details.model';
 import { CreditCardDetails } from './credit-card-details.model';
 
 export interface Invoice {
-  invoiceId?: string;
+  id?: string;
   anonymousUID: string;
   productName: string;
   productId: string;
@@ -10,6 +10,7 @@ export interface Invoice {
   purchasePrice: number;
   billingDetails: BillingDetails;
   creditCardDetails: CreditCardDetails;
+  lastModified: number;
   orderNumber?: string; // A subset of invoiceId
   paymentComplete?: boolean;
 }

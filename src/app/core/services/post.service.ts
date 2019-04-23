@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { map, takeUntil, catchError } from 'rxjs/operators';
-import { Observable, throwError, from, Subject } from 'rxjs';
+import { Observable, throwError, from } from 'rxjs';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { Post } from '../models/posts/post.model';
 import { ImageType } from '../models/images/image-type.model';
@@ -15,10 +15,6 @@ import { UiService } from './ui.service';
   providedIn: 'root'
 })
 export class PostService {
-
-  imageSizesRetrieved: Subject<number[]> = new Subject();
-
-  imageDirectory: string;
 
   constructor(
     private afs: AngularFirestore,
@@ -51,9 +47,9 @@ export class PostService {
     return postDoc.valueChanges()
     .pipe(
       takeUntil(this.authService.unsubTrigger$),
-      map(product => {
-        console.log('Fetched this item', product);
-        return product;
+      map(post => {
+        console.log('Fetched this item', post);
+        return post;
       }),
       catchError(error => {
         this.uiService.showSnackBar(error, null, 5000);
