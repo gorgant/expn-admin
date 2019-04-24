@@ -45,9 +45,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private imagesModifiedSinceLastSave: boolean;
   private manualSave: boolean;
 
-  private initProductTimeout: NodeJS.Timer;
-  // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
-  private autoSaveTicker: NodeJS.Timer;
+  private initProductTimeout: NodeJS.Timer; // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
+  private autoSaveTicker: NodeJS.Timer; // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
   private autoSaveSubscription: Subscription;
 
   constructor(
