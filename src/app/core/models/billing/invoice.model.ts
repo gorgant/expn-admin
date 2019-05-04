@@ -1,5 +1,5 @@
-import { BillingDetails } from './billing-details.model';
 import { CreditCardDetails } from './credit-card-details.model';
+import { BillingDetails } from './billing-details.model';
 
 export interface Invoice {
   id: string;

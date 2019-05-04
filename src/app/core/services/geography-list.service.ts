@@ -46,7 +46,7 @@ export class GeographyListService {
     });
   }
 
-  // Data courtesy of: https://datahub.io/core/country-list
+  // Data courtesy of: https://datahub.io/core/country-list and https://datahub.io/core/country-codes
   private fetchCountryData(): Observable<Country[]> {
     return this.http.get('assets/data/country-list-updated.csv', {responseType: 'text'})
       .pipe(
@@ -115,7 +115,8 @@ export class GeographyListService {
       const countryObject: Country = {
         name: country[0],
         code: country[1],
-        order: Number(country[2])
+        dial: Number(country[2]),
+        order: Number(country[3])
       };
       countryObjectArray.push(countryObject);
     });
