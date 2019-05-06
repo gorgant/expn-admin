@@ -11,6 +11,8 @@ import { Post } from '../models/posts/post.model';
 import { Product } from '../models/products/product.model';
 import { ImageUrlObject } from '../models/images/image-url-object.model';
 import { ImageProps } from '../models/images/image-props.model';
+import { FbFunctionNames } from '../models/routes-and-paths/fb-function-names';
+import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -202,7 +204,7 @@ export class ImageService {
 
   private async resizeImagesOnServer(metadata: ImageMetadata) {
 
-    const resizeImagesHttpCall = this.fns.httpsCallable('resizeImages');
+    const resizeImagesHttpCall = this.fns.httpsCallable(FbFunctionNames.RESIZE_IMAGES);
 
     const response = await resizeImagesHttpCall(metadata)
       .catch(error =>  console.log('Error updating item data on server', error));
@@ -385,14 +387,14 @@ export class ImageService {
   private getItemRef(itemId: string, imageType: ImageType): firebase.firestore.DocumentReference {
     switch (imageType) {
       case ImageType.BLOG_HERO:
-        return this.db.collection('posts').doc(itemId);
+        return this.db.collection(FbCollectionPaths.POSTS).doc(itemId);
       case ImageType.BLOG_INLINE:
-        return this.db.collection('posts').doc(itemId);
+        return this.db.collection(FbCollectionPaths.POSTS).doc(itemId);
       case ImageType.PRODUCT_CARD:
-        return this.db.collection('products').doc(itemId);
+        return this.db.collection(FbCollectionPaths.PRODUCTS).doc(itemId);
       case ImageType.PRODUCT_HERO:
-        return this.db.collection('products').doc(itemId);
-      default: return this.db.collection('products').doc(itemId);
+        return this.db.collection(FbCollectionPaths.PRODUCTS).doc(itemId);
+      default: return this.db.collection(FbCollectionPaths.PRODUCTS).doc(itemId);
     }
 
   }
@@ -431,24 +433,24 @@ export class ImageService {
     let imageDirectory: string;
     switch (imageType) {
       case ImageType.BLOG_HERO:
-        imagePath = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${FbCollectionPaths.POSTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${FbCollectionPaths.POSTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
       case ImageType.BLOG_INLINE:
-        imagePath = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `posts/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${FbCollectionPaths.POSTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${FbCollectionPaths.POSTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
       case ImageType.PRODUCT_CARD:
-        imagePath = `products/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `products/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${FbCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${FbCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
       case ImageType.PRODUCT_HERO:
-        imagePath = `products/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `products/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${FbCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${FbCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
       default:
-        imagePath = `products/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `products/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${FbCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${FbCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
     }
     const resizedImagesPath = `${imageDirectory}/resized`;
     const resizedFileNamePrefix = `${sanitizedFileName.fileNameNoExt}_thumb@`;

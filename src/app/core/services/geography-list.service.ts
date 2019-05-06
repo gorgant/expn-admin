@@ -6,6 +6,7 @@ import { map, tap } from 'rxjs/operators';
 import { Observable, zip } from 'rxjs';
 import { UsState } from '../models/forms-and-components/geography/us-state.model';
 import { GeographicData } from '../models/forms-and-components/geography/geographic-data.model';
+import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -140,7 +141,7 @@ export class GeographyListService {
   }
 
   private getPublicCollection(): AngularFirestoreCollection<{}> {
-    return this.afs.collection('publicResources');
+    return this.afs.collection(FbCollectionPaths.PUBLIC_RESOURCES);
   }
 
 

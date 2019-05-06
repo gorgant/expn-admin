@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, from, Subject, throwError } from 'rxjs';
 import { AppUser } from '../models/user/app-user.model';
 import { map, takeUntil, catchError } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import { UiService } from './ui.service';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StoreUserDataType } from '../models/user/store-user-data-type.model';
+import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -74,8 +75,12 @@ export class UserService {
   }
 
   // Provides easy access to user doc throughout the app
-  fetchUserDoc(userId: string) {
-    return this.db.doc<AppUser>(`users/${userId}`);
+  getUserDoc(userId: string): AngularFirestoreDocument<AppUser> {
+    return this.getUserCollection().doc<AppUser>(userId);
+  }
+
+  private getUserCollection(): AngularFirestoreCollection<AppUser> {
+    return this.db.collection<AppUser>(FbCollectionPaths.USERS);
   }
 
 }

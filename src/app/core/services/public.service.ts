@@ -6,6 +6,7 @@ import { AngularFireFunctions } from '@angular/fire/functions';
 import { throwError } from 'rxjs';
 import { GeographyListService } from './geography-list.service';
 import { Product } from '../models/products/product.model';
+import { FbFunctionNames } from '../models/routes-and-paths/fb-function-names';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class PublicService {
 
   // Submit http request to cloud functions to publish or unpublish post
   updatePublicPost(post: Post): void {
-    const callable = this.fns.httpsCallable('publishBlogPost');
+    const callable = this.fns.httpsCallable(FbFunctionNames.PUBLISH_BLOG_POST);
     callable(post)
       .pipe(
         take(1),
@@ -33,7 +34,7 @@ export class PublicService {
 
   // Submit http request to cloud functions to activate or deactivate product
   updatePublicProduct(product: Product): void {
-    const callable = this.fns.httpsCallable('updateProduct');
+    const callable = this.fns.httpsCallable(FbFunctionNames.UPDATE_PRODUCT);
     callable(product)
       .pipe(
         take(1),
@@ -46,7 +47,7 @@ export class PublicService {
   }
 
   updateGeographicData() {
-    const geographicHttpCall = this.fns.httpsCallable('updateGeographicData');
+    const geographicHttpCall = this.fns.httpsCallable(FbFunctionNames.UPDATE_GEOGRAPHIC_DATA);
 
     this.geographyListService.updateGeographicData()
       .pipe(take(1))

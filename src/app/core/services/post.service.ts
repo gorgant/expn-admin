@@ -10,6 +10,7 @@ import { PublicService } from './public.service';
 import { ImageService } from './image.service';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
+import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -173,10 +174,10 @@ export class PostService {
   }
 
   getPostDoc(id: string): AngularFirestoreDocument<Post> {
-    return this.afs.doc<Post>(`posts/${id}`);
+    return this.getPostCollection().doc(id);
   }
 
   private getPostCollection(): AngularFirestoreCollection<Post> {
-    return this.afs.collection<Post>('posts');
+    return this.afs.collection<Post>(FbCollectionPaths.POSTS);
   }
 }

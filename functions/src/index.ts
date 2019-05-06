@@ -1,17 +1,17 @@
 
 // Structure courtesy of https://github.com/malikasinger1/firebase-functions-with-typescript
 
-import { resizeImages } from './lib/resize-images';
+import { resizeImages } from './local/resize-images';
 export { resizeImages };
 
-import { createAdminUser } from './lib/create-admin-user';
+import { createAdminUser } from './local/create-admin-user';
 export { createAdminUser };
 
-import { publishBlogPost } from './lib/publish-blog-post';
+import { publishBlogPost } from './local/publish-blog-post';
 export { publishBlogPost };
 
-import { updateGeographicData } from './lib/update-geographic-data';
+import { updateGeographicData } from './local/update-geographic-data';
 export { updateGeographicData };
 
-import { updateProduct } from './lib/update-product';
+import { updateProduct } from './local/update-product';
 export { updateProduct };
