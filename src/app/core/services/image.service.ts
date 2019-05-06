@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
 import { SanitizedFileName } from '../models/images/sanitized-file-name.model';
-import { FirebasePaths } from '../models/routes-and-paths/firebase-paths.model';
+import { FbSystemPaths } from '../models/routes-and-paths/fb-system-paths.model';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { ImageType } from '../models/images/image-type.model';
 import { ImageDirectoryData } from '../models/images/image-directory-data.model';
@@ -19,8 +19,8 @@ export class ImageService {
 
   private imageProcessing$ = new BehaviorSubject<boolean>(false);
 
-  private blogStorageRef = firebase.app().storage(FirebasePaths.BLOG_STORAGE_FB).ref();
-  private productsStorageRef = firebase.app().storage(FirebasePaths.PRODUCTS_STORAGE_FB).ref();
+  private blogStorageRef = firebase.app().storage(FbSystemPaths.BLOG_STORAGE_FB).ref();
+  private productsStorageRef = firebase.app().storage(FbSystemPaths.PRODUCTS_STORAGE_FB).ref();
 
   private db = firebase.firestore(); // Firebase database
   private fns = firebase.functions(); // Firebase functions
