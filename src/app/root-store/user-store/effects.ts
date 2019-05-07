@@ -6,7 +6,6 @@ import * as userFeatureActions from './actions';
 import { switchMap, map, catchError, tap } from 'rxjs/operators';
 import { UserService } from 'src/app/core/services/user.service';
 import { RootStoreState } from '..';
-import { StoreUserDataType } from 'src/app/core/models/user/store-user-data-type.model';
 
 @Injectable()
 export class UserStoreEffects {
@@ -38,24 +37,13 @@ export class UserStoreEffects {
       userFeatureActions.ActionTypes.STORE_USER_DATA_REQUESTED
     ),
     switchMap(action =>
-      this.userService.storeUserData(
-        action.payload.userData, action.payload.userId, action.payload.requestType
-      )
+      this.userService.storeUserData(action.payload.userData)
       .pipe(
-        tap(appUser => {
-          // Update user data in store
+        tap(userId => {
+          // After data is stored, fetch it to update user data in local store for immediate UI updates
           this.store$.dispatch(
-            new userFeatureActions.UserDataRequested({userId: appUser.id})
+            new userFeatureActions.UserDataRequested({userId})
           );
-          // If new user registration (via email or Google), create demo timer
-          // Important: use action.payload userData for isNewUser (vs appUser from storeUserData database request)
-          // because after store in db request, isNewUser will be false)
-          if (
-            action.payload.requestType === StoreUserDataType.REGISTER_USER ||
-            (action.payload.requestType === StoreUserDataType.GOOGLE_LOGIN && action.payload.userData.isNewUser)
-            ) {
-              // Any actions needed for new user should happen here
-          }
         }),
         map(appUser => new userFeatureActions.StoreUserDataComplete()),
         catchError(error => {

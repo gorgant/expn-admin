@@ -22,53 +22,33 @@ export class UserService {
   ) { }
 
   fetchUserData(userId: string): Observable<AppUser> {
-    return this.db.doc<AppUser>(`users/${userId}`)
-      .snapshotChanges()
+    const userDoc = this.getUserDoc(userId);
+    return userDoc
+      .valueChanges()
       .pipe(
         // If logged out, this triggers unsub of this observable
         takeUntil(this.authService.unsubTrigger$),
-        map(docSnapshot => {
-          const appUser: AppUser = {
-            id: docSnapshot.payload.id,
-            ...docSnapshot.payload.data(),
-          };
-          console.log('user data retrieved', appUser);
-          // Mark new user false bc at this point demo timer request should have already been fired
-          if (appUser.isNewUser) {
-            this.storeUserData(appUser, appUser.id, StoreUserDataType.TOGGLE_NEW_USER_OFF);
-          }
-          return appUser;
+        map(user => {
+          console.log('Fetched user', user);
+          return user;
         }),
         catchError(error => {
-          this.uiService.showSnackBar(error, null, 5000);
+          console.log('Error fetching user', error);
           return throwError(error);
         })
       );
   }
 
-  storeUserData(appUser: AppUser, userId: string, requestType: StoreUserDataType): Observable<AppUser> {
-    const userData: AppUser = appUser;
-    if (requestType === StoreUserDataType.REGISTER_USER) {
-      userData.id = userId;
-    }
-    if (requestType === StoreUserDataType.TOGGLE_NEW_USER_OFF) {
-      userData.isNewUser = false;
-    }
-    const userCollection = this.db.collection<AppUser>('users');
-    const fbResponse = userCollection.doc(userId).set(appUser, {merge: true})
-      .then(() => {
-        if (
-          requestType !== StoreUserDataType.REGISTER_USER &&
-          requestType !== StoreUserDataType.GOOGLE_LOGIN &&
-          requestType !== StoreUserDataType.EMAIL_UPDATE &&
-          requestType !== StoreUserDataType.TOGGLE_NEW_USER_OFF
-        ) {
-          this.uiService.showSnackBar('User info updated', null, 3000);
-        }
-        return appUser;
+  storeUserData(user: AppUser): Observable<string> {
+    const userDoc = this.getUserDoc(user.id);
+    // Use set here because may be generating a new user or updating existing user
+    const fbResponse = userDoc.set(user, {merge: true})
+      .then(res => {
+        console.log('User data stored in database');
+        return user.id;
       } )
       .catch(error => {
-        this.uiService.showSnackBar(error, null, 5000);
+        console.log('Error storing data in database');
         return throwError(error).toPromise();
       });
     return from(fbResponse);

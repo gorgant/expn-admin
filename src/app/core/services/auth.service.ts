@@ -35,17 +35,17 @@ export class AuthService {
     });
   }
 
-  registerUser(authData: AuthData): Observable<{userData: AppUser, userId: string}> {
+  registerUser(authData: AuthData): Observable<AppUser> {
     const authResponse = this.afAuth.auth.createUserWithEmailAndPassword(
       authData.email,
       authData.password
     ).then(creds => {
       const appUser: AppUser = {
+        id: creds.user.uid,
         displayName: authData.name,
         email: authData.email,
       };
-      const userId = creds.user.uid;
-      return {userData: appUser, userId};
+      return appUser;
     })
     .catch(error => {
       this.uiService.showSnackBar(error, null, 5000);

@@ -4,8 +4,8 @@ import { AuthenticateUserType } from 'src/app/core/models/auth/authenticate-user
 import { AuthData } from 'src/app/core/models/auth/auth-data.model';
 
 export enum ActionTypes {
-  REGISTER_USER_REQUESTED = '[Auth] Register User Requested',
-  REGISTER_USER_COMPLETE = '[Auth] Register User Complete',
+  // REGISTER_USER_REQUESTED = '[Auth] Register User Requested',
+  // REGISTER_USER_COMPLETE = '[Auth] Register User Complete',
   AUTHENTICATION_REQUESTED = '[Auth] Authentication Requested',
   AUTHENTICATION_COMPLETE = '[Auth] Authentication Complete',
   SET_AUTHENTICATED = '[Auth] Set Authenticated',
@@ -19,15 +19,15 @@ export enum ActionTypes {
   AUTH_LOAD_ERROR = '[Auth] Load Failure'
 }
 
-export class RegisterUserRequested implements Action {
-  readonly type = ActionTypes.REGISTER_USER_REQUESTED;
+// export class RegisterUserRequested implements Action {
+//   readonly type = ActionTypes.REGISTER_USER_REQUESTED;
 
-  constructor(public payload: { authData: AuthData }) {}
-}
+//   constructor(public payload: { authData: AuthData }) {}
+// }
 
-export class RegisterUserComplete implements Action {
-  readonly type = ActionTypes.REGISTER_USER_COMPLETE;
-}
+// export class RegisterUserComplete implements Action {
+//   readonly type = ActionTypes.REGISTER_USER_COMPLETE;
+// }
 
 export class AuthenticationRequested implements Action {
   readonly type = ActionTypes.AUTHENTICATION_REQUESTED;
@@ -84,8 +84,8 @@ export class LoadErrorDetected implements Action {
 }
 
 export type Actions =
-  RegisterUserRequested |
-  RegisterUserComplete |
+  // RegisterUserRequested |
+  // RegisterUserComplete |
   AuthenticationRequested |
   AuthenticationComplete |
   SetAuthenticated |

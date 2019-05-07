@@ -19,30 +19,6 @@ export class AuthStoreEffects {
   ) { }
 
   @Effect()
-  registerUserRequestedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<authFeatureActions.RegisterUserRequested>(
-      authFeatureActions.ActionTypes.REGISTER_USER_REQUESTED
-    ),
-    switchMap(action =>
-      this.authService.registerUser(action.payload.authData)
-        .pipe(
-          // Store registered user data in the database (not just the user records)
-          tap(response => {
-            this.store$.dispatch(
-              new userFeatureActions.StoreUserDataRequested(
-                {userData: response.userData, userId: response.userId, requestType: StoreUserDataType.REGISTER_USER}
-              )
-            );
-          }),
-          map(response => new authFeatureActions.RegisterUserComplete()),
-          catchError(error => {
-            return of(new authFeatureActions.LoadErrorDetected({ error }));
-          })
-        )
-    )
-  );
-
-  @Effect()
   authenticationRequestedEffect$: Observable<Action> = this.actions$.pipe(
     ofType<authFeatureActions.AuthenticationRequested>(
       authFeatureActions.ActionTypes.AUTHENTICATION_REQUESTED
@@ -53,7 +29,7 @@ export class AuthStoreEffects {
       if (action.payload.requestType === AuthenticateUserType.EMAIL_AUTH) {
         return this.authService.loginWithEmail(action.payload.authData)
           .pipe(
-            // Load user data into the store
+            // Load user data into the store (skip info update that happens in Google login)
             tap(fbUser =>
               // If email login, payload is a firebaseUser, but all we need is the uid
               this.store$.dispatch(new userFeatureActions.UserDataRequested({userId: fbUser.uid}))
@@ -67,22 +43,18 @@ export class AuthStoreEffects {
 
       // If Google login, treat like user registration
       if (action.payload.requestType === AuthenticateUserType.GOOGLE_AUTH) {
-        return this.authService.loginWithGoogle()
-          .pipe(
-            tap(appUser => {
-              // Store (or overwrite) user data
-              // User data fetched in User Store after the storing process is complete
-              this.store$.dispatch(
-                new userFeatureActions.StoreUserDataRequested(
-                  {userData: appUser, userId: appUser.id, requestType: StoreUserDataType.GOOGLE_LOGIN}
-                )
-              );
-            }),
-            map(fbUser => new authFeatureActions.AuthenticationComplete()),
-            catchError(error => {
-              return of(new authFeatureActions.LoadErrorDetected({ error }));
-            })
-          );
+       return this.authService.loginWithGoogle()
+        .pipe(
+          // Load user data into the store
+          tap(userData => {
+            // Add or update user info in database (will trigger a subsequent user store update request in User Store)
+            return this.store$.dispatch(new userFeatureActions.StoreUserDataRequested({userData}));
+          }),
+          map(userCreds => new authFeatureActions.AuthenticationComplete()),
+          catchError(error => {
+            return of(new authFeatureActions.LoadErrorDetected({ error }));
+          })
+        );
       }
 
     })
@@ -104,7 +76,7 @@ export class AuthStoreEffects {
           tap(response => {
             return this.store$.dispatch(
               new userFeatureActions.StoreUserDataRequested(
-                {userData: response.userData, userId: response.userId, requestType: StoreUserDataType.EMAIL_UPDATE}
+                {userData: response.userData}
               )
             );
           }),

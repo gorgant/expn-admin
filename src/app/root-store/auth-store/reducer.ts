@@ -3,11 +3,11 @@ import { Actions, ActionTypes } from './actions';
 
 export function featureReducer(state = initialState, action: Actions): State {
   switch (action.type) {
-    case ActionTypes.REGISTER_USER_COMPLETE:
-      return {
-        ...state,
-        isAuthenticated: true
-      };
+    // case ActionTypes.REGISTER_USER_COMPLETE:
+    //   return {
+    //     ...state,
+    //     isAuthenticated: true
+    //   };
     case ActionTypes.AUTHENTICATION_COMPLETE:
       return {
         ...state,
