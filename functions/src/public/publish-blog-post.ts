@@ -12,6 +12,7 @@ export const publishBlogPost = functions.https.onCall(async (data: Post, context
 async function publishPost(post: Post) {
 
   const db = publicFirestore;
+  console.log('Public firestore', db);
 
   // If post is published on admin, publish here
   if (post.published) {

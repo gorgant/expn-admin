@@ -38,6 +38,7 @@ export class PostCardComponent implements OnInit {
   }
 
   onUnPublishPost() {
+    console.log('Request to unpublish this post', this.post);
     this.postService.unPublishPost(this.post);
   }
 
