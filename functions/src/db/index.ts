@@ -1,7 +1,10 @@
-import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
+import { adminApp, publicApp } from "../apps";
+import { Storage } from '@google-cloud/storage';
 
-const adminApp = admin.initializeApp(functions.config().firebase);
+// LOCAL VARIABLES
+export const adminFirestore = adminApp.firestore();
+export const adminStorage = new Storage();
 
-const adminFirestore = adminApp.firestore();
-export default adminFirestore;
+
+// PUBLIC VARIABLES
+export const publicFirestore = publicApp.then(pubApp => pubApp.firestore());

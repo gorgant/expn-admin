@@ -1,9 +1,9 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import adminFirestore from '../db';
 
 import { AppUser } from '../../../shared-models/user/app-user.model';
 import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
+import { adminFirestore } from '../db';
 
 export const createAdminUser = functions.auth.user()
   .onCreate( async (user) => {

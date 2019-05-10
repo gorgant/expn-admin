@@ -6,13 +6,13 @@ import { tmpdir } from 'os';
 import * as sharp from 'sharp';
 import * as fs from 'fs-extra'; // Mirrors the existing filesystem methods, but uses Promises
 
-import adminFirestore from '../db';
 import { now } from 'moment';
 
 import { ImageMetadata } from '../../../shared-models/images/image-metadata.model';
 import { ImageType } from '../../../shared-models/images/image-type.model';
 import { FbSystemPaths } from '../../../shared-models/routes-and-paths/fb-system-paths.model';
 import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
+import { adminFirestore } from '../db';
 
 interface ResizeImageDataObject {
   fileName: string;

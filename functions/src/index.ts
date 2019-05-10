@@ -7,11 +7,14 @@ export { resizeImages };
 import { createAdminUser } from './local/create-admin-user';
 export { createAdminUser };
 
-import { publishBlogPost } from './local/publish-blog-post';
+import { publishBlogPost } from './public/publish-blog-post';
 export { publishBlogPost };
 
-import { updateGeographicData } from './local/update-geographic-data';
+import { updateGeographicData } from './public/update-geographic-data';
 export { updateGeographicData };
 
-import { updateProduct } from './local/update-product';
+import { updateProduct } from './public/update-product';
 export { updateProduct };
+
+import { saveOrderInFirestore } from './public/store-order';
+export { saveOrderInFirestore };
