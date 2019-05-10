@@ -11,12 +11,11 @@ export const updateProduct = functions.https.onCall(async (data: Product, contex
 
 async function updateProd(product: Product) {
 
-
-  const pubFirestore = await publicFirestore;
+  const db = publicFirestore;
 
   // If product is active on admin, add to public
   if (product.active) {
-    const fbRes = await pubFirestore.collection(FbCollectionPaths.PRODUCTS).doc(product.id).set(product)
+    const fbRes = await db.collection(FbCollectionPaths.PRODUCTS).doc(product.id).set(product)
       .catch(error => console.log(error));
     console.log('Product activated');
     return fbRes;
@@ -24,7 +23,7 @@ async function updateProd(product: Product) {
 
   // If product is not active on admin, remove from public
   if (!product.active) {
-    const fbRes = await pubFirestore.collection(FbCollectionPaths.PRODUCTS).doc(product.id).delete()
+    const fbRes = await db.collection(FbCollectionPaths.PRODUCTS).doc(product.id).delete()
       .catch(error => console.log(error));
     console.log('Product deactivated');
     return fbRes;

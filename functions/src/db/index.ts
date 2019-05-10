@@ -7,4 +7,4 @@ export const adminStorage = new Storage();
 
 
 // PUBLIC VARIABLES
-export const publicFirestore = publicApp.then(pubApp => pubApp.firestore());
+export const publicFirestore = publicApp.firestore();

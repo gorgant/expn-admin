@@ -1,5 +1,8 @@
 import * as admin from 'firebase-admin';
-import { getPublicApp } from './public-config';
 
 export const adminApp = admin.initializeApp();
-export const publicApp = getPublicApp();
+
+// Requires adim service account to be added to public IAM
+export const publicApp = admin.initializeApp({
+  databaseURL: `https://explearning-76d93.firebaseio.com`,
+}, 'public');

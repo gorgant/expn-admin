@@ -11,12 +11,11 @@ export const publishBlogPost = functions.https.onCall(async (data: Post, context
 
 async function publishPost(post: Post) {
 
-  const pubFirestore = await publicFirestore;
-
+  const db = publicFirestore;
 
   // If post is published on admin, publish here
   if (post.published) {
-    const fbRes = await pubFirestore.collection(FbCollectionPaths.POSTS).doc(post.id).set(post)
+    const fbRes = await db.collection(FbCollectionPaths.POSTS).doc(post.id).set(post)
       .catch(error => console.log(error));
     console.log('Post published');
     return fbRes;
@@ -24,7 +23,7 @@ async function publishPost(post: Post) {
 
   // If post not published on admin, unpublish here
   if (!post.published) {
-    const fbRes = await pubFirestore.collection(FbCollectionPaths.POSTS).doc(post.id).delete()
+    const fbRes = await db.collection(FbCollectionPaths.POSTS).doc(post.id).delete()
       .catch(error => console.log(error));
     console.log('Post unpublished');
     return fbRes;

@@ -11,10 +11,10 @@ export const updateGeographicData = functions.https.onCall(async (data: Geograph
 
 async function updateGeoLists(geographicData: GeographicData) {
 
-  const pubFirestore = await publicFirestore;
+  const db = publicFirestore;
 
   console.log('About to set geographic data', geographicData);
-  const fbRes = await pubFirestore.collection(FbCollectionPaths.PUBLIC_RESOURCES).doc('geographicData').set(geographicData)
+  const fbRes = await db.collection(FbCollectionPaths.PUBLIC_RESOURCES).doc('geographicData').set(geographicData)
     .catch(error => console.log(error));
     console.log('Geographic data updated');
     return fbRes;
