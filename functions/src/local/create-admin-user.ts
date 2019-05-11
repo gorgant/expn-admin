@@ -5,13 +5,7 @@ import { AppUser } from '../../../shared-models/user/app-user.model';
 import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { adminFirestore } from '../db';
 
-export const createAdminUser = functions.auth.user()
-  .onCreate( async (user) => {
-    await addUserToDb(user);
-    return true;
-});
-
-async function addUserToDb(authUser: admin.auth.UserRecord) {
+const addUserToDb = async (authUser: admin.auth.UserRecord) => {
   
   const appUser: AppUser = {
     displayName: authUser.displayName as string,
@@ -23,3 +17,12 @@ async function addUserToDb(authUser: admin.auth.UserRecord) {
   await adminFirestore.collection(FbCollectionPaths.USERS).doc(authUser.uid).set(appUser);
   console.log('Admin user created', appUser);
 }
+
+/////// DEPLOYABLE FUNCTIONS ///////
+
+export const createAdminUser = functions.auth.user()
+  .onCreate( async (user) => {
+    await addUserToDb(user);
+    return true;
+});
+

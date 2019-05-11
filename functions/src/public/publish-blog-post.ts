@@ -3,13 +3,7 @@ import { Post } from '../../../shared-models/posts/post.model';
 import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { publicFirestore } from '../db';
 
-export const publishBlogPost = functions.https.onCall(async (data: Post, context) => {
-  const outcome = await publishPost(data);
-  return {outcome}
-});
-
-
-async function publishPost(post: Post) {
+const publishPost = async (post: Post) => {
 
   const db = publicFirestore;
   console.log('Public firestore', db);
@@ -31,3 +25,10 @@ async function publishPost(post: Post) {
   }
 
 }
+
+/////// DEPLOYABLE FUNCTIONS ///////
+
+export const publishBlogPost = functions.https.onCall(async (data: Post, context) => {
+  const outcome = await publishPost(data);
+  return {outcome}
+});

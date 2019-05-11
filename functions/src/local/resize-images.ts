@@ -34,28 +34,9 @@ const blogInlineImages = [ 150 ]
 const productCardSizes = [ 300 ]
 const productHeroSizes = [ 500, 1500 ]
 
-export const resizeImages = functions.https.onCall(async (metadata: ImageMetadata, context) => {
-  console.log('Received this image metadata', metadata);
-  const imageData = await assignVariables(metadata);
 
-  // Exit function if invalid object
-  if(!objectIsValidCheck(imageData)) {
-    return false;
-  };
 
-  // Resize images (and delete original)
-  await resizeImgs(imageData);
-
-  // Signal to Firebase that updates are complete
-  const outcome = await updateFBPost(imageData);
-
-  // Cleanup remove the tmp/thumbs from the filesystem
-  await fs.remove(imageData.workingDir);
-
-  return {outcome}
-});
-
-async function assignVariables(metadata: ImageMetadata): Promise<ResizeImageDataObject> {
+const assignVariables = async (metadata: ImageMetadata): Promise<ResizeImageDataObject> => {
   const imageType = metadata.customMetadata.imageType;
   
   let bucket: Bucket; // The Storage bucket that contains the file.
@@ -113,7 +94,7 @@ async function assignVariables(metadata: ImageMetadata): Promise<ResizeImageData
   return resizeImageDataObject;
 }
 
-function objectIsValidCheck (imageData: ResizeImageDataObject) {
+const objectIsValidCheck = (imageData: ResizeImageDataObject): boolean => {
 
   // Exit if this is triggered on a file that is not an image.
   if (!imageData.contentType || !imageData.contentType.includes('image')) {
@@ -124,7 +105,7 @@ function objectIsValidCheck (imageData: ResizeImageDataObject) {
   return true
 }
 
-async function resizeImgs(imageData: ResizeImageDataObject) {
+const resizeImgs = async (imageData: ResizeImageDataObject) => {
   // 1. Ensure thumbnail dir exists
   await fs.ensureDir(imageData.workingDir);
 
@@ -213,7 +194,7 @@ async function resizeImgs(imageData: ResizeImageDataObject) {
 
 }
 
-async function updateFBPost(imageData: ResizeImageDataObject): Promise<FirebaseFirestore.WriteResult> {
+const updateFBPost = async (imageData: ResizeImageDataObject): Promise<FirebaseFirestore.WriteResult> => {
 
   // Set approapriate data in Firestore then signal to database that images have been uploaded
   switch (imageData.imageType) {
@@ -233,4 +214,28 @@ async function updateFBPost(imageData: ResizeImageDataObject): Promise<FirebaseF
       await adminFirestore.collection(FbCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imageSizes: productCardSizes});
       return adminFirestore.collection(FbCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imagesUpdated: now()})
   }
+  
 }
+
+/////// DEPLOYABLE FUNCTIONS ///////
+
+export const resizeImages = functions.https.onCall(async (metadata: ImageMetadata, context) => {
+  console.log('Received this image metadata', metadata);
+  const imageData = await assignVariables(metadata);
+
+  // Exit function if invalid object
+  if(!objectIsValidCheck(imageData)) {
+    return false;
+  };
+
+  // Resize images (and delete original)
+  await resizeImgs(imageData);
+
+  // Signal to Firebase that updates are complete
+  const outcome = await updateFBPost(imageData);
+
+  // Cleanup remove the tmp/thumbs from the filesystem
+  await fs.remove(imageData.workingDir);
+
+  return {outcome}
+});

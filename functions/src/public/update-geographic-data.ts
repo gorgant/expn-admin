@@ -3,13 +3,9 @@ import { GeographicData } from '../../../shared-models/forms-and-components/geog
 import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { publicFirestore } from '../db';
 
-export const updateGeographicData = functions.https.onCall(async (data: GeographicData, context) => {
-  const outcome = await updateGeoLists(data);
-  return {outcome}
-});
 
 
-async function updateGeoLists(geographicData: GeographicData) {
+const updateGeoLists = async (geographicData: GeographicData) => {
 
   const db = publicFirestore;
 
@@ -19,3 +15,10 @@ async function updateGeoLists(geographicData: GeographicData) {
     console.log('Geographic data updated');
     return fbRes;
 }
+
+/////// DEPLOYABLE FUNCTIONS ///////
+
+export const updateGeographicData = functions.https.onCall(async (data: GeographicData, context) => {
+  const outcome = await updateGeoLists(data);
+  return {outcome}
+});
