@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { PostService } from 'src/app/core/services/post.service';
 import { Observable } from 'rxjs';
 import { Post } from 'src/app/core/models/posts/post.model';
 import { Router } from '@angular/router';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { Store } from '@ngrx/store';
+import { RootStoreState, PostStoreSelectors, PostStoreActions } from 'src/app/root-store';
+import { withLatestFrom, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-blog-dashboard',
@@ -12,19 +14,35 @@ import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model
 })
 export class BlogDashboardComponent implements OnInit {
 
-  posts: Observable<Post[]>;
+  posts$: Observable<Post[]>;
 
   constructor(
-    private postService: PostService,
     private router: Router,
+    private store$: Store<RootStoreState.State>
   ) { }
 
   ngOnInit() {
-    this.posts = this.postService.fetchAllPosts();
+    this.initializePosts();
   }
 
   onCreatePost() {
     this.router.navigate([AppRoutes.BLOG_NEW_POST]);
+  }
+
+  private initializePosts() {
+    this.posts$ = this.store$.select(PostStoreSelectors.selectAllPosts)
+    .pipe(
+      withLatestFrom(
+        this.store$.select(PostStoreSelectors.selectPostsLoaded)
+      ),
+      map(([posts, postsLoaded]) => {
+        // Check if posts are loaded, if not fetch from server
+        if (!postsLoaded) {
+          this.store$.dispatch(new PostStoreActions.AllPostsRequested());
+        }
+        return posts;
+      })
+    );
   }
 
 }

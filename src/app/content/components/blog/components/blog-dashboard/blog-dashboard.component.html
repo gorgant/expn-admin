@@ -3,18 +3,18 @@
   <div class="create-post-container" fxLayout="row" fxLayoutAlign="center center">
     <button class="create-post-button" mat-raised-button (click)="onCreatePost()">Create Post</button>
   </div>
-  <mat-tab-group *ngIf="posts | async as loadedPosts" mat-stretch-tabs>
+  <mat-tab-group *ngIf="posts$ | async as posts" mat-stretch-tabs>
     <mat-tab label="Drafts" >
       <div class="blog-container">
         <div class="grid-container" gdColumns="repeat(auto-fill, minmax(300px, 1fr))" gdAlignRows="center center" gdGap="10px">
-          <app-post-card *ngFor="let post of loadedPosts | unpublishedPostFilter" [post]="post" fxLayout="column"></app-post-card>
+          <app-post-card *ngFor="let post of posts | unpublishedPostFilter" [post]="post" fxLayout="column"></app-post-card>
         </div>
       </div>
     </mat-tab>
     <mat-tab label="Published">
       <div class="blog-container">
         <div class="grid-container" gdColumns="repeat(auto-fill, minmax(300px, 1fr))" gdAlignRows="center center" gdGap="10px" fxFill>
-          <app-post-card *ngFor="let post of loadedPosts | publishedPostFilter" [post]="post" fxLayout="column"></app-post-card>
+          <app-post-card *ngFor="let post of posts | publishedPostFilter" [post]="post" fxLayout="column"></app-post-card>
         </div>
       </div>
     </mat-tab>

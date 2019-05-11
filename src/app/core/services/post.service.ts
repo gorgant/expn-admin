@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { map, takeUntil, catchError } from 'rxjs/operators';
+import { map, takeUntil, catchError, switchMap } from 'rxjs/operators';
 import { Observable, throwError, from } from 'rxjs';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { Post } from '../models/posts/post.model';
@@ -66,7 +66,8 @@ export class PostService {
         return post;
       })
       .catch(error => {
-        return throwError(error).toPromise();
+        console.log('Error creating post', error);
+        return error;
       });
 
     return from(fbResponse);
@@ -80,25 +81,36 @@ export class PostService {
       })
       .catch(error => {
         console.log('Error updating post', error);
-        return throwError(error).toPromise();
+        return error;
       });
 
     return from(fbResponse);
   }
 
-  async deletePost(postId: string): Promise<string> {
-    await this.imageService.deleteAllItemImages(postId, ImageType.BLOG_HERO); // Be sure to delete images before deleting the item doc
-    const fbResponse = this.getPostDoc(postId).delete()
-      .then(empty => {
-        console.log('Post deleted', postId);
-        return postId;
-      })
-      .catch(error => {
-        console.log('Error deleting post', error);
-        return throwError(error).toPromise();
+  deletePost(postId: string): Observable<string> {
+
+    // Be sure to delete images before deleting the item doc
+    const deleteImagePromise = this.imageService.deleteAllItemImages(postId, ImageType.BLOG_HERO)
+      .catch(err => {
+        console.log('Error deleting post images', err);
+        return err;
       });
 
-    return fbResponse;
+    return from(deleteImagePromise)
+      .pipe(
+        switchMap(res => {
+          const fbResponse = this.getPostDoc(postId).delete()
+          .then(empty => {
+            console.log('Post deleted', postId);
+            return postId;
+          })
+          .catch(error => {
+            console.log('Error deleting post', error);
+            return throwError(error).toPromise();
+          });
+          return from(fbResponse);
+        })
+      );
   }
 
   publishPost(post: Post): void {

@@ -4,13 +4,13 @@ import { ImageProps } from 'src/app/core/models/images/image-props.model';
 import { Observable, Subscription, of, Subject, from } from 'rxjs';
 import { PostService } from 'src/app/core/services/post.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs/operators';
+import { take, withLatestFrom, map } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
 import { Post } from 'src/app/core/models/posts/post.model';
 
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Store } from '@ngrx/store';
-import { RootStoreState, UserStoreSelectors } from 'src/app/root-store';
+import { RootStoreState, UserStoreSelectors, PostStoreActions, PostStoreSelectors } from 'src/app/root-store';
 import { AppUser } from 'src/app/core/models/user/app-user.model';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { MatDialogConfig, MatDialog } from '@angular/material';
@@ -28,7 +28,8 @@ import { ImageService } from 'src/app/core/services/image.service';
 export class PostFormComponent implements OnInit, OnDestroy {
 
   appUser$: Observable<AppUser>;
-  postData$: Observable<Post>;
+  private post$: Observable<Post>;
+  private postLoaded: boolean;
   heroImageProps$: Observable<ImageProps>;
   imageUploadProcessing$: Subject<boolean>;
 
@@ -58,7 +59,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: MatDialog,
     private route: ActivatedRoute,
-    private imageService: ImageService
+    private imageService: ImageService,
   ) { }
 
   ngOnInit() {
@@ -96,18 +97,19 @@ export class PostFormComponent implements OnInit, OnDestroy {
           this.postDiscarded = true;
           this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
           if (this.isNewPost) {
-            this.postService.deletePost(this.postId);
+            console.log('Dialog delete confirmed, dispatching delete request');
+            this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId: this.postId}));
           } else {
-            this.postData$
+            this.post$
               .pipe(take(1))
               .subscribe(post => {
                 const originalItemWithCurrentImageList: Post = {
                   ...this.originalPost,
-                  imageFilePathList: post.imageFilePathList
+                  imageFilePathList: post.imageFilePathList ? post.imageFilePathList : null
                 };
                 console.log('Original post to revert to', this.originalPost);
                 console.log('Original post with current image list', originalItemWithCurrentImageList);
-                this.postService.updatePost(originalItemWithCurrentImageList);
+                this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post: originalItemWithCurrentImageList}));
               });
           }
         }
@@ -166,12 +168,14 @@ export class PostFormComponent implements OnInit, OnDestroy {
     const idParamName = 'id';
     const idParam = this.route.snapshot.params[idParamName];
     if (idParam) {
+      console.log('Id param detected', idParam);
       this.postInitialized = true;
       this.postId = idParam;
-      this.postData$ = this.postService.fetchSinglePost(this.postId);
+      console.log('Fetching post from existing post data, id param', idParam);
+      this.post$ = this.getPost(this.postId);
 
       // If post data available, patch values into form
-      this.postData$
+      this.post$
         .pipe(take(1))
         .subscribe(post => {
           if (post) {
@@ -190,6 +194,24 @@ export class PostFormComponent implements OnInit, OnDestroy {
           }
       });
     }
+  }
+
+  private getPost(postId: string): Observable<Post> {
+    return this.store$.select(PostStoreSelectors.selectPostById(postId))
+    .pipe(
+      withLatestFrom(
+        this.store$.select(PostStoreSelectors.selectPostsLoaded)
+      ),
+      map(([post, postsLoaded]) => {
+        // Check if items are loaded, if not fetch from server
+        if (!postsLoaded && !this.postLoaded) {
+          console.log('No post in store, fetching from server', postId);
+          this.store$.dispatch(new PostStoreActions.SinglePostRequested({postId}));
+        }
+        this.postLoaded = true; // Prevents loading from firing more than needed
+        return post;
+      })
+    );
   }
 
   private configurePost() {
@@ -242,7 +264,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
         };
-        this.postService.createPost(data);
+        this.store$.dispatch(new PostStoreActions.AddPostRequested({post: data}));
         this.postInitialized = true;
       });
 
@@ -261,7 +283,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           title: this.title.value ? this.title.value : this.tempPostTitle,
           id: this.postId
         };
-        this.postService.updatePost(post);
+        this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post}));
       });
   }
 
@@ -270,7 +292,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
     // Set interval at 10 seconds
     const step = 10000;
 
-    this.autoSavePostSubscription = this.postService.fetchSinglePost(this.postId)
+    // TODO: FIGURE OUT WHY THIS IS LOADING ALL POSTS WHEN ALL POSTS ARE LOADED BUT ONLY SINGLE POST WHEN ONLY SINGLE POST IS LOADED
+    this.autoSavePostSubscription = this.getPost(this.postId)
       .subscribe(post => {
         if (this.autoSaveTicker) {
           // Clear old interval
@@ -323,7 +346,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
     if (this.postInitialized && this.postIsBlank() && !this.postDiscarded) {
       console.log('Deleting blank post');
-      this.postService.deletePost(this.postId);
+      this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId: this.postId}));
     }
 
     if (this.autoSavePostSubscription) {

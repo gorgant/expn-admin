@@ -8,6 +8,8 @@ import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete
 import { take } from 'rxjs/operators';
 import { Post } from 'src/app/core/models/posts/post.model';
 import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
+import { Store } from '@ngrx/store';
+import { RootStoreState, PostStoreActions } from 'src/app/root-store';
 
 @Component({
   selector: 'app-post-card',
@@ -23,6 +25,7 @@ export class PostCardComponent implements OnInit {
     private postService: PostService,
     private router: Router,
     private dialog: MatDialog,
+    private store$: Store<RootStoreState.State>
   ) { }
 
   ngOnInit() {
@@ -50,7 +53,7 @@ export class PostCardComponent implements OnInit {
     this.router.navigate([AppRoutes.BLOG_PREVIEW_POST, postId]);
   }
 
-  onDelete(id: string) {
+  onDelete(postId: string) {
     const dialogConfig = new MatDialogConfig();
 
     const deleteConfData: DeleteConfData = {
@@ -66,13 +69,11 @@ export class PostCardComponent implements OnInit {
     .pipe(take(1))
     .subscribe(userConfirmed => {
       if (userConfirmed) {
-        this.deletePost(id);
+        console.log('User confirmed delete on card, dispatching delete action');
+        this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId}));
+        // this.store$.dispatch(new PostStoreActions.AltDeletePostRequested({postId}));
       }
     });
-  }
-
-  private deletePost(id: string) {
-    this.postService.deletePost(id);
   }
 
 }
