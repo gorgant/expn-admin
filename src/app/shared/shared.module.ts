@@ -9,13 +9,15 @@ import { PublishedPostPipe } from './pipes/published-post.pipe';
 import { UnpublishedPostPipe } from './pipes/unpublished-post.pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { MatElevationDirective } from './directives/mat-elevation.directive';
+import { ProductIdToNamePipe } from './pipes/product-id-to-name.pipe';
 
 @NgModule({
   declarations: [
     DeleteConfirmDialogueComponent,
     PublishedPostPipe,
     UnpublishedPostPipe,
-    MatElevationDirective
+    MatElevationDirective,
+    ProductIdToNamePipe
   ],
   imports: [
     CommonModule,
@@ -34,7 +36,8 @@ import { MatElevationDirective } from './directives/mat-elevation.directive';
     PublishedPostPipe,
     UnpublishedPostPipe,
     HttpClientModule,
-    MatElevationDirective
+    MatElevationDirective,
+    ProductIdToNamePipe
   ],
   entryComponents: [
     DeleteConfirmDialogueComponent

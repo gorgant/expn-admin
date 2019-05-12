@@ -8,6 +8,10 @@ const routes: Routes = [
     path: 'home', component: HomeComponent
   },
   {
+    path: 'orders',
+    loadChildren: '../components/orders/modules/orders.module#OrdersModule',
+  },
+  {
     path: 'blog',
     loadChildren: '../components/blog/modules/blog.module#BlogModule',
   },

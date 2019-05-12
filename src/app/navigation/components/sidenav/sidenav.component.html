@@ -7,6 +7,14 @@
     <mat-icon mat-list-icon>home</mat-icon>
     <p mat-line>Home</p>
   </mat-list-item>
+  
+  <mat-list-item 
+    routerLinkActive="active-list-item"
+    [routerLink]="appRoutes.ORDERS_DASHBOARD"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>shopping_cart</mat-icon>
+    <p mat-line>Orders</p>
+  </mat-list-item>
 
   <mat-list-item 
     routerLinkActive="active-list-item"

@@ -29,6 +29,6 @@ export const selectOrderError: MemoizedSelector<object, any> = createSelector(
 export const selectOrderIsLoading: MemoizedSelector<object, boolean>
 = createSelector(selectOrderState, getIsLoading);
 
-export const selectOrderLoaded: MemoizedSelector<object, boolean>
+export const selectOrdersLoaded: MemoizedSelector<object, boolean>
 = createSelector(selectOrderState, getOrdersLoaded);
 
