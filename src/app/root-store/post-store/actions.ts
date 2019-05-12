@@ -9,10 +9,14 @@ export enum ActionTypes {
   ALL_POSTS_LOADED = '[Posts] All Posts Loaded',
   ADD_POST_REQUESTED = '[Posts] Add Post Requested',
   ADD_POST_COMPLETE = '[Posts] Add Post Complete',
-  DELETE_POST_REQUESTED = '[Posts] Delete Post Requested',
-  DELETE_POST_COMPLETE = '[Posts] Delete Post Complete',
   UPDATE_POST_REQUESTED = '[Posts] Update Post Requested',
   UPDATE_POST_COMPLETE = '[Posts] Update Post Complete',
+  DELETE_POST_REQUESTED = '[Posts] Delete Post Requested',
+  DELETE_POST_COMPLETE = '[Posts] Delete Post Complete',
+  TOGGLE_PUBLISHED_REQUESTED = '[Posts] Toggle Post Published Requested',
+  TOGGLE_PUBLISHED_COMPLETE = '[Posts] Toggle Post Published Complete',
+  TOGGLE_FEATURED_REQUESTED = '[Posts] Toggle Post Featured Requested',
+  TOGGLE_FEATURED_COMPLETE = '[Posts] Toggle Post Featured Complete',
   POST_LOAD_FAILURE = '[Posts] Load Failure',
 }
 
@@ -71,6 +75,26 @@ export class DeletePostComplete implements Action {
   constructor(public payload: {postId: string}) {}
 }
 
+export class TogglePublishedRequested implements Action {
+  readonly type = ActionTypes.TOGGLE_PUBLISHED_REQUESTED;
+
+  constructor(public payload: { post: Post }) {}
+}
+
+export class TogglePublishedComplete implements Action {
+  readonly type = ActionTypes.TOGGLE_PUBLISHED_COMPLETE;
+}
+
+export class ToggleFeaturedRequested implements Action {
+  readonly type = ActionTypes.TOGGLE_FEATURED_REQUESTED;
+
+  constructor(public payload: { post: Post }) {}
+}
+
+export class ToggleFeaturedComplete implements Action {
+  readonly type = ActionTypes.TOGGLE_FEATURED_COMPLETE;
+}
+
 export class LoadErrorDetected implements Action {
   readonly type = ActionTypes.POST_LOAD_FAILURE;
   constructor(public payload: { error: string }) {}
@@ -87,5 +111,9 @@ export type Actions =
   UpdatePostComplete |
   DeletePostRequested |
   DeletePostComplete |
+  TogglePublishedRequested |
+  TogglePublishedComplete |
+  ToggleFeaturedRequested |
+  ToggleFeaturedComplete |
   LoadErrorDetected
   ;

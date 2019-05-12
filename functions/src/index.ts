@@ -7,8 +7,8 @@ export { resizeImages };
 import { createAdminUser } from './local/create-admin-user';
 export { createAdminUser };
 
-import { publishBlogPost } from './public/publish-blog-post';
-export { publishBlogPost };
+import { updatePublicBlogPost } from './public/update-public-blog-post';
+export { updatePublicBlogPost };
 
 import { updateGeographicData } from './public/update-geographic-data';
 export { updateGeographicData };

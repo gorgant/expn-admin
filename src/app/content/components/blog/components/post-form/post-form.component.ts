@@ -19,6 +19,7 @@ import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete
 import { now } from 'moment';
 import { ImageType } from 'src/app/core/models/images/image-type.model';
 import { ImageService } from 'src/app/core/services/image.service';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-post-form',
@@ -54,7 +55,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private store$: Store<RootStoreState.State>,
-    private postService: PostService,
+    private afs: AngularFirestore, // Used purely to generate ID
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -197,6 +198,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private getPost(postId: string): Observable<Post> {
+    console.log('Getting post', postId);
     return this.store$.select(PostStoreSelectors.selectPostById(postId))
     .pipe(
       withLatestFrom(
@@ -208,6 +210,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           console.log('No post in store, fetching from server', postId);
           this.store$.dispatch(new PostStoreActions.SinglePostRequested({postId}));
         }
+        console.log('Single post status', this.postLoaded);
         this.postLoaded = true; // Prevents loading from firing more than needed
         return post;
       })
@@ -224,7 +227,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     this.imageUploadProcessing$ = this.imageService.getImageProcessing(); // Monitor image processing
     this.setContentFormStatus();
     this.isNewPost = true;
-    this.postId = this.postService.generateNewPostId();
+    this.postId = this.afs.createId();
     this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
 
     // Auto-init post if it hasn't already been initialized and it has content

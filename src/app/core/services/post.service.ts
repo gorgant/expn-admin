@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { map, takeUntil, catchError, switchMap } from 'rxjs/operators';
-import { Observable, throwError, from } from 'rxjs';
+import { map, takeUntil, catchError, switchMap, take } from 'rxjs/operators';
+import { Observable, throwError, from, of } from 'rxjs';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { Post } from '../models/posts/post.model';
 import { ImageType } from '../models/images/image-type.model';
@@ -113,43 +113,39 @@ export class PostService {
       );
   }
 
-  publishPost(post: Post): void {
-    const publishedPost: Post = {
-      ...post,
-      published: true,
-      publishedDate: post.publishedDate ? post.publishedDate : now() // Only add publish date if doesn't already exist
+  // Update post on server (local update happens in store effects)
+  togglePublishPost(post: Post): Observable<Post> {
+    let updatedPost: Post = {
+      ...post
     };
+    if (!post.published) {
+      updatedPost = {
+        ...updatedPost,
+        published: true,
+        publishedDate: post.publishedDate ? post.publishedDate : now() // Only add publish date if doesn't already exist
+      };
+    } else {
+      updatedPost = {
+        ...updatedPost,
+        published: false,
+      };
+    }
 
-    this.getPostDoc(post.id).update(publishedPost)
+    const serverRes = this.publicService.updatePublicPost(updatedPost)
       .then(res => {
-        // If the local update is successful, update on other server
-        this.publicService.updatePublicPost(publishedPost); // Will publish post on public server (because published = true)
-      })
-      .catch(error => {
-        console.log('Error publishing post in admin', error);
-      });
-
-  }
-
-  unPublishPost(post: Post): void {
-
-    const unPublishedPost: Post = {
-      ...post,
-      published: false,
-    };
-
-    this.getPostDoc(post.id).update(unPublishedPost)
-      .then(res => {
-        // If the local update is successful, update on other server
-        this.publicService.updatePublicPost(unPublishedPost); // Will delete post on public server (because published = false)
+        console.log('Server call succeded', res);
+        return updatedPost;
       })
       .catch(error => {
         console.log('Error updating post', error);
+        return error;
       });
+
+    // For instant UI updates, don't wait for server response
+    return of(updatedPost);
   }
 
-  togglePostFeatured(post: Post): void {
-    const postDoc = this.getPostDoc(post.id);
+  togglePostFeatured(post: Post): Observable<Post> {
     let updatedPost: Post = {
       ...post
     };
@@ -165,16 +161,18 @@ export class PostService {
       };
     }
 
-    console.log('Toggling post featured', updatedPost);
-
-    postDoc.update(updatedPost)
+    const serverRes = this.publicService.updatePublicPost(updatedPost)
       .then(res => {
-        // If the local update is successful, update on other server
-        this.publicService.updatePublicPost(updatedPost);
+        console.log('Server call succeded', res);
+        return updatedPost;
       })
       .catch(error => {
         console.log('Error updating post', error);
+        return error;
       });
+
+    // For instant UI updates, don't wait for server response
+    return of(updatedPost);
   }
 
   generateNewPostId(): string {

@@ -12,8 +12,8 @@
     </div>
   </mat-card-content>
   <mat-card-actions fxLayout="row">
-    <button *ngIf="!post.published" [disabled]="!post.imageProps || !post.content" mat-raised-button class="publish-button" color="accent" (click)="onPublishPost()">Publish</button>
-    <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onUnPublishPost()">Un-Publish</button>
+    <button *ngIf="!post.published" [disabled]="!post.imageProps || !post.content" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Publish</button>
+    <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Un-Publish</button>
     <div *ngIf="post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
       <button *ngIf="post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
         <mat-icon>star</mat-icon>

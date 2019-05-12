@@ -1,5 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { PostService } from 'src/app/core/services/post.service';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
@@ -10,6 +9,7 @@ import { Post } from 'src/app/core/models/posts/post.model';
 import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreActions } from 'src/app/root-store';
+import { TogglePublishedRequested, ToggleFeaturedRequested } from 'src/app/root-store/post-store/actions';
 
 @Component({
   selector: 'app-post-card',
@@ -22,7 +22,6 @@ export class PostCardComponent implements OnInit {
   heroPlaceholderPath = ImagePaths.HERO_PLACEHOLDER;
 
   constructor(
-    private postService: PostService,
     private router: Router,
     private dialog: MatDialog,
     private store$: Store<RootStoreState.State>
@@ -35,18 +34,14 @@ export class PostCardComponent implements OnInit {
     this.router.navigate([AppRoutes.BLOG_EDIT_POST, postId]);
   }
 
-  onPublishPost() {
-    this.postService.publishPost(this.post);
-    console.log('Published this post', this.post);
-  }
-
-  onUnPublishPost() {
-    console.log('Request to unpublish this post', this.post);
-    this.postService.unPublishPost(this.post);
+  onTogglePublishPost() {
+    console.log('Publish post toggled');
+    this.store$.dispatch(new TogglePublishedRequested({post: this.post}));
   }
 
   onTogglePostFeatured() {
-    this.postService.togglePostFeatured(this.post);
+    console.log('Publish featured toggled');
+    this.store$.dispatch(new ToggleFeaturedRequested({post: this.post}));
   }
 
   onPreviewBlogItem(postId) {
@@ -71,7 +66,6 @@ export class PostCardComponent implements OnInit {
       if (userConfirmed) {
         console.log('User confirmed delete on card, dispatching delete action');
         this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId}));
-        // this.store$.dispatch(new PostStoreActions.AltDeletePostRequested({postId}));
       }
     });
   }

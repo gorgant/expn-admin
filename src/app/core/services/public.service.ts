@@ -18,18 +18,27 @@ export class PublicService {
     private geographyListService: GeographyListService
   ) { }
 
-  // Submit http request to cloud functions to publish or unpublish post
-  updatePublicPost(post: Post): void {
-    const callable = this.fns.httpsCallable(FbFunctionNames.PUBLISH_BLOG_POST);
-    callable(post)
-      .pipe(
-        take(1),
-        tap(response => console.log('Post updated on public server', response)),
-        catchError(error => {
-          console.log('Error publishing post on public server', error);
-          return throwError(error);
-        })
-      ).subscribe();
+  // Submit http request to cloud functions to publish post updates or unpublish post
+  async updatePublicPost(post: Post): Promise<any> {
+    const callable = this.fns.httpsCallable(FbFunctionNames.UPDATE_PUBLIC_BLOG_POST);
+
+    const callPromise = new Promise<any>((resolve, reject) => {
+      console.log('Calling function with this data', post);
+      callable(post)
+        .pipe(
+          take(1),
+          catchError(error => {
+            console.log('Error publishing post on public server', error);
+            reject();
+            return throwError(error);
+          })
+        ).subscribe(res => {
+          console.log('Post updated on public server', res);
+          resolve(res);
+        });
+    });
+
+    return callPromise;
   }
 
   // Submit http request to cloud functions to activate or deactivate product

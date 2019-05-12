@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Observable, of } from 'rxjs';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import * as postFeatureActions from './actions';
 import { switchMap, map, catchError, mergeMap, tap } from 'rxjs/operators';
 import { PostService } from 'src/app/core/services/post.service';
 import { Post } from 'src/app/core/models/posts/post.model';
 import { Update } from '@ngrx/entity';
+import { RootStoreState } from '..';
 
 @Injectable()
 export class PostStoreEffects {
   constructor(
     private postService: PostService,
     private actions$: Actions,
+    private store$: Store<RootStoreState.State>,
   ) { }
 
   @Effect()
@@ -91,6 +93,38 @@ export class PostStoreEffects {
             };
             return new postFeatureActions.UpdatePostComplete({ post: postUpdate });
           }),
+          catchError(error => {
+            return of(new postFeatureActions.LoadErrorDetected({ error }));
+          })
+        )
+    ),
+  );
+
+  @Effect()
+  togglePublishedEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<postFeatureActions.TogglePublishedRequested>(
+      postFeatureActions.ActionTypes.TOGGLE_PUBLISHED_REQUESTED
+    ),
+    switchMap(action => this.postService.togglePublishPost(action.payload.post)
+      .pipe(
+          tap(post => this.store$.dispatch(new postFeatureActions.UpdatePostRequested({post}))),
+          map(post => new postFeatureActions.TogglePublishedComplete()),
+          catchError(error => {
+            return of(new postFeatureActions.LoadErrorDetected({ error }));
+          })
+        )
+    ),
+  );
+
+  @Effect()
+  toggleFeaturedEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<postFeatureActions.ToggleFeaturedRequested>(
+      postFeatureActions.ActionTypes.TOGGLE_FEATURED_REQUESTED
+    ),
+    switchMap(action => this.postService.togglePostFeatured(action.payload.post)
+      .pipe(
+          tap(post => this.store$.dispatch(new postFeatureActions.UpdatePostRequested({post}))),
+          map(post => new postFeatureActions.ToggleFeaturedComplete()),
           catchError(error => {
             return of(new postFeatureActions.LoadErrorDetected({ error }));
           })

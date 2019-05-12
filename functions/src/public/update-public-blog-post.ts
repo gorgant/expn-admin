@@ -8,7 +8,7 @@ const publishPost = async (post: Post) => {
   const db = publicFirestore;
   console.log('Public firestore', db);
 
-  // If post is published on admin, publish here
+  // If post is published on admin, publish updates on public
   if (post.published) {
     const fbRes = await db.collection(FbCollectionPaths.POSTS).doc(post.id).set(post)
       .catch(error => console.log(error));
@@ -16,7 +16,7 @@ const publishPost = async (post: Post) => {
     return fbRes;
   }
 
-  // If post not published on admin, unpublish here
+  // If post not published on admin, unpublish on public
   if (!post.published) {
     const fbRes = await db.collection(FbCollectionPaths.POSTS).doc(post.id).delete()
       .catch(error => console.log(error));
@@ -28,7 +28,8 @@ const publishPost = async (post: Post) => {
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
-export const publishBlogPost = functions.https.onCall(async (data: Post, context) => {
+export const updatePublicBlogPost = functions.https.onCall(async (data: Post, context) => {
+  console.log('Updating public post with this data', data);
   const outcome = await publishPost(data);
   return {outcome}
 });

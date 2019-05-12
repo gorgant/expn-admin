@@ -49,6 +49,14 @@ export function featureReducer(state = initialState, action: Actions): State {
         }
       );
 
+    case ActionTypes.UPDATE_POST_COMPLETE:
+      return featureAdapter.updateOne(
+        action.payload.post,
+        {
+          ...state,
+        }
+      );
+
     case ActionTypes.DELETE_POST_COMPLETE:
       return featureAdapter.removeOne(
         action.payload.postId,
@@ -57,13 +65,15 @@ export function featureReducer(state = initialState, action: Actions): State {
         }
       );
 
-    case ActionTypes.UPDATE_POST_COMPLETE:
-      return featureAdapter.updateOne(
-        action.payload.post,
-        {
-          ...state,
-        }
-      );
+    case ActionTypes.TOGGLE_PUBLISHED_COMPLETE:
+      return {
+        ...state
+      };
+
+    case ActionTypes.TOGGLE_FEATURED_COMPLETE:
+      return {
+        ...state
+      };
 
     case ActionTypes.POST_LOAD_FAILURE: {
       return {
