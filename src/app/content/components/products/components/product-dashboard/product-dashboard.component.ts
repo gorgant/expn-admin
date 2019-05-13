@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
-import { ProductService } from 'src/app/core/services/product.service';
 import { Router } from '@angular/router';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { Store } from '@ngrx/store';
@@ -15,7 +14,6 @@ import { withLatestFrom, map } from 'rxjs/operators';
 })
 export class ProductDashboardComponent implements OnInit {
 
-  // productList$: Observable<Product[]>;
   products$: Observable<Product[]>;
 
   constructor(

@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
-import { ProductService } from 'src/app/core/services/product.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/validation-messages.model';
