@@ -28,7 +28,7 @@ export class PublicService {
         .pipe(
           take(1),
           catchError(error => {
-            console.log('Error publishing post on public server', error);
+            console.log('Error updating post on public server', error);
             reject();
             return throwError(error);
           })
@@ -41,18 +41,39 @@ export class PublicService {
     return callPromise;
   }
 
-  // Submit http request to cloud functions to activate or deactivate product
-  updatePublicProduct(product: Product): void {
+  // Submit http request to cloud functions to update product
+  updatePublicProduct(product: Product): Promise<any> {
+
     const callable = this.fns.httpsCallable(FbFunctionNames.UPDATE_PRODUCT);
-    callable(product)
-      .pipe(
-        take(1),
-        tap(response => console.log('Product updated on public server', response)),
-        catchError(error => {
-          console.log('Error updating product on public server', error);
-          return throwError(error);
-        })
-      ).subscribe();
+
+    const callPromise = new Promise<any>((resolve, reject) => {
+      console.log('Calling function with this data', product);
+      callable(product)
+        .pipe(
+          take(1),
+          catchError(error => {
+            console.log('Error updating product on public server', error);
+            reject();
+            return throwError(error);
+          })
+        ).subscribe(res => {
+          console.log('Post updated on public server', res);
+          resolve(res);
+        });
+    });
+
+    return callPromise;
+
+    // const callable = this.fns.httpsCallable(FbFunctionNames.UPDATE_PRODUCT);
+    // callable(product)
+    //   .pipe(
+    //     take(1),
+    //     tap(response => console.log('Product updated on public server', response)),
+    //     catchError(error => {
+    //       console.log('Error updating product on public server', error);
+    //       return throwError(error);
+    //     })
+    //   ).subscribe();
   }
 
   updateGeographicData() {

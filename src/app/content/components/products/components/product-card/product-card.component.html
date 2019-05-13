@@ -18,8 +18,8 @@
   </div>
 
   <div class="admin-actions" fxLayout="row">
-    <button *ngIf="!product.active" [disabled]="!product.readyToActivate" mat-raised-button class="activate-button" color="accent" (click)="onActivateProduct()">Activate</button>
-    <button *ngIf="product.active" mat-raised-button class="activate-button" color="warn" (click)="onDeactivateProduct()">De-Activate</button>
+    <button *ngIf="!product.active" [disabled]="!product.readyToActivate" mat-raised-button class="activate-button" color="accent" (click)="onToggleProductActive()">Activate</button>
+    <button *ngIf="product.active" mat-raised-button class="activate-button" color="warn" (click)="onToggleProductActive()">De-Activate</button>
     <div *ngIf="!product.active" class="other-actions" fxFlex fxLayoutAlign="end center">
       <button mat-icon-button class="edit-button" (click)="onEditProduct()">
         <mat-icon>edit</mat-icon>

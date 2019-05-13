@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ImageProps } from 'src/app/core/models/images/image-props.model';
 import { Observable, Subscription, of, Subject, from } from 'rxjs';
-import { PostService } from 'src/app/core/services/post.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { take, withLatestFrom, map } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
@@ -43,6 +42,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   private postInitialized: boolean;
   private postDiscarded: boolean;
   private heroImageAdded: boolean; // Helps determine if post is blank
+  private imagesModifiedSinceLastSave: boolean;
   private manualSave: boolean;
 
   private initPostTimeout: NodeJS.Timer;
@@ -65,7 +65,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.configurePost();
+    this.configureNewPost();
 
     this.loadExistingPostData(); // Only loads if exists
 
@@ -98,18 +98,19 @@ export class PostFormComponent implements OnInit, OnDestroy {
           this.postDiscarded = true;
           this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
           if (this.isNewPost) {
-            console.log('Dialog delete confirmed, dispatching delete request');
             this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId: this.postId}));
           } else {
             this.post$
               .pipe(take(1))
               .subscribe(post => {
+                // Insert the latest imageFilePathList so that if item it is deleted, all images are scrubbed
+                // After all, images get uploaded irrespective of if changes are discarded
                 const originalItemWithCurrentImageList: Post = {
                   ...this.originalPost,
                   imageFilePathList: post.imageFilePathList ? post.imageFilePathList : null
                 };
-                console.log('Original post to revert to', this.originalPost);
-                console.log('Original post with current image list', originalItemWithCurrentImageList);
+                console.log('Original item to revert to', this.originalPost);
+                console.log('Original item with current image list', originalItemWithCurrentImageList);
                 this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post: originalItemWithCurrentImageList}));
               });
           }
@@ -154,7 +155,14 @@ export class PostFormComponent implements OnInit, OnDestroy {
     }
 
     // Upload file and get image props
-    this.heroImageProps$ = from(this.imageService.uploadImageAndGetProps(file, this.postId, ImageType.BLOG_HERO));
+    this.heroImageProps$ = from(
+      this.imageService.uploadImageAndGetProps(file, this.postId, ImageType.BLOG_HERO)
+        .then(imageProps => {
+          this.heroImageAdded = true;
+          this.imagesModifiedSinceLastSave = true; // Used for auto-save change detection only after image uploaded
+          return imageProps;
+        })
+      );
   }
 
   // This handles a weird error related to lastpass form detection when pressing enter
@@ -169,10 +177,9 @@ export class PostFormComponent implements OnInit, OnDestroy {
     const idParamName = 'id';
     const idParam = this.route.snapshot.params[idParamName];
     if (idParam) {
-      console.log('Id param detected', idParam);
       this.postInitialized = true;
       this.postId = idParam;
-      console.log('Fetching post from existing post data, id param', idParam);
+      console.log('Post detected with id', idParam);
       this.post$ = this.getPost(this.postId);
 
       // If post data available, patch values into form
@@ -217,7 +224,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     );
   }
 
-  private configurePost() {
+  private configureNewPost() {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
       videoUrl: [''],
@@ -273,29 +280,11 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   }
 
-  private savePost(): void {
-    this.appUser$
-      .pipe(take(1))
-      .subscribe(appUser => {
-        const post: Post = {
-          author: appUser.displayName || appUser.id,
-          authorId: appUser.id,
-          videoUrl: this.videoUrl.value,
-          content: this.content.value,
-          modifiedDate: now(),
-          title: this.title.value ? this.title.value : this.tempPostTitle,
-          id: this.postId
-        };
-        this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post}));
-      });
-  }
-
   private createAutoSaveTicker() {
     console.log('Creating autosave ticker');
     // Set interval at 10 seconds
     const step = 10000;
 
-    // TODO: FIGURE OUT WHY THIS IS LOADING ALL POSTS WHEN ALL POSTS ARE LOADED BUT ONLY SINGLE POST WHEN ONLY SINGLE POST IS LOADED
     this.autoSavePostSubscription = this.getPost(this.postId)
       .subscribe(post => {
         if (this.autoSaveTicker) {
@@ -313,6 +302,60 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   }
 
+  private autoSave(post: Post) {
+    // Cancel autosave if no changes to content
+    if (!this.changesDetected(post)) {
+      console.log('No changes to content, no auto save');
+      return;
+    }
+    this.savePost();
+    console.log('Auto saving');
+  }
+
+  private changesDetected(post: Post): boolean {
+    if (
+      (post.title === this.title.value || post.title === this.tempPostTitle) &&
+      post.content === this.content.value &&
+      !this.imagesModifiedSinceLastSave
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  private postIsBlank(): boolean {
+    if (
+      this.heroImageAdded ||
+      this.title.value ||
+      this.videoUrl.value ||
+      this.content.value ||
+      this.imagesModifiedSinceLastSave
+    ) {
+      return false;
+    }
+    console.log('Post is blank');
+    return true;
+  }
+
+  private savePost(): void {
+    this.appUser$
+      .pipe(take(1))
+      .subscribe(appUser => {
+        const post: Post = {
+          author: appUser.displayName || appUser.id,
+          authorId: appUser.id,
+          videoUrl: this.videoUrl.value,
+          content: this.content.value,
+          modifiedDate: now(),
+          title: this.title.value ? this.title.value : this.tempPostTitle,
+          id: this.postId
+        };
+        this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post}));
+        console.log('Post saved', post);
+        this.imagesModifiedSinceLastSave = false; // Reset image change detection
+      });
+  }
+
   private killAutoSaveTicker(): void {
     clearInterval(this.autoSaveTicker);
   }
@@ -321,26 +364,9 @@ export class PostFormComponent implements OnInit, OnDestroy {
     clearTimeout(this.initPostTimeout);
   }
 
-  private autoSave(post: Post) {
-    // Cancel autosave if no changes to content
-    if (
-      post.content === this.content.value &&
-      (post.title === this.title.value || post.title === this.tempPostTitle)
-    ) {
-      console.log('No changes to content, no auto save');
-      return;
-    }
-    this.savePost();
-    console.log('Auto saving post');
-  }
-
-  private postIsBlank(): boolean {
-    if (this.title.value || this.videoUrl.value || this.content.value || this.heroImageAdded) {
-      return false;
-    }
-    console.log('Post is blank');
-    return true;
-  }
+  get title() { return this.postForm.get('title'); }
+  get videoUrl() { return this.postForm.get('videoUrl'); }
+  get content() { return this.postForm.get('content'); }
 
   ngOnDestroy(): void {
     if (this.postInitialized && !this.postDiscarded && !this.manualSave && !this.postIsBlank()) {
@@ -368,10 +394,5 @@ export class PostFormComponent implements OnInit, OnDestroy {
       this.killInitPostTimeout();
     }
   }
-
-
-  get title() { return this.postForm.get('title'); }
-  get videoUrl() { return this.postForm.get('videoUrl'); }
-  get content() { return this.postForm.get('content'); }
 
 }

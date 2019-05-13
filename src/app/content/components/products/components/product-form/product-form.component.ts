@@ -6,7 +6,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/validation-messages.model';
 import { Subscription, Observable, of, from } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
-import { take } from 'rxjs/operators';
+import { take, withLatestFrom, map } from 'rxjs/operators';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
@@ -17,6 +17,9 @@ import { ProductCardData } from 'src/app/core/models/products/product-card-data.
 import { PageHeroData } from 'src/app/core/models/forms-and-components/page-hero-data.model';
 import { BuyNowBoxData } from 'src/app/core/models/products/buy-now-box-data.model';
 import { CheckoutData } from 'src/app/core/models/products/checkout-data.model';
+import { Store } from '@ngrx/store';
+import { RootStoreState, ProductStoreActions, ProductStoreSelectors } from 'src/app/root-store';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-product-form',
@@ -25,7 +28,8 @@ import { CheckoutData } from 'src/app/core/models/products/checkout-data.model';
 })
 export class ProductFormComponent implements OnInit, OnDestroy {
 
-  productData$: Observable<Product>;
+  product$: Observable<Product>;
+  private productLoaded: boolean;
   cardImageProps$: Observable<ImageProps>;
   heroImageProps$: Observable<ImageProps>;
   imageUploadProcessing$: Observable<boolean>;
@@ -50,7 +54,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private autoSaveSubscription: Subscription;
 
   constructor(
-    private productService: ProductService,
+    private store$: Store<RootStoreState.State>,
+    private afs: AngularFirestore, // Used purely to generate ID
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -88,19 +93,21 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         this.productDiscarded = true;
         this.router.navigate([AppRoutes.PRODUCT_DASHBOARD]);
         if (this.isNewProduct) {
-          this.productService.deleteProduct(this.productId);
+          this.store$.dispatch(new ProductStoreActions.DeleteProductRequested({productId: this.productId}));
         } else {
           // Changes discarded, so revert to original product (with current image list)
-          this.productData$
+          this.product$
             .pipe(take(1))
             .subscribe(product => {
               // Insert the latest imageFilePathList so that if item it is deleted, all images are scrubbed
               // After all, images get uploaded irrespective of if changes are discarded
               const originalItemWithCurrentImageList: Product = {
                 ...this.originalProduct,
-                imageFilePathList: product.imageFilePathList,
+                imageFilePathList: product.imageFilePathList ? product.imageFilePathList : null
               };
-              this.productService.updateProduct(originalItemWithCurrentImageList);
+              console.log('Original item to revert to', this.originalProduct);
+              console.log('Original item with current image list', originalItemWithCurrentImageList);
+              this.store$.dispatch(new ProductStoreActions.UpdateProductRequested({product: originalItemWithCurrentImageList}));
             });
         }
       }
@@ -157,7 +164,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           default:
             break;
         }
-        this.cardImageAdded = true;
         this.imagesModifiedSinceLastSave = true; // Used for auto-save change detection only after image uploaded
         return imageProps;
       });
@@ -179,10 +185,10 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       this.productInitialized = true;
       this.productId = idParam;
       console.log('Product detected with id', this.productId);
-      this.productData$ = this.productService.fetchSingleProduct(this.productId);
+      this.product$ = this.getProduct(this.productId);
 
-      // If post data available, patch values into form
-      this.productData$
+      // If product data available, patch values into form
+      this.product$
         .pipe(take(1))
         .subscribe(product => {
           if (product) {
@@ -217,6 +223,26 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  private getProduct(productId: string): Observable<Product> {
+    console.log('Getting product', productId);
+    return this.store$.select(ProductStoreSelectors.selectProductById(productId))
+    .pipe(
+      withLatestFrom(
+        this.store$.select(ProductStoreSelectors.selectProductsLoaded)
+      ),
+      map(([product, productsLoaded]) => {
+        // Check if items are loaded, if not fetch from server
+        if (!productsLoaded && !this.productLoaded) {
+          console.log('No product in store, fetching from server', productId);
+          this.store$.dispatch(new ProductStoreActions.SingleProductRequested({productId}));
+        }
+        console.log('Single product status', this.productLoaded);
+        this.productLoaded = true; // Prevents loading from firing more than needed
+        return product;
+      })
+    );
+  }
+
   private setProductImages(product: Product): void {
     this.cardImageProps$ = of(product.cardImageProps);
     if (product.cardImageProps) {
@@ -231,7 +257,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private configureNewProduct() {
     this.isNewProduct = true;
-    this.productId = this.productService.generateNewId();
+    this.productId = this.afs.createId();
     this.tempProductTitle = `Untitled Product ${this.productId.substr(0, 4)}`;
 
     this.productForm = this.fb.group({
@@ -250,7 +276,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       checkoutDescription: ['', [Validators.required]],
     });
 
-    // Auto-init post if it hasn't already been initialized and it has content
+    // Auto-init product if it hasn't already been initialized and it has content
     this.initProductTimeout = setTimeout(() => {
       if (!this.productInitialized) {
         this.initializeProduct();
@@ -297,7 +323,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       buyNowData,
       checkoutData,
     };
-    this.productService.createProduct(product);
+    this.store$.dispatch(new ProductStoreActions.AddProductRequested({product}));
     this.productInitialized = true;
     console.log('Product initialized');
   }
@@ -306,10 +332,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     // Set interval at 10 seconds
     const step = 10000;
 
-
-    // TODO: FIGURE OUT WHY THIS IS FETCHING THE PRODUCT A SECOND TIME
-
-    this.autoSaveSubscription = this.productService.fetchSingleProduct(this.productId)
+    this.autoSaveSubscription = this.getProduct(this.productId)
       .subscribe(product => {
         if (this.autoSaveTicker) {
           // Clear old interval
@@ -334,7 +357,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       return;
     }
     this.saveProduct();
-    console.log('Auto saving post');
+    console.log('Auto saving');
   }
 
   private changesDetected(product: Product): boolean {
@@ -370,7 +393,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     ) {
       return false;
     }
-    console.log('Post is blank');
+    console.log('Product is blank');
     return true;
   }
 
@@ -380,10 +403,10 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       !this.heroImageAdded ||
       this.productForm.invalid
     ) {
-      console.log('Post not ready to activate');
+      console.log('Product not ready to activate');
       return false;
     }
-    console.log('Post is ready to activate');
+    console.log('Product is ready to activate');
     return true;
   }
 
@@ -424,7 +447,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       checkoutData,
       readyToActivate: this.readyToActivate(),
     };
-    this.productService.updateProduct(product);
+    this.store$.dispatch(new ProductStoreActions.UpdateProductRequested({product}));
     console.log('Product saved', product);
     this.imagesModifiedSinceLastSave = false; // Reset image change detection
   }
@@ -452,17 +475,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     });
     return isBlank;
   }
-
-  // private highlightsArrayHasBlankValue(): boolean {
-  //   let hasBlankValue = false;
-  //   this.highlightsArray.map(highlight => {
-  //     if (!highlight) {
-  //       console.log('Blank highlight value detected');
-  //       hasBlankValue = true;
-  //     }
-  //   });
-  //   return hasBlankValue;
-  // }
 
   private createHighlight(): FormControl {
     return this.fb.control('', Validators.required);
@@ -501,7 +513,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     // Delete product if blank
     if (this.productInitialized && this.productIsBlank() && !this.productDiscarded) {
       console.log('Deleting blank product');
-      this.productService.deleteProduct(this.productId);
+      this.store$.dispatch(new ProductStoreActions.DeleteProductRequested({productId: this.productId}));
     }
 
     if (this.autoSaveSubscription) {

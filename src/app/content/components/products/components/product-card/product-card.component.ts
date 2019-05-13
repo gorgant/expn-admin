@@ -7,7 +7,8 @@ import { MatDialogConfig, MatDialog } from '@angular/material';
 import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
-import { ProductService } from 'src/app/core/services/product.service';
+import { Store } from '@ngrx/store';
+import { RootStoreState, ProductStoreActions } from 'src/app/root-store';
 
 @Component({
   selector: 'app-product-card',
@@ -16,13 +17,13 @@ import { ProductService } from 'src/app/core/services/product.service';
 })
 export class ProductCardComponent implements OnInit {
 
-  imagePaths = ImagePaths;
   @Input() product: Product;
+  imagePaths = ImagePaths;
 
   constructor(
     private router: Router,
     private dialog: MatDialog,
-    private productService: ProductService
+    private store$: Store<RootStoreState.State>
   ) { }
 
   ngOnInit() {
@@ -32,12 +33,9 @@ export class ProductCardComponent implements OnInit {
     this.router.navigate([AppRoutes.PRODUCT_EDIT, this.product.id]);
   }
 
-  onActivateProduct() {
-    this.productService.activateProduct(this.product);
-  }
-
-  onDeactivateProduct() {
-    this.productService.deactivateProduct(this.product);
+  onToggleProductActive() {
+    console.log('Activate product toggled');
+    this.store$.dispatch(new ProductStoreActions.ToggleActiveRequested({product: this.product}));
   }
 
   onDelete() {
@@ -56,13 +54,9 @@ export class ProductCardComponent implements OnInit {
     .pipe(take(1))
     .subscribe(userConfirmed => {
       if (userConfirmed) {
-        this.deletePost();
+        this.store$.dispatch(new ProductStoreActions.DeleteProductRequested({productId: this.product.id}));
       }
     });
-  }
-
-  private deletePost() {
-    this.productService.deleteProduct(this.product.id);
   }
 
 }

@@ -13,7 +13,7 @@
       <button mat-raised-button color="accent" (click)="imageInput.click()">Choose Card Image</button>
     </div>
     <div *ngIf="(cardImageProps$ | async) as imageData">
-      <img class="product-image-display" [src]="imageData.src" [alt]="(productData$ | async)?.name">
+      <img class="product-image-display" [src]="imageData.src" [alt]="(product$ | async)?.name">
     </div>
     <div>
       <h3>Hero Image (2000x938)</h3>
@@ -23,7 +23,7 @@
       <button mat-raised-button color="accent" (click)="imageInput.click()">Choose Hero Image</button>
     </div>
     <div *ngIf="(heroImageProps$ | async) as imageData">
-      <img class="product-image-display" [src]="imageData.src" [alt]="(productData$ | async)?.name">
+      <img class="product-image-display" [src]="imageData.src" [alt]="(product$ | async)?.name">
     </div>
   </div>
 

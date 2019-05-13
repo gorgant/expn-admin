@@ -60,7 +60,7 @@ export class PostService {
   }
 
   createPost(post: Post): Observable<Post> {
-    const fbResponse = this.getPostCollection().doc(post.id).set(post)
+    const fbResponse = this.getPostDoc(post.id).set(post)
       .then(empty => {
         console.log('Post created', post);
         return post;

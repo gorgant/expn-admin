@@ -9,7 +9,6 @@ import { Post } from 'src/app/core/models/posts/post.model';
 import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreActions } from 'src/app/root-store';
-import { TogglePublishedRequested, ToggleFeaturedRequested } from 'src/app/root-store/post-store/actions';
 
 @Component({
   selector: 'app-post-card',
@@ -36,19 +35,19 @@ export class PostCardComponent implements OnInit {
 
   onTogglePublishPost() {
     console.log('Publish post toggled');
-    this.store$.dispatch(new TogglePublishedRequested({post: this.post}));
+    this.store$.dispatch(new PostStoreActions.TogglePublishedRequested({post: this.post}));
   }
 
   onTogglePostFeatured() {
     console.log('Publish featured toggled');
-    this.store$.dispatch(new ToggleFeaturedRequested({post: this.post}));
+    this.store$.dispatch(new PostStoreActions.ToggleFeaturedRequested({post: this.post}));
   }
 
-  onPreviewBlogItem(postId) {
-    this.router.navigate([AppRoutes.BLOG_PREVIEW_POST, postId]);
+  onPreviewBlogItem() {
+    this.router.navigate([AppRoutes.BLOG_PREVIEW_POST, this.post.id]);
   }
 
-  onDelete(postId: string) {
+  onDelete() {
     const dialogConfig = new MatDialogConfig();
 
     const deleteConfData: DeleteConfData = {
@@ -64,8 +63,7 @@ export class PostCardComponent implements OnInit {
     .pipe(take(1))
     .subscribe(userConfirmed => {
       if (userConfirmed) {
-        console.log('User confirmed delete on card, dispatching delete action');
-        this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId}));
+        this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId: this.post.id}));
       }
     });
   }

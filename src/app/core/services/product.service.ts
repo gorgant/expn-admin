@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { Observable, throwError, from, Subject } from 'rxjs';
+import { Observable, throwError, from, Subject, of } from 'rxjs';
 import { Product } from '../models/products/product.model';
 import { AuthService } from './auth.service';
-import { takeUntil, map, catchError } from 'rxjs/operators';
+import { takeUntil, map, catchError, switchMap } from 'rxjs/operators';
 import { UiService } from './ui.service';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { ImageService } from './image.service';
@@ -67,7 +67,8 @@ export class ProductService {
         return product;
       })
       .catch(error => {
-        return throwError(error).toPromise();
+        console.log('Error creating product', error);
+        return error;
       });
 
     return from(fbResponse);
@@ -81,59 +82,101 @@ export class ProductService {
       })
       .catch(error => {
         console.log('Error updating product', error);
-        return throwError(error).toPromise();
+        return error;
       });
 
     return from(fbResponse);
   }
 
-  async deleteProduct(productId: string): Promise<string> {
+  deleteProduct(productId: string): Observable<string> {
     // Be sure to delete images before deleting the item doc
-    await this.imageService.deleteAllItemImages(productId, ImageType.PRODUCT_CARD); // Any product image type will work here
-    const fbResponse = this.getProductDoc(productId).delete()
-      .then(empty => {
-        console.log('Product deleted', productId);
-        return productId;
-      })
-      .catch(error => {
-        return throwError(error).toPromise();
-      });
+    const deleteImagePromise = this.imageService.deleteAllItemImages(
+      productId, ImageType.PRODUCT_CARD // Any product image type will work here
+    ).catch(err => {
+      console.log('Error deleting product images', err);
+      return err;
+    });
 
-    return fbResponse;
+    return from(deleteImagePromise)
+      .pipe(
+        switchMap(res => {
+          const fbResponse = this.getProductDoc(productId).delete()
+          .then(empty => {
+            console.log('Product deleted', productId);
+            return productId;
+          })
+          .catch(error => {
+            console.log('Error deleting product', error);
+            return throwError(error).toPromise();
+          });
+          return from(fbResponse);
+        })
+      );
   }
 
-  activateProduct(product: Product): void {
-    const activatedProduct: Product = {
-      ...product,
-      active: true,
+  // Update product on server (local update happens in store effects)
+  toggleProductActive(product: Product): Observable<Product> {
+    let updatedProduct: Product = {
+      ...product
     };
+    if (!product.active) {
+      updatedProduct = {
+        ...updatedProduct,
+        active: true,
+      };
+    } else {
+      updatedProduct = {
+        ...updatedProduct,
+        active: false,
+      };
+    }
 
-    this.getProductDoc(product.id).update(activatedProduct)
+    const serverRes = this.publicService.updatePublicProduct(updatedProduct)
       .then(res => {
-        // If the local update is successful, update on other server
-        this.publicService.updatePublicProduct(activatedProduct); // Will activate product on public server
+        console.log('Server call succeded', res);
+        return updatedProduct;
       })
       .catch(error => {
-        console.log('Error activating product in admin', error);
+        console.log('Error updating product', error);
+        return error;
       });
+
+    // For instant UI updates, don't wait for server response
+    return of(updatedProduct);
   }
 
-  deactivateProduct(product: Product): void {
+  // activateProduct(product: Product): void {
+  //   const activatedProduct: Product = {
+  //     ...product,
+  //     active: true,
+  //   };
 
-    const deactivatedProduct: Product = {
-      ...product,
-      active: false,
-    };
+  //   this.getProductDoc(product.id).update(activatedProduct)
+  //     .then(res => {
+  //       // If the local update is successful, update on other server
+  //       this.publicService.updatePublicProduct(activatedProduct); // Will activate product on public server
+  //     })
+  //     .catch(error => {
+  //       console.log('Error activating product in admin', error);
+  //     });
+  // }
 
-    this.getProductDoc(product.id).update(deactivatedProduct)
-      .then(res => {
-        // If the local update is successful, update on other server
-        this.publicService.updatePublicProduct(deactivatedProduct); // Will deactivate product on public server
-      })
-      .catch(error => {
-        console.log('Error updating post', error);
-      });
-  }
+  // deactivateProduct(product: Product): void {
+
+  //   const deactivatedProduct: Product = {
+  //     ...product,
+  //     active: false,
+  //   };
+
+  //   this.getProductDoc(product.id).update(deactivatedProduct)
+  //     .then(res => {
+  //       // If the local update is successful, update on other server
+  //       this.publicService.updatePublicProduct(deactivatedProduct); // Will deactivate product on public server
+  //     })
+  //     .catch(error => {
+  //       console.log('Error updating product', error);
+  //     });
+  // }
 
   fetchStorageRef(imagePath: string): AngularFireStorageReference {
     return this.storage.ref(imagePath);

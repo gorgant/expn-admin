@@ -35,11 +35,40 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.products, {
           ...state,
           isLoading: false,
-          error: null,
           productsLoaded: true,
+          error: null,
         }
       );
     }
+
+    case ActionTypes.ADD_PRODUCT_COMPLETE:
+      return featureAdapter.addOne(
+        action.payload.product,
+        {
+          ...state,
+        }
+      );
+
+    case ActionTypes.UPDATE_PRODUCT_COMPLETE:
+      return featureAdapter.updateOne(
+        action.payload.product,
+        {
+          ...state,
+        }
+      );
+
+    case ActionTypes.DELETE_PRODUCT_COMPLETE:
+      return featureAdapter.removeOne(
+        action.payload.productId,
+        {
+          ...state,
+        }
+      );
+
+    case ActionTypes.TOGGLE_ACTIVE_COMPLETE:
+      return {
+        ...state
+      };
 
     case ActionTypes.PRODUCT_LOAD_FAILURE: {
       return {

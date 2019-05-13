@@ -1,5 +1,5 @@
 <mat-card fxLayout="column" fxLayoutAlign="end start">
-  <mat-card-content (click)="onPreviewBlogItem(post.id)" >
+  <mat-card-content (click)="onPreviewBlogItem()" >
     <div *ngIf="post.imageProps">
       <img class="post-image" [src]="post.imageProps.src" [srcset]="post.imageProps.srcset" [sizes]="post.imageProps.sizes" [width]="post.imageProps.width" [alt]="post.title">
     </div>
@@ -23,10 +23,10 @@
       </button>
     </div>
     <div *ngIf="!post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
-      <button mat-icon-button class="edit-button" (click)="onSelectBlogItem(post.id)">
+      <button mat-icon-button class="edit-button" (click)="onSelectBlogItem()">
         <mat-icon>edit</mat-icon>
       </button>
-      <button mat-icon-button class="delete-button" (click)="onDelete(post.id)">
+      <button mat-icon-button class="delete-button" (click)="onDelete()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>

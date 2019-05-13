@@ -4,6 +4,9 @@ import { Product } from 'src/app/core/models/products/product.model';
 import { ProductService } from 'src/app/core/services/product.service';
 import { Router } from '@angular/router';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { Store } from '@ngrx/store';
+import { RootStoreState, ProductStoreSelectors, ProductStoreActions } from 'src/app/root-store';
+import { withLatestFrom, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-dashboard',
@@ -12,23 +15,36 @@ import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model
 })
 export class ProductDashboardComponent implements OnInit {
 
-  productList$: Observable<Product[]>;
+  // productList$: Observable<Product[]>;
+  products$: Observable<Product[]>;
 
   constructor(
-    private productService: ProductService,
     private router: Router,
+    private store$: Store<RootStoreState.State>
   ) { }
 
   ngOnInit() {
-    this.initializeGeographicData();
+    this.initializeProducts();
   }
 
   onCreateProduct() {
     this.router.navigate([AppRoutes.PRODUCT_NEW]);
   }
 
-  private initializeGeographicData() {
-    this.productList$ = this.productService.fetchAllProducts();
+  private initializeProducts() {
+    this.products$ = this.store$.select(ProductStoreSelectors.selectAllProducts)
+    .pipe(
+      withLatestFrom(
+        this.store$.select(ProductStoreSelectors.selectProductsLoaded)
+      ),
+      map(([products, productsLoaded]) => {
+        // Check if products are loaded, if not fetch from server
+        if (!productsLoaded) {
+          this.store$.dispatch(new ProductStoreActions.AllProductsRequested());
+        }
+        return products;
+      })
+    );
   }
 
 }
