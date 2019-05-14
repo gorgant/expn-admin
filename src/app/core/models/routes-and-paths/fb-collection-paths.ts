@@ -4,5 +4,6 @@ export enum FbCollectionPaths {
   USERS = 'users',
   POSTS = 'posts',
   PUBLIC_RESOURCES = 'publicResources',
-  ORDERS = 'orders'
+  ORDERS = 'orders',
+  SUBSCRIBERS = 'subscribers'
 }

@@ -11,7 +11,8 @@ const addUserToDb = async (authUser: admin.auth.UserRecord) => {
     displayName: authUser.displayName as string,
     email: authUser.email as string,
     avatarUrl: authUser.photoURL,
-    id: authUser.uid,
+    id: authUser.uid, // Set this manually in database for security reasons
+    isAdmin: false
   }
 
   await adminFirestore.collection(FbCollectionPaths.USERS).doc(authUser.uid).set(appUser);

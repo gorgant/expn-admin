@@ -6,7 +6,7 @@ import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-co
 /////// DEPLOYABLE FUNCTIONS ///////
 
 // Listen for order messages 
-export const saveOrderInFirestore = functions.pubsub.topic('save-order').onPublish( async (message, context) => {
+export const storeOrder = functions.pubsub.topic('save-order').onPublish( async (message, context) => {
   const db = adminFirestore;
 
   console.log('Context from pubsub', context);
@@ -14,7 +14,11 @@ export const saveOrderInFirestore = functions.pubsub.topic('save-order').onPubli
   console.log('Message converted to order', order);
 
   // Add ID and order number to new order
-  const orderDoc = await db.collection(FbCollectionPaths.ORDERS).doc().get();
+  const orderDoc = await db.collection(FbCollectionPaths.ORDERS).doc().get()
+    .catch(error => {
+      console.log('Error fetching order doc', error)
+      return error;
+    });
   const orderId = orderDoc.id;
   const orderNumber = orderId.substring(orderId.length - 8, orderId.length); // Create a user friendly 8 digit order ID
 

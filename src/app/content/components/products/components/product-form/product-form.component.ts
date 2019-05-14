@@ -41,7 +41,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private productId: string;
   private tempProductTitle: string;
   private originalProduct: Product;
-  private productInitialized: boolean;
+  productInitialized: boolean;
   private productDiscarded: boolean;
   private cardImageAdded: boolean;
   private heroImageAdded: boolean;

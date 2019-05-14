@@ -39,7 +39,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   private postId: string;
   private tempPostTitle: string;
   private originalPost: Post;
-  private postInitialized: boolean;
+  postInitialized: boolean;
   private postDiscarded: boolean;
   private heroImageAdded: boolean; // Helps determine if post is blank
   private imagesModifiedSinceLastSave: boolean;

@@ -1,20 +1,16 @@
 
 // Structure courtesy of https://github.com/malikasinger1/firebase-functions-with-typescript
 
-import { resizeImages } from './local/resize-images';
-export { resizeImages };
+export { resizeImages } from './local/resize-images';;
 
-import { createAdminUser } from './local/create-admin-user';
-export { createAdminUser };
+export { createAdminUser } from './local/create-admin-user';
 
-import { updatePublicBlogPost } from './public/update-public-blog-post';
-export { updatePublicBlogPost };
+export { updatePublicBlogPost } from './public/update-public-blog-post';
 
-import { updateGeographicData } from './public/update-geographic-data';
-export { updateGeographicData };
+export { updateGeographicData } from './public/update-geographic-data';
 
-import { updateProduct } from './public/update-product';
-export { updateProduct };
+export { updateProduct } from './public/update-product';
 
-import { saveOrderInFirestore } from './public/store-order';
-export { saveOrderInFirestore };
+export { storeOrder } from './pub-sub/store-order';
+
+export { storeEmailSub } from './pub-sub/store-email-sub';
