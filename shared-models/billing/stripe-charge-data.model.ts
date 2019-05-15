@@ -2,7 +2,7 @@ import { Product } from '../products/product.model';
 
 export interface StripeChargeData {
   source: stripe.Source;
-  anonymousUID: string;
+  publicUserId: string;
   amountPaid: number;
   product: Product;
 }

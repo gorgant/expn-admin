@@ -11,26 +11,10 @@ export const storeOrder = functions.pubsub.topic('save-order').onPublish( async 
 
   console.log('Context from pubsub', context);
   const order = message.json as Order;
-  console.log('Message converted to order', order);
+  console.log('Message from pubsub', order);
 
-  // Add ID and order number to new order
-  const orderDoc = await db.collection(FbCollectionPaths.ORDERS).doc().get()
-    .catch(error => {
-      console.log('Error fetching order doc', error)
-      return error;
-    });
-  const orderId = orderDoc.id;
-  const orderNumber = orderId.substring(orderId.length - 8, orderId.length); // Create a user friendly 8 digit order ID
-
-  const orderWithId: Order = {
-    ...order,
-    id: orderId,
-    orderNumber
-  }
-
-  console.log('Order with ID', orderWithId);
-  
-  const fbRes = await db.collection(FbCollectionPaths.ORDERS).doc(orderId).set(orderWithId)
+ 
+  const fbRes = await db.collection(FbCollectionPaths.ORDERS).doc(order.id).set(order)
     .catch(error => console.log(error));
     console.log('Order stored', fbRes);
 

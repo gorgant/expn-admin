@@ -1,12 +1,12 @@
 export interface Order {
   id: string;
   orderNumber: string; // A subset of id
-  processedDate: number;
+  createdDate: number;
   stripeChargeId: string;
   stripeCustomerId: string;
   name: string;
   email: string;
-  anonymousUID: string;
+  publicUserId: string;
   productId: string;
   amountPaid: number;
   status: 'activated' | 'inactive';

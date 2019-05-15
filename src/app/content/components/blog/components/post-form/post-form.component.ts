@@ -10,7 +10,7 @@ import { Post } from 'src/app/core/models/posts/post.model';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Store } from '@ngrx/store';
 import { RootStoreState, UserStoreSelectors, PostStoreActions, PostStoreSelectors } from 'src/app/root-store';
-import { AppUser } from 'src/app/core/models/user/app-user.model';
+import { AdminUser } from 'src/app/core/models/user/admin-user.model';
 import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { MatDialogConfig, MatDialog } from '@angular/material';
 import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
@@ -27,7 +27,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 })
 export class PostFormComponent implements OnInit, OnDestroy {
 
-  appUser$: Observable<AppUser>;
+  publicUser$: Observable<AdminUser>;
   private post$: Observable<Post>;
   private postLoaded: boolean;
   heroImageProps$: Observable<ImageProps>;
@@ -69,7 +69,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
     this.loadExistingPostData(); // Only loads if exists
 
-    this.appUser$ = this.store$.select(UserStoreSelectors.selectAppUser);
+    this.publicUser$ = this.store$.select(UserStoreSelectors.selectUser);
 
   }
 
@@ -261,13 +261,13 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private initializePost(): void {
-    this.appUser$
+    this.publicUser$
       .pipe(take(1))
-      .subscribe(appUser => {
+      .subscribe(publicUser => {
         console.log('Post initialized');
         const data: Post = {
-          author: appUser.displayName || appUser.id,
-          authorId: appUser.id,
+          author: publicUser.displayName || publicUser.id,
+          authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
           content: this.content.value,
           modifiedDate: now(),
@@ -338,12 +338,12 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private savePost(): void {
-    this.appUser$
+    this.publicUser$
       .pipe(take(1))
-      .subscribe(appUser => {
+      .subscribe(publicUser => {
         const post: Post = {
-          author: appUser.displayName || appUser.id,
-          authorId: appUser.id,
+          author: publicUser.displayName || publicUser.id,
+          authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
           content: this.content.value,
           modifiedDate: now(),

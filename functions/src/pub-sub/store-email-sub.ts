@@ -3,6 +3,7 @@ import { adminFirestore } from '../db';
 import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { EmailSubscriber } from '../../../shared-models/subscribers/email-subscriber.model';
 import { now } from 'moment';
+import { OrderHistory } from '../../../shared-models/orders/order-history.model';
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
@@ -24,14 +25,36 @@ export const storeEmailSub = functions.pubsub.topic('save-email-sub').onPublish(
 
   let fbRes;
 
+  const orderId = subscriber.lastOrder ? subscriber.lastOrder.id : null; // Check if subscriber has a current order
   if (subDoc.exists) {
-    // If doc already exists, merge with existing doc, adding the lastSubSource to the existing array
+
+    // Actions if subscriber does exist
+
     const oldSubData: EmailSubscriber = subDoc.data() as EmailSubscriber;
+    
+    // Merge lastSubSource to the existing subscriptionSources array
     const existingSubSources = oldSubData.subscriptionSources; // Fetch existing sub sources
+    const updatedSubSources = [...existingSubSources, subscriber.lastSubSource];
+    
+    // Merge lastOrder to the existing orderHistory object (key = order ID) if it exists
+    const existingOrderHistory = oldSubData.orderHistory ? oldSubData.orderHistory : null; // Check if subscriber has previous order history
+    let updatedOrderHistory = existingOrderHistory ? {...existingOrderHistory} : null; // Pre-load exisiting order history if available
+    if (orderId) {
+      // If order is present on latest subscriber request, add it to the object
+      if (!updatedOrderHistory) {
+        // First create a new object if it doesn't exist
+        updatedOrderHistory = {};
+      }
+      updatedOrderHistory[orderId] = subscriber.lastOrder;
+    }
+
     const updatedSubscriber: EmailSubscriber = {
       ...subscriber,
-      subscriptionSources: [...existingSubSources, subscriber.lastSubSource]
+      subscriptionSources: updatedSubSources,
+      orderHistory: updatedOrderHistory as OrderHistory
     }
+    console.log('Updating subscriber with this data', updatedSubscriber);
+
     fbRes = await db.collection(FbCollectionPaths.SUBSCRIBERS).doc(subId).update(updatedSubscriber)
       .catch(error => {
         console.log('Error storing subscriber doc', error)
@@ -39,12 +62,26 @@ export const storeEmailSub = functions.pubsub.topic('save-email-sub').onPublish(
       });
       console.log('Existing subscriber updated', fbRes);
   } else {
-    // If doc does not exist, create new subscriber with a fresh subscriptionSource array
+
+    // Actions if subscriber doesn't exist
+
+    let orderHistory: any;
+    if (orderId) {
+      orderHistory = {};
+      orderHistory[orderId] = subscriber.lastOrder;
+    } else {
+      orderHistory = null;
+    }
+
+    // Create new subscriber with a fresh subscriptionSource array
     const newSubscriber: EmailSubscriber = {
       ...subscriber,
       subscriptionSources: [subscriber.lastSubSource],
+      orderHistory: orderHistory as OrderHistory,
       createdDate: now()
     };
+    console.log('Creating subscriber with this data', newSubscriber);
+
     fbRes = await db.collection(FbCollectionPaths.SUBSCRIBERS).doc(subId).set(newSubscriber)
       .catch(error => {
         console.log('Error storing subscriber doc', error)

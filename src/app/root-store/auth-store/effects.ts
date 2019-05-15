@@ -9,6 +9,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { RootStoreState } from '..';
 import { StoreUserDataType } from 'src/app/core/models/user/store-user-data-type.model';
 import { AuthenticateUserType } from 'src/app/core/models/auth/authenticate-user-type.model';
+import { AdminUser } from 'src/app/core/models/user/admin-user.model';
 
 @Injectable()
 export class AuthStoreEffects {
@@ -30,11 +31,12 @@ export class AuthStoreEffects {
         return this.authService.loginWithEmail(action.payload.authData)
           .pipe(
             // Load user data into the store (skip info update that happens in Google login)
-            tap(fbUser =>
+            tap(partialUser => {
+              this.store$.dispatch(new userFeatureActions.StoreUserDataRequested({userData: partialUser}));
               // If email login, payload is a firebaseUser, but all we need is the uid
-              this.store$.dispatch(new userFeatureActions.UserDataRequested({userId: fbUser.uid}))
-            ),
-            map(fbUser => new authFeatureActions.AuthenticationComplete()),
+              // this.store$.dispatch(new userFeatureActions.UserDataRequested({userId: fbUser.uid}))
+            }),
+            map(partialUser => new authFeatureActions.AuthenticationComplete()),
             catchError(error => {
               return of(new authFeatureActions.LoadErrorDetected({ error }));
             })
@@ -48,7 +50,7 @@ export class AuthStoreEffects {
           // Load user data into the store
           tap(userData => {
             // Add or update user info in database (will trigger a subsequent user store update request in User Store)
-            return this.store$.dispatch(new userFeatureActions.StoreUserDataRequested({userData}));
+            this.store$.dispatch(new userFeatureActions.StoreUserDataRequested({userData}));
           }),
           map(userCreds => new authFeatureActions.AuthenticationComplete()),
           catchError(error => {
@@ -67,7 +69,7 @@ export class AuthStoreEffects {
     ),
     switchMap(action =>
       this.authService.updateEmail(
-        action.payload.appUser,
+        action.payload.publicUser,
         action.payload.password,
         action.payload.newEmail
         )
@@ -95,7 +97,7 @@ export class AuthStoreEffects {
     ),
     switchMap(action =>
       this.authService.updatePassword(
-        action.payload.appUser,
+        action.payload.publicUser,
         action.payload.oldPassword,
         action.payload.newPassword
         )

@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { AppUser } from 'src/app/core/models/user/app-user.model';
+import { AdminUser } from 'src/app/core/models/user/admin-user.model';
 import { StoreUserDataType } from 'src/app/core/models/user/store-user-data-type.model';
 
 export enum ActionTypes {
@@ -21,13 +21,13 @@ export class UserDataRequested implements Action {
 export class UserDataLoaded implements Action {
   readonly type = ActionTypes.USER_DATA_LOADED;
 
-  constructor(public payload: { userData: AppUser }) {}
+  constructor(public payload: { userData: AdminUser }) {}
 }
 
 export class StoreUserDataRequested implements Action {
   readonly type = ActionTypes.STORE_USER_DATA_REQUESTED;
 
-  constructor(public payload: { userData: AppUser}) {}
+  constructor(public payload: { userData: AdminUser | Partial<AdminUser>}) {}
 }
 
 export class StoreUserDataComplete implements Action {

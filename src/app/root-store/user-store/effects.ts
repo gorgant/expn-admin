@@ -45,7 +45,7 @@ export class UserStoreEffects {
             new userFeatureActions.UserDataRequested({userId})
           );
         }),
-        map(appUser => new userFeatureActions.StoreUserDataComplete()),
+        map(publicUser => new userFeatureActions.StoreUserDataComplete()),
         catchError(error => {
           return of(new userFeatureActions.LoadErrorDetected({ error }));
         })

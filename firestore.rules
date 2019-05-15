@@ -19,7 +19,7 @@ service cloud.firestore {
     // Retrieve user data
     // Note you need to explicitly escape variables using the $(variable) syntax.
     function getUserData() {
-    	return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    	return get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data;
     }
     
     function isAdmin() {

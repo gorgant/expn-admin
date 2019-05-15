@@ -1,7 +1,9 @@
-import { AnonymousUser } from '../user/anonymous-user.model';
+import { PublicUser } from '../user/public-user.model';
 import { SubscriptionSource } from './subscription-source.model';
+import * as Stripe from 'stripe';
 
 export interface EmailSubData {
-  user: AnonymousUser;
+  user: PublicUser;
   subSource: SubscriptionSource;
+  stripeCharge?: Stripe.charges.ICharge;
 }

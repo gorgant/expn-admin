@@ -1,13 +1,17 @@
-import { AnonymousUser } from '../user/anonymous-user.model';
+import { PublicUser } from '../user/public-user.model';
 import { SubscriptionSource } from './subscription-source.model';
+import { OrderHistory } from '../orders/order-history.model';
+import { Order } from '../orders/order.model';
 
 export interface EmailSubscriber {
   id: string; // email address of user
-  publicUserData: AnonymousUser;
+  publicUserData: PublicUser;
   active: boolean;
   createdDate: number;
-  subscriptionSources: SubscriptionSource[];
+  modifiedDate: number;
   lastSubSource: SubscriptionSource;
-  lastUpdated: number;
+  subscriptionSources: SubscriptionSource[];
+  lastOrder: Order;
+  orderHistory: OrderHistory;
   unsubscribedDate?: number;
 }

@@ -3,11 +3,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AuthData } from '../models/auth/auth-data.model';
 import { UiService } from 'src/app/core/services/ui.service';
-import { AppUser } from 'src/app/core/models/user/app-user.model';
+import { AdminUser } from 'src/app/core/models/user/admin-user.model';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import { from, Observable, Subject, throwError } from 'rxjs';
 import { AppRoutes } from '../models/routes-and-paths/app-routes.model';
+import { now } from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -35,17 +36,20 @@ export class AuthService {
     });
   }
 
-  registerUser(authData: AuthData): Observable<AppUser> {
+  // Currently, registration is not available (done with admin console)
+  registerUser(authData: AuthData): Observable<AdminUser> {
     const authResponse = this.afAuth.auth.createUserWithEmailAndPassword(
       authData.email,
       authData.password
     ).then(creds => {
-      const appUser: AppUser = {
+      const publicUser: AdminUser = {
         id: creds.user.uid,
         displayName: authData.name,
         email: authData.email,
+        lastAuthenticated: now(),
+        createdDate: now()
       };
-      return appUser;
+      return publicUser;
     })
     .catch(error => {
       this.uiService.showSnackBar(error, null, 5000);
@@ -55,19 +59,24 @@ export class AuthService {
     return from(authResponse);
   }
 
-  loginWithGoogle(): Observable<AppUser> {
+  // Currently, Google Login is not available (done with admin console)
+  loginWithGoogle(): Observable<AdminUser> {
     const authResponse = this.afAuth.auth.signInWithPopup(
       new firebase.auth.GoogleAuthProvider()
     ).then(creds => {
-      const newAppUser = creds.additionalUserInfo.isNewUser; // Check if this is a new user
-      const appUser: AppUser = {
+      const newUser = creds.additionalUserInfo.isNewUser; // Check if this is a new user
+      const publicUser: AdminUser = {
         displayName: creds.user.displayName,
         email: creds.user.email,
         avatarUrl: creds.user.photoURL,
         id: creds.user.uid,
-        isNewUser: newAppUser,
+        isNewUser: newUser,
+        lastAuthenticated: now()
       };
-      return appUser;
+      if (newUser) {
+        publicUser.createdDate = now();
+      }
+      return publicUser;
     })
     .catch(error => {
       this.uiService.showSnackBar(error, null, 5000);
@@ -77,12 +86,17 @@ export class AuthService {
     return from(authResponse);
   }
 
-  loginWithEmail(authData: AuthData): Observable<firebase.User> {
+  loginWithEmail(authData: AuthData): Observable<Partial<AdminUser>> {
     const authResponse = this.afAuth.auth.signInWithEmailAndPassword(
       authData.email,
       authData.password
     ).then(creds => {
-      return creds.user;
+      // Create a partial user object to log last authenticated
+      const partialUser: Partial<AdminUser> = {
+        id: creds.user.uid,
+        lastAuthenticated: now()
+      };
+      return partialUser;
     })
     .catch(error => {
       this.uiService.showSnackBar(error, null, 5000);
@@ -98,20 +112,20 @@ export class AuthService {
     // Post logout actions carried out by auth listener once logout detected
   }
 
-  updateEmail(appUser: AppUser, password: string, newEmail: string): Observable<{userData: AppUser, userId: string}> {
+  updateEmail(publicUser: AdminUser, password: string, newEmail: string): Observable<{userData: AdminUser, userId: string}> {
 
-    const credentials = this.getUserCredentials(appUser.email, password);
+    const credentials = this.getUserCredentials(publicUser.email, password);
 
     const authResponse = this.afAuth.auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credentials)
       .then(userCreds => {
         const updateResponse = this.afAuth.auth.currentUser.updateEmail(newEmail)
           .then(empty => {
-            const newUserData: AppUser = {
-              ...appUser,
+            const newUserData: AdminUser = {
+              ...publicUser,
               email: newEmail
             };
             this.uiService.showSnackBar(`Email successfully updated: ${newEmail}`, null, 3000);
-            return {userData: newUserData, userId: appUser.id};
+            return {userData: newUserData, userId: publicUser.id};
           })
           .catch(error => {
             this.uiService.showSnackBar(error, null, 3000);
@@ -127,8 +141,8 @@ export class AuthService {
     return from(authResponse);
   }
 
-  updatePassword(appUser: AppUser, oldPassword: string, newPassword: string): Observable<string> {
-    const credentials = this.getUserCredentials(appUser.email, oldPassword);
+  updatePassword(publicUser: AdminUser, oldPassword: string, newPassword: string): Observable<string> {
+    const credentials = this.getUserCredentials(publicUser.email, oldPassword);
 
     const authResponse = this.afAuth.auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credentials)
       .then(userCreds => {

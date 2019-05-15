@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { AppUser } from 'src/app/core/models/user/app-user.model';
+import { AdminUser } from 'src/app/core/models/user/admin-user.model';
 import { AuthenticateUserType } from 'src/app/core/models/auth/authenticate-user-type.model';
 import { AuthData } from 'src/app/core/models/auth/auth-data.model';
 
@@ -51,7 +51,7 @@ export class SetUnauthenticated implements Action {
 export class UpdateEmailRequested implements Action {
   readonly type = ActionTypes.UPDATE_EMAIL_REQUESTED;
 
-  constructor(public payload: { appUser: AppUser, password: string, newEmail: string }) {}
+  constructor(public payload: { publicUser: AdminUser, password: string, newEmail: string }) {}
 }
 
 export class UpdateEmailComplete implements Action {
@@ -61,7 +61,7 @@ export class UpdateEmailComplete implements Action {
 export class UpdatePasswordRequested implements Action {
   readonly type = ActionTypes.UPDATE_PASSWORD_REQUESTED;
 
-  constructor(public payload: { appUser: AppUser, oldPassword: string, newPassword: string }) {}
+  constructor(public payload: { publicUser: AdminUser, oldPassword: string, newPassword: string }) {}
 }
 
 export class UpdatePasswordComplete implements Action {

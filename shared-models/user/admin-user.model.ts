@@ -1,6 +1,8 @@
-export interface AppUser {
+export interface AdminUser {
   displayName: string;
   email: string;
+  lastAuthenticated: number;
+  createdDate?: number;
   isAdmin?: boolean;
   avatarUrl?: string;
   id?: string;
