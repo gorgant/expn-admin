@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
 import { SanitizedFileName } from '../models/images/sanitized-file-name.model';
-import { FbSystemPaths } from '../models/routes-and-paths/fb-system-paths.model';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { ImageType } from '../models/images/image-type.model';
 import { ImageDirectoryData } from '../models/images/image-directory-data.model';
@@ -13,6 +12,8 @@ import { ImageUrlObject } from '../models/images/image-url-object.model';
 import { ImageProps } from '../models/images/image-props.model';
 import { FbFunctionNames } from '../models/routes-and-paths/fb-function-names';
 import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { environment } from 'src/environments/environment';
+import { ProductionCloudStorage, SandboxCloudStorage } from '../models/environments/env-vars.model';
 
 @Injectable({
   providedIn: 'root'
@@ -21,13 +22,35 @@ export class ImageService {
 
   private imageProcessing$ = new BehaviorSubject<boolean>(false);
 
-  private blogStorageRef = firebase.app().storage(FbSystemPaths.BLOG_STORAGE_FB).ref();
-  private productsStorageRef = firebase.app().storage(FbSystemPaths.PRODUCTS_STORAGE_FB).ref();
+  private currentEnvironmentType: boolean = environment.production;
+  private blogStorageRef: firebase.storage.Reference;
+  private productsStorageRef: firebase.storage.Reference;
 
   private db = firebase.firestore(); // Firebase database
   private fns = firebase.functions(); // Firebase functions
 
-  constructor() { }
+  constructor() {
+    this.setStorageBasedOnEnvironment();
+  }
+
+  private setStorageBasedOnEnvironment() {
+    switch (this.currentEnvironmentType) {
+      case true:
+        console.log('Setting storage to production');
+        this.blogStorageRef = firebase.app().storage(ProductionCloudStorage.ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.app().storage(ProductionCloudStorage.ADMIN_PRODUCTS_STORAGE_FB).ref();
+        break;
+      case false:
+        console.log('Setting storage to sandbox');
+        this.blogStorageRef = firebase.app().storage(SandboxCloudStorage.ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.app().storage(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_FB).ref();
+        break;
+      default:
+        this.blogStorageRef = firebase.app().storage(SandboxCloudStorage.ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.app().storage(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_FB).ref();
+        break;
+    }
+  }
 
   // Starts the upload process.
   async uploadImageAndGetProps(file: File, itemId: string, imageType: ImageType): Promise<ImageProps> {

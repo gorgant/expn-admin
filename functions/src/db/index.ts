@@ -1,4 +1,4 @@
-import { adminApp, publicApp } from "../apps";
+import { adminApp, getPublicApp } from "../apps";
 import { Storage } from '@google-cloud/storage';
 
 // LOCAL VARIABLES
@@ -7,4 +7,4 @@ export const adminStorage = new Storage();
 
 
 // PUBLIC VARIABLES
-export const publicFirestore = publicApp.firestore();
+export const publicFirestore = getPublicApp().firestore();

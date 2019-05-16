@@ -6,7 +6,8 @@ export const environment = {
     databaseURL: 'https://explearning-admin.firebaseio.com',
     projectId: 'explearning-admin',
     storageBucket: 'explearning-admin.appspot.com',
-    messagingSenderId: '4522010229'
+    messagingSenderId: '4522010229',
+    appId: '1:4522010229:web:0764f6ceaa15bb13'
   },
   public: {
     apiKey: 'AIzaSyDv8zEnxl6-PPuXvy8hFvlmaGqzOnGXc0M',

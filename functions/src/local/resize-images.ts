@@ -10,9 +10,10 @@ import { now } from 'moment';
 
 import { ImageMetadata } from '../../../shared-models/images/image-metadata.model';
 import { ImageType } from '../../../shared-models/images/image-type.model';
-import { FbSystemPaths } from '../../../shared-models/routes-and-paths/fb-system-paths.model';
 import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { adminFirestore } from '../db';
+import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '../../../shared-models/environments/env-vars.model';
+import { currentEnvironmentType } from '../environments/config';
 
 interface ResizeImageDataObject {
   fileName: string;
@@ -34,26 +35,52 @@ const blogInlineImages = [ 150 ]
 const productCardSizes = [ 300 ]
 const productHeroSizes = [ 500, 1500 ]
 
+let blogBucket: Bucket;
+let productsBucket: Bucket;
 
+const setBucketsBasedOnEnvironment = (): void => {
+
+  switch (currentEnvironmentType) {
+    case EnvironmentTypes.PRODUCTION:
+      blogBucket = gcs.bucket(ProductionCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = gcs.bucket(ProductionCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      break;
+    case EnvironmentTypes.SANDBOX:
+      blogBucket = gcs.bucket(SandboxCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = gcs.bucket(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      break;
+    default:
+      blogBucket = gcs.bucket(SandboxCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = gcs.bucket(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      break;
+  }
+}
 
 const assignVariables = async (metadata: ImageMetadata): Promise<ResizeImageDataObject> => {
+
+  setBucketsBasedOnEnvironment();
+  
   const imageType = metadata.customMetadata.imageType;
   
   let bucket: Bucket; // The Storage bucket that contains the file.
+
+  // Set bucket based on image type
   switch (imageType) {
     case ImageType.BLOG_HERO:
-      bucket = gcs.bucket(FbSystemPaths.BLOG_STORAGE_AF);
+      bucket = blogBucket;
       break;
     case ImageType.BLOG_INLINE:
-      bucket = gcs.bucket(FbSystemPaths.BLOG_STORAGE_AF);
+      bucket = blogBucket;
       break;
     case ImageType.PRODUCT_CARD:
-      bucket = gcs.bucket(FbSystemPaths.PRODUCTS_STORAGE_AF);
+      bucket = productsBucket;
       break;
     case ImageType.PRODUCT_HERO:
-      bucket = gcs.bucket(FbSystemPaths.PRODUCTS_STORAGE_AF);
+      bucket = productsBucket;
       break;
-    default: bucket = gcs.bucket(FbSystemPaths.PRODUCTS_STORAGE_AF);
+    default: 
+      bucket = productsBucket;
+      break;
   }
 
   const filePath = <string>metadata.customMetadata.filePath; // File path in the bucket.
@@ -162,23 +189,25 @@ const resizeImgs = async (imageData: ResizeImageDataObject) => {
       metadata: {metadata: metadata},
     })
 
-    // See https://stackoverflow.com/a/42959262/6572208
-    // In order to get signedDownloadUrl, must enable IAM API https://console.developers.google.com/apis/api/iam.googleapis.com/overview?project=explearning-admin
-    // Assign the Service account token creator role
-    // More here: https://medium.com/@hiranya911/firebase-create-custom-tokens-without-service-account-credentials-d6049c2d2d85
+    // // See https://stackoverflow.com/a/42959262/6572208
+    // // In order to get signedDownloadUrl, must enable IAM API https://console.developers.google.com/apis/api/iam.googleapis.com/overview?project=explearning-admin
+    // // Assign the Service account token creator role
+    // // More here: https://medium.com/@hiranya911/firebase-create-custom-tokens-without-service-account-credentials-d6049c2d2d85
     
-    const file = imageData.bucket.file(destination);
+    // const file = imageData.bucket.file(destination);
 
-    const signedUrls = await file.getSignedUrl({
-      action: 'read',
-      expires: '03-09-2491'
-    })
+    // const signedUrls = await file.getSignedUrl({
+    //   action: 'read',
+    //   expires: '03-09-2491'
+    // })
 
-    const publicUrl = signedUrls[0];
-    console.log('Public url', publicUrl);
+    // const publicUrl = signedUrls[0];
+    // console.log('Public url', publicUrl);
 
-    // NOTE CURRENTLY WE AREN'T ACTUALLY USING THIS URL, INSTEAD WE ARE USING THE STORAGE VERSION
-    return publicUrl;
+    // // NOTE CURRENTLY WE AREN'T ACTUALLY USING THIS URL, INSTEAD WE ARE USING THE STORAGE VERSION
+    // return publicUrl;
+
+    return 'images created successfully';
 
   });
 

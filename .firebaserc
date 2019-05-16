@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "explearning-admin"
+    "default": "explearning-admin",
+    "sandbox-admin": "explearning-sandbox-admin"
   }
 }

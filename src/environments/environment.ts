@@ -5,20 +5,22 @@
 export const environment = {
   production: false,
   admin: {
-    apiKey: 'AIzaSyA5LwS0zLxdWDrk0ccgnvYQLe63d4lEffw',
-    authDomain: 'explearning-admin.firebaseapp.com',
-    databaseURL: 'https://explearning-admin.firebaseio.com',
-    projectId: 'explearning-admin',
-    storageBucket: 'explearning-admin.appspot.com',
-    messagingSenderId: '4522010229'
+    apiKey: 'AIzaSyB7esIVcpCnOBawciNhEjG804kof9A2W3U',
+    authDomain: 'explearning-sandbox-admin.firebaseapp.com',
+    databaseURL: 'https://explearning-sandbox-admin.firebaseio.com',
+    projectId: 'explearning-sandbox-admin',
+    storageBucket: 'explearning-sandbox-admin.appspot.com',
+    messagingSenderId: '1066862918149',
+    appId: '1:1066862918149:web:ed8346ca57d15b3f'
   },
   public: {
-    apiKey: 'AIzaSyDv8zEnxl6-PPuXvy8hFvlmaGqzOnGXc0M',
-    authDomain: 'explearning-76d93.firebaseapp.com',
-    databaseURL: 'https://explearning-76d93.firebaseio.com',
-    projectId: 'explearning-76d93',
-    storageBucket: 'explearning-76d93.appspot.com',
-    messagingSenderId: '924141189564'
+    apiKey: 'AIzaSyDrK4bOysz6FODkDkfOMeE44UkneyZyn9Y',
+    authDomain: 'explearning-sandbox-public.firebaseapp.com',
+    databaseURL: 'https://explearning-sandbox-public.firebaseio.com',
+    projectId: 'explearning-sandbox-public',
+    storageBucket: 'explearning-sandbox-public.appspot.com',
+    messagingSenderId: '896806779883',
+    appId: '1:896806779883:web:37fcf19e58524c8b'
   }
 };
 
