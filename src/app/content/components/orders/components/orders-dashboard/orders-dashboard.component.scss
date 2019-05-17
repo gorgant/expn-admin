@@ -24,3 +24,8 @@
 .order-table {
   width: 100%;
 }
+
+.mat-row:hover {
+  cursor: pointer;
+  @include background-opacity($primary, $opacity-faded);
+}

@@ -41,7 +41,7 @@
       </ng-container>
     
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let order; columns: displayedColumns;" (click)="onSelectOrder(order)"></tr>
     </table>
   
     <div class="loading-spinner-container" *ngIf="isLoading$ | async" fxLayoutAlign="center center">

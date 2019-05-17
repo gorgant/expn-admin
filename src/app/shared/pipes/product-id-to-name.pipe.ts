@@ -19,7 +19,7 @@ export class ProductIdToNamePipe implements PipeTransform {
       return of('');
     }
 
-    // Product data is initialized on the orders page
+    // Product data should be initialized on the page where the product is displayed
     return this.store$.select(ProductStoreSelectors.selectProductById(productId))
       .pipe(
         map(product => {

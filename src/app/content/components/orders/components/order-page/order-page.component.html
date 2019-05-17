@@ -1,3 +1,58 @@
-<p>
-  order-page works!
-</p>
+<div class="page-container" fxLayout="column" fxLayoutAlign="center center">
+
+  <div class="back-button-container" fxLayout="row" fxLayoutAlign="start center">
+    <button mat-button color="primary" routerLink="../../">Back to Orders</button>
+  </div>
+
+  <div *ngIf="order$ | async as order" class="order-details-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="32px">
+    
+    <div appMatElevation class="details-card customer-details" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+      <div class="card-title" fxFlexAlign="center">Customer Details</div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Customer Name:</div>
+        <div class="item-value">{{ order.name }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Customer Email:</div>
+        <div class="item-value">{{ order.email }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Stripe Cus ID:</div>
+        <div class="item-value">{{ order.stripeCustomerId }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Pub User ID:</div>
+        <div class="item-value">{{ order.publicUserId }}</div>
+      </div>
+    </div>
+    
+    <div appMatElevation class="details-card order-details" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+      <div class="card-title" fxFlexAlign="center">Order Details</div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+          <div class="item-title">Order Number:</div>
+          <div class="item-value">{{ order.orderNumber }}</div>
+        </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Date Placed:</div>
+        <div class="item-value">{{ order.createdDate | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Product Name:</div>
+        <div class="item-value">{{ order.productId | productIdToName | async }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Amount Paid:</div>
+        <div class="item-value">${{ order.amountPaid / 100 | number:'1.2' }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Status:</div>
+        <div class="item-value">{{ order.status }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Stripe Ch ID:</div>
+        <div class="item-value">{{ order.stripeChargeId }}</div>
+      </div>
+    </div>
+
+  </div>
+</div>

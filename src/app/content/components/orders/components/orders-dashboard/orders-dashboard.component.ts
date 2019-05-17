@@ -6,6 +6,8 @@ import { RootStoreState, OrderStoreSelectors, OrderStoreActions, ProductStoreSel
 import { withLatestFrom, map, take } from 'rxjs/operators';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
+import { Router } from '@angular/router';
+import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-orders-dashboard',
@@ -24,7 +26,8 @@ export class OrdersDashboardComponent implements OnInit {
 
   constructor(
     private store$: Store<RootStoreState.State>,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -32,6 +35,10 @@ export class OrdersDashboardComponent implements OnInit {
     this.initializeProducts(); // Ensures this is available for productIdToName pipe
     this.initializeMatTable();
     this.initBreakpointObserver();
+  }
+
+  onSelectOrder(order: Order) {
+    this.router.navigate([AppRoutes.ORDERS_ORDER_DETAILS, order.id]);
   }
 
   private initializeOrders() {
@@ -60,7 +67,7 @@ export class OrdersDashboardComponent implements OnInit {
           this.store$.select(ProductStoreSelectors.selectProductsLoaded)
         ),
         map(([products, productsLoaded]) => {
-          // Check if posts are loaded, if not fetch from server
+          // Check if items are loaded, if not fetch from server
           if (!productsLoaded) {
             this.store$.dispatch(new ProductStoreActions.AllProductsRequested());
           }
