@@ -29,8 +29,8 @@ export class PostCardComponent implements OnInit {
   ngOnInit() {
   }
 
-  onSelectBlogItem(postId) {
-    this.router.navigate([AppRoutes.BLOG_EDIT_POST, postId]);
+  onSelectBlogItem() {
+    this.router.navigate([AppRoutes.BLOG_EDIT_POST, this.post.id]);
   }
 
   onTogglePublishPost() {

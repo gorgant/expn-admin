@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
-import {Storage, Bucket} from '@google-cloud/storage';
-const gcs = new Storage();
+import { Bucket } from '@google-cloud/storage';
 import { join, dirname, basename } from 'path';
 import { tmpdir } from 'os';
 import * as sharp from 'sharp';
@@ -11,7 +10,7 @@ import { now } from 'moment';
 import { ImageMetadata } from '../../../shared-models/images/image-metadata.model';
 import { ImageType } from '../../../shared-models/images/image-type.model';
 import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
-import { adminFirestore } from '../db';
+import { adminFirestore, adminStorage } from '../db';
 import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '../../../shared-models/environments/env-vars.model';
 import { currentEnvironmentType } from '../environments/config';
 
@@ -42,16 +41,16 @@ const setBucketsBasedOnEnvironment = (): void => {
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      blogBucket = gcs.bucket(ProductionCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = gcs.bucket(ProductionCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      blogBucket = adminStorage.bucket(ProductionCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = adminStorage.bucket(ProductionCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
       break;
     case EnvironmentTypes.SANDBOX:
-      blogBucket = gcs.bucket(SandboxCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = gcs.bucket(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      blogBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
       break;
     default:
-      blogBucket = gcs.bucket(SandboxCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = gcs.bucket(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      blogBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
       break;
   }
 }
@@ -188,24 +187,6 @@ const resizeImgs = async (imageData: ResizeImageDataObject) => {
       contentType: imageData.contentType,
       metadata: {metadata: metadata},
     })
-
-    // // See https://stackoverflow.com/a/42959262/6572208
-    // // In order to get signedDownloadUrl, must enable IAM API https://console.developers.google.com/apis/api/iam.googleapis.com/overview?project=explearning-admin
-    // // Assign the Service account token creator role
-    // // More here: https://medium.com/@hiranya911/firebase-create-custom-tokens-without-service-account-credentials-d6049c2d2d85
-    
-    // const file = imageData.bucket.file(destination);
-
-    // const signedUrls = await file.getSignedUrl({
-    //   action: 'read',
-    //   expires: '03-09-2491'
-    // })
-
-    // const publicUrl = signedUrls[0];
-    // console.log('Public url', publicUrl);
-
-    // // NOTE CURRENTLY WE AREN'T ACTUALLY USING THIS URL, INSTEAD WE ARE USING THE STORAGE VERSION
-    // return publicUrl;
 
     return 'images created successfully';
 

@@ -4,13 +4,7 @@ import { currentEnvironmentType } from '../environments/config';
 
 export const adminApp = admin.initializeApp();
 
-// Requires admin service account to be added to public IAM
-
-// export const publicApp = admin.initializeApp(
-//     prodPublicApp,
-//     'public'
-//   );
-
+// Access to public app requires admin service account to be added to public IAM
 export const getPublicApp = () => {
   let app: admin.app.App;
 

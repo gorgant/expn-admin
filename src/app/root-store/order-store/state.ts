@@ -8,9 +8,9 @@ export const featureAdapter: EntityAdapter<Order>
 
       // Sort by date
       sortComparer: (a: Order, b: Order): number => {
-        const processedDateA = a.createdDate;
-        const processedDateB = b.createdDate;
-        return processedDateA.toString().localeCompare(processedDateB.toString(), undefined, {numeric: true});
+        const createdDateA = a.createdDate;
+        const createdDateB = b.createdDate;
+        return createdDateA.toString().localeCompare(createdDateB.toString(), undefined, {numeric: true});
       }
     }
   );

@@ -48,7 +48,7 @@ export class OrderService {
   }
 
   private getOrdersCollection(): AngularFirestoreCollection<Order> {
-    return this.afs.collection<Order>(FbCollectionPaths.ORDERS, ref => ref.orderBy('processedDate', 'desc'));
+    return this.afs.collection<Order>(FbCollectionPaths.ORDERS);
   }
 
   private getOrderDoc(orderId: string): AngularFirestoreDocument<Order> {
