@@ -3,7 +3,7 @@
   <div class="create-post-container" fxLayout="row" fxLayoutAlign="center center">
     <button class="create-post-button" mat-raised-button (click)="onCreatePost()">Create Post</button>
   </div>
-  <mat-tab-group *ngIf="posts$ | async as posts" mat-stretch-tabs>
+  <mat-tab-group *ngIf="!(deletionProcessing$ | async) && posts$ | async as posts" mat-stretch-tabs>
     <mat-tab label="Drafts" >
       <div class="blog-container">
         <div class="grid-container" gdColumns="repeat(auto-fill, minmax(300px, 1fr))" gdAlignRows="center center" gdGap="10px">

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
 import { Router } from '@angular/router';
-import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ProductStoreSelectors, ProductStoreActions } from 'src/app/root-store';
 import { withLatestFrom, map } from 'rxjs/operators';
@@ -15,6 +15,7 @@ import { withLatestFrom, map } from 'rxjs/operators';
 export class ProductDashboardComponent implements OnInit {
 
   products$: Observable<Product[]>;
+  deletionProcessing$: Observable<boolean>;
 
   constructor(
     private router: Router,
@@ -26,18 +27,20 @@ export class ProductDashboardComponent implements OnInit {
   }
 
   onCreateProduct() {
-    this.router.navigate([AppRoutes.PRODUCT_NEW]);
+    this.router.navigate([AdminAppRoutes.PRODUCT_NEW]);
   }
 
   private initializeProducts() {
+    this.deletionProcessing$ = this.store$.select(ProductStoreSelectors.selectDeletionProcessing);
     this.products$ = this.store$.select(ProductStoreSelectors.selectAllProducts)
     .pipe(
       withLatestFrom(
-        this.store$.select(ProductStoreSelectors.selectProductsLoaded)
+        this.store$.select(ProductStoreSelectors.selectProductsLoaded),
+        this.store$.select(ProductStoreSelectors.selectDeletionProcessing), // Prevents error loading deleted data
       ),
-      map(([products, productsLoaded]) => {
+      map(([products, productsLoaded, deletionProcessing]) => {
         // Check if products are loaded, if not fetch from server
-        if (!productsLoaded) {
+        if (!productsLoaded && !deletionProcessing) {
           this.store$.dispatch(new ProductStoreActions.AllProductsRequested());
         }
         return products;

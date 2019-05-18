@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
 import { AdminUser } from '../../../shared-models/user/admin-user.model';
-import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
+import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { adminFirestore } from '../db';
 import { now } from 'moment';
 
@@ -18,7 +18,7 @@ const addUserToDb = async (authUser: admin.auth.UserRecord) => {
     createdDate: now()
   }
 
-  await adminFirestore.collection(FbCollectionPaths.ADMIN_USERS).doc(authUser.uid).set(publicUser);
+  await adminFirestore.collection(AdminCollectionPaths.ADMIN_USERS).doc(authUser.uid).set(publicUser);
   console.log('Admin user created', publicUser);
 }
 

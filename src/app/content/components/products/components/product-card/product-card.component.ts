@@ -1,8 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Product } from 'src/app/core/models/products/product.model';
-import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
+import { AdminImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 import { Router } from '@angular/router';
-import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { MatDialogConfig, MatDialog } from '@angular/material';
 import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
@@ -18,7 +18,7 @@ import { RootStoreState, ProductStoreActions } from 'src/app/root-store';
 export class ProductCardComponent implements OnInit {
 
   @Input() product: Product;
-  imagePaths = ImagePaths;
+  imagePaths = AdminImagePaths;
 
   constructor(
     private router: Router,
@@ -30,7 +30,7 @@ export class ProductCardComponent implements OnInit {
   }
 
   onEditProduct() {
-    this.router.navigate([AppRoutes.PRODUCT_EDIT, this.product.id]);
+    this.router.navigate([AdminAppRoutes.PRODUCT_EDIT, this.product.id]);
   }
 
   onToggleProductActive() {

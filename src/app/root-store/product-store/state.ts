@@ -19,6 +19,7 @@ export interface State extends EntityState<Product> {
   isLoading?: boolean;
   error?: any;
   productsLoaded?: boolean;
+  deletionProcessing: boolean;
 }
 
 export const initialState: State = featureAdapter.getInitialState(
@@ -26,5 +27,6 @@ export const initialState: State = featureAdapter.getInitialState(
     isLoading: false,
     error: null,
     productsLoaded: false,
+    deletionProcessing: false,
   }
 );

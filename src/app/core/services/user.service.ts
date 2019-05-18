@@ -4,7 +4,7 @@ import { Observable, from, throwError } from 'rxjs';
 import { AdminUser } from '../models/user/admin-user.model';
 import { map, takeUntil, catchError } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { AdminCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -55,7 +55,7 @@ export class UserService {
   }
 
   private getUserCollection(): AngularFirestoreCollection<AdminUser> {
-    return this.db.collection<AdminUser>(FbCollectionPaths.ADMIN_USERS);
+    return this.db.collection<AdminUser>(AdminCollectionPaths.ADMIN_USERS);
   }
 
 }

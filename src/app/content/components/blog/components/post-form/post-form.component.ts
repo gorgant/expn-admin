@@ -11,7 +11,7 @@ import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Store } from '@ngrx/store';
 import { RootStoreState, UserStoreSelectors, PostStoreActions, PostStoreSelectors } from 'src/app/root-store';
 import { AdminUser } from 'src/app/core/models/user/admin-user.model';
-import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { MatDialogConfig, MatDialog } from '@angular/material';
 import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
@@ -76,7 +76,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   onSave() {
     this.manualSave = true;
     this.savePost();
-    this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
+    this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
   }
 
   onDiscardEdits() {
@@ -96,7 +96,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .subscribe(userConfirmed => {
         if (userConfirmed) {
           this.postDiscarded = true;
-          this.router.navigate([AppRoutes.BLOG_DASHBOARD]);
+          this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
           if (this.isNewPost) {
             this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId: this.postId}));
           } else {
@@ -315,6 +315,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   private changesDetected(post: Post): boolean {
     if (
       (post.title === this.title.value || post.title === this.tempPostTitle) &&
+      post.videoUrl === this.videoUrl.value &&
       post.content === this.content.value &&
       !this.imagesModifiedSinceLastSave
     ) {

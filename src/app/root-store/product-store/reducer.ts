@@ -57,11 +57,18 @@ export function featureReducer(state = initialState, action: Actions): State {
         }
       );
 
+    case ActionTypes.DELETE_PRODUCT_REQUESTED:
+      return {
+        ...state,
+        deletionProcessing: true,
+      };
+
     case ActionTypes.DELETE_PRODUCT_COMPLETE:
       return featureAdapter.removeOne(
         action.payload.productId,
         {
           ...state,
+          deletionProcessing: false,
         }
       );
 

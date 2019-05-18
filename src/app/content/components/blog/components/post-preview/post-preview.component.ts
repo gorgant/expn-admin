@@ -5,8 +5,8 @@ import { PostService } from 'src/app/core/services/post.service';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
-import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-post-preview',
@@ -17,12 +17,12 @@ export class PostPreviewComponent implements OnInit {
 
   @ViewChild('contentStartTag') ContentStartTag: ElementRef;
 
-  appRoutes = AppRoutes;
+  appRoutes = AdminAppRoutes;
 
   postId: string;
   postData$: Observable<Post>;
 
-  heroImagePlaceholder = ImagePaths.HERO_PLACEHOLDER;
+  heroImagePlaceholder = AdminImagePaths.HERO_PLACEHOLDER;
 
   postTitle: string;
   sanitizedPostBody: SafeHtml;

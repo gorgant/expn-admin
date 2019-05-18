@@ -3,13 +3,13 @@ import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection 
 import { Observable, throwError, from, Subject, of } from 'rxjs';
 import { Product } from '../models/products/product.model';
 import { AuthService } from './auth.service';
-import { takeUntil, map, catchError, switchMap } from 'rxjs/operators';
+import { takeUntil, map, catchError, switchMap, take } from 'rxjs/operators';
 import { UiService } from './ui.service';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { ImageService } from './image.service';
 import { ImageType } from '../models/images/image-type.model';
 import { PublicService } from './public.service';
-import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { SharedCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +48,8 @@ export class ProductService {
     const productDoc = this.getProductDoc(productId);
     return productDoc.valueChanges()
       .pipe(
-        takeUntil(this.authService.unsubTrigger$),
+        // takeUntil(this.authService.unsubTrigger$),
+        take(1), // Prevents load attempts after deletion
         map(product => {
           console.log('Fetched this product', product);
           return product;
@@ -195,6 +196,6 @@ export class ProductService {
   }
 
   private getProductsCollection(): AngularFirestoreCollection<Product> {
-    return this.afs.collection<Product>(FbCollectionPaths.PRODUCTS);
+    return this.afs.collection<Product>(SharedCollectionPaths.PRODUCTS);
   }
 }
