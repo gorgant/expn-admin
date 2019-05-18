@@ -12,6 +12,7 @@ export interface State extends EntityState<Post> {
   isLoading?: boolean;
   postsLoaded?: boolean;
   error?: any;
+  deletionProcessing: boolean;
 }
 
 export const initialState: State = featureAdapter.getInitialState(
@@ -19,5 +20,6 @@ export const initialState: State = featureAdapter.getInitialState(
     isLoading: false,
     postsLoaded: false,
     error: null,
+    deletionProcessing: false,
   }
 );

@@ -57,11 +57,18 @@ export function featureReducer(state = initialState, action: Actions): State {
         }
       );
 
+    case ActionTypes.DELETE_POST_REQUESTED:
+      return {
+        ...state,
+        deletionProcessing: true,
+      };
+
     case ActionTypes.DELETE_POST_COMPLETE:
       return featureAdapter.removeOne(
         action.payload.postId,
         {
           ...state,
+          deletionProcessing: false,
         }
       );
 

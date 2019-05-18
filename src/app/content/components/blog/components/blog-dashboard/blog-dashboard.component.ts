@@ -15,6 +15,7 @@ import { withLatestFrom, map } from 'rxjs/operators';
 export class BlogDashboardComponent implements OnInit {
 
   posts$: Observable<Post[]>;
+  deletionProcessing$: Observable<boolean>;
 
   constructor(
     private router: Router,
@@ -33,11 +34,12 @@ export class BlogDashboardComponent implements OnInit {
     this.posts$ = this.store$.select(PostStoreSelectors.selectAllPosts)
     .pipe(
       withLatestFrom(
-        this.store$.select(PostStoreSelectors.selectPostsLoaded)
+        this.store$.select(PostStoreSelectors.selectPostsLoaded),
+        this.store$.select(PostStoreSelectors.selectDeletionProcessing), // Prevents error loading deleted data
       ),
-      map(([posts, postsLoaded]) => {
+      map(([posts, postsLoaded, deletionProcessing]) => {
         // Check if posts are loaded, if not fetch from server
-        if (!postsLoaded) {
+        if (!postsLoaded && !deletionProcessing) {
           this.store$.dispatch(new PostStoreActions.AllPostsRequested());
         }
         return posts;

@@ -15,6 +15,7 @@ import { withLatestFrom, map } from 'rxjs/operators';
 export class ProductDashboardComponent implements OnInit {
 
   products$: Observable<Product[]>;
+  deletionProcessing$: Observable<boolean>;
 
   constructor(
     private router: Router,
@@ -30,14 +31,16 @@ export class ProductDashboardComponent implements OnInit {
   }
 
   private initializeProducts() {
+    this.deletionProcessing$ = this.store$.select(ProductStoreSelectors.selectDeletionProcessing);
     this.products$ = this.store$.select(ProductStoreSelectors.selectAllProducts)
     .pipe(
       withLatestFrom(
-        this.store$.select(ProductStoreSelectors.selectProductsLoaded)
+        this.store$.select(ProductStoreSelectors.selectProductsLoaded),
+        this.store$.select(ProductStoreSelectors.selectDeletionProcessing), // Prevents error loading deleted data
       ),
-      map(([products, productsLoaded]) => {
+      map(([products, productsLoaded, deletionProcessing]) => {
         // Check if products are loaded, if not fetch from server
-        if (!productsLoaded) {
+        if (!productsLoaded && !deletionProcessing) {
           this.store$.dispatch(new ProductStoreActions.AllProductsRequested());
         }
         return products;

@@ -315,6 +315,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   private changesDetected(post: Post): boolean {
     if (
       (post.title === this.title.value || post.title === this.tempPostTitle) &&
+      post.videoUrl === this.videoUrl.value &&
       post.content === this.content.value &&
       !this.imagesModifiedSinceLastSave
     ) {

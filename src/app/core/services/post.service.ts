@@ -47,7 +47,8 @@ export class PostService {
     const postDoc = this.getPostDoc(id);
     return postDoc.valueChanges()
     .pipe(
-      takeUntil(this.authService.unsubTrigger$),
+      take(1), // Prevents load attempts after deletion
+      // takeUntil(this.authService.unsubTrigger$),
       map(post => {
         console.log('Fetched this item', post);
         return post;

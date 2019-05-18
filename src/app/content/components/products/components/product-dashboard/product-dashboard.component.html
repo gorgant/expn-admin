@@ -1,6 +1,6 @@
 <div class="page-container" fxLayout="column" fxLayoutAlign="center center">
   <button class="create-product-button" color="primary" mat-raised-button (click)="onCreateProduct()">Create Product</button>
-  <div class="products-container" fxLayout="column" fxLayoutGap="40px">
+  <div *ngIf="!(deletionProcessing$ | async)" class="products-container" fxLayout="column" fxLayoutGap="40px">
     <app-product-card *ngFor="let product of products$ | async" [product]="product"></app-product-card>
   </div>
 </div>

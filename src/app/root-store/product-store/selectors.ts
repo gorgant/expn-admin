@@ -6,6 +6,7 @@ import { Product } from 'src/app/core/models/products/product.model';
 const getError = (state: State): any => state.error;
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getProductsLoaded = (state: State): boolean => state.productsLoaded;
+const getDeletionProcessing = (state: State): boolean => state.deletionProcessing;
 
 export const selectProductState: MemoizedSelector<object, State>
 = createFeatureSelector<State>('products');
@@ -31,3 +32,6 @@ export const selectProductIsLoading: MemoizedSelector<object, boolean>
 
 export const selectProductsLoaded: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getProductsLoaded);
+
+export const selectDeletionProcessing: MemoizedSelector<object, boolean>
+= createSelector(selectProductState, getDeletionProcessing);
