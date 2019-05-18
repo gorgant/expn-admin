@@ -83,7 +83,7 @@
         </mat-error>
       </mat-form-field>
       <mat-form-field class="buyNowBoxSubtitle">
-        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="buyNowBoxSubtitle" type="text" placeholder="Hero Subtitle"></textarea>
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="buyNowBoxSubtitle" type="text" placeholder="Buy Now Box Subtitle"></textarea>
         <mat-error *ngFor="let validation of productValidationMessages.buyNowBoxSubtitle">
           <mat-error *ngIf="buyNowBoxSubtitle.hasError(validation.type) && buyNowBoxSubtitle.invalid && (buyNowBoxSubtitle.dirty || buyNowBoxSubtitle.touched)">{{ validation.message }}</mat-error>
         </mat-error>

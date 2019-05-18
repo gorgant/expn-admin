@@ -1,3 +1,5 @@
+import { PublicUser } from '../user/public-user.model';
+
 export interface Order {
   id: string;
   orderNumber: string; // A subset of id
@@ -6,7 +8,7 @@ export interface Order {
   stripeCustomerId: string;
   name: string;
   email: string;
-  publicUserId: string;
+  publicUser: PublicUser;
   productId: string;
   amountPaid: number;
   status: 'activated' | 'inactive';

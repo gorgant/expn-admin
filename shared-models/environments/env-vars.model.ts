@@ -42,3 +42,11 @@ export enum SandboxCloudStorage {
   ADMIN_PRODUCTS_STORAGE_AF_CF = 'explearning-sandbox-admin-products',
   ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-sandbox-admin-products',
 }
+
+export enum ProductionStripePublishableKeys {
+  PUBLISHABLE = 'pk_live_2ybMSK15jNXw8mpoJ1MmIrfW00PvuSsi2F'
+}
+
+export enum SandboxStripePublishableKeys {
+  PUBLISHABLE = 'pk_test_qiAhFPd39eG3eqgEtWM9Yx0v00p7PxdzcH'
+}
