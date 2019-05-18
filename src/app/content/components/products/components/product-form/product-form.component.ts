@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/validation-messages.model';
+import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
 import { Subscription, Observable, of, from } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
 import { take, withLatestFrom, map } from 'rxjs/operators';
-import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { ImageType } from 'src/app/core/models/images/image-type.model';
@@ -70,7 +70,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   onSave() {
     this.manualSave = true;
     this.saveProduct();
-    this.router.navigate([AppRoutes.PRODUCT_DASHBOARD]);
+    this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
   }
 
   onDiscardEdits() {
@@ -90,7 +90,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     .subscribe(userConfirmed => {
       if (userConfirmed) {
         this.productDiscarded = true;
-        this.router.navigate([AppRoutes.PRODUCT_DASHBOARD]);
+        this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
         if (this.isNewProduct) {
           this.store$.dispatch(new ProductStoreActions.DeleteProductRequested({productId: this.productId}));
         } else {

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Post } from 'src/app/core/models/posts/post.model';
 import { Router } from '@angular/router';
-import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreSelectors, PostStoreActions } from 'src/app/root-store';
 import { withLatestFrom, map } from 'rxjs/operators';
@@ -26,7 +26,7 @@ export class BlogDashboardComponent implements OnInit {
   }
 
   onCreatePost() {
-    this.router.navigate([AppRoutes.BLOG_NEW_POST]);
+    this.router.navigate([AdminAppRoutes.BLOG_NEW_POST]);
   }
 
   private initializePosts() {

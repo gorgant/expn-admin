@@ -1,4 +1,4 @@
-export enum ProductIdList {
+export enum ProductionProductIdList {
   REMOTE_COACH = 'PYBao7tSd5XZFA8rBFtm',
 }
 

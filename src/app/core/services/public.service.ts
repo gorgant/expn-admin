@@ -6,7 +6,7 @@ import { AngularFireFunctions } from '@angular/fire/functions';
 import { throwError } from 'rxjs';
 import { GeographyListService } from './geography-list.service';
 import { Product } from '../models/products/product.model';
-import { FbFunctionNames } from '../models/routes-and-paths/fb-function-names';
+import { AdminFunctionNames } from '../models/routes-and-paths/fb-function-names';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,7 @@ export class PublicService {
 
   // Submit http request to cloud functions to publish post updates or unpublish post
   async updatePublicPost(post: Post): Promise<any> {
-    const callable = this.fns.httpsCallable(FbFunctionNames.UPDATE_PUBLIC_BLOG_POST);
+    const callable = this.fns.httpsCallable(AdminFunctionNames.UPDATE_PUBLIC_BLOG_POST);
 
     const callPromise = new Promise<any>((resolve, reject) => {
       console.log('Calling function with this data', post);
@@ -44,7 +44,7 @@ export class PublicService {
   // Submit http request to cloud functions to update product
   updatePublicProduct(product: Product): Promise<any> {
 
-    const callable = this.fns.httpsCallable(FbFunctionNames.UPDATE_PRODUCT);
+    const callable = this.fns.httpsCallable(AdminFunctionNames.UPDATE_PRODUCT);
 
     const callPromise = new Promise<any>((resolve, reject) => {
       console.log('Calling function with this data', product);
@@ -77,7 +77,7 @@ export class PublicService {
   }
 
   updateGeographicData() {
-    const geographicHttpCall = this.fns.httpsCallable(FbFunctionNames.UPDATE_GEOGRAPHIC_DATA);
+    const geographicHttpCall = this.fns.httpsCallable(AdminFunctionNames.UPDATE_GEOGRAPHIC_DATA);
 
     this.geographyListService.updateGeographicData()
       .pipe(take(1))

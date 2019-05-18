@@ -5,7 +5,7 @@ import { Observable, throwError } from 'rxjs';
 import { Order } from '../models/orders/order.model';
 import { takeUntil, map, catchError } from 'rxjs/operators';
 import { AngularFirestoreCollection, AngularFirestoreDocument, AngularFirestore } from '@angular/fire/firestore';
-import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { AdminCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +48,7 @@ export class OrderService {
   }
 
   private getOrdersCollection(): AngularFirestoreCollection<Order> {
-    return this.afs.collection<Order>(FbCollectionPaths.ORDERS);
+    return this.afs.collection<Order>(AdminCollectionPaths.ORDERS);
   }
 
   private getOrderDoc(orderId: string): AngularFirestoreDocument<Order> {

@@ -1,14 +1,15 @@
 import * as functions from 'firebase-functions';
 import { adminFirestore } from '../db';
-import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
+import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { EmailSubscriber } from '../../../shared-models/subscribers/email-subscriber.model';
 import { now } from 'moment';
 import { OrderHistory } from '../../../shared-models/orders/order-history.model';
+import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 // Listen for pubsub message
-export const storeEmailSub = functions.pubsub.topic('save-email-sub').onPublish( async (message, context) => {
+export const storeEmailSub = functions.pubsub.topic(AdminFunctionNames.SAVE_EMAIL_SUB_TOPIC).onPublish( async (message, context) => {
 
   console.log('Context from pubsub', context);
   const subscriber = message.json as EmailSubscriber;
@@ -17,7 +18,7 @@ export const storeEmailSub = functions.pubsub.topic('save-email-sub').onPublish(
   const subId = subscriber.id;
 
   const db = adminFirestore;
-  const subDoc: FirebaseFirestore.DocumentSnapshot = await db.collection(FbCollectionPaths.SUBSCRIBERS).doc(subId).get()
+  const subDoc: FirebaseFirestore.DocumentSnapshot = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).get()
     .catch(error => {
       console.log('Error fetching subscriber doc', error)
       return error;
@@ -55,7 +56,7 @@ export const storeEmailSub = functions.pubsub.topic('save-email-sub').onPublish(
     }
     console.log('Updating subscriber with this data', updatedSubscriber);
 
-    fbRes = await db.collection(FbCollectionPaths.SUBSCRIBERS).doc(subId).update(updatedSubscriber)
+    fbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).update(updatedSubscriber)
       .catch(error => {
         console.log('Error storing subscriber doc', error)
         return error;
@@ -82,7 +83,7 @@ export const storeEmailSub = functions.pubsub.topic('save-email-sub').onPublish(
     };
     console.log('Creating subscriber with this data', newSubscriber);
 
-    fbRes = await db.collection(FbCollectionPaths.SUBSCRIBERS).doc(subId).set(newSubscriber)
+    fbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).set(newSubscriber)
       .catch(error => {
         console.log('Error storing subscriber doc', error)
         return error;

@@ -7,7 +7,7 @@ import { withLatestFrom, map, take } from 'rxjs/operators';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
-import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-orders-dashboard',
@@ -38,7 +38,7 @@ export class OrdersDashboardComponent implements OnInit {
   }
 
   onSelectOrder(order: Order) {
-    this.router.navigate([AppRoutes.ORDERS_ORDER_DETAILS, order.id]);
+    this.router.navigate([AdminAppRoutes.ORDERS_ORDER_DETAILS, order.id]);
   }
 
   private initializeOrders() {

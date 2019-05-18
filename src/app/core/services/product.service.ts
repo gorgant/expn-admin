@@ -9,7 +9,7 @@ import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/s
 import { ImageService } from './image.service';
 import { ImageType } from '../models/images/image-type.model';
 import { PublicService } from './public.service';
-import { FbCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { SharedCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -195,6 +195,6 @@ export class ProductService {
   }
 
   private getProductsCollection(): AngularFirestoreCollection<Product> {
-    return this.afs.collection<Product>(FbCollectionPaths.PRODUCTS);
+    return this.afs.collection<Product>(SharedCollectionPaths.PRODUCTS);
   }
 }

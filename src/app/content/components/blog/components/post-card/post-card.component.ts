@@ -1,12 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { AppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
 import { Post } from 'src/app/core/models/posts/post.model';
-import { ImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
+import { AdminImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreActions } from 'src/app/root-store';
 
@@ -18,7 +18,7 @@ import { RootStoreState, PostStoreActions } from 'src/app/root-store';
 export class PostCardComponent implements OnInit {
 
   @Input() post: Post;
-  heroPlaceholderPath = ImagePaths.HERO_PLACEHOLDER;
+  heroPlaceholderPath = AdminImagePaths.HERO_PLACEHOLDER;
 
   constructor(
     private router: Router,
@@ -30,7 +30,7 @@ export class PostCardComponent implements OnInit {
   }
 
   onSelectBlogItem() {
-    this.router.navigate([AppRoutes.BLOG_EDIT_POST, this.post.id]);
+    this.router.navigate([AdminAppRoutes.BLOG_EDIT_POST, this.post.id]);
   }
 
   onTogglePublishPost() {
@@ -44,7 +44,7 @@ export class PostCardComponent implements OnInit {
   }
 
   onPreviewBlogItem() {
-    this.router.navigate([AppRoutes.BLOG_PREVIEW_POST, this.post.id]);
+    this.router.navigate([AdminAppRoutes.BLOG_PREVIEW_POST, this.post.id]);
   }
 
   onDelete() {

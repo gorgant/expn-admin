@@ -9,7 +9,7 @@ import { now } from 'moment';
 
 import { ImageMetadata } from '../../../shared-models/images/image-metadata.model';
 import { ImageType } from '../../../shared-models/images/image-type.model';
-import { FbCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
+import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { adminFirestore, adminStorage } from '../db';
 import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '../../../shared-models/environments/env-vars.model';
 import { currentEnvironmentType } from '../environments/config';
@@ -209,20 +209,20 @@ const updateFBPost = async (imageData: ResizeImageDataObject): Promise<FirebaseF
   // Set approapriate data in Firestore then signal to database that images have been uploaded
   switch (imageData.imageType) {
     case ImageType.BLOG_HERO:
-      await adminFirestore.collection(FbCollectionPaths.POSTS).doc(imageData.itemId).update({imageSizes: blogHeroSizes});
-      return adminFirestore.collection(FbCollectionPaths.POSTS).doc(imageData.itemId).update({imagesUpdated: now()})
+      await adminFirestore.collection(SharedCollectionPaths.POSTS).doc(imageData.itemId).update({imageSizes: blogHeroSizes});
+      return adminFirestore.collection(SharedCollectionPaths.POSTS).doc(imageData.itemId).update({imagesUpdated: now()})
     case ImageType.BLOG_INLINE:
-      await adminFirestore.collection(FbCollectionPaths.POSTS).doc(imageData.itemId).update({imageSizes: blogInlineImages});
-      return adminFirestore.collection(FbCollectionPaths.POSTS).doc(imageData.itemId).update({imagesUpdated: now()})
+      await adminFirestore.collection(SharedCollectionPaths.POSTS).doc(imageData.itemId).update({imageSizes: blogInlineImages});
+      return adminFirestore.collection(SharedCollectionPaths.POSTS).doc(imageData.itemId).update({imagesUpdated: now()})
     case ImageType.PRODUCT_CARD:
-      await adminFirestore.collection(FbCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imageSizes: productCardSizes});
-      return adminFirestore.collection(FbCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imagesUpdated: now()})
+      await adminFirestore.collection(SharedCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imageSizes: productCardSizes});
+      return adminFirestore.collection(SharedCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imagesUpdated: now()})
     case ImageType.PRODUCT_HERO:
-      await adminFirestore.collection(FbCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imageSizes: productHeroSizes});
-      return adminFirestore.collection(FbCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imagesUpdated: now()})
+      await adminFirestore.collection(SharedCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imageSizes: productHeroSizes});
+      return adminFirestore.collection(SharedCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imagesUpdated: now()})
     default: 
-      await adminFirestore.collection(FbCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imageSizes: productCardSizes});
-      return adminFirestore.collection(FbCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imagesUpdated: now()})
+      await adminFirestore.collection(SharedCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imageSizes: productCardSizes});
+      return adminFirestore.collection(SharedCollectionPaths.PRODUCTS).doc(imageData.itemId).update({imagesUpdated: now()})
   }
   
 }
