@@ -1,9 +1,9 @@
 <div appMatElevation class="product-card" fxLayout="column" fxLayoutGap="16px">
   <div fxLayout="column" fxLayout.gt-sm="row">
-    <div class="card-image-container" fxFlex="40" fxLayout="column" fxLayoutAlign="center center" fxFlexOrder.gt-sm="2">
+    <div class="card-image-container" fxFlex="30" fxLayout="column" fxLayoutAlign="center center" fxFlexOrder.gt-sm="2">
       <img class="card-image" [src]="product.cardImageProps.src ? product.cardImageProps.src : imagePaths.PRODUCT_PLACEHOLDER" alt="Remote Coach">
     </div>
-    <div class="card-text-container" fxFlex="60" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="16px" fxFlexOrder.gt-sm="1">
+    <div class="card-text-container" fxFlex="70" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="16px" fxFlexOrder.gt-sm="1">
       <div class="card-title">{{ product.productCardData.name }}</div>
       <div class="card-subtitle">{{ product.productCardData.tagline }}</div>
       <div class="card-description">
