@@ -18,8 +18,18 @@ export const storeOrder = functions.pubsub.topic(AdminFunctionNames.SAVE_ORDER_T
   const fbRes = await db.collection(AdminCollectionPaths.ORDERS).doc(order.id).set(order)
     .catch(error => console.log(error));
     console.log('Order stored', fbRes);
+  
+  // Also update subscriber with order data
+  const subOrderFbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(order.email)
+    .collection(AdminCollectionPaths.ORDERS).doc(order.id)
+    .set(order)
+    .catch(error => {
+      console.log('Error storing subscriber order', error)
+      return error;
+    });
+    console.log('Order stored', subOrderFbRes);  
 
-  return fbRes;
+  return fbRes && subOrderFbRes;
 })
 
 

@@ -16,3 +16,4 @@ export interface Post {
   videoUrl?: string;
   featured?: boolean;
 }
+
