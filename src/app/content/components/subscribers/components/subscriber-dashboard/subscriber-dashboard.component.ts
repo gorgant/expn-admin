@@ -31,8 +31,8 @@ export class SubscriberDashboardComponent implements OnInit {
     const trimmedId = subscriberId.trim();
 
     this.subscriberFetched = false;
-    this.subscriber$.next(null);
-    this.subscriberLoadError$.next(null);
+    this.subscriber$.next(null); // Clear UI for next pull
+    this.subscriberLoadError$.next(null); // Clear UI for next pull
 
 
     this.getSubscriber(trimmedId); // Must execute before monitor errors
@@ -74,6 +74,10 @@ export class SubscriberDashboardComponent implements OnInit {
           this.subscriberFetched = true; // Close out subscriber sub
         }
       });
+  }
+
+  private getContactForms() {
+    // TODO: fetch contact forms (if they exist) using contact form store, then display on subscriber profile
   }
 
 }

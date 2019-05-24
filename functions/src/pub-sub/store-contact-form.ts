@@ -17,9 +17,19 @@ export const storeContactForm = functions.pubsub.topic(AdminFunctionNames.SAVE_C
  
   const fbRes = await db.collection(AdminCollectionPaths.CONTACT_FORMS).doc(contactForm.id).set(contactForm)
     .catch(error => console.log(error));
-    console.log('Order stored', fbRes);
+    console.log('Contact form stored', fbRes);
+  
+  // Also update subcriber with contact form data
+  const subContactFormFbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(contactForm.email)
+    .collection(AdminCollectionPaths.ORDERS).doc(contactForm.id)
+    .set(contactForm)
+    .catch(error => {
+      console.log('Error storing subscriber contact form', error)
+      return error;
+    });
+    console.log('Contact form stored', subContactFormFbRes);  
 
-  return fbRes;
+  return fbRes && subContactFormFbRes;
 })
 
 
