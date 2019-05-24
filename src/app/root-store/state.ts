@@ -5,4 +5,5 @@ export interface State {
   products: '';
   orders: '';
   subscribers: '';
+  contactForms: '';
 }

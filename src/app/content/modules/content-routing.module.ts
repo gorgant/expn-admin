@@ -24,6 +24,10 @@ const routes: Routes = [
     loadChildren: '../components/subscribers/modules/subscribers.module#SubscribersModule',
   },
   {
+    path: 'contact-forms',
+    loadChildren: '../components/contact-forms/modules/contact-forms.module#ContactFormsModule',
+  },
+  {
     path: 'data-imports',
     component: DataImportsComponent
   },

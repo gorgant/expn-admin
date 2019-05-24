@@ -36,35 +36,37 @@ export class SubscriberService {
   }
 
   fetchSingleSubscriber(subscriberId: string): Observable<EmailSubscriber> {
-    // const subscriberDoc = this.getSubscriberDoc(subscriberId);
-    // return subscriberDoc.valueChanges()
-    //   .pipe(
-    //     takeUntil(this.authService.unsubTrigger$),
-    //     map(subscriber => {
-    //       console.log('Fetched single subscriber', subscriber);
-    //       return subscriber;
-    //     }),
-    //     catchError(error => {
-    //       this.uiService.showSnackBar(error, null, 5000);
-    //       return throwError(error);
-    //     })
-    //   );
+    console.log('Getting subscriber with this id', subscriberId);
+    const subscriberDoc = this.getSubscriberDoc(subscriberId);
+    return subscriberDoc.valueChanges()
+      .pipe(
+        takeUntil(this.authService.unsubTrigger$),
+        map(subscriber => {
+          console.log('Fetched single subscriber', subscriber);
+          return subscriber;
+        }),
+        catchError(error => {
+          console.log('Error fetching subscriber', error);
+          this.uiService.showSnackBar(error, null, 5000);
+          return throwError(error);
+        })
+      );
 
-    const demoServerPromise: Promise<EmailSubscriber> = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (subscriberId === 'bob@tim.com') {
-          resolve(demoSubscriber);
-        } else {
-          reject('No subscriber found');
-        }
-      }, 1000);
-    });
+    // const demoServerPromise: Promise<EmailSubscriber> = new Promise((resolve, reject) => {
+    //   setTimeout(() => {
+    //     if (subscriberId === 'bob@tim.com') {
+    //       resolve(demoSubscriber);
+    //     } else {
+    //       reject('No subscriber found');
+    //     }
+    //   }, 1000);
+    // });
 
-    const serverResponse = demoServerPromise.then(subscriber => subscriber);
+    // const serverResponse = demoServerPromise.then(subscriber => subscriber);
 
 
 
-    return from(serverResponse);
+    // return from(serverResponse);
 
   }
 

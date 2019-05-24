@@ -42,6 +42,14 @@
 
   <a mat-list-item 
     routerLinkActive="active-list-item"
+    [routerLink]="appRoutes.CONTACT_FORM_DASHBOARD"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>video_label</mat-icon>
+    <p mat-line>Contact Forms</p>
+  </a>
+
+  <a mat-list-item 
+    routerLinkActive="active-list-item"
     [routerLink]="appRoutes.DATA_IMPORTS"
     (click)="onToggleSideNav()">
     <mat-icon mat-list-icon>cloud_upload</mat-icon>

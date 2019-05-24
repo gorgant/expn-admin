@@ -46,17 +46,14 @@ export class SubscriberDashboardComponent implements OnInit {
       takeWhile(() => !this.subscriberFetched),
       map(subscriber => {
         if (!subscriber) {
-          console.log('Fetching subscriber from database');
           this.store$.dispatch(new SubscriberStoreActions.SingleSubscriberRequested({subscriberId}));
         }
-        console.log('Returning subscriber', subscriber);
         return subscriber;
       })
     ).subscribe(subscriber => {
       console.log('Subscriber subscription fired', subscriber);
       if (subscriber) {
         this.subscriber$.next(subscriber);
-        console.log('Subscriber detected', subscriber);
         this.subscriberFetched = true;
       }
     });
@@ -68,7 +65,6 @@ export class SubscriberDashboardComponent implements OnInit {
         takeWhile(() => !this.subscriberFetched)
       )
       .subscribe(error => {
-        console.log('Error subscription fired', error);
         if (error) {
           this.subscriberLoadError$.next(error);
           this.subscriberFetched = true; // Close out subscriber sub

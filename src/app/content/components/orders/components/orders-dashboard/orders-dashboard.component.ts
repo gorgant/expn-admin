@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { Order } from 'src/app/core/models/orders/order.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, OrderStoreSelectors, OrderStoreActions, ProductStoreSelectors, ProductStoreActions } from 'src/app/root-store';
@@ -14,9 +14,11 @@ import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.
   templateUrl: './orders-dashboard.component.html',
   styleUrls: ['./orders-dashboard.component.scss']
 })
-export class OrdersDashboardComponent implements OnInit {
+export class OrdersDashboardComponent implements OnInit, OnDestroy {
 
   orders$: Observable<Order[]>;
+  private ordersSubscription: Subscription;
+
   displayedColumns = ['processedDate', 'orderNumber', 'productId', 'amountPaid', 'status', 'email'];
   dataSource = new MatTableDataSource<Order>();
   isLoading$: Observable<boolean>;
@@ -50,7 +52,7 @@ export class OrdersDashboardComponent implements OnInit {
           this.store$.select(OrderStoreSelectors.selectOrdersLoaded)
         ),
         map(([orders, ordersLoaded]) => {
-          // Check if posts are loaded, if not fetch from server
+          // Check if items are loaded, if not fetch from server
           if (!ordersLoaded) {
             this.store$.dispatch(new OrderStoreActions.AllOrdersRequested());
           }
@@ -78,7 +80,7 @@ export class OrdersDashboardComponent implements OnInit {
   }
 
   private initializeMatTable() {
-    this.orders$.subscribe(orders => this.dataSource.data = orders); // Supply data
+    this.ordersSubscription = this.orders$.subscribe(orders => this.dataSource.data = orders); // Supply data
     this.dataSource.sort = this.sort; // Configure sorting on headers
     this.dataSource.paginator = this.paginator; // Configure pagination
   }
@@ -96,6 +98,12 @@ export class OrdersDashboardComponent implements OnInit {
 
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  ngOnDestroy() {
+    if (this.ordersSubscription) {
+      this.ordersSubscription.unsubscribe();
+    }
   }
 
 }

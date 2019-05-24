@@ -11,6 +11,8 @@ export enum AdminAppRoutes {
   PRODUCT_NEW = '/products/new',
   PRODUCT_EDIT = '/products/existing', // Note this also requires an ID route param to be appended to it
   SUBSCRIBER_DASHBOARD = '/subscribers/dashboard',
+  CONTACT_FORM_DASHBOARD = '/contact-forms/dashboard',
+  CONTACT_FORM_DETAILS = '/contact-forms/existing', // Note this also requires an ID route param to be appended to it
   DATA_IMPORTS = '/data-imports'
 }
 

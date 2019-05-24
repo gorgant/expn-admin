@@ -7,5 +7,6 @@ export * from './post-store';
 export * from './product-store';
 export * from './order-store';
 export * from './subscriber-store';
+export * from './contact-form-store';
 
 export { RootStoreState, RootStoreModule };
