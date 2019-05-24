@@ -1,0 +1,52 @@
+<div class="page-container" fxLayout="column" fxLayoutAlign="center center">
+
+  <div class="search-bar" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-sm="row" fxLayoutGap="8px">
+    <mat-form-field class="search-input">
+      <input #searchInput matInput placeholder="Search by Email">
+    </mat-form-field>
+    <button mat-raised-button class="search-buttom" color="primary" (click)="onGetSubscriber(searchInput.value)" >Fetch Subscriber</button>
+  </div>
+
+  <div class="loading-spinner-container" *ngIf="subscriberLoading$ | async" fxLayoutAlign="center center">
+    <mat-progress-spinner 
+      color="primary" 
+      mode="indeterminate">
+    </mat-progress-spinner>
+  </div>
+
+  <div class="load-error" *ngIf="subscriberLoadError$ | async" fxLayoutAlign="center center">
+    Error loading subscriber. This subscriber may not exist. Please confirm your search entry and try again.  
+  </div>
+
+  <div *ngIf="!(subscriberLoading$ | async) && (subscriber$ | async) as subscriber" class="subscriber-details-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="32px">
+
+    <div appMatElevation class="details-card subscriber-details" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+      <div class="card-title" fxFlexAlign="center">Subscriber Details</div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Subscriber Name:</div>
+        <div class="item-value">{{ subscriber.publicUserData.billingDetails.firstName + ' ' + subscriber.publicUserData.billingDetails.lastName }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Subscriber Status:</div>
+        <div class="item-value">{{ subscriber.active ? 'Subscribed' : 'Unsubscribed' }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Subscriber Email:</div>
+        <div class="item-value">{{ subscriber.id }}</div>
+      </div>
+      <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
+        <div class="item-title">Created Date:</div>
+        <div class="item-value">{{ subscriber.createdDate | date }}</div>
+      </div>
+      <div class="card-list-item" fxLayout="column" fxLayoutAlign="center center">
+        <div class="item-title">Subscription Sources</div>
+        <ul>
+          <li class="item-value" *ngFor="let source of subscriber.subscriptionSources">{{ source }}</li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>  
+
+</div>

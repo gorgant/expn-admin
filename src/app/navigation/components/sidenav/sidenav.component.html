@@ -1,43 +1,51 @@
 <mat-nav-list>
   
-  <mat-list-item 
+  <a mat-list-item 
     routerLinkActive="active-list-item"
     [routerLink]="appRoutes.HOME"
     (click)="onToggleSideNav()">
     <mat-icon mat-list-icon>home</mat-icon>
     <p mat-line>Home</p>
-  </mat-list-item>
+  </a>
   
-  <mat-list-item 
+  <a mat-list-item 
     routerLinkActive="active-list-item"
     [routerLink]="appRoutes.ORDERS_DASHBOARD"
     (click)="onToggleSideNav()">
     <mat-icon mat-list-icon>shopping_cart</mat-icon>
     <p mat-line>Orders</p>
-  </mat-list-item>
+  </a>
 
-  <mat-list-item 
+  <a mat-list-item 
     routerLinkActive="active-list-item"
     [routerLink]="appRoutes.BLOG_DASHBOARD"
     (click)="onToggleSideNav()">
     <mat-icon mat-list-icon>explore</mat-icon>
     <p mat-line>Blog</p>
-  </mat-list-item>
+  </a>
 
-  <mat-list-item 
+  <a mat-list-item 
     routerLinkActive="active-list-item"
     [routerLink]="appRoutes.PRODUCT_DASHBOARD"
     (click)="onToggleSideNav()">
     <mat-icon mat-list-icon>video_label</mat-icon>
     <p mat-line>Products</p>
-  </mat-list-item>
+  </a>
 
-  <mat-list-item 
+  <a mat-list-item 
+    routerLinkActive="active-list-item"
+    [routerLink]="appRoutes.SUBSCRIBER_DASHBOARD"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>video_label</mat-icon>
+    <p mat-line>Subscribers</p>
+  </a>
+
+  <a mat-list-item 
     routerLinkActive="active-list-item"
     [routerLink]="appRoutes.DATA_IMPORTS"
     (click)="onToggleSideNav()">
     <mat-icon mat-list-icon>cloud_upload</mat-icon>
     <p mat-line>Data Imports</p>
-  </mat-list-item>
+  </a>
 
 </mat-nav-list>

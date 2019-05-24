@@ -13,11 +13,11 @@ const routes: Routes = [
     canLoad: [AuthGuard],
     canActivate: [AuthGuard]
   },
-  {
-    path: '**',
-    redirectTo: 'home',
-    pathMatch: 'full'
-  },
+  // {
+  //   path: '**',
+  //   redirectTo: 'home',
+  //   pathMatch: 'full'
+  // },
 ];
 
 @NgModule({

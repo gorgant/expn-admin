@@ -4,4 +4,5 @@ export interface State {
   posts: '';
   products: '';
   orders: '';
+  subscribers: '';
 }

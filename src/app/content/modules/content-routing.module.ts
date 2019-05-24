@@ -20,6 +20,10 @@ const routes: Routes = [
     loadChildren: '../components/products/modules/products.module#ProductsModule',
   },
   {
+    path: 'subscribers',
+    loadChildren: '../components/subscribers/modules/subscribers.module#SubscribersModule',
+  },
+  {
     path: 'data-imports',
     component: DataImportsComponent
   },
