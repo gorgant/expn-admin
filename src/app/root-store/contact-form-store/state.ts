@@ -10,15 +10,16 @@ export const featureAdapter: EntityAdapter<ContactForm>
       sortComparer: (a: ContactForm, b: ContactForm): number => {
         const contactFormCreatedDateA = a.createdDate;
         const contactFormCreatedDateB = b.createdDate;
-        return contactFormCreatedDateA.toString().localeCompare(contactFormCreatedDateB.toString(), undefined, {numeric: true});
+        return contactFormCreatedDateB.toString().localeCompare(contactFormCreatedDateA.toString(), undefined, {numeric: true});
       }
     }
   );
 
 export interface State extends EntityState<ContactForm> {
-  isLoading?: boolean;
-  error?: any;
-  contactFormsLoaded?: boolean;
+  isLoading: boolean;
+  error: any;
+  contactFormsLoaded: boolean;
+  subscriberContactFormsLoading: boolean;
 }
 
 export const initialState: State = featureAdapter.getInitialState(
@@ -26,5 +27,6 @@ export const initialState: State = featureAdapter.getInitialState(
     isLoading: false,
     error: null,
     contactFormsLoaded: false,
+    subscriberContactFormsLoading: false,
   }
 );

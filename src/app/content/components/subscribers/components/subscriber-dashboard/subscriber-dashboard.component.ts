@@ -1,9 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { RootStoreState, SubscriberStoreSelectors, SubscriberStoreActions } from 'src/app/root-store';
+import {
+  RootStoreState,
+  SubscriberStoreSelectors,
+  SubscriberStoreActions,
+  ContactFormStoreSelectors,
+  ContactFormStoreActions
+} from 'src/app/root-store';
 import { EmailSubscriber } from 'src/app/core/models/subscribers/email-subscriber.model';
 import { Observable, Subject } from 'rxjs';
-import { map, takeWhile } from 'rxjs/operators';
+import { map, takeWhile, withLatestFrom } from 'rxjs/operators';
+import { ContactForm } from 'src/app/core/models/user/contact-form.model';
+import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-subscriber-dashboard',
@@ -12,10 +20,15 @@ import { map, takeWhile } from 'rxjs/operators';
 })
 export class SubscriberDashboardComponent implements OnInit {
 
+  appRoutes = AdminAppRoutes;
+
   subscriber$: Subject<EmailSubscriber> = new Subject();
-  private subscriberFetched;
+  private subscriberFetched: boolean;
   subscriberLoading$: Observable<boolean>;
   subscriberLoadError$: Subject<string> = new Subject();
+
+  contactForms$: Subject<ContactForm[]> = new Subject();
+  private contactFormsFetched: boolean;
 
   constructor(
     private store$: Store<RootStoreState.State>,
@@ -33,6 +46,7 @@ export class SubscriberDashboardComponent implements OnInit {
     this.subscriberFetched = false;
     this.subscriber$.next(null); // Clear UI for next pull
     this.subscriberLoadError$.next(null); // Clear UI for next pull
+    this.contactForms$.next(null); // Clear UI for next pull
 
 
     this.getSubscriber(trimmedId); // Must execute before monitor errors
@@ -51,7 +65,6 @@ export class SubscriberDashboardComponent implements OnInit {
         return subscriber;
       })
     ).subscribe(subscriber => {
-      console.log('Subscriber subscription fired', subscriber);
       if (subscriber) {
         this.subscriber$.next(subscriber);
         this.subscriberFetched = true;
@@ -72,8 +85,35 @@ export class SubscriberDashboardComponent implements OnInit {
       });
   }
 
-  private getContactForms() {
-    // TODO: fetch contact forms (if they exist) using contact form store, then display on subscriber profile
+  onGetContactForms(subscriberId: string) {
+    this.contactFormsFetched = false;
+
+    this.getContactForms(subscriberId);
+  }
+
+  private getContactForms(subscriberId: string) {
+
+    this.contactFormsFetched = false;
+
+    this.store$.select(ContactFormStoreSelectors.selectSubscriberContactForms(subscriberId))
+      .pipe(
+        takeWhile(() => !this.contactFormsFetched),
+        withLatestFrom(this.store$.select(ContactFormStoreSelectors.selectContactFormsLoaded)),
+        map(([contactForms, contactFormsLoaded]) => {
+          if (!contactFormsLoaded) {
+            console.log('No contact forms, fetching from server');
+            this.store$.dispatch(new ContactFormStoreActions.SubscriberContactFormsRequested({subscriberId}));
+          }
+          return contactForms;
+        }),
+        withLatestFrom(this.store$.select(ContactFormStoreSelectors.selectSubscriberContactFormsLoading)),
+      ).subscribe(([contactForms, formsLoading]) => {
+        console.log('Contact form subscription fired', contactForms);
+        if (contactForms && !formsLoading) {
+          this.contactForms$.next(contactForms);
+          this.contactFormsFetched = true;
+        }
+      });
   }
 
 }

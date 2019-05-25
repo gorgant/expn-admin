@@ -5,6 +5,7 @@ import { ContactForm } from 'src/app/core/models/user/contact-form.model';
 
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getContactFormsLoaded = (state: State): boolean => state.contactFormsLoaded;
+const getSubscriberContactFormsLoading = (state: State): boolean => state.subscriberContactFormsLoading;
 const getError = (state: State): any => state.error;
 
 export const selectContactFormState: MemoizedSelector<object, State>
@@ -13,6 +14,12 @@ export const selectContactFormState: MemoizedSelector<object, State>
 export const selectAllContactForms: (state: object) => ContactForm[] = createSelector(
   selectContactFormState,
   fromContactForms.selectAll
+);
+
+export const selectSubscriberContactForms: (subscriberId: string) => MemoizedSelector<object, ContactForm[]>
+= (subscriberId: string) => createSelector(
+  selectAllContactForms,
+  contactForms => contactForms.filter(contactForm => contactForm.email === subscriberId)
 );
 
 export const selectContactFormById: (contactFormId: string) => MemoizedSelector<object, ContactForm>
@@ -31,4 +38,8 @@ export const selectContactFormIsLoading: MemoizedSelector<object, boolean>
 
 export const selectContactFormsLoaded: MemoizedSelector<object, boolean>
 = createSelector(selectContactFormState, getContactFormsLoaded);
+
+export const selectSubscriberContactFormsLoading: MemoizedSelector<object, boolean>
+= createSelector(selectContactFormState, getSubscriberContactFormsLoading);
+
 

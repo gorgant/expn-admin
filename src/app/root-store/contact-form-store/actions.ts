@@ -6,6 +6,8 @@ export enum ActionTypes {
   SINGLE_CONTACT_FORM_LOADED = '[ContactForms] Single ContactForm Loaded',
   ALL_CONTACT_FORMS_REQUESTED = '[ContactForms] All ContactForms Requested',
   ALL_CONTACT_FORMS_LOADED = '[ContactForms] All ContactForms Loaded',
+  SUBSCRIBER_CONTACT_FORMS_REQUESTED = '[ContactForms] Subscriber Contact Forms Requested',
+  SUBSCRIBER_CONTACT_FORMS_LOADED = '[ContactForms] Subscriber Contact Forms Loaded',
   LOAD_FAILURE = '[ContactForms] Load Failure',
 }
 
@@ -28,6 +30,16 @@ export class AllContactFormsLoaded implements Action {
   constructor(public payload: { contactForms: ContactForm[] }) {}
 }
 
+export class SubscriberContactFormsRequested implements Action {
+  readonly type = ActionTypes.SUBSCRIBER_CONTACT_FORMS_REQUESTED;
+  constructor(public payload: { subscriberId: string }) {}
+}
+
+export class SubscriberContactFormsLoaded implements Action {
+  readonly type = ActionTypes.SUBSCRIBER_CONTACT_FORMS_LOADED;
+  constructor(public payload: { contactForms: ContactForm[] }) {}
+}
+
 export class LoadErrorDetected implements Action {
   readonly type = ActionTypes.LOAD_FAILURE;
   constructor(public payload: { error: string }) {}
@@ -38,5 +50,7 @@ export type Actions =
   SingleContactFormLoaded |
   AllContactFormsRequested |
   AllContactFormsLoaded |
+  SubscriberContactFormsRequested |
+  SubscriberContactFormsLoaded |
   LoadErrorDetected
   ;

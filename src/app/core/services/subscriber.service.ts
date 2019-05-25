@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { EmailSubscriber } from '../models/subscribers/email-subscriber.model';
-import { Observable, throwError, of, from } from 'rxjs';
+import { Observable, throwError, from } from 'rxjs';
 import { takeUntil, map, catchError } from 'rxjs/operators';
 import { AdminCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 import { demoSubscriber } from '../models/demo/demo-data.model';
@@ -52,22 +52,19 @@ export class SubscriberService {
         })
       );
 
-    // const demoServerPromise: Promise<EmailSubscriber> = new Promise((resolve, reject) => {
+    // const serverPromise: Promise<EmailSubscriber> = new Promise((resolve, reject) => {
     //   setTimeout(() => {
     //     if (subscriberId === 'bob@tim.com') {
     //       resolve(demoSubscriber);
     //     } else {
-    //       reject('No subscriber found');
+    //       reject('No such id found');
     //     }
     //   }, 1000);
     // });
 
-    // const serverResponse = demoServerPromise.then(subscriber => subscriber);
-
-
+    // const serverResponse = serverPromise.then(subscriber => subscriber);
 
     // return from(serverResponse);
-
   }
 
   private getSubscribersCollection(): AngularFirestoreCollection<EmailSubscriber> {

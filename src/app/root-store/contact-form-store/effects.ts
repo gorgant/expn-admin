@@ -45,4 +45,20 @@ export class ContactFormStoreEffects {
     )
   );
 
+  @Effect()
+  subscriberContactFormsRequestedEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<contactFormFeatureActions.SubscriberContactFormsRequested>(
+      contactFormFeatureActions.ActionTypes.SUBSCRIBER_CONTACT_FORMS_REQUESTED
+    ),
+    switchMap(action =>
+      this.contactFormService.fetchSubscriberContactForms(action.payload.subscriberId)
+        .pipe(
+          map(contactForms => new contactFormFeatureActions.SubscriberContactFormsLoaded({ contactForms })),
+          catchError(error => {
+            return of(new contactFormFeatureActions.LoadErrorDetected({ error }));
+          })
+        )
+    )
+  );
+
 }

@@ -44,6 +44,16 @@
           <li class="item-value" *ngFor="let source of subscriber.subscriptionSources">{{ source }}</li>
         </ul>
       </div>
+      <div class="contact-forms-container" fxLayout="column" fxLayoutAlign="center center">
+        <button class="request-contact-forms-button" mat-raised-button color="primary" (click)="onGetContactForms(subscriber.id)">View Contact Forms</button>
+        <div class="contact-form-list" *ngIf="contactForms$ | async as contactForms">
+          <ul *ngFor="let form of contactForms">
+            <li class="form-link">
+              <a [routerLink]="[appRoutes.CONTACT_FORM_DETAILS, form.id]">{{ form.createdDate | date }}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
 
     </div>
 

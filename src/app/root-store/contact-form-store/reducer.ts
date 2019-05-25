@@ -41,10 +41,28 @@ export function featureReducer(state = initialState, action: Actions): State {
       );
     }
 
+    case ActionTypes.SUBSCRIBER_CONTACT_FORMS_REQUESTED: {
+      return {
+        ...state,
+        subscriberContactFormsLoading: true
+      };
+    }
+
+    case ActionTypes.SUBSCRIBER_CONTACT_FORMS_LOADED: {
+      return featureAdapter.addMany(
+        action.payload.contactForms, {
+          ...state,
+          subscriberContactFormsLoading: false,
+          error: null,
+        }
+      );
+    }
+
     case ActionTypes.LOAD_FAILURE: {
       return {
         ...state,
         isLoading: false,
+        subscriberContactFormsLoading: false,
         error: action.payload.error
       };
     }
