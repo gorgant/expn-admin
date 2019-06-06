@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   RootStoreState,
@@ -8,8 +8,8 @@ import {
   ContactFormStoreActions
 } from 'src/app/root-store';
 import { EmailSubscriber } from 'src/app/core/models/subscribers/email-subscriber.model';
-import { Observable, Subject } from 'rxjs';
-import { map, takeWhile, withLatestFrom } from 'rxjs/operators';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { map, combineLatest } from 'rxjs/operators';
 import { ContactForm } from 'src/app/core/models/user/contact-form.model';
 import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 
@@ -18,17 +18,20 @@ import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.
   templateUrl: './subscriber-dashboard.component.html',
   styleUrls: ['./subscriber-dashboard.component.scss']
 })
-export class SubscriberDashboardComponent implements OnInit {
+export class SubscriberDashboardComponent implements OnInit, OnDestroy {
 
   appRoutes = AdminAppRoutes;
 
   subscriber$: Subject<EmailSubscriber> = new Subject();
-  private subscriberFetched: boolean;
   subscriberLoading$: Observable<boolean>;
   subscriberLoadError$: Subject<string> = new Subject();
+  private subscriberRequestDispatched: boolean;
+  private subscriberStoreSub: Subscription;
+  private subscriberErrorSub: Subscription;
 
   contactForms$: Subject<ContactForm[]> = new Subject();
-  private contactFormsFetched: boolean;
+  private contactFormRequestDispatched: boolean;
+  private contactFormStoreSub: Subscription;
 
   constructor(
     private store$: Store<RootStoreState.State>,
@@ -36,84 +39,102 @@ export class SubscriberDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.subscriberLoading$ = this.store$.select(SubscriberStoreSelectors.selectSubscriberIsLoading);
-
   }
 
   onGetSubscriber(subscriberId: string) {
 
     const trimmedId = subscriberId.trim();
 
-    this.subscriberFetched = false;
+    this.unsubAllQuerySubs(); // Remove all existing subscriptions
     this.subscriber$.next(null); // Clear UI for next pull
     this.subscriberLoadError$.next(null); // Clear UI for next pull
     this.contactForms$.next(null); // Clear UI for next pull
+    this.store$.dispatch(new ContactFormStoreActions.ResetSubscriberContactFormsStatus()); // Clear Store state
 
-
-    this.getSubscriber(trimmedId); // Must execute before monitor errors
+    this.getSubscriber(trimmedId);
     this.monitorErrors();
-
   }
 
   private getSubscriber(subscriberId: string) {
-    this.store$.select(SubscriberStoreSelectors.selectSubscriberById(subscriberId))
+    console.log('Getting subscriber', subscriberId);
+    this.subscriberRequestDispatched = false;
+
+    this.subscriberStoreSub = this.store$.select(SubscriberStoreSelectors.selectSubscriberById(subscriberId))
     .pipe(
-      takeWhile(() => !this.subscriberFetched),
       map(subscriber => {
-        if (!subscriber) {
+        if (!subscriber && !this.subscriberRequestDispatched) {
           this.store$.dispatch(new SubscriberStoreActions.SingleSubscriberRequested({subscriberId}));
+          this.subscriberRequestDispatched = true;
         }
         return subscriber;
       })
     ).subscribe(subscriber => {
       if (subscriber) {
         this.subscriber$.next(subscriber);
-        this.subscriberFetched = true;
+        this.getContactForms(subscriber.id); // Once subscriber loaded, get contact forms
       }
     });
   }
 
   private monitorErrors() {
-    this.store$.select(SubscriberStoreSelectors.selectSubscriberError)
-      .pipe(
-        takeWhile(() => !this.subscriberFetched)
-      )
+    this.subscriberErrorSub = this.store$.select(SubscriberStoreSelectors.selectSubscriberError)
       .subscribe(error => {
         if (error) {
           this.subscriberLoadError$.next(error);
-          this.subscriberFetched = true; // Close out subscriber sub
         }
       });
-  }
-
-  onGetContactForms(subscriberId: string) {
-    this.contactFormsFetched = false;
-
-    this.getContactForms(subscriberId);
   }
 
   private getContactForms(subscriberId: string) {
 
-    this.contactFormsFetched = false;
+    console.log('Getting contact form for ', subscriberId);
+    this.contactFormRequestDispatched = false;
 
-    this.store$.select(ContactFormStoreSelectors.selectSubscriberContactForms(subscriberId))
+    this.contactFormStoreSub = this.store$.select(ContactFormStoreSelectors.selectSubscriberContactForms(subscriberId))
       .pipe(
-        takeWhile(() => !this.contactFormsFetched),
-        withLatestFrom(this.store$.select(ContactFormStoreSelectors.selectContactFormsLoaded)),
-        map(([contactForms, contactFormsLoaded]) => {
-          if (!contactFormsLoaded) {
-            console.log('No contact forms, fetching from server');
+        map((contactForms) => {
+          if (contactForms.length < 1 && !this.contactFormRequestDispatched) {
+            console.log('No contact forms, fetching from server', subscriberId);
             this.store$.dispatch(new ContactFormStoreActions.SubscriberContactFormsRequested({subscriberId}));
+            this.contactFormRequestDispatched = true;
           }
           return contactForms;
         }),
-        withLatestFrom(this.store$.select(ContactFormStoreSelectors.selectSubscriberContactFormsLoading)),
-      ).subscribe(([contactForms, formsLoading]) => {
-        console.log('Contact form subscription fired', contactForms);
-        if (contactForms && !formsLoading) {
+        combineLatest(
+          this.store$.select(ContactFormStoreSelectors.selectSubscriberContactFormsLoaded),
+          this.store$.select(ContactFormStoreSelectors.selectContactFormError)
+        ),
+      ).subscribe(([contactForms, formsLoaded, error]) => {
+        console.log('Contact form subscription fired', contactForms, formsLoaded, subscriberId);
+        if (contactForms.length > 0) {
+          console.log('Piping in contact forms', contactForms);
           this.contactForms$.next(contactForms);
-          this.contactFormsFetched = true;
+        }
+        if (error) {
+          console.log('Error retrieving forms', error.message);
         }
       });
+  }
+
+  private unsubAllQuerySubs() {
+    // Remove any previous subscriber subscription if it exists
+    if (this.subscriberStoreSub) {
+      this.subscriberErrorSub.unsubscribe();
+    }
+
+    // Remove any previous contact form subscription if it exists
+    if (this.contactFormStoreSub) {
+      this.contactFormStoreSub.unsubscribe();
+    }
+
+    // Remove any previous error if it exists
+    if (this.subscriberErrorSub) {
+      this.subscriberErrorSub.unsubscribe();
+    }
+  }
+
+  ngOnDestroy() {
+    this.unsubAllQuerySubs();
   }
 
 }

@@ -18,9 +18,9 @@
     Error loading subscriber. This subscriber may not exist. Please confirm your search entry and try again.  
   </div>
 
-  <div *ngIf="!(subscriberLoading$ | async) && (subscriber$ | async) as subscriber" class="subscriber-details-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="32px">
+  <div class="subscriber-details-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="32px">
 
-    <div appMatElevation class="details-card subscriber-details" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+    <div *ngIf="!(subscriberLoading$ | async) && (subscriber$ | async) as subscriber" appMatElevation class="details-card subscriber-details" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
       <div class="card-title" fxFlexAlign="center">Subscriber Details</div>
       <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
         <div class="item-title">Subscriber Name:</div>
@@ -44,19 +44,19 @@
           <li class="item-value" *ngFor="let source of subscriber.subscriptionSources">{{ source }}</li>
         </ul>
       </div>
-      <div class="contact-forms-container" fxLayout="column" fxLayoutAlign="center center">
-        <button class="request-contact-forms-button" mat-raised-button color="primary" (click)="onGetContactForms(subscriber.id)">View Contact Forms</button>
-        <div class="contact-form-list" *ngIf="contactForms$ | async as contactForms">
-          <ul *ngFor="let form of contactForms">
-            <li class="form-link">
-              <a [routerLink]="[appRoutes.CONTACT_FORM_DETAILS, form.id]">{{ form.createdDate | date }}</a>
-            </li>
-          </ul>
-        </div>
-      </div>
+    </div>  
 
+    <div *ngIf="contactForms$ | async as contactForms" appMatElevation class="details-card contact-forms" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+      <div class="card-title" fxFlexAlign="center">Contact Forms</div>
+      <div class="contact-form-list" >
+        <ul *ngFor="let form of contactForms">
+          <li class="form-link">
+            <a [routerLink]="[appRoutes.CONTACT_FORM_DETAILS, form.id]">{{ form.createdDate | date }}</a>
+          </li>
+        </ul>
+      </div>
     </div>
 
-  </div>  
+  </div>
 
 </div>

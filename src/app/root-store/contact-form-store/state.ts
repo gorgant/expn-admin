@@ -20,6 +20,7 @@ export interface State extends EntityState<ContactForm> {
   error: any;
   contactFormsLoaded: boolean;
   subscriberContactFormsLoading: boolean;
+  subscriberContactFormsLoaded: boolean;
 }
 
 export const initialState: State = featureAdapter.getInitialState(
@@ -28,5 +29,6 @@ export const initialState: State = featureAdapter.getInitialState(
     error: null,
     contactFormsLoaded: false,
     subscriberContactFormsLoading: false,
+    subscriberContactFormsLoaded: false,
   }
 );

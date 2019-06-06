@@ -44,6 +44,7 @@ export function featureReducer(state = initialState, action: Actions): State {
     case ActionTypes.SUBSCRIBER_CONTACT_FORMS_REQUESTED: {
       return {
         ...state,
+        subscriberContactFormsLoaded: false,
         subscriberContactFormsLoading: true
       };
     }
@@ -53,9 +54,19 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.contactForms, {
           ...state,
           subscriberContactFormsLoading: false,
+          subscriberContactFormsLoaded: true,
           error: null,
         }
       );
+    }
+
+    case ActionTypes.RESET_SUBSCRIBER_CONTACT_FORMS_STATUS: {
+      return {
+        ...state,
+        subscriberContactFormsLoading: false,
+        subscriberContactFormsLoaded: false,
+        error: null
+      };
     }
 
     case ActionTypes.LOAD_FAILURE: {

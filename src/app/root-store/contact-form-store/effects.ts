@@ -53,7 +53,12 @@ export class ContactFormStoreEffects {
     switchMap(action =>
       this.contactFormService.fetchSubscriberContactForms(action.payload.subscriberId)
         .pipe(
-          map(contactForms => new contactFormFeatureActions.SubscriberContactFormsLoaded({ contactForms })),
+          map(contactForms => {
+            if (contactForms.length < 1) {
+              throw new Error('No contact forms for subscriber');
+            }
+            return new contactFormFeatureActions.SubscriberContactFormsLoaded({ contactForms });
+          }),
           catchError(error => {
             return of(new contactFormFeatureActions.LoadErrorDetected({ error }));
           })

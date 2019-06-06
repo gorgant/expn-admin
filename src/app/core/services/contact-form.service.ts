@@ -58,7 +58,7 @@ export class ContactFormService {
       .pipe(
         takeUntil(this.authService.unsubTrigger$),
         map(contactForms => {
-          console.log('Fetched all contactForms', contactForms);
+          console.log('Fetched subscriber contact forms', contactForms);
           return contactForms;
         }),
         catchError(error => {
