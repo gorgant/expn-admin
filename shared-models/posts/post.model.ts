@@ -15,5 +15,7 @@ export interface Post {
   imageFilePathList?: string[];
   videoUrl?: string;
   featured?: boolean;
+  description?: string;
+  keywords?: string;
 }
 

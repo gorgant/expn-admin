@@ -29,7 +29,7 @@ interface ResizeImageDataObject {
   imageType: ImageType;
 }
 
-const blogHeroSizes = [ 300 ] // Actually just a thumbnail
+const blogHeroSizes = [ 300, 1500 ] // Actually just a thumbnail
 const blogInlineImages = [ 150 ]
 const productCardSizes = [ 300 ]
 const productHeroSizes = [ 500, 1500 ]
