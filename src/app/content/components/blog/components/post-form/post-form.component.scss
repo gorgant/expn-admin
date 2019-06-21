@@ -24,12 +24,20 @@ $blog-content-max-width: 800px;
   width: $blog-content-max-width;
 }
 
-.post-title {
+mat-form-field {
   width: 100%;
 }
 
-.video-url {
+mat-hint {
   width: 100%;
+}
+
+.description {
+  margin-bottom: 16px;
+}
+
+.keywords {
+  margin-bottom: 16px;
 }
 
 .ck [role="textbox"] {

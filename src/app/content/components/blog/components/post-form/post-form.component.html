@@ -16,14 +16,36 @@
     </div>
   </div>
 
-  <div class="blog-content-section" fxLayout="column" fxLayoutAlign="center center">
+  <div *ngIf="postLoaded || isNewPost" class="blog-content-section" fxLayout="column" fxLayoutAlign="center center">
     <form [formGroup]="postForm" (keydown.enter)="$event.preventDefault()" fxFlexFill >
       <mat-form-field class="post-title">
         <input matInput formControlName="title" type="text" placeholder="Post Title">
+        <mat-error *ngFor="let validation of postValidationMessages.title">
+          <mat-error *ngIf="title.hasError(validation.type) && title.invalid && (title.dirty || title.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field class="video-url">
         <input matInput formControlName="videoUrl" type="text" placeholder="Video Url">
+        <mat-error *ngFor="let validation of postValidationMessages.videoUrl">
+          <mat-error *ngIf="videoUrl.hasError(validation.type) && videoUrl.invalid && (videoUrl.dirty || videoUrl.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="description">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="description" type="text" placeholder="Post Description"></textarea>
+        <mat-hint>Max {{ descriptionMaxLength }} characters <span style="float: right;">{{ description.value.length }} / {{ descriptionMaxLength }}</span></mat-hint>
+        <mat-error *ngFor="let validation of postValidationMessages.description">
+          <mat-error *ngIf="description.hasError(validation.type) && description.invalid && (description.dirty || description.touched)">{{ validation.message }} <span style="float: right;">{{ description.value.length }} / {{ descriptionMaxLength }}</span> </mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="keywords">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="keywords" type="text" placeholder="Post keywords"></textarea>
+        <mat-hint>Max {{ keywordsMaxLength }} characters <span style="float: right;">{{ keywords.value.length }} / {{ keywordsMaxLength }}</span></mat-hint>
+        <mat-error *ngFor="let validation of postValidationMessages.keywords">
+          <mat-error *ngIf="keywords.hasError(validation.type) && keywords.invalid && (keywords.dirty || keywords.touched)">{{ validation.message }} <span style="float: right;">{{ keywords.value.length }} / {{ keywordsMaxLength }}</span> </mat-error>
+        </mat-error>
       </mat-form-field>
 
       <ckeditor

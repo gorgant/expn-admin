@@ -1,7 +1,7 @@
 <mat-card fxLayout="column" fxLayoutAlign="end start">
   <mat-card-content (click)="onPreviewBlogItem()" >
     <div *ngIf="post.imageProps">
-      <img class="post-image" [src]="post.imageProps.src" [srcset]="post.imageProps.srcset" [sizes]="post.imageProps.sizes" [width]="post.imageProps.width" [alt]="post.title">
+      <img class="post-image" [src]="thumbnailSrc" [alt]="post.title">
     </div>
     <div *ngIf="!post.imageProps">
       <img class="post-image" [src]="heroPlaceholderPath">
@@ -12,7 +12,7 @@
     </div>
   </mat-card-content>
   <mat-card-actions fxLayout="row">
-    <button *ngIf="!post.published" [disabled]="!post.imageProps || !post.content" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Publish</button>
+    <button *ngIf="!post.published" [disabled]="!post.readyToPublish" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Publish</button>
     <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Un-Publish</button>
     <div *ngIf="post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
       <button *ngIf="post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">

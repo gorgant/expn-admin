@@ -1,17 +1,19 @@
-<div class="blog-container" fxLayout="column" fxLayoutAlign="center center">
-  <div *ngIf="(postData$ | async) as post"  class="hero-background-image" [style.backgroundImage]="stylesObject" fxLayout="column" fxLayoutAlign="end center">
-    <div class="hero-title" fxFlex="60" fxLayoutAlign="center end">{{ post.title }}</div>
-    <div class="hero-read-more-container" fxFlex="40" fxLayout="column" fxLayoutAlign="end center">
-      <div (click)=scrollToTextStart()>Read More</div>
-      <mat-icon class="hero-down-icon">keyboard_arrow_down</mat-icon>
-    </div>
-  </div>
-  <div #contentStartTag>
+<div *ngIf="(post$ | async) as post" class="blog-container" fxLayout="column" fxLayoutAlign="center center">
+  <app-page-hero [heroData]="heroData"></app-page-hero>
+  <div class="blog-content" fxLayout="column" fxLayoutAlign="center center">
+    <p class="header">{{ post.description }}</p>
     <div *ngIf="videoHtml" class="video-container" fxLayout="column" fxLayoutAlign="center center">
       <div class="video-body" [innerHTML]="videoHtml"></div>
     </div>
     <div  class="text-container" fxLayout="column" fxLayoutAlign="center center">
       <div class="post-body" [innerHTML]="sanitizedPostBody"></div>
     </div>
+    <div class="back-button">
+      <a mat-raised-button color="primary" routerLink="../..">View More Blog Posts</a>
+    </div>
   </div>
+</div>
+<div class="load-error" *ngIf="error$ | async as error" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="16px">
+  <p>{{ error }}.</p>
+  <a routerLink="../..">Go back</a>
 </div>

@@ -1,0 +1,119 @@
+@import '../../../variables';
+
+.hero-background-image {
+  background-color: #cccccc;
+  height: 93vh;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hero-content-container {
+  margin-left: 86px;
+  padding-left: 16px;
+  padding-right: 16px;
+  max-width: 100%; // Ensures padding doesn't cause side-scroll on smallest devices
+}
+
+.about-me-blurb-container {
+  margin-left: 86px;
+  padding-left: 16px;
+  padding-right: 16px;
+  max-width: 100%; // Ensures padding doesn't cause side-scroll on smallest devices
+}
+
+.post-hero-content-container {
+  margin-left: 0px;
+  text-align: center;
+}
+
+.hero-text-container {
+  color: white;
+  max-width: 600px;
+}
+
+.hero-title {
+  font-size: 60px;
+  font-weight: $font-weight-light;
+}
+
+.hero-subtitle {
+  font-size: 24px;
+  font-weight: $font-weight-light;
+  width: 100%;
+  margin-top: 0px;
+}
+
+:host ::ng-deep .hero-button-container {
+  margin-top: 32px;
+}
+
+:host ::ng-deep .hero-button {
+  background-color: $primary;
+  color: white;
+  font-size: 20px;
+  padding: 8px;
+  width: 200px;
+}
+
+:host ::ng-deep .hero-button:hover {
+  background-color: $accent;
+}
+
+.hero-action-container {
+  width: 100%;
+  font-size: 22px;
+  color: white;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.hero-actions {
+  opacity: $inactive-item-opacity;
+}
+
+.hero-actions:hover {
+  opacity: $active-item-opacity;
+  cursor: pointer;
+  
+}
+
+.hero-action-message:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: $mobile-cutoff-width) {
+
+  .hero-background-image {
+    background-position: 75%; // Center MD's face on mobile screens (requires MD to be on right side of image)
+  }
+
+  .hero-content-container {
+    margin-left: 0px;
+  }
+
+  .about-me-blurb-container {
+    margin-left: 0px;
+  }
+
+  .hero-text-container {
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 42px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  :host ::ng-deep .hero-button {
+    width: auto;
+    font-size: 16px;
+  }
+
+  .hero-actions {
+    opacity: $active-item-opacity;
+  }
+}

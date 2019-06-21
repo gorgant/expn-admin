@@ -19,6 +19,7 @@ import { now } from 'moment';
 import { ImageType } from 'src/app/core/models/images/image-type.model';
 import { ImageService } from 'src/app/core/services/image.service';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { POST_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
 
 @Component({
   selector: 'app-post-form',
@@ -29,12 +30,16 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   publicUser$: Observable<AdminUser>;
   private post$: Observable<Post>;
-  private postLoaded: boolean;
+  postLoaded: boolean;
   heroImageProps$: Observable<ImageProps>;
   imageUploadProcessing$: Subject<boolean>;
 
   postForm: FormGroup;
+  postValidationMessages = POST_FORM_VALIDATION_MESSAGES;
+  descriptionMaxLength = 320;
+  keywordsMaxLength = 100;
   isNewPost: boolean;
+
 
   private postId: string;
   private tempPostTitle: string;
@@ -190,6 +195,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
             const data = {
               title: post.title,
               videoUrl: post.videoUrl,
+              description: post.description,
+              keywords: post.keywords,
               content: post.content,
             };
             this.postForm.patchValue(data);
@@ -228,7 +235,9 @@ export class PostFormComponent implements OnInit, OnDestroy {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
       videoUrl: [''],
-      content: [{value: '', disabled: false }, Validators.required]
+      description: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],
+      keywords: ['', [Validators.required, Validators.maxLength(this.keywordsMaxLength)]],
+      content: [{value: '', disabled: false }, Validators.required],
     });
 
     this.imageUploadProcessing$ = this.imageService.getImageProcessing(); // Monitor image processing
@@ -266,9 +275,11 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .subscribe(publicUser => {
         console.log('Post initialized');
         const data: Post = {
-          author: publicUser.displayName || publicUser.id,
+          author: publicUser.displayName || publicUser.email,
           authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
+          description: this.description.value,
+          keywords: this.keywords.value,
           content: this.content.value,
           modifiedDate: now(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
@@ -316,6 +327,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
     if (
       (post.title === this.title.value || post.title === this.tempPostTitle) &&
       post.videoUrl === this.videoUrl.value &&
+      post.description === this.description.value &&
+      post.keywords === this.keywords.value &&
       post.content === this.content.value &&
       !this.imagesModifiedSinceLastSave
     ) {
@@ -329,6 +342,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
       this.heroImageAdded ||
       this.title.value ||
       this.videoUrl.value ||
+      this.description.value ||
+      this.keywords.value ||
       this.content.value ||
       this.imagesModifiedSinceLastSave
     ) {
@@ -338,18 +353,33 @@ export class PostFormComponent implements OnInit, OnDestroy {
     return true;
   }
 
+  private readyToPublish(): boolean {
+    if (
+      !this.heroImageAdded ||
+      this.postForm.invalid
+    ) {
+      console.log('Item not ready to activate');
+      return false;
+    }
+    console.log('Item is ready to activate');
+    return true;
+  }
+
   private savePost(): void {
     this.publicUser$
       .pipe(take(1))
       .subscribe(publicUser => {
         const post: Post = {
-          author: publicUser.displayName || publicUser.id,
+          author: publicUser.displayName || publicUser.email,
           authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
+          description: this.description.value,
+          keywords: this.keywords.value,
           content: this.content.value,
           modifiedDate: now(),
           title: this.title.value ? this.title.value : this.tempPostTitle,
-          id: this.postId
+          id: this.postId,
+          readyToPublish: this.readyToPublish()
         };
         this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post}));
         console.log('Post saved', post);
@@ -367,6 +397,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   get title() { return this.postForm.get('title'); }
   get videoUrl() { return this.postForm.get('videoUrl'); }
+  get description() { return this.postForm.get('description'); }
+  get keywords() { return this.postForm.get('keywords'); }
   get content() { return this.postForm.get('content'); }
 
   ngOnDestroy(): void {

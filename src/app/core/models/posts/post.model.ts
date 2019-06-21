@@ -5,6 +5,8 @@ export interface Post {
   author: string;
   authorId: string;
   content: string;
+  description: string;
+  keywords: string;
   modifiedDate: number;
   published?: boolean;
   publishedDate?: number;
@@ -15,7 +17,6 @@ export interface Post {
   imageFilePathList?: string[];
   videoUrl?: string;
   featured?: boolean;
-  description?: string;
-  keywords?: string;
+  readyToPublish?: boolean;
 }
 

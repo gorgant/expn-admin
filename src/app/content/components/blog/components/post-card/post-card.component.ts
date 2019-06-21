@@ -19,6 +19,7 @@ export class PostCardComponent implements OnInit {
 
   @Input() post: Post;
   heroPlaceholderPath = AdminImagePaths.HERO_PLACEHOLDER;
+  thumbnailSrc: string;
 
   constructor(
     private router: Router,
@@ -27,6 +28,9 @@ export class PostCardComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    if (this.post.imageProps) {
+      this.thumbnailSrc = this.post.imageProps.srcset.split(' ')[0]; // Get smallest image in the src set
+    }
   }
 
   onSelectBlogItem() {

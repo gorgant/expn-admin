@@ -22,6 +22,23 @@ export const resetPasswordFormValidationMessages = {
   ],
 };
 
+export const POST_FORM_VALIDATION_MESSAGES = {
+  title: [
+    { type: 'required', message: 'Title is required.'},
+  ],
+  videoUrl: [
+    { type: 'required', message: 'Video URL is required.'},
+  ],
+  description: [
+    { type: 'required', message: 'Description is required'},
+    { type: 'maxlength', message: 'Entry exceeds max length' }
+  ],
+  keywords: [
+    { type: 'requried', message: 'Keywords are required'},
+    { type: 'maxlength', message: 'Entry exceeds max length' }
+  ]
+};
+
 export const PRODUCT_FORM_VALIDATION_MESSAGES = {
   name: [
     { type: 'required', message: 'Name is required.'},

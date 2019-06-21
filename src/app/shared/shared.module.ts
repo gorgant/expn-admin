@@ -10,6 +10,7 @@ import { UnpublishedPostPipe } from './pipes/unpublished-post.pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { MatElevationDirective } from './directives/mat-elevation.directive';
 import { ProductIdToNamePipe } from './pipes/product-id-to-name.pipe';
+import { PageHeroComponent } from './components/page-hero/page-hero.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { ProductIdToNamePipe } from './pipes/product-id-to-name.pipe';
     PublishedPostPipe,
     UnpublishedPostPipe,
     MatElevationDirective,
-    ProductIdToNamePipe
+    ProductIdToNamePipe,
+    PageHeroComponent
   ],
   imports: [
     CommonModule,
@@ -37,7 +39,8 @@ import { ProductIdToNamePipe } from './pipes/product-id-to-name.pipe';
     UnpublishedPostPipe,
     HttpClientModule,
     MatElevationDirective,
-    ProductIdToNamePipe
+    ProductIdToNamePipe,
+    PageHeroComponent
   ],
   entryComponents: [
     DeleteConfirmDialogueComponent
