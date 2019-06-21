@@ -5,7 +5,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
 import { Subscription, Observable, of, from } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
-import { take, withLatestFrom, map } from 'rxjs/operators';
+import { take, withLatestFrom, map, takeWhile } from 'rxjs/operators';
 import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
@@ -188,7 +188,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
       // If product data available, patch values into form
       this.product$
-        .pipe(take(1))
+        .pipe(
+          takeWhile( item => !this.originalProduct) // Take until an item is loaded into memory
+        )
         .subscribe(product => {
           if (product) {
             const productFormObject = {

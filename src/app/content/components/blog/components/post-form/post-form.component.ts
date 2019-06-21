@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ImageProps } from 'src/app/core/models/images/image-props.model';
 import { Observable, Subscription, of, Subject, from } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
-import { take, withLatestFrom, map } from 'rxjs/operators';
+import { take, withLatestFrom, map, takeWhile } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
 import { Post } from 'src/app/core/models/posts/post.model';
 
@@ -189,7 +189,9 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
       // If post data available, patch values into form
       this.post$
-        .pipe(take(1))
+        .pipe(
+          takeWhile( item => !this.originalPost) // Take until an item is loaded into memory
+        )
         .subscribe(post => {
           if (post) {
             const data = {
@@ -199,6 +201,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
               keywords: post.keywords,
               content: post.content,
             };
+            console.log('Patching post data into form', data);
             this.postForm.patchValue(data);
             this.heroImageProps$ = of(post.imageProps);
             if (post.imageProps) {
