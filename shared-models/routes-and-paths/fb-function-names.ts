@@ -5,7 +5,8 @@ export enum AdminFunctionNames {
   UPDATE_GEOGRAPHIC_DATA = 'updateGeographicData',
   SAVE_ORDER_TOPIC = 'save-order',
   SAVE_EMAIL_SUB_TOPIC = 'save-email-sub',
-  SAVE_CONTACT_FORM_TOPIC = 'save-contact-form'
+  SAVE_CONTACT_FORM_TOPIC = 'save-contact-form',
+  BACKUP_ADMIN_DATABASE = 'backup-admin-database'
 }
 
 export enum PublicFunctionNames {

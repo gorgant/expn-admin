@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { EnvironmentTypes, PRODUCTION_APPS, SANDBOX_APPS } from '../../../shared-models/environments/env-vars.model';
 import { currentEnvironmentType } from '../environments/config';
 
+// Local app intialization will automatically select sandbox or production based on which environment initialized it
 export const adminApp = admin.initializeApp();
 
 // Access to public app requires admin service account to be added to public IAM

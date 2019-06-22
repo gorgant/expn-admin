@@ -57,10 +57,9 @@ const setBucketsBasedOnEnvironment = (): void => {
 
 const assignVariables = async (metadata: ImageMetadata): Promise<ResizeImageDataObject> => {
 
-  setBucketsBasedOnEnvironment();
-  
   const imageType = metadata.customMetadata.imageType;
   
+  setBucketsBasedOnEnvironment();
   let bucket: Bucket; // The Storage bucket that contains the file.
 
   // Set bucket based on image type

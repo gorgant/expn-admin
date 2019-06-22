@@ -34,6 +34,8 @@ export enum ProductionCloudStorage {
   ADMIN_BLOG_STORAGE_FB = 'gs://explearning-admin-blog',
   ADMIN_PRODUCTS_STORAGE_AF_CF = 'explearning-admin-products',
   ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-admin-products',
+  ADMIN_BACKUP_STORAGE_AF_CF = 'explearning-admin-backup',
+  ADMIN_BACKUP_STORAGE_FB = 'gs://explearning-admin-backup',
 }
 
 export enum SandboxCloudStorage {
@@ -41,6 +43,8 @@ export enum SandboxCloudStorage {
   ADMIN_BLOG_STORAGE_FB = 'gs://explearning-sandbox-admin-blog',
   ADMIN_PRODUCTS_STORAGE_AF_CF = 'explearning-sandbox-admin-products',
   ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-sandbox-admin-products',
+  ADMIN_BACKUP_STORAGE_AF_CF = 'explearning-sandbox-admin-backup',
+  ADMIN_BACKUP_STORAGE_FB = 'gs://explearning-sandbox-admin-backup',
 }
 
 export enum ProductionStripePublishableKeys {
