@@ -4,6 +4,10 @@ import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb
 import { EmailSubscriber } from '../../../shared-models/subscribers/email-subscriber.model';
 import { now } from 'moment';
 import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
+import { getSgMail } from '../sendgrid/config';
+import { BillingDetails } from '../../../shared-models/billing/billing-details.model';
+import { currentEnvironmentType } from '../environments/config';
+import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
@@ -69,6 +73,45 @@ export const storeEmailSub = functions.pubsub.topic(AdminFunctionNames.SAVE_EMAI
 
     console.log('New subscriber created', subFbRes);
 
+    // TODO: (maybe) If last sub source is not purchase, send email to subscriber welcoming them to Explearning, bcc greg@myexplearning
+
+    const sgMail = getSgMail();
+    const subName = (newSubscriber.publicUserData.billingDetails as BillingDetails).firstName ? (newSubscriber.publicUserData.billingDetails as BillingDetails).firstName : undefined;
+    let subEmail: string;
+    let bccEmail = undefined;
+
+    switch (currentEnvironmentType) {
+      case EnvironmentTypes.PRODUCTION:
+        subEmail = subscriber.id;
+        bccEmail = 'greg@myexplearning.com';
+        break;
+      case EnvironmentTypes.SANDBOX:
+        subEmail = 'greg@myexplearning.com';
+        break;
+      default:
+        subEmail = 'greg@myexplearning.com';
+        break;
+    }
+
+    const msg = {
+      to: {
+        email: subEmail,
+        name: subName
+      },
+      from: {
+        email: 'hello@myexplearning.com',
+        name: 'Explearning',
+      },
+      bcc: bccEmail, // bcc me if this is a real delivery
+      templateId: 'd-a5178c4ee40244649122e684d244f6cc',
+      dynamic_template_data: {
+        firstName: subName as string, // Will populate first name greeting if name exists
+      },
+    };
+    await sgMail.send(msg)
+      .catch(err => console.log(`Error sending email: ${msg} because `, err));
+
+    console.log('Email sent', msg);
   }
 
   return subFbRes;

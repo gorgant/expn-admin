@@ -1,4 +1,7 @@
 export const SUBSCRIBE_VALIDATION_MESSAGES = {
+  firstName: [
+    { type: 'required', message: 'First name is required.'},
+  ],
   email: [
     { type: 'required', message: 'Email is required.'},
     { type: 'email', message: 'Not a valid email.'},
@@ -69,7 +72,7 @@ export const CREDIT_CARD_VALIDATION_MESSAGES = {
 };
 
 export const CONTACT_VALIDATION_MESSAGES = {
-  name: [
+  firstName: [
     { type: 'required', message: 'Name is required.'},
   ],
   email: [

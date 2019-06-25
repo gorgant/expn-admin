@@ -34,7 +34,7 @@ export const demoSubscriber: EmailSubscriber = {
   lastSubSource: SubscriptionSource.CONTACT_FORM,
   subscriptionSources: [
     SubscriptionSource.CONTACT_FORM,
-    SubscriptionSource.PURCHASE
+    SubscriptionSource.CHECKOUT
   ]
 };
 

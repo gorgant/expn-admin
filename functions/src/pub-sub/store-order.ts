@@ -29,6 +29,8 @@ export const storeOrder = functions.pubsub.topic(AdminFunctionNames.SAVE_ORDER_T
     });
     console.log('Order stored', subOrderFbRes);  
 
+    // TODO: Send email to customer with product intro, bcc greg@myexplearning
+
   return fbRes && subOrderFbRes;
 })
 
