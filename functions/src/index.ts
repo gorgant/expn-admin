@@ -18,3 +18,5 @@ export { storeEmailSub } from './pub-sub/store-email-sub';
 export { storeContactForm } from './pub-sub/store-contact-form';
 
 export { backupAdminDatabase } from './pub-sub/backup-admin-database';
+
+export { sgEmailWebhookEndpoint } from './sendgrid/webhooks';

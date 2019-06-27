@@ -10,4 +10,5 @@ export interface EmailSubscriber {
   lastSubSource: SubscriptionSource;
   subscriptionSources: SubscriptionSource[];
   unsubscribedDate?: number;
+  introEmailSent?: boolean;
 }

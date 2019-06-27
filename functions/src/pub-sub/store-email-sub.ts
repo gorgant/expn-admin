@@ -8,6 +8,60 @@ import { getSgMail } from '../sendgrid/config';
 import { BillingDetails } from '../../../shared-models/billing/billing-details.model';
 import { currentEnvironmentType } from '../environments/config';
 import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
+import { MailData } from '@sendgrid/helpers/classes/mail';
+import { SubscriptionSource } from '../../../shared-models/subscribers/subscription-source.model';
+
+const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
+  const sgMail = getSgMail();
+  const fromEmail = 'hello@myexplearning.com';
+  const fromName = 'Explearning';
+  const subFirstName = (subscriber.publicUserData.billingDetails as BillingDetails).firstName ? (subscriber.publicUserData.billingDetails as BillingDetails).firstName : undefined;
+  let subEmail: string;
+  let bccEmail = undefined;
+  const templateId = 'd-a5178c4ee40244649122e684d244f6cc'; // Subscription Confirmation id
+  const unsubscribeGroupId = 10288; // Communications Strategies Unsubscribe Group
+
+  switch (currentEnvironmentType) {
+    case EnvironmentTypes.PRODUCTION:
+      subEmail = subscriber.id;
+      bccEmail = 'greg@myexplearning.com';
+      break;
+    case EnvironmentTypes.SANDBOX:
+      subEmail = 'greg@myexplearning.com';
+      break;
+    default:
+      subEmail = 'greg@myexplearning.com';
+      break;
+  }
+
+  const msg: MailData = {
+    to: {
+      email: subEmail,
+      name: subFirstName
+    },
+    from: {
+      email: fromEmail,
+      name: fromName,
+    },
+    bcc: bccEmail, // bcc me if this is a real delivery
+    templateId,
+    dynamicTemplateData: {
+      firstName: subFirstName, // Will populate first name greeting if name exists
+    },
+    trackingSettings: {
+      subscriptionTracking: {
+        enable: true, // Enable tracking in order to catch the unsubscribe webhook
+      },
+    },
+    asm: {
+      groupId: unsubscribeGroupId, // Set the unsubscribe group
+    },
+  };
+  await sgMail.send(msg)
+    .catch(err => console.log(`Error sending email: ${msg} because `, err));
+
+  console.log('Email sent', msg);
+}
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
@@ -73,45 +127,29 @@ export const storeEmailSub = functions.pubsub.topic(AdminFunctionNames.SAVE_EMAI
 
     console.log('New subscriber created', subFbRes);
 
-    // TODO: (maybe) If last sub source is not purchase, send email to subscriber welcoming them to Explearning, bcc greg@myexplearning
 
-    const sgMail = getSgMail();
-    const subName = (newSubscriber.publicUserData.billingDetails as BillingDetails).firstName ? (newSubscriber.publicUserData.billingDetails as BillingDetails).firstName : undefined;
-    let subEmail: string;
-    let bccEmail = undefined;
 
-    switch (currentEnvironmentType) {
-      case EnvironmentTypes.PRODUCTION:
-        subEmail = subscriber.id;
-        bccEmail = 'greg@myexplearning.com';
-        break;
-      case EnvironmentTypes.SANDBOX:
-        subEmail = 'greg@myexplearning.com';
-        break;
-      default:
-        subEmail = 'greg@myexplearning.com';
-        break;
+
+    
+  }
+
+  // Send intro email if none has been sent and it's not a contact form
+  if (!subscriber.introEmailSent && subscriber.lastSubSource !== SubscriptionSource.CONTACT_FORM) {
+    await sendSubConfirmationEmail(subscriber)
+      .catch(error => console.log('Error in send email function', error));
+
+    // Mark sent
+    const updatedSubscriber: EmailSubscriber = {
+      ...subscriber,
+      introEmailSent: true
     }
-
-    const msg = {
-      to: {
-        email: subEmail,
-        name: subName
-      },
-      from: {
-        email: 'hello@myexplearning.com',
-        name: 'Explearning',
-      },
-      bcc: bccEmail, // bcc me if this is a real delivery
-      templateId: 'd-a5178c4ee40244649122e684d244f6cc',
-      dynamic_template_data: {
-        firstName: subName as string, // Will populate first name greeting if name exists
-      },
-    };
-    await sgMail.send(msg)
-      .catch(err => console.log(`Error sending email: ${msg} because `, err));
-
-    console.log('Email sent', msg);
+    
+    await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).update(updatedSubscriber)
+      .catch(error => {
+        console.log('Error marking intro email sent', error)
+        return error;
+      });
+      console.log('Marked email sent', subFbRes);
   }
 
   return subFbRes;

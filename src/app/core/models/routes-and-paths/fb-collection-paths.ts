@@ -2,7 +2,8 @@ export enum AdminCollectionPaths {
   ADMIN_USERS = 'adminUsers',
   ORDERS = 'orders',
   SUBSCRIBERS = 'subscribers',
-  CONTACT_FORMS = 'contactForms'
+  CONTACT_FORMS = 'contactForms',
+  EMAIL_RECORDS = 'emailRecords'
 }
 
 export enum PublicCollectionPaths {

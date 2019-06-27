@@ -42,7 +42,7 @@ export const demoContactForms: ContactForm[] = [
   {
     id: 'zxcvlkjwoi234iasdlfkj',
     createdDate: now(),
-    name: 'Bobby Brown',
+    firstName: 'Bobby Brown',
     email: 'bob@tim.com',
     message: 'Cool stuff today yo fo sho',
     publicUser: demoPublicUser
@@ -50,7 +50,7 @@ export const demoContactForms: ContactForm[] = [
   {
     id: 'qwpreoqwaf1243kfds',
     createdDate: now() - (1000 * 60 * 60 * 24 * 2),
-    name: 'Zorba Joabo',
+    firstName: 'Zorba Joabo',
     email: 'zorba@jim.com',
     message: 'Lovin life on the crazy side yessir',
     publicUser: demoPublicUser
@@ -58,7 +58,7 @@ export const demoContactForms: ContactForm[] = [
   {
     id: 'poiuqwerkjds823kds',
     createdDate: now() - (1000 * 60 * 60 * 24 * 4),
-    name: 'Bobby Brown',
+    firstName: 'Bobby Brown',
     email: 'bob@tim.com',
     message: 'Nothin like a hot shower on a cold day, mmmhmmm',
     publicUser: demoPublicUser
