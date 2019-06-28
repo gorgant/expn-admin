@@ -6,7 +6,8 @@ export interface Order {
   createdDate: number;
   stripeChargeId: string;
   stripeCustomerId: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   publicUser: PublicUser;
   productId: string;

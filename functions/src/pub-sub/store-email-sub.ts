@@ -10,34 +10,35 @@ import { currentEnvironmentType } from '../environments/config';
 import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
 import { MailData } from '@sendgrid/helpers/classes/mail';
 import { SubscriptionSource } from '../../../shared-models/subscribers/subscription-source.model';
+import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, EmailBccAddresses, EmailCategories } from '../../../shared-models/email/email-vars.model';
 
 const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
   const sgMail = getSgMail();
-  const fromEmail = 'hello@myexplearning.com';
-  const fromName = 'Explearning';
-  const subFirstName = (subscriber.publicUserData.billingDetails as BillingDetails).firstName ? (subscriber.publicUserData.billingDetails as BillingDetails).firstName : undefined;
-  let subEmail: string;
+  const fromEmail = EmailSenderAddresses.DEFAULT;
+  const fromName = EmailSenderNames.DEFAULT;
+  const toFirstName = (subscriber.publicUserData.billingDetails as BillingDetails).firstName ? (subscriber.publicUserData.billingDetails as BillingDetails).firstName : undefined;
+  let toEmail: string;
   let bccEmail = undefined;
-  const templateId = 'd-a5178c4ee40244649122e684d244f6cc'; // Subscription Confirmation id
+  const templateId = EmailTemplateIds.SUBSCRIPTION_CONFIRMATION;
   const unsubscribeGroupId = 10288; // Communications Strategies Unsubscribe Group
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      subEmail = subscriber.id;
-      bccEmail = 'greg@myexplearning.com';
+      toEmail = subscriber.id;
+      bccEmail = EmailBccAddresses.GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
-      subEmail = 'greg@myexplearning.com';
+      toEmail = EmailBccAddresses.GREG_ONLY;
       break;
     default:
-      subEmail = 'greg@myexplearning.com';
+      toEmail = EmailBccAddresses.GREG_ONLY;
       break;
   }
 
   const msg: MailData = {
     to: {
-      email: subEmail,
-      name: subFirstName
+      email: toEmail,
+      name: toFirstName
     },
     from: {
       email: fromEmail,
@@ -46,7 +47,7 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
     bcc: bccEmail, // bcc me if this is a real delivery
     templateId,
     dynamicTemplateData: {
-      firstName: subFirstName, // Will populate first name greeting if name exists
+      firstName: toFirstName, // Will populate first name greeting if name exists
     },
     trackingSettings: {
       subscriptionTracking: {
@@ -56,6 +57,7 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
     asm: {
       groupId: unsubscribeGroupId, // Set the unsubscribe group
     },
+    category: EmailCategories.SUBSCRIPTION_CONFIRMATION
   };
   await sgMail.send(msg)
     .catch(err => console.log(`Error sending email: ${msg} because `, err));
@@ -69,10 +71,10 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
 export const storeEmailSub = functions.pubsub.topic(AdminFunctionNames.SAVE_EMAIL_SUB_TOPIC).onPublish( async (message, context) => {
 
   console.log('Context from pubsub', context);
-  const subscriber = message.json as EmailSubscriber;
-  console.log('Message from pubsub', subscriber);
+  const newSubscriberData = message.json as EmailSubscriber;
+  console.log('Message from pubsub', newSubscriberData);
 
-  const subId = subscriber.id;
+  const subId = newSubscriberData.id;
 
   const db = adminFirestore;
   const subDoc: FirebaseFirestore.DocumentSnapshot = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).get()
@@ -80,22 +82,24 @@ export const storeEmailSub = functions.pubsub.topic(AdminFunctionNames.SAVE_EMAI
       console.log('Error fetching subscriber doc', error)
       return error;
     });
+  // let subscriberExists: boolean;
+  let existingSubscriberData: EmailSubscriber | undefined = undefined // Will be assigned if it exists
 
   let subFbRes;
   
   // Take action based on whether or not subscriber exists
-  if (subDoc.exists) {
+  if (subDoc.exists) { 
 
     // Actions if subscriber does exist
-
-    const oldSubData: EmailSubscriber = subDoc.data() as EmailSubscriber;
+    // subscriberExists = true; // Used for the email delivery 
+    existingSubscriberData = subDoc.data() as EmailSubscriber;
     
     // Merge lastSubSource to the existing subscriptionSources array
-    const existingSubSources = oldSubData.subscriptionSources; // Fetch existing sub sources
-    const updatedSubSources = [...existingSubSources, subscriber.lastSubSource];
+    const existingSubSources = existingSubscriberData.subscriptionSources; // Fetch existing sub sources
+    const updatedSubSources = [...existingSubSources, newSubscriberData.lastSubSource];
 
     const updatedSubscriber: EmailSubscriber = {
-      ...subscriber,
+      ...newSubscriberData,
       subscriptionSources: updatedSubSources,
     }
     console.log('Updating subscriber with this data', updatedSubscriber);
@@ -113,8 +117,8 @@ export const storeEmailSub = functions.pubsub.topic(AdminFunctionNames.SAVE_EMAI
 
     // Create new subscriber with a fresh subscriptionSource array
     const newSubscriber: EmailSubscriber = {
-      ...subscriber,
-      subscriptionSources: [subscriber.lastSubSource],
+      ...newSubscriberData,
+      subscriptionSources: [newSubscriberData.lastSubSource],
       createdDate: now()
     };
     console.log('Creating subscriber with this data', newSubscriber);
@@ -134,17 +138,24 @@ export const storeEmailSub = functions.pubsub.topic(AdminFunctionNames.SAVE_EMAI
   }
 
   // Send intro email if none has been sent and it's not a contact form
-  if (!subscriber.introEmailSent && subscriber.lastSubSource !== SubscriptionSource.CONTACT_FORM) {
-    await sendSubConfirmationEmail(subscriber)
+  if (existingSubscriberData && existingSubscriberData.introEmailSent) {
+    console.log('Subscriber has already received an intro email, will not send', existingSubscriberData);
+  };
+
+  if (
+    newSubscriberData.lastSubSource !== SubscriptionSource.CONTACT_FORM && // Don't send if contact form
+    (!existingSubscriberData || !existingSubscriberData.introEmailSent) // Send if no existing subscriber data or if no intro email sent
+  ) {
+    console.log('Subscriber has not received an intro email and this is not a contact form, sending intro email', existingSubscriberData);
+    await sendSubConfirmationEmail(newSubscriberData)
       .catch(error => console.log('Error in send email function', error));
 
     // Mark sent
-    const updatedSubscriber: EmailSubscriber = {
-      ...subscriber,
+    const introEmailSent: Partial<EmailSubscriber> = {
       introEmailSent: true
     }
     
-    await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).update(updatedSubscriber)
+    await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).update(introEmailSent)
       .catch(error => {
         console.log('Error marking intro email sent', error)
         return error;

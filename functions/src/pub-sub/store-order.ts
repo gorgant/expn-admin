@@ -3,6 +3,72 @@ import { Order } from '../../../shared-models/orders/order.model';
 import { adminFirestore } from '../db';
 import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
+import { getSgMail } from '../sendgrid/config';
+import { EmailSenderAddresses, EmailSenderNames, EmailBccAddresses, EmailCategories, ProductEmailTemplates } from '../../../shared-models/email/email-vars.model';
+import { currentEnvironmentType } from '../environments/config';
+import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
+import { MailData } from '@sendgrid/helpers/classes/mail';
+
+const getProductEmailTemplateIdFromProductId = (order: Order): string => {
+  try {
+    // Fetch the template based on the product ID
+    const template = ProductEmailTemplates[order.productId].templateId;
+    return template;
+  } catch(error) {
+    console.log(`Error fetching email template from product id ${order.productId}`, error);
+    return error;
+  }
+}
+
+const sendOrderConfirmationEmail = async (order: Order) => {
+  const sgMail = getSgMail();
+  const fromEmail = EmailSenderAddresses.ORDERS;
+  const fromName = EmailSenderNames.DEFAULT;
+  const toFirstName = order.firstName;
+  let toEmail: string;
+  let bccEmail = undefined;
+  const templateId = getProductEmailTemplateIdFromProductId(order);
+
+  // Prevents test emails from going to the actual address used
+  switch (currentEnvironmentType) {
+    case EnvironmentTypes.PRODUCTION:
+      toEmail = order.email;
+      bccEmail = EmailBccAddresses.GREG_ONLY;
+      break;
+    case EnvironmentTypes.SANDBOX:
+      toEmail = EmailBccAddresses.GREG_ONLY;
+      break;
+    default:
+      toEmail = EmailBccAddresses.GREG_ONLY;
+      break;
+  }
+
+  const msg: MailData = {
+    to: {
+      email: toEmail,
+      name: toFirstName
+    },
+    from: {
+      email: fromEmail,
+      name: fromName,
+    },
+    bcc: bccEmail, // bcc me if this is a real delivery
+    templateId,
+    dynamicTemplateData: {
+      firstName: toFirstName, // Will populate first name greeting if name exists
+      orderNumber: order.orderNumber
+    },
+    category: EmailCategories.PURCHASE_CONFIRMATION,
+    customArgs: {
+      productId: order.productId,
+      orderId: order.id
+    }
+  };
+  await sgMail.send(msg)
+    .catch(err => console.log(`Error sending email: ${msg} because `, err));
+
+  console.log('Email sent', msg);
+}
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
@@ -29,7 +95,8 @@ export const storeOrder = functions.pubsub.topic(AdminFunctionNames.SAVE_ORDER_T
     });
     console.log('Order stored', subOrderFbRes);  
 
-    // TODO: Send email to customer with product intro, bcc greg@myexplearning
+  await sendOrderConfirmationEmail(order)
+    .catch(error => console.log('Error sending contact form email', error));    
 
   return fbRes && subOrderFbRes;
 })

@@ -1,8 +1,8 @@
-import { EmailEvent } from "../../../shared-models/subscribers/email-event.model";
-import { EmailRecord, EmailRecordWithClicks } from "../../../shared-models/subscribers/email-record.model";
+import { EmailEvent } from "../../../shared-models/email/email-event.model";
+import { EmailRecord, EmailRecordWithClicks } from "../../../shared-models/email/email-record.model";
 import { adminFirestore } from "../db";
 import { AdminCollectionPaths } from "../../../shared-models/routes-and-paths/fb-collection-paths";
-import { EmailEventType } from "../../../shared-models/subscribers/email-event-type.model";
+import { EmailEventType } from "../../../shared-models/email/email-event-type.model";
 
 export const updateEmailRecord = async (emailEvents: EmailEvent[]) => {
 

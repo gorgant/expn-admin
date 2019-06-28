@@ -7,34 +7,35 @@ import { getSgMail } from '../sendgrid/config';
 import { currentEnvironmentType } from '../environments/config';
 import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
 import { MailData } from '@sendgrid/helpers/classes/mail';
+import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, EmailBccAddresses, EmailCategories } from '../../../shared-models/email/email-vars.model';
 
 const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
   const sgMail = getSgMail();
-  const fromEmail = 'hello@myexplearning.com';
-  const fromName = 'Explearning';
-  const subFirstName = (contactForm.firstName);
-  let subEmail: string;
+  const fromEmail = EmailSenderAddresses.DEFAULT;
+  const fromName = EmailSenderNames.DEFAULT;
+  const toFirstName = (contactForm.firstName);
+  let toEmail: string;
   let bccEmail = undefined;
-  const templateId = 'd-c333f6f223d24ba8925e35e08caa37b5';
+  const templateId = EmailTemplateIds.CONTACT_FORM_CONFIRMATION;
 
   // Prevents test emails from going to the actual address used
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      subEmail = contactForm.email;
-      bccEmail = 'greg@myexplearning.com';
+      toEmail = contactForm.email;
+      bccEmail = EmailBccAddresses.GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
-      subEmail = 'greg@myexplearning.com';
+      toEmail = EmailBccAddresses.GREG_ONLY;
       break;
     default:
-      subEmail = 'greg@myexplearning.com';
+      toEmail = EmailBccAddresses.GREG_ONLY;
       break;
   }
 
   const msg: MailData = {
     to: {
-      email: subEmail,
-      name: subFirstName
+      email: toEmail,
+      name: toFirstName
     },
     from: {
       email: fromEmail,
@@ -43,9 +44,10 @@ const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
     bcc: bccEmail, // bcc me if this is a real delivery
     templateId,
     dynamicTemplateData: {
-      firstName: subFirstName, // Will populate first name greeting if name exists
+      firstName: toFirstName, // Will populate first name greeting if name exists
       contactFormMessage: contactForm.message, // Message sent by the user
-    }
+    },
+    category: EmailCategories.CONTACT_FORM_CONFIRMATION
   };
   await sgMail.send(msg)
     .catch(err => console.log(`Error sending email: ${msg} because `, err));

@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { RootStoreState, ProductStoreSelectors, ProductStoreActions } from 'src/app/root-store';
-import { withLatestFrom, map } from 'rxjs/operators';
+import { RootStoreState, ProductStoreSelectors } from 'src/app/root-store';
+import { map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
 @Pipe({

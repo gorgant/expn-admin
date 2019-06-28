@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import { EmailEvent } from '../../../shared-models/subscribers/email-event.model';
+import { EmailEvent } from '../../../shared-models/email/email-event.model';
 import { updateEmailRecord } from './handlers';
 import { currentEnvironmentType } from '../environments/config';
 import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
@@ -24,6 +24,7 @@ export const sgEmailWebhookEndpoint = functions.https.onRequest(
     // Sendgrid only allows one webhook, so be sure to switch Sendgrid webhook setting to the sandbox endpoint before commenting this out
     if (!isProductionEnv()) {
       console.log('Sandbox mode, canceling function, received this data', req.body);
+      res.sendStatus(200);
       return;
     }
 
