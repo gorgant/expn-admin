@@ -10,7 +10,7 @@ export const featureAdapter: EntityAdapter<Order>
       sortComparer: (a: Order, b: Order): number => {
         const createdDateA = a.createdDate;
         const createdDateB = b.createdDate;
-        return createdDateA.toString().localeCompare(createdDateB.toString(), undefined, {numeric: true});
+        return createdDateB.toString().localeCompare(createdDateA.toString(), undefined, {numeric: true});
       }
     }
   );

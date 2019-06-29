@@ -19,7 +19,7 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
   orders$: Observable<Order[]>;
   private ordersSubscription: Subscription;
 
-  displayedColumns = ['processedDate', 'orderNumber', 'productId', 'amountPaid', 'status', 'email'];
+  displayedColumns = ['createdDate', 'orderNumber', 'productId', 'amountPaid', 'status', 'email'];
   dataSource = new MatTableDataSource<Order>();
   isLoading$: Observable<boolean>;
 
@@ -89,9 +89,9 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
     this.breakpointObserver.observe(['(max-width: 959px)'])
       .subscribe((state: BreakpointState) => {
         if (state.matches) {
-          this.displayedColumns = ['processedDate', 'orderNumber', 'amountPaid'];
+          this.displayedColumns = ['createdDate', 'orderNumber', 'amountPaid'];
         } else {
-          this.displayedColumns = ['processedDate', 'orderNumber', 'productId', 'amountPaid', 'status', 'email'];
+          this.displayedColumns = ['createdDate', 'orderNumber', 'productId', 'amountPaid', 'status', 'email'];
         }
       });
   }
