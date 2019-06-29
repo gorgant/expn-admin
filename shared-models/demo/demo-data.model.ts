@@ -28,7 +28,6 @@ export const demoPublicUser: PublicUser = {
 export const demoSubscriber: EmailSubscriber = {
   id: 'bob@tim.com',
   publicUserData: demoPublicUser,
-  active: true,
   createdDate: now(),
   modifiedDate: now(),
   lastSubSource: SubscriptionSource.CONTACT_FORM,

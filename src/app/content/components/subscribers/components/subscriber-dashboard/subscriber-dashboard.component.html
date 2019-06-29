@@ -27,8 +27,8 @@
         <div class="item-value">{{ subscriber.publicUserData.billingDetails.firstName + ' ' + subscriber.publicUserData.billingDetails.lastName }}</div>
       </div>
       <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
-        <div class="item-title">Subscriber Status:</div>
-        <div class="item-value">{{ subscriber.active ? 'Subscribed' : 'Unsubscribed' }}</div>
+        <div class="item-title">Global Unsub Status:</div>
+        <div class="item-value">{{ subscriber.globalUnsubscribe ? 'Unsubscribed' : 'Subscribed' }}</div>
       </div>
       <div class="card-item" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px">
         <div class="item-title">Subscriber Email:</div>
