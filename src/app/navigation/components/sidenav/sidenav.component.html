@@ -56,4 +56,18 @@
     <p mat-line>Data Imports</p>
   </a>
 
+  <a mat-list-item 
+    routerLinkActive="active-list-item"
+    [routerLink]="appRoutes.PROFILE"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>person</mat-icon>
+    <p mat-line>Profile</p>
+  </a>
+
+  <a mat-list-item 
+    (click)="onLogout()">
+    <mat-icon mat-list-icon>exit_to_app</mat-icon>
+    <p mat-line>Logout</p>
+  </a>
+
 </mat-nav-list>

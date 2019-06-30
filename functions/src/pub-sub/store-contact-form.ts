@@ -15,14 +15,12 @@ const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
   const fromName = EmailSenderNames.DEFAULT;
   const toFirstName = (contactForm.firstName);
   let toEmail: string;
-  let bccEmail = undefined;
   const templateId = EmailTemplateIds.CONTACT_FORM_CONFIRMATION;
 
   // Prevents test emails from going to the actual address used
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       toEmail = contactForm.email;
-      bccEmail = EmailBccAddresses.GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
       toEmail = EmailBccAddresses.GREG_ONLY;
@@ -41,7 +39,6 @@ const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
       email: fromEmail,
       name: fromName,
     },
-    bcc: bccEmail, // bcc me if this is a real delivery
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists

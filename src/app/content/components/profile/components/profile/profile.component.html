@@ -1,0 +1,40 @@
+<section fxLayout="column" fxLayoutAlign="center start">
+  
+  <h1 fxFlexAlign="center" class="mat-headline">Edit Profile</h1>
+  
+  <!-- Profile Details -->
+  <div fxFlexAlign="center" *ngIf="(userLoading$ | async)">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  </div>
+  <div *ngIf="(adminUser$ | async) as user" class="profile-content">
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <div class="mat-subheading-2">
+        {{ user.displayName }}
+      </div>
+      <button #matButton (click)="onEditName()" mat-button color="primary">
+        Edit
+      </button>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <div class="mat-subheading-2">
+        {{ user.email }}
+      </div>
+      <button #matButton2 (click)="onEditEmail()" mat-button color="primary">
+        Edit
+      </button>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <button 
+        #matButton3
+        (click)="onEditPassword()"
+        class="action-button" 
+        type="button" 
+        mat-stroked-button 
+        color="primary">
+          Change Password
+      </button>
+    </div>
+  </div>
+
+</section>
+

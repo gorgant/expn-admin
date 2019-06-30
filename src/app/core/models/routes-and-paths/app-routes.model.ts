@@ -13,7 +13,8 @@ export enum AdminAppRoutes {
   SUBSCRIBER_DASHBOARD = '/subscribers/dashboard',
   CONTACT_FORM_DASHBOARD = '/contact-forms/dashboard',
   CONTACT_FORM_DETAILS = '/contact-forms/existing', // Note this also requires an ID route param to be appended to it
-  DATA_IMPORTS = '/data-imports'
+  DATA_IMPORTS = '/data-imports',
+  PROFILE = '/profile'
 }
 
 export enum PublicAppRoutes {

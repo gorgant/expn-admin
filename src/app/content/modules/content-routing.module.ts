@@ -32,6 +32,10 @@ const routes: Routes = [
     component: DataImportsComponent
   },
   {
+    path: 'profile',
+    loadChildren: '../components/profile/modules/profile.module#ProfileModule',
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'

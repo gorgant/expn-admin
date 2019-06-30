@@ -46,5 +46,5 @@ export enum EmailSenderNames {
 
 export const EmailBccAddresses = {
   GREG_ONLY: 'greg@myexplearning.com',
-  GREG_AND_MD: ['greg@myexplearning.com, md@myexplearning.com']
+  GREG_AND_MD: ['greg@myexplearning.com, marydaphne@myexplearning.com']
 };

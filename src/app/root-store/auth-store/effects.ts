@@ -69,7 +69,7 @@ export class AuthStoreEffects {
     ),
     switchMap(action =>
       this.authService.updateEmail(
-        action.payload.publicUser,
+        action.payload.user,
         action.payload.password,
         action.payload.newEmail
         )
@@ -97,7 +97,7 @@ export class AuthStoreEffects {
     ),
     switchMap(action =>
       this.authService.updatePassword(
-        action.payload.publicUser,
+        action.payload.user,
         action.payload.oldPassword,
         action.payload.newPassword
         )

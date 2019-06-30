@@ -51,7 +51,7 @@ export class SetUnauthenticated implements Action {
 export class UpdateEmailRequested implements Action {
   readonly type = ActionTypes.UPDATE_EMAIL_REQUESTED;
 
-  constructor(public payload: { publicUser: AdminUser, password: string, newEmail: string }) {}
+  constructor(public payload: { user: AdminUser, password: string, newEmail: string }) {}
 }
 
 export class UpdateEmailComplete implements Action {
@@ -61,7 +61,7 @@ export class UpdateEmailComplete implements Action {
 export class UpdatePasswordRequested implements Action {
   readonly type = ActionTypes.UPDATE_PASSWORD_REQUESTED;
 
-  constructor(public payload: { publicUser: AdminUser, oldPassword: string, newPassword: string }) {}
+  constructor(public payload: { user: AdminUser, oldPassword: string, newPassword: string }) {}
 }
 
 export class UpdatePasswordComplete implements Action {

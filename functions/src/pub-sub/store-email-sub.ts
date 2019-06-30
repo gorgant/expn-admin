@@ -18,14 +18,12 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
   const fromName = EmailSenderNames.DEFAULT;
   const toFirstName = (subscriber.publicUserData.billingDetails as BillingDetails).firstName ? (subscriber.publicUserData.billingDetails as BillingDetails).firstName : undefined;
   let toEmail: string;
-  let bccEmail = undefined;
   const templateId = EmailTemplateIds.SUBSCRIPTION_CONFIRMATION;
   const unsubscribeGroupId = 10288; // Communications Strategies Unsubscribe Group
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       toEmail = subscriber.id;
-      bccEmail = EmailBccAddresses.GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
       toEmail = EmailBccAddresses.GREG_ONLY;
@@ -44,7 +42,6 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
       email: fromEmail,
       name: fromName,
     },
-    bcc: bccEmail, // bcc me if this is a real delivery
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists

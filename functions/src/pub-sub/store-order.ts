@@ -26,14 +26,12 @@ const sendOrderConfirmationEmail = async (order: Order) => {
   const fromName = EmailSenderNames.DEFAULT;
   const toFirstName = order.firstName;
   let toEmail: string;
-  let bccEmail = undefined;
   const templateId = getProductEmailTemplateIdFromProductId(order);
 
   // Prevents test emails from going to the actual address used
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       toEmail = order.email;
-      bccEmail = EmailBccAddresses.GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
       toEmail = EmailBccAddresses.GREG_ONLY;
@@ -52,7 +50,6 @@ const sendOrderConfirmationEmail = async (order: Order) => {
       email: fromEmail,
       name: fromName,
     },
-    bcc: bccEmail, // bcc me if this is a real delivery
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists
