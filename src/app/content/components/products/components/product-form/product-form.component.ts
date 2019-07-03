@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@ang
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
-import { Subscription, Observable, of, from } from 'rxjs';
+import { Subscription, Observable, of } from 'rxjs';
 import { Product } from 'src/app/core/models/products/product.model';
 import { take, withLatestFrom, map, takeWhile } from 'rxjs/operators';
 import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
@@ -18,7 +18,7 @@ import { BuyNowBoxData } from 'src/app/core/models/products/buy-now-box-data.mod
 import { CheckoutData } from 'src/app/core/models/products/checkout-data.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ProductStoreActions, ProductStoreSelectors } from 'src/app/root-store';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { UtilsService } from 'src/app/core/services/utils.service';
 
 @Component({
   selector: 'app-product-form',
@@ -54,7 +54,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private store$: Store<RootStoreState.State>,
-    private afs: AngularFirestore, // Used purely to generate ID
+    private utilsService: UtilsService,
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -258,7 +258,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private configureNewProduct() {
     this.isNewProduct = true;
-    this.productId = this.afs.createId();
+    this.productId = `${this.utilsService.generateRandomCharacterNoCaps(8)}`; // Use custom ID creator to avoid caps in URLs
     this.tempProductTitle = `Untitled Product ${this.productId.substr(0, 4)}`;
 
     this.productForm = this.fb.group({

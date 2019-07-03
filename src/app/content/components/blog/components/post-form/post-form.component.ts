@@ -18,8 +18,8 @@ import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete
 import { now } from 'moment';
 import { ImageType } from 'src/app/core/models/images/image-type.model';
 import { ImageService } from 'src/app/core/services/image.service';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { POST_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
+import { UtilsService } from 'src/app/core/services/utils.service';
 
 @Component({
   selector: 'app-post-form',
@@ -60,7 +60,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private store$: Store<RootStoreState.State>,
-    private afs: AngularFirestore, // Used purely to generate ID
+    private utilsService: UtilsService,
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -246,7 +246,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     this.imageUploadProcessing$ = this.imageService.getImageProcessing(); // Monitor image processing
     this.setContentFormStatus();
     this.isNewPost = true;
-    this.postId = this.afs.createId();
+    this.postId = `${this.utilsService.generateRandomCharacterNoCaps(8)}`; // Use custom ID creator to avoid caps in URLs
     this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
 
     // Auto-init post if it hasn't already been initialized and it has content
@@ -257,6 +257,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
       this.createAutoSaveTicker();
     }, 5000);
   }
+
+
 
   private setContentFormStatus(): void {
     this.imageProcessingSubscription = this.imageUploadProcessing$
@@ -291,7 +293,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
         this.store$.dispatch(new PostStoreActions.AddPostRequested({post: data}));
         this.postInitialized = true;
       });
-
   }
 
   private createAutoSaveTicker() {

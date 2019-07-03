@@ -18,7 +18,7 @@ export enum AdminAppRoutes {
 }
 
 export enum PublicAppRoutes {
-  HOME = '/home',
+  HOME = '',
   ABOUT_ME = '/about',
   PRODUCTS = '/products',
   PRODUCT_INDIVIDUAL = '/products/product',
