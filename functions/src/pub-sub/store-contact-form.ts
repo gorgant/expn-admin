@@ -3,11 +3,11 @@ import { adminFirestore } from '../db';
 import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { ContactForm } from '../../../shared-models/user/contact-form.model';
 import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
-import { getSgMail } from '../sendgrid/config';
+import { getSgMail, EmailWebsiteLinks } from '../sendgrid/config';
 import { currentEnvironmentType } from '../environments/config';
 import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
 import { MailData } from '@sendgrid/helpers/classes/mail';
-import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, EmailBccAddresses, EmailCategories } from '../../../shared-models/email/email-vars.model';
+import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, AdminEmailAddresses, EmailCategories } from '../../../shared-models/email/email-vars.model';
 
 const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
   const sgMail = getSgMail();
@@ -16,17 +16,21 @@ const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
   const toFirstName = (contactForm.firstName);
   let toEmail: string;
   const templateId = EmailTemplateIds.CONTACT_FORM_CONFIRMATION;
+  let categories: string[];
 
   // Prevents test emails from going to the actual address used
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       toEmail = contactForm.email;
+      categories = [EmailCategories.CONTACT_FORM_CONFIRMATION];
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = EmailBccAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.GREG_ONLY;
+      categories = [EmailCategories.CONTACT_FORM_CONFIRMATION, EmailCategories.TEST_SEND];
       break;
     default:
-      toEmail = EmailBccAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.GREG_ONLY;
+      categories = [EmailCategories.CONTACT_FORM_CONFIRMATION, EmailCategories.TEST_SEND];
       break;
   }
 
@@ -42,9 +46,12 @@ const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists
-      contactFormMessage: contactForm.message, // Message sent by the user
+      contactFormMessage: contactForm.message, // Message sent by the user,
+      blogUrl: EmailWebsiteLinks.BLOG_URL,
+      remoteCoachUrl: EmailWebsiteLinks.REMOTE_COACH_URL,
+      replyEmailAddress: fromEmail
     },
-    category: EmailCategories.CONTACT_FORM_CONFIRMATION
+    categories
   };
   await sgMail.send(msg)
     .catch(err => console.log(`Error sending email: ${msg} because `, err));

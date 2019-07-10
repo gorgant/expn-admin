@@ -4,32 +4,36 @@ import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb
 import { EmailSubscriber } from '../../../shared-models/subscribers/email-subscriber.model';
 import { now } from 'moment';
 import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
-import { getSgMail } from '../sendgrid/config';
+import { getSgMail, EmailWebsiteLinks } from '../sendgrid/config';
 import { BillingDetails } from '../../../shared-models/billing/billing-details.model';
 import { currentEnvironmentType } from '../environments/config';
 import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
 import { MailData } from '@sendgrid/helpers/classes/mail';
 import { SubscriptionSource } from '../../../shared-models/subscribers/subscription-source.model';
-import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, EmailBccAddresses, EmailCategories } from '../../../shared-models/email/email-vars.model';
+import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, AdminEmailAddresses, EmailCategories, EmailUnsubscribeGroupIds } from '../../../shared-models/email/email-vars.model';
 
 const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
   const sgMail = getSgMail();
-  const fromEmail = EmailSenderAddresses.DEFAULT;
-  const fromName = EmailSenderNames.DEFAULT;
-  const toFirstName = (subscriber.publicUserData.billingDetails as BillingDetails).firstName ? (subscriber.publicUserData.billingDetails as BillingDetails).firstName : undefined;
+  const fromEmail: string = EmailSenderAddresses.DEFAULT;
+  const fromName: string = EmailSenderNames.DEFAULT;
+  const toFirstName: string = (subscriber.publicUserData.billingDetails as BillingDetails).firstName;
   let toEmail: string;
-  const templateId = EmailTemplateIds.SUBSCRIPTION_CONFIRMATION;
-  const unsubscribeGroupId = 10288; // Communications Strategies Unsubscribe Group
-
+  const templateId: string = EmailTemplateIds.SUBSCRIPTION_CONFIRMATION;
+  const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.COMMUNICATIONS_STRATEGIES;
+  let categories: string[];
+  
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       toEmail = subscriber.id;
+      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION];
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = EmailBccAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.GREG_ONLY;
+      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.TEST_SEND];
       break;
     default:
-      toEmail = EmailBccAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.GREG_ONLY;
+      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.TEST_SEND];
       break;
   }
 
@@ -45,6 +49,9 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists
+      blogUrl: EmailWebsiteLinks.BLOG_URL,
+      remoteCoachUrl: EmailWebsiteLinks.REMOTE_COACH_URL,
+      replyEmailAddress: fromEmail
     },
     trackingSettings: {
       subscriptionTracking: {
@@ -54,7 +61,7 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
     asm: {
       groupId: unsubscribeGroupId, // Set the unsubscribe group
     },
-    category: EmailCategories.SUBSCRIPTION_CONFIRMATION
+    categories
   };
   await sgMail.send(msg)
     .catch(err => console.log(`Error sending email: ${msg} because `, err));
@@ -128,10 +135,6 @@ export const storeEmailSub = functions.pubsub.topic(AdminFunctionNames.SAVE_EMAI
 
     console.log('New subscriber created', subFbRes);
 
-
-
-
-    
   }
 
   // Send intro email if none has been sent and it's not a contact form

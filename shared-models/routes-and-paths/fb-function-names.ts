@@ -22,4 +22,6 @@ export enum PublicFunctionNames {
   TRANSMIT_ORDER_TO_ADMIN = 'transmitOrderToAdmin',
   TRANSMIT_EMAIL_SUB_TO_ADMIN = 'transmitEmailSubToAdmin',
   TRANSMIT_CONTACT_FORM_TO_ADMIN = 'transmitContactFormToAdmin',
+  TRANSMIT_WEBPAGE_URL_TO_PUPPETEER = 'transmitWebpageUrlToPuppeteer',
+  SAVE_WEBPAGE_TO_CACHE_TOPIC = 'saveWebpageToCache'
 }

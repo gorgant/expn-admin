@@ -3,8 +3,8 @@ import { Order } from '../../../shared-models/orders/order.model';
 import { adminFirestore } from '../db';
 import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
-import { getSgMail } from '../sendgrid/config';
-import { EmailSenderAddresses, EmailSenderNames, EmailBccAddresses, EmailCategories, ProductEmailTemplates } from '../../../shared-models/email/email-vars.model';
+import { getSgMail, getProductUrlById } from '../sendgrid/config';
+import { EmailSenderAddresses, EmailSenderNames, AdminEmailAddresses, EmailCategories, ProductEmailTemplates } from '../../../shared-models/email/email-vars.model';
 import { currentEnvironmentType } from '../environments/config';
 import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
 import { MailData } from '@sendgrid/helpers/classes/mail';
@@ -27,17 +27,22 @@ const sendOrderConfirmationEmail = async (order: Order) => {
   const toFirstName = order.firstName;
   let toEmail: string;
   const templateId = getProductEmailTemplateIdFromProductId(order);
+  let categories: string[];
+  const productUrl: string = getProductUrlById(order.productId);
 
   // Prevents test emails from going to the actual address used
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       toEmail = order.email;
+      categories = [EmailCategories.PURCHASE_CONFIRMATION];
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = EmailBccAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.GREG_ONLY;
+      categories = [EmailCategories.PURCHASE_CONFIRMATION, EmailCategories.TEST_SEND];
       break;
     default:
-      toEmail = EmailBccAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.GREG_ONLY;
+      categories = [EmailCategories.PURCHASE_CONFIRMATION, EmailCategories.TEST_SEND];
       break;
   }
 
@@ -53,9 +58,10 @@ const sendOrderConfirmationEmail = async (order: Order) => {
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists
-      orderNumber: order.orderNumber
+      orderNumber: order.orderNumber,
+      productUrl
     },
-    category: EmailCategories.PURCHASE_CONFIRMATION,
+    categories,
     customArgs: {
       productId: order.productId,
       orderId: order.id

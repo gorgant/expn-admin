@@ -1,6 +1,6 @@
 export enum SubscriptionSource {
-  WEBSITE_BOX = 'website_box',
+  WEBSITE_BOX = 'website-box',
   POPUP = 'popup',
   CHECKOUT = 'checkout',
-  CONTACT_FORM = 'contact_form'
+  CONTACT_FORM = 'contact-form'
 }

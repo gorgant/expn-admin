@@ -8,11 +8,13 @@ export const PRODUCTION_APPS = {
     databaseURL: 'https://explearning-76d93.firebaseio.com',
     projectId: 'explearning-76d93',
     storageBucket: 'explearning-76d93.appspot.com',
+    websiteDomain: 'myexplearning.com'
   },
   adminApp: {
     databaseURL: 'https://explearning-admin.firebaseio.com',
     projectId: 'explearning-admin',
     storageBucket: 'explearning-admin.appspot.com',
+    websiteDomain: 'admin.myexplearning.com'
   }
 };
 
@@ -21,11 +23,13 @@ export const SANDBOX_APPS = {
     databaseURL: 'https://explearning-sandbox-public.firebaseio.com',
     projectId: 'explearning-sandbox-public',
     storageBucket: 'explearning-sandbox-public.appspot.com',
+    websiteDomain: 'explearning-sandbox-public.firebaseapp.com'
   },
   adminApp: {
     databaseURL: 'https://explearning-sandbox-admin.firebaseio.com',
     projectId: 'explearning-sandbox-admin',
     storageBucket: 'explearning-sandbox-admin.appspot.com',
+    websiteDomain: 'explearning-sandbox-admin.firebaseapp.com'
   }
 };
 

@@ -8,7 +8,8 @@ export enum AdminCollectionPaths {
 
 export enum PublicCollectionPaths {
   PUBLIC_USERS = 'publicUsers',
-  NAVIGATION_STAMPS = 'navigationStamps'
+  NAVIGATION_STAMPS = 'navigationStamps',
+  PUBLIC_SITE_CACHE = 'publicSiteCache'
 }
 
 export enum SharedCollectionPaths {
