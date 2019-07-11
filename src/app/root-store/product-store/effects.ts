@@ -25,7 +25,12 @@ export class ProductStoreEffects {
     mergeMap(action =>
       this.productService.fetchSingleProduct(action.payload.productId)
         .pipe(
-          map(product => new productFeatureActions.SingleProductLoaded({ product })),
+          map(product => {
+            if (!product) {
+              throw new Error('Product not found');
+            }
+            return new productFeatureActions.SingleProductLoaded({ product });
+          }),
           catchError(error => {
             return of(new productFeatureActions.LoadErrorDetected({ error }));
           })
@@ -41,7 +46,12 @@ export class ProductStoreEffects {
     switchMap(action =>
       this.productService.fetchAllProducts()
         .pipe(
-          map(products => new productFeatureActions.AllProductsLoaded({ products })),
+          map(products => {
+            if (!products) {
+              throw new Error('Products not found');
+            }
+            return new productFeatureActions.AllProductsLoaded({ products });
+          }),
           catchError(error => {
             return of(new productFeatureActions.LoadErrorDetected({ error }));
           })
@@ -56,6 +66,9 @@ export class ProductStoreEffects {
     ),
     mergeMap(action => this.productService.createProduct(action.payload.product).pipe(
       map(product => {
+        if (!product) {
+          throw new Error('Error adding product');
+        }
         return new productFeatureActions.AddProductComplete({product});
       }),
       catchError(error => {
@@ -71,7 +84,12 @@ export class ProductStoreEffects {
     ),
     switchMap(action => this.productService.deleteProduct(action.payload.productId)
       .pipe(
-          map(productId => new productFeatureActions.DeleteProductComplete({productId})),
+          map(productId => {
+            if (!productId) {
+              throw new Error('Error deleting product');
+            }
+            return new productFeatureActions.DeleteProductComplete({productId});
+          }),
           catchError(error => {
             return of(new productFeatureActions.LoadErrorDetected({ error }));
           })
@@ -87,6 +105,9 @@ export class ProductStoreEffects {
     switchMap(action => this.productService.updateProduct(action.payload.product)
       .pipe(
           map(product => {
+            if (!product) {
+              throw new Error('Error updating product');
+            }
             const productUpdate: Update<Product> = {
               id: product.id,
               changes: product
@@ -107,7 +128,12 @@ export class ProductStoreEffects {
     ),
     switchMap(action => this.productService.toggleProductActive(action.payload.product)
       .pipe(
-          tap(product => this.store$.dispatch(new productFeatureActions.UpdateProductRequested({product}))),
+          tap(product => {
+            if (!product) {
+              throw new Error('Error toggling product active');
+            }
+            return this.store$.dispatch(new productFeatureActions.UpdateProductRequested({product}));
+          }),
           map(product => new productFeatureActions.ToggleActiveComplete()),
           catchError(error => {
             return of(new productFeatureActions.LoadErrorDetected({ error }));

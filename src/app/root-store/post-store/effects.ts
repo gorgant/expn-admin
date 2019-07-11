@@ -25,7 +25,12 @@ export class PostStoreEffects {
     mergeMap(action =>
       this.postService.fetchSinglePost(action.payload.postId)
         .pipe(
-          map(post => new postFeatureActions.SinglePostLoaded({ post })),
+          map(post => {
+            if (!post) {
+              throw new Error('Post not found');
+            }
+            return new postFeatureActions.SinglePostLoaded({ post });
+          }),
           catchError(error => {
             return of(new postFeatureActions.LoadErrorDetected({ error }));
           })
@@ -41,7 +46,12 @@ export class PostStoreEffects {
     switchMap(action =>
       this.postService.fetchAllPosts()
         .pipe(
-          map(posts => new postFeatureActions.AllPostsLoaded({ posts })),
+          map(posts => {
+            if (!posts) {
+              throw new Error('Posts not found');
+            }
+            return new postFeatureActions.AllPostsLoaded({ posts });
+          }),
           catchError(error => {
             return of(new postFeatureActions.LoadErrorDetected({ error }));
           })
@@ -56,6 +66,9 @@ export class PostStoreEffects {
     ),
     mergeMap(action => this.postService.createPost(action.payload.post).pipe(
       map(post => {
+        if (!post) {
+          throw new Error('Error adding post');
+        }
         return new postFeatureActions.AddPostComplete({post});
       }),
       catchError(error => {
@@ -71,7 +84,12 @@ export class PostStoreEffects {
     ),
     switchMap(action => this.postService.deletePost(action.payload.postId)
       .pipe(
-          map(postId => new postFeatureActions.DeletePostComplete({postId})),
+          map(postId => {
+            if (!postId) {
+              throw new Error('Error deleting post');
+            }
+            return new postFeatureActions.DeletePostComplete({postId});
+          }),
           catchError(error => {
             return of(new postFeatureActions.LoadErrorDetected({ error }));
           })
@@ -87,6 +105,9 @@ export class PostStoreEffects {
     switchMap(action => this.postService.updatePost(action.payload.post)
       .pipe(
           map(post => {
+            if (!post) {
+              throw new Error('Error updating post');
+            }
             const postUpdate: Update<Post> = {
               id: post.id,
               changes: post
@@ -107,7 +128,12 @@ export class PostStoreEffects {
     ),
     switchMap(action => this.postService.togglePublishPost(action.payload.post)
       .pipe(
-          tap(post => this.store$.dispatch(new postFeatureActions.UpdatePostRequested({post}))),
+          tap(post => {
+            if (!post) {
+              throw new Error('Error publishing post');
+            }
+            return this.store$.dispatch(new postFeatureActions.UpdatePostRequested({post}));
+          }),
           map(post => new postFeatureActions.TogglePublishedComplete()),
           catchError(error => {
             return of(new postFeatureActions.LoadErrorDetected({ error }));
@@ -123,7 +149,12 @@ export class PostStoreEffects {
     ),
     switchMap(action => this.postService.togglePostFeatured(action.payload.post)
       .pipe(
-          tap(post => this.store$.dispatch(new postFeatureActions.UpdatePostRequested({post}))),
+          tap(post => {
+            if (!post) {
+              throw new Error('Error toggling post featured');
+            }
+            return this.store$.dispatch(new postFeatureActions.UpdatePostRequested({post}));
+          }),
           map(post => new postFeatureActions.ToggleFeaturedComplete()),
           catchError(error => {
             return of(new postFeatureActions.LoadErrorDetected({ error }));

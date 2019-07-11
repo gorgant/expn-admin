@@ -32,6 +32,9 @@ export class AuthStoreEffects {
           .pipe(
             // Load user data into the store (skip info update that happens in Google login)
             tap(partialUser => {
+              if (!partialUser) {
+                throw new Error('User data not found');
+              }
               this.store$.dispatch(new userFeatureActions.StoreUserDataRequested({userData: partialUser}));
               // If email login, payload is a firebaseUser, but all we need is the uid
               // this.store$.dispatch(new userFeatureActions.UserDataRequested({userId: fbUser.uid}))
@@ -49,6 +52,9 @@ export class AuthStoreEffects {
         .pipe(
           // Load user data into the store
           tap(userData => {
+            if (!userData) {
+              throw new Error('User data not found');
+            }
             // Add or update user info in database (will trigger a subsequent user store update request in User Store)
             this.store$.dispatch(new userFeatureActions.StoreUserDataRequested({userData}));
           }),
@@ -76,6 +82,9 @@ export class AuthStoreEffects {
         .pipe(
           // Update email in the main database (separate from the User database)
           tap(response => {
+            if (!response) {
+              throw new Error('No response from updateEmail function');
+            }
             return this.store$.dispatch(
               new userFeatureActions.StoreUserDataRequested(
                 {userData: response.userData}
@@ -102,7 +111,12 @@ export class AuthStoreEffects {
         action.payload.newPassword
         )
         .pipe(
-          map(response => new authFeatureActions.UpdatePasswordComplete()),
+          map(response => {
+            if (!response) {
+              throw new Error('No response from updatePassword function');
+            }
+            return new authFeatureActions.UpdatePasswordComplete();
+          }),
           catchError(error => {
             return of(new authFeatureActions.LoadErrorDetected({ error }));
           })
@@ -120,7 +134,12 @@ export class AuthStoreEffects {
         action.payload.email
         )
         .pipe(
-          map(response => new authFeatureActions.ResetPasswordComplete()),
+          map(response => {
+            if (!response) {
+              throw new Error('No response from sendResetPasswordEmail function');
+            }
+            return new authFeatureActions.ResetPasswordComplete();
+          }),
           catchError(error => {
             return of(new authFeatureActions.LoadErrorDetected({ error }));
           })

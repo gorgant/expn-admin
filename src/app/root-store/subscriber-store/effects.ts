@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Action } from '@ngrx/store';
 import * as subscriberFeatureActions from './actions';
 import { switchMap, map, catchError, mergeMap } from 'rxjs/operators';
@@ -42,7 +42,12 @@ export class SubscriberStoreEffects {
     switchMap(action =>
       this.subscriberService.fetchAllSubscribers()
         .pipe(
-          map(subscribers => new subscriberFeatureActions.AllSubscribersLoaded({ subscribers })),
+          map(subscribers => {
+            if (!subscribers) {
+              throw new Error('Subscribers not found');
+            }
+            return new subscriberFeatureActions.AllSubscribersLoaded({ subscribers });
+          }),
           catchError(error => {
             return of(new subscriberFeatureActions.LoadErrorDetected({ error }));
           })

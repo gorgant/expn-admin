@@ -21,7 +21,12 @@ export class OrderStoreEffects {
     mergeMap(action =>
       this.orderService.fetchSingleOrder(action.payload.orderId)
         .pipe(
-          map(order => new orderFeatureActions.SingleOrderLoaded({ order })),
+          map(order => {
+            if (!order) {
+              throw new Error('Order not found');
+            }
+            return new orderFeatureActions.SingleOrderLoaded({ order });
+          }),
           catchError(error => {
             return of(new orderFeatureActions.LoadErrorDetected({ error }));
           })
@@ -37,7 +42,12 @@ export class OrderStoreEffects {
     switchMap(action =>
       this.orderService.fetchAllOrders()
         .pipe(
-          map(orders => new orderFeatureActions.AllOrdersLoaded({ orders })),
+          map(orders => {
+            if (!orders) {
+              throw new Error('Orders not found');
+            }
+            return new orderFeatureActions.AllOrdersLoaded({ orders });
+          }),
           catchError(error => {
             return of(new orderFeatureActions.LoadErrorDetected({ error }));
           })

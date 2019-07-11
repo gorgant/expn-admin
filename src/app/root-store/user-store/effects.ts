@@ -23,7 +23,12 @@ export class UserStoreEffects {
     switchMap(action =>
       this.userService.fetchUserData(action.payload.userId)
         .pipe(
-          map(user => new userFeatureActions.UserDataLoaded({userData: user})),
+          map(user => {
+            if (!user) {
+              throw new Error('User data not found');
+            }
+            return new userFeatureActions.UserDataLoaded({userData: user});
+          }),
           catchError(error => {
             return of(new userFeatureActions.LoadErrorDetected({ error }));
           })
@@ -40,6 +45,9 @@ export class UserStoreEffects {
       this.userService.storeUserData(action.payload.userData)
       .pipe(
         tap(userId => {
+          if (!userId) {
+            throw new Error('User id not found');
+          }
           // After data is stored, fetch it to update user data in local store for immediate UI updates
           this.store$.dispatch(
             new userFeatureActions.UserDataRequested({userId})

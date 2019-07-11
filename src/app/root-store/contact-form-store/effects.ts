@@ -21,7 +21,12 @@ export class ContactFormStoreEffects {
     mergeMap(action =>
       this.contactFormService.fetchSingleContactForm(action.payload.contactFormId)
         .pipe(
-          map(contactForm => new contactFormFeatureActions.SingleContactFormLoaded({ contactForm })),
+          map(contactForm => {
+            if (!contactForm) {
+              throw new Error('Contact form not found');
+            }
+            return new contactFormFeatureActions.SingleContactFormLoaded({ contactForm });
+          }),
           catchError(error => {
             return of(new contactFormFeatureActions.LoadErrorDetected({ error }));
           })
@@ -37,7 +42,12 @@ export class ContactFormStoreEffects {
     switchMap(action =>
       this.contactFormService.fetchAllContactForms()
         .pipe(
-          map(contactForms => new contactFormFeatureActions.AllContactFormsLoaded({ contactForms })),
+          map(contactForms => {
+            if (!contactForms) {
+              throw new Error('Contact forms not found');
+            }
+            return new contactFormFeatureActions.AllContactFormsLoaded({ contactForms });
+          }),
           catchError(error => {
             return of(new contactFormFeatureActions.LoadErrorDetected({ error }));
           })
