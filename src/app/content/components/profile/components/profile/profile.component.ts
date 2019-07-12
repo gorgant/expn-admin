@@ -16,9 +16,9 @@ import { EditPasswordDialogueComponent } from '../edit-password-dialogue/edit-pa
 })
 export class ProfileComponent implements OnInit {
 
-  @ViewChild('matButton') matButton;
-  @ViewChild('matButton2') matButton2;
-  @ViewChild('matButton3') matButton3;
+  @ViewChild('matButton', { static: false }) matButton;
+  @ViewChild('matButton2', { static: false }) matButton2;
+  @ViewChild('matButton3', { static: false }) matButton3;
 
   userLoading$: Observable<boolean>;
   adminUser$: Observable<AdminUser>;

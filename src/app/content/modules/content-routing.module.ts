@@ -9,23 +9,23 @@ const routes: Routes = [
   },
   {
     path: 'orders',
-    loadChildren: '../components/orders/modules/orders.module#OrdersModule',
+    loadChildren: () => import('../components/orders/modules/orders.module').then(m => m.OrdersModule),
   },
   {
     path: 'blog',
-    loadChildren: '../components/blog/modules/blog.module#BlogModule',
+    loadChildren: () => import('../components/blog/modules/blog.module').then(m => m.BlogModule),
   },
   {
     path: 'products',
-    loadChildren: '../components/products/modules/products.module#ProductsModule',
+    loadChildren: () => import('../components/products/modules/products.module').then(m => m.ProductsModule),
   },
   {
     path: 'subscribers',
-    loadChildren: '../components/subscribers/modules/subscribers.module#SubscribersModule',
+    loadChildren: () => import('../components/subscribers/modules/subscribers.module').then(m => m.SubscribersModule),
   },
   {
     path: 'contact-forms',
-    loadChildren: '../components/contact-forms/modules/contact-forms.module#ContactFormsModule',
+    loadChildren: () => import('../components/contact-forms/modules/contact-forms.module').then(m => m.ContactFormsModule),
   },
   {
     path: 'data-imports',
@@ -33,7 +33,7 @@ const routes: Routes = [
   },
   {
     path: 'profile',
-    loadChildren: '../components/profile/modules/profile.module#ProfileModule',
+    loadChildren: () => import('../components/profile/modules/profile.module').then(m => m.ProfileModule),
   },
   {
     path: '',

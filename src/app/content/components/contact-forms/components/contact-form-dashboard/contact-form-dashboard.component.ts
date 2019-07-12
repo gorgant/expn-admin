@@ -22,8 +22,8 @@ export class ContactFormDashboardComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<ContactForm>();
   isLoading$: Observable<boolean>;
 
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   constructor(
     private store$: Store<RootStoreState.State>,

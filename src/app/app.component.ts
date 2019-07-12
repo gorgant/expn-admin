@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
   title = 'admin';
   appVersion = '1.7.1';
 
-  @ViewChild('sidenav') sidenav: MatSidenav;
+  @ViewChild('sidenav', { static: true }) sidenav: MatSidenav;
 
   constructor(
     private uiService: UiService,

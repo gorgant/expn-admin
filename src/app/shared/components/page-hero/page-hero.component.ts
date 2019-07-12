@@ -14,7 +14,7 @@ export class PageHeroComponent implements OnInit, OnDestroy {
 
   @Input() heroData: PageHeroData;
 
-  @ViewChild('contentStartTag') ContentStartTag: ElementRef;
+  @ViewChild('contentStartTag', { static: true }) ContentStartTag: ElementRef;
 
 
   imageUrl: string;
