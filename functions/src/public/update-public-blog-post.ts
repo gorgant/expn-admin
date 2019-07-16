@@ -1,25 +1,31 @@
 import * as functions from 'firebase-functions';
 import { Post } from '../../../shared-models/posts/post.model';
 import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
-import { publicFirestore } from '../db';
+import { publicFirestore, maryDaphnePublicFirestore } from '../db';
+import { BlogDomains } from '../../../shared-models/posts/blog-domains.model';
 
 const publishPost = async (post: Post) => {
 
-  const db = publicFirestore;
+  let db: FirebaseFirestore.Firestore = publicFirestore;
+
+  // Switch to Mary Daphne firestore if flagged
+  if (post.blogDomain === BlogDomains.MARY_DAPHNE) {
+    db = maryDaphnePublicFirestore;
+  }
   console.log('Public firestore', db);
 
   // If post is published on admin, publish updates on public
   if (post.published) {
-    const fbRes = await db.collection(SharedCollectionPaths.POSTS).doc(post.id).set(post)
-      .catch(error => console.log(error));
+    const fbRes = await db.collection(SharedCollectionPaths.POSTS).doc(post.id as string).set(post)
+      .catch((error: any) => console.log(error));
     console.log('Post published');
     return fbRes;
   }
 
   // If post not published on admin, unpublish on public
   if (!post.published) {
-    const fbRes = await db.collection(SharedCollectionPaths.POSTS).doc(post.id).delete()
-      .catch(error => console.log(error));
+    const fbRes = await db.collection(SharedCollectionPaths.POSTS).doc(post.id as string).delete()
+      .catch((error: any) => console.log(error));
     console.log('Post unpublished');
     return fbRes;
   }

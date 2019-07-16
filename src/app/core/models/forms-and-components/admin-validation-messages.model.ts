@@ -23,6 +23,9 @@ export const resetPasswordFormValidationMessages = {
 };
 
 export const POST_FORM_VALIDATION_MESSAGES = {
+  blogDomain: [
+    {type: 'required', message: 'Blog domain is required.'}
+  ],
   title: [
     { type: 'required', message: 'Title is required.'},
   ],
@@ -36,7 +39,7 @@ export const POST_FORM_VALIDATION_MESSAGES = {
   keywords: [
     { type: 'requried', message: 'Keywords are required'},
     { type: 'maxlength', message: 'Entry exceeds max length' }
-  ]
+  ],
 };
 
 export const PRODUCT_FORM_VALIDATION_MESSAGES = {

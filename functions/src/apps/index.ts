@@ -31,3 +31,30 @@ export const getPublicApp = () => {
   }
   return app;
 };
+
+// Access to Mary Daphne app requires admin service account to be added to Mary Daphne public IAM
+export const getMaryDaphneApp = () => {
+  let app: admin.app.App;
+
+  switch (currentEnvironmentType) {
+    case EnvironmentTypes.PRODUCTION:
+      app = admin.initializeApp(
+        PRODUCTION_APPS.maryDaphnePublicApp,
+        'maryDaphnePublic'
+      );
+      break;
+    case EnvironmentTypes.SANDBOX:
+      app = admin.initializeApp(
+        SANDBOX_APPS.maryDaphnePublicApp,
+        'maryDaphnePublic'
+      );
+      break;
+    default:
+      app = admin.initializeApp(
+        SANDBOX_APPS.maryDaphnePublicApp,
+        'maryDaphnePublic'
+      );
+      break;
+  }
+  return app;
+};

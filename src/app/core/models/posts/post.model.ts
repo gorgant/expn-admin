@@ -1,4 +1,5 @@
 import { ImageProps } from '../images/image-props.model';
+import { BlogDomains } from './blog-domains.model';
 
 export interface Post {
   title: string;
@@ -8,6 +9,7 @@ export interface Post {
   description: string;
   keywords: string;
   modifiedDate: number;
+  blogDomain: BlogDomains;
   published?: boolean;
   publishedDate?: number;
   imageProps?: ImageProps;

@@ -20,6 +20,7 @@ import { ImageType } from 'src/app/core/models/images/image-type.model';
 import { ImageService } from 'src/app/core/services/image.service';
 import { POST_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
 import { UtilsService } from 'src/app/core/services/utils.service';
+import { BlogDomains } from 'src/app/core/models/posts/blog-domains.model';
 
 @Component({
   selector: 'app-post-form',
@@ -39,6 +40,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
   descriptionMaxLength = 320;
   keywordsMaxLength = 100;
   isNewPost: boolean;
+
+  blogDomains: string[] = Object.values(BlogDomains);
 
 
   private postId: string;
@@ -75,6 +78,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
     this.loadExistingPostData(); // Only loads if exists
 
     this.publicUser$ = this.store$.select(UserStoreSelectors.selectUser);
+
+    console.log('Blog domains', this.blogDomains);
 
   }
 
@@ -195,6 +200,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
         .subscribe(post => {
           if (post) {
             const data = {
+              blogDomain: post.blogDomain,
               title: post.title,
               videoUrl: post.videoUrl,
               description: post.description,
@@ -236,6 +242,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   private configureNewPost() {
     this.postForm = this.fb.group({
+      blogDomain: [BlogDomains.EXPLEARNING, Validators.required],
       title: ['', Validators.required],
       videoUrl: [''],
       description: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],
@@ -280,6 +287,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .subscribe(publicUser => {
         console.log('Post initialized');
         const data: Post = {
+          blogDomain: this.blogDomain.value,
           author: publicUser.displayName || publicUser.email,
           authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
@@ -329,6 +337,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   private changesDetected(post: Post): boolean {
     if (
+      post.blogDomain === this.blogDomain.value &&
       (post.title === this.title.value || post.title === this.tempPostTitle) &&
       post.videoUrl === this.videoUrl.value &&
       post.description === this.description.value &&
@@ -374,6 +383,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe(publicUser => {
         const post: Post = {
+          blogDomain: this.blogDomain.value,
           author: publicUser.displayName || publicUser.email,
           authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
@@ -399,6 +409,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
     clearTimeout(this.initPostTimeout);
   }
 
+
+  get blogDomain() { return this.postForm.get('blogDomain'); }
   get title() { return this.postForm.get('title'); }
   get videoUrl() { return this.postForm.get('videoUrl'); }
   get description() { return this.postForm.get('description'); }

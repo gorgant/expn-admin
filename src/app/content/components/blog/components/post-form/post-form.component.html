@@ -18,6 +18,17 @@
 
   <div *ngIf="postLoaded || isNewPost" class="blog-content-section" fxLayout="column" fxLayoutAlign="center center">
     <form [formGroup]="postForm" (keydown.enter)="$event.preventDefault()" fxFlexFill >
+      
+      <mat-form-field class="blogDomain">
+        <mat-label>Select Blog Domain</mat-label>
+        <mat-select formControlName="blogDomain">
+          <mat-option *ngFor="let domain of blogDomains" [value]="domain">{{ domain }}</mat-option>
+        </mat-select>
+        <mat-error *ngFor="let validation of postValidationMessages.blogDomain">
+          <mat-error *ngIf="blogDomain.hasError(validation.type) && blogDomain.invalid && (blogDomain.dirty || blogDomain.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+
       <mat-form-field class="post-title">
         <input matInput formControlName="title" type="text" placeholder="Post Title">
         <mat-error *ngFor="let validation of postValidationMessages.title">
