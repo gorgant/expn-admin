@@ -13,18 +13,12 @@ const routes: Routes = [
     canLoad: [AuthGuard],
     canActivate: [AuthGuard]
   },
-  // {
-  //   path: '**',
-  //   redirectTo: 'home',
-  //   pathMatch: 'full'
-  // },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {
     anchorScrolling: 'enabled',
     onSameUrlNavigation: 'reload',
-    // scrollPositionRestoration: 'enabled'
   })],
   exports: [RouterModule]
 })

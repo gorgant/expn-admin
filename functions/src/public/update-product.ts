@@ -1,11 +1,11 @@
 import * as functions from 'firebase-functions';
 import { Product } from '../../../shared-models/products/product.model';
 import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
-import { publicFirestore } from '../db';
+import { explearningPublicFirestore } from '../db';
 
 const updateProd = async (product: Product) => {
 
-  const db = publicFirestore;
+  const db = explearningPublicFirestore;
 
   // If product is active on admin, add to public
   if (product.active) {

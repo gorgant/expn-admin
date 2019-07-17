@@ -22,7 +22,7 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,
-    AngularFireModule.initializeApp(environment.admin),
+    AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireStorageModule,
     AngularFireAuthModule,

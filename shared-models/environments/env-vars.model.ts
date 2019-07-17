@@ -21,6 +21,12 @@ export const PRODUCTION_APPS = {
     projectId: 'marydaphne-public',
     storageBucket: 'marydaphne-public.appspot.com',
     websiteDomain: 'marydaphne.com'
+  },
+  maryDaphneAdminApp: {
+    databaseURL: 'https://marydaphne-admin.firebaseio.com',
+    projectId: 'marydaphne-admin',
+    storageBucket: 'marydaphne-admin.appspot.com',
+    websiteDomain: 'admin.marydaphne.com'
   }
 };
 
@@ -42,6 +48,12 @@ export const SANDBOX_APPS = {
     projectId: 'marydaphne-sandbox-public',
     storageBucket: 'marydaphne-sandbox-public.appspot.com',
     websiteDomain: 'marydaphne-sandbox-public.firebaseapp.com'
+  },
+  maryDaphneAdminApp: {
+    databaseURL: 'https://marydaphne-sandbox-admin.firebaseio.com',
+    projectId: 'marydaphne-sandbox-admin',
+    storageBucket: 'marydaphne-sandbox-admin.appspot.com',
+    websiteDomain: 'marydaphne-sandbox-admin.firebaseapp.com'
   }
 };
 

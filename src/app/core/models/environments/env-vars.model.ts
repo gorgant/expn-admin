@@ -15,6 +15,18 @@ export const PRODUCTION_APPS = {
     projectId: 'explearning-admin',
     storageBucket: 'explearning-admin.appspot.com',
     websiteDomain: 'admin.myexplearning.com'
+  },
+  maryDaphnePublicApp: {
+    databaseURL: 'https://marydaphne-public.firebaseio.com',
+    projectId: 'marydaphne-public',
+    storageBucket: 'marydaphne-public.appspot.com',
+    websiteDomain: 'marydaphne.com'
+  },
+  maryDaphneAdminApp: {
+    databaseURL: 'https://marydaphne-admin.firebaseio.com',
+    projectId: 'marydaphne-admin',
+    storageBucket: 'marydaphne-admin.appspot.com',
+    websiteDomain: 'admin.marydaphne.com'
   }
 };
 
@@ -30,6 +42,18 @@ export const SANDBOX_APPS = {
     projectId: 'explearning-sandbox-admin',
     storageBucket: 'explearning-sandbox-admin.appspot.com',
     websiteDomain: 'explearning-sandbox-admin.firebaseapp.com'
+  },
+  maryDaphnePublicApp: {
+    databaseURL: 'https://marydaphne-sandbox-public.firebaseio.com',
+    projectId: 'marydaphne-sandbox-public',
+    storageBucket: 'marydaphne-sandbox-public.appspot.com',
+    websiteDomain: 'marydaphne-sandbox-public.firebaseapp.com'
+  },
+  maryDaphneAdminApp: {
+    databaseURL: 'https://marydaphne-sandbox-admin.firebaseio.com',
+    projectId: 'marydaphne-sandbox-admin',
+    storageBucket: 'marydaphne-sandbox-admin.appspot.com',
+    websiteDomain: 'marydaphne-sandbox-admin.firebaseapp.com'
   }
 };
 

@@ -12,7 +12,7 @@ import { withLatestFrom } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'admin';
+  title = 'Admin - Explearning';
   appVersion = '1.7.2';
 
   @ViewChild('sidenav', { static: true }) sidenav: MatSidenav;
