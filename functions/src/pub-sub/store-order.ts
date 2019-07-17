@@ -22,10 +22,11 @@ const getProductEmailTemplateIdFromProductId = (order: Order): string => {
 
 const sendOrderConfirmationEmail = async (order: Order) => {
   const sgMail = getSgMail();
-  const fromEmail = EmailSenderAddresses.ORDERS;
-  const fromName = EmailSenderNames.DEFAULT;
+  const fromEmail = EmailSenderAddresses.EXPLEARNING_ORDERS;
+  const fromName = EmailSenderNames.EXPLEARNING_DEFAULT;
   const toFirstName = order.firstName;
   let toEmail: string;
+  let bccEmail: string;
   const templateId = getProductEmailTemplateIdFromProductId(order);
   let categories: string[];
   const productUrl: string = getProductUrlById(order.productId);
@@ -35,14 +36,17 @@ const sendOrderConfirmationEmail = async (order: Order) => {
     case EnvironmentTypes.PRODUCTION:
       toEmail = order.email;
       categories = [EmailCategories.PURCHASE_CONFIRMATION];
+      bccEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       categories = [EmailCategories.PURCHASE_CONFIRMATION, EmailCategories.TEST_SEND];
+      bccEmail = '';
       break;
     default:
-      toEmail = AdminEmailAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       categories = [EmailCategories.PURCHASE_CONFIRMATION, EmailCategories.TEST_SEND];
+      bccEmail = '';
       break;
   }
 
@@ -55,6 +59,7 @@ const sendOrderConfirmationEmail = async (order: Order) => {
       email: fromEmail,
       name: fromName,
     },
+    bcc: bccEmail,
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists

@@ -64,6 +64,13 @@ export enum ProductionCloudStorage {
   EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-admin-products',
   EXPLEARNING_ADMIN_BACKUP_STORAGE_AF_CF = 'explearning-admin-backup',
   EXPLEARNING_ADMIN_BACKUP_STORAGE_FB = 'gs://explearning-admin-backup',
+  MARY_DAPHNE_ADMIN_BLOG_STORAGE_AF_CF = 'marydaphne-admin-blog',
+  MARY_DAPHNE_ADMIN_BLOG_STORAGE_FB = 'gs://marydaphne-admin-blog',
+  MARY_DAPHNE_ADMIN_PRODUCTS_STORAGE_AF_CF = 'marydaphne-admin-products',
+  MARY_DAPHNE_ADMIN_PRODUCTS_STORAGE_FB = 'gs://marydaphne-admin-products',
+  MARY_DAPHNE_ADMIN_BACKUP_STORAGE_AF_CF = 'marydaphne-admin-backup',
+  MARY_DAPHNE_ADMIN_BACKUP_STORAGE_FB = 'gs://marydaphne-admin-backup',
+
 }
 
 export enum SandboxCloudStorage {
@@ -73,12 +80,15 @@ export enum SandboxCloudStorage {
   EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-sandbox-admin-products',
   EXPLEARNING_ADMIN_BACKUP_STORAGE_AF_CF = 'explearning-sandbox-admin-backup',
   EXPLEARNING_ADMIN_BACKUP_STORAGE_FB = 'gs://explearning-sandbox-admin-backup',
+  MARY_DAPHNE_ADMIN_BLOG_STORAGE_AF_CF = 'marydaphne-sandbox-admin-blog',
+  MARY_DAPHNE_ADMIN_BLOG_STORAGE_FB = 'gs://marydaphne-sandbox-admin-blog',
+  MARY_DAPHNE_ADMIN_PRODUCTS_STORAGE_AF_CF = 'marydaphne-sandbox-admin-products',
+  MARY_DAPHNE_ADMIN_PRODUCTS_STORAGE_FB = 'gs://marydaphne-sandbox-admin-products',
+  MARY_DAPHNE_ADMIN_BACKUP_STORAGE_AF_CF = 'marydaphne-sandbox-admin-backup',
+  MARY_DAPHNE_ADMIN_BACKUP_STORAGE_FB = 'gs://marydaphne-sandbox-admin-backup',
 }
 
-export enum ProductionStripePublishableKeys {
-  PUBLISHABLE = 'pk_live_2ybMSK15jNXw8mpoJ1MmIrfW00PvuSsi2F'
-}
-
-export enum SandboxStripePublishableKeys {
-  PUBLISHABLE = 'pk_test_qiAhFPd39eG3eqgEtWM9Yx0v00p7PxdzcH'
-}
+export const StripePublishableKeys = {
+  production: 'pk_live_2ybMSK15jNXw8mpoJ1MmIrfW00PvuSsi2F',
+  sandbox: 'pk_test_qiAhFPd39eG3eqgEtWM9Yx0v00p7PxdzcH'
+};

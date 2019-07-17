@@ -21,31 +21,48 @@ export enum EmailUnsubscribeGroupIds {
 
 // Set the key to the Product ID Searchable by product ID
 export const ProductEmailTemplates: ProductEmailTemplateList = {
-  [ProductIdList.REMOTE_COACH]: {
+  [ProductIdList.EXPLEARNING_REMOTE_COACH]: {
     templateId: EmailTemplateIds.REMOTE_COACH_PURCHASE_CONFIRMATION,
-    productId: ProductIdList.REMOTE_COACH
+    productId: ProductIdList.EXPLEARNING_REMOTE_COACH
   },
-  [ProductIdList.SANDBOX_REMOTE_COACH]: {
+  [ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH]: {
     templateId: EmailTemplateIds.REMOTE_COACH_PURCHASE_CONFIRMATION,
-    productId: ProductIdList.SANDBOX_REMOTE_COACH
+    productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH
   },
-  [ProductIdList.SANDBOX_ANOTHER_COOL_PRODUCT]: {
+  [ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT]: {
     templateId: EmailTemplateIds.REMOTE_COACH_PURCHASE_CONFIRMATION,
-    productId: ProductIdList.SANDBOX_REMOTE_COACH
+    productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH
+  },
+  [ProductIdList.MARY_DAPHNE_REMOTE_COACH]: {
+    templateId: EmailTemplateIds.REMOTE_COACH_PURCHASE_CONFIRMATION,
+    productId: ProductIdList.MARY_DAPHNE_REMOTE_COACH
+  },
+  [ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH]: {
+    templateId: EmailTemplateIds.REMOTE_COACH_PURCHASE_CONFIRMATION,
+    productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH
+  },
+  [ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT]: {
+    templateId: EmailTemplateIds.REMOTE_COACH_PURCHASE_CONFIRMATION,
+    productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH
   }
 };
 
 export enum EmailSenderAddresses {
-  DEFAULT = 'hello@myexplearning.com',
-  ORDERS = 'orders@myexplearning.com'
+  EXPLEARNING_DEFAULT = 'hello@myexplearning.com',
+  EXPLEARNING_ORDERS = 'orders@myexplearning.com',
+  MARY_DAPHNE_DEFAULT = 'hello@marydaphne.com',
+  MARY_DAPHNE_ORDERS = 'orders@marydaphne.com'
 
 }
 
 export enum EmailSenderNames {
-  DEFAULT = 'Explearning'
+  EXPLEARNING_DEFAULT = 'Explearning',
+  MARY_DAPHNE_DEFAULT = 'Mary Daphne'
 }
 
 export const AdminEmailAddresses = {
-  GREG_ONLY: 'greg@myexplearning.com',
-  GREG_AND_MD: ['greg@myexplearning.com, marydaphne@myexplearning.com']
+  EXPLEARNING_GREG_ONLY: 'greg@myexplearning.com',
+  EXPLEARNING_GREG_AND_MD: ['greg@myexplearning.com, marydaphne@myexplearning.com'],
+  MARY_DAPHNE_GREG_ONLY: 'greg@marydaphne.com',
+  MARY_DAPHNE_GREG_AND_MD: ['greg@marydaphne.com, marydaphne@marydaphne.com']
 };

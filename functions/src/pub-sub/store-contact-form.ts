@@ -11,10 +11,11 @@ import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, AdminEmailAdd
 
 const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
   const sgMail = getSgMail();
-  const fromEmail = EmailSenderAddresses.DEFAULT;
-  const fromName = EmailSenderNames.DEFAULT;
+  const fromEmail = EmailSenderAddresses.EXPLEARNING_DEFAULT;
+  const fromName = EmailSenderNames.EXPLEARNING_DEFAULT;
   const toFirstName = (contactForm.firstName);
   let toEmail: string;
+  let bccEmail: string;
   const templateId = EmailTemplateIds.CONTACT_FORM_CONFIRMATION;
   let categories: string[];
 
@@ -23,14 +24,17 @@ const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
     case EnvironmentTypes.PRODUCTION:
       toEmail = contactForm.email;
       categories = [EmailCategories.CONTACT_FORM_CONFIRMATION];
+      bccEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       categories = [EmailCategories.CONTACT_FORM_CONFIRMATION, EmailCategories.TEST_SEND];
+      bccEmail = '';
       break;
     default:
-      toEmail = AdminEmailAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       categories = [EmailCategories.CONTACT_FORM_CONFIRMATION, EmailCategories.TEST_SEND];
+      bccEmail = '';
       break;
   }
 
@@ -43,6 +47,7 @@ const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
       email: fromEmail,
       name: fromName,
     },
+    bcc: bccEmail,
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists

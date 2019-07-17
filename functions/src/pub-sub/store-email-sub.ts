@@ -14,10 +14,11 @@ import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, AdminEmailAdd
 
 const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
   const sgMail = getSgMail();
-  const fromEmail: string = EmailSenderAddresses.DEFAULT;
-  const fromName: string = EmailSenderNames.DEFAULT;
+  const fromEmail: string = EmailSenderAddresses.EXPLEARNING_DEFAULT;
+  const fromName: string = EmailSenderNames.EXPLEARNING_DEFAULT;
   const toFirstName: string = (subscriber.publicUserData.billingDetails as BillingDetails).firstName;
   let toEmail: string;
+  let bccEmail: string;
   const templateId: string = EmailTemplateIds.SUBSCRIPTION_CONFIRMATION;
   const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.COMMUNICATIONS_STRATEGIES;
   let categories: string[];
@@ -26,14 +27,17 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
     case EnvironmentTypes.PRODUCTION:
       toEmail = subscriber.id;
       categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION];
+      bccEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.TEST_SEND];
+      bccEmail = '';
       break;
     default:
-      toEmail = AdminEmailAddresses.GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
       categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.TEST_SEND];
+      bccEmail = '';
       break;
   }
 
@@ -46,6 +50,7 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
       email: fromEmail,
       name: fromName,
     },
+    bcc: bccEmail,
     templateId,
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists
