@@ -1,6 +1,5 @@
 import { Action } from '@ngrx/store';
-import { AdminUser } from 'src/app/core/models/user/admin-user.model';
-import { StoreUserDataType } from 'src/app/core/models/user/store-user-data-type.model';
+import { AdminUser } from 'shared-models/user/admin-user.model';
 
 export enum ActionTypes {
   USER_DATA_REQUESTED = '[User] User Data Requested',

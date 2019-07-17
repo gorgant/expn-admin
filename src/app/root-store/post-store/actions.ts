@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
-import { Post } from 'src/app/core/models/posts/post.model';
 import { Update } from '@ngrx/entity';
+import { Post } from 'shared-models/posts/post.model';
 
 export enum ActionTypes {
   SINGLE_POST_REQUESTED = '[Posts] Single Post Requested',

@@ -1,14 +1,14 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
-import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
-import { Post } from 'src/app/core/models/posts/post.model';
-import { AdminImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreActions } from 'src/app/root-store';
+import { Post } from 'shared-models/posts/post.model';
+import { AdminImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
+import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 
 @Component({
   selector: 'app-post-card',

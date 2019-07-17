@@ -7,11 +7,11 @@ import {
   ContactFormStoreSelectors,
   ContactFormStoreActions
 } from 'src/app/root-store';
-import { EmailSubscriber } from 'src/app/core/models/subscribers/email-subscriber.model';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { map, combineLatest } from 'rxjs/operators';
-import { ContactForm } from 'src/app/core/models/user/contact-form.model';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
+import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
+import { ContactForm } from 'shared-models/user/contact-form.model';
 
 @Component({
   selector: 'app-subscriber-dashboard',

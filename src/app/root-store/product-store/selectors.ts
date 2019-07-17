@@ -1,7 +1,7 @@
 import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromProducts from './reducer';
-import { Product } from 'src/app/core/models/products/product.model';
+import { Product } from 'shared-models/products/product.model';
 
 const getError = (state: State): any => state.error;
 const getIsLoading = (state: State): boolean => state.isLoading;

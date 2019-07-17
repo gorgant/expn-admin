@@ -1,5 +1,5 @@
 import { EntityAdapter, createEntityAdapter, EntityState } from '@ngrx/entity';
-import { EmailSubscriber } from 'src/app/core/models/subscribers/email-subscriber.model';
+import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
 
 export const featureAdapter: EntityAdapter<EmailSubscriber>
   = createEntityAdapter<EmailSubscriber>(

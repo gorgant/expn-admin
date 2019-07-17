@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AdminUser } from 'src/app/core/models/user/admin-user.model';
 import { take } from 'rxjs/operators';
 import { MatDialogConfig, MatDialog } from '@angular/material';
 import { Store } from '@ngrx/store';
@@ -8,6 +7,7 @@ import { RootStoreState, UserStoreSelectors } from 'src/app/root-store';
 import { EditEmailDialogueComponent } from '../edit-email-dialogue/edit-email-dialogue.component';
 import { EditNameDialogueComponent } from '../edit-name-dialogue/edit-name-dialogue.component';
 import { EditPasswordDialogueComponent } from '../edit-password-dialogue/edit-password-dialogue.component';
+import { AdminUser } from 'shared-models/user/admin-user.model';
 
 @Component({
   selector: 'app-profile',

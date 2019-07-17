@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
-import { Product } from 'src/app/core/models/products/product.model';
 import { Update } from '@ngrx/entity';
+import { Product } from 'shared-models/products/product.model';
 
 export enum ActionTypes {
   SINGLE_PRODUCT_REQUESTED = '[Products] Single Product Requested',

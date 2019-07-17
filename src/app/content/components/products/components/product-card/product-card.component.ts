@@ -1,14 +1,14 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Product } from 'src/app/core/models/products/product.model';
-import { AdminImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 import { Router } from '@angular/router';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { MatDialogConfig, MatDialog } from '@angular/material';
-import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ProductStoreActions } from 'src/app/root-store';
+import { Product } from 'shared-models/products/product.model';
+import { AdminImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
+import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 
 @Component({
   selector: 'app-product-card',

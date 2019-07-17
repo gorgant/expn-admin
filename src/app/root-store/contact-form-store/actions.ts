@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { ContactForm } from 'src/app/core/models/user/contact-form.model';
+import { ContactForm } from 'shared-models/user/contact-form.model';
 
 export enum ActionTypes {
   SINGLE_CONTACT_FORM_REQUESTED = '[ContactForms] Single ContactForm Requested',

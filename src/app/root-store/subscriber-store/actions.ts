@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { EmailSubscriber } from 'src/app/core/models/subscribers/email-subscriber.model';
+import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
 
 export enum ActionTypes {
   SINGLE_SUBSCRIBER_REQUESTED = '[Subscribers] Single Subscriber Requested',

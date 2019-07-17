@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { Order } from 'src/app/core/models/orders/order.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, OrderStoreSelectors, OrderStoreActions, ProductStoreSelectors, ProductStoreActions } from 'src/app/root-store';
 import { withLatestFrom, map, take } from 'rxjs/operators';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
+import { Order } from 'shared-models/orders/order.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-orders-dashboard',

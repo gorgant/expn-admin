@@ -1,5 +1,5 @@
 import { EntityAdapter, createEntityAdapter, EntityState } from '@ngrx/entity';
-import { ContactForm } from 'src/app/core/models/user/contact-form.model';
+import { ContactForm } from 'shared-models/user/contact-form.model';
 
 export const featureAdapter: EntityAdapter<ContactForm>
   = createEntityAdapter<ContactForm>(

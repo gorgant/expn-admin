@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { Order } from 'src/app/core/models/orders/order.model';
+import { Order } from 'shared-models/orders/order.model';
 
 export enum ActionTypes {
   SINGLE_ORDER_REQUESTED = '[Orders] Single Order Requested',

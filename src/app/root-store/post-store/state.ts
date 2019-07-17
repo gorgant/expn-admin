@@ -1,5 +1,5 @@
 import { EntityAdapter, createEntityAdapter, EntityState } from '@ngrx/entity';
-import { Post } from 'src/app/core/models/posts/post.model';
+import { Post } from 'shared-models/posts/post.model';
 
 export const featureAdapter: EntityAdapter<Post>
   = createEntityAdapter<Post>(

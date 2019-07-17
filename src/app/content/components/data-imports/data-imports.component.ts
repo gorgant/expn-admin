@@ -19,4 +19,8 @@ export class DataImportsComponent implements OnInit {
     this.publicService.updateGeographicData();
   }
 
+  onSendSendgridTest() {
+    this.publicService.sendSendgridTest();
+  }
+
 }

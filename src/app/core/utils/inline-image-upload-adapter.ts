@@ -1,5 +1,5 @@
-import { ImageType } from '../models/images/image-type.model';
 import { ImageService } from '../services/image.service';
+import { ImageType } from 'shared-models/images/image-type.model';
 
 // Adapted from https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
 export class InlineImageUploadAdapter {

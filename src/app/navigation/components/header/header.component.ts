@@ -3,10 +3,10 @@ import { UiService } from 'src/app/core/services/ui.service';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Router, NavigationEnd } from '@angular/router';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, AuthStoreSelectors, AuthStoreActions } from 'src/app/root-store';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-header',

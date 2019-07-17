@@ -1,4 +1,4 @@
-import { AdminUser } from 'src/app/core/models/user/admin-user.model';
+import { AdminUser } from 'shared-models/user/admin-user.model';
 
 export interface State {
   user: AdminUser | null;

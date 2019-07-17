@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Post } from 'src/app/core/models/posts/post.model';
 import { Router } from '@angular/router';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreSelectors, PostStoreActions } from 'src/app/root-store';
 import { withLatestFrom, map } from 'rxjs/operators';
+import { Post } from 'shared-models/posts/post.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-blog-dashboard',

@@ -1,5 +1,5 @@
 import { EntityAdapter, createEntityAdapter, EntityState } from '@ngrx/entity';
-import { Order } from 'src/app/core/models/orders/order.model';
+import { Order } from 'shared-models/orders/order.model';
 
 export const featureAdapter: EntityAdapter<Order>
   = createEntityAdapter<Order>(

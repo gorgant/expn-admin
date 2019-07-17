@@ -1,7 +1,7 @@
 import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromOrders from './reducer';
-import { Order } from 'src/app/core/models/orders/order.model';
+import { Order } from 'shared-models/orders/order.model';
 
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getOrdersLoaded = (state: State): boolean => state.ordersLoaded;

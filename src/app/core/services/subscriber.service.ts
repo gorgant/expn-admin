@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { EmailSubscriber } from '../models/subscribers/email-subscriber.model';
 import { Observable, throwError, from } from 'rxjs';
 import { takeUntil, map, catchError } from 'rxjs/operators';
-import { AdminCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
-import { demoSubscriber } from '../models/demo/demo-data.model';
+import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
+import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'

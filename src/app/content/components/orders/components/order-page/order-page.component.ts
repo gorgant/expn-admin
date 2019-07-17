@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Order } from 'src/app/core/models/orders/order.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, OrderStoreSelectors, OrderStoreActions, ProductStoreSelectors, ProductStoreActions } from 'src/app/root-store';
 import { ActivatedRoute } from '@angular/router';
 import { withLatestFrom, map, take } from 'rxjs/operators';
+import { Order } from 'shared-models/orders/order.model';
 
 @Component({
   selector: 'app-order-page',

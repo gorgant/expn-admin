@@ -7,9 +7,8 @@ import * as userFeatureActions from '../user-store/actions';
 import { switchMap, map, catchError, tap } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { RootStoreState } from '..';
-import { StoreUserDataType } from 'src/app/core/models/user/store-user-data-type.model';
-import { AuthenticateUserType } from 'src/app/core/models/auth/authenticate-user-type.model';
-import { AdminUser } from 'src/app/core/models/user/admin-user.model';
+import { AuthenticateUserType } from 'shared-models/auth/authenticate-user-type.model';
+
 
 @Injectable()
 export class AuthStoreEffects {

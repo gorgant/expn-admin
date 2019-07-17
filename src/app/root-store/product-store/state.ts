@@ -1,5 +1,5 @@
 import { EntityAdapter, createEntityAdapter, EntityState } from '@ngrx/entity';
-import { Product } from 'src/app/core/models/products/product.model';
+import { Product } from 'shared-models/products/product.model';
 
 export const featureAdapter: EntityAdapter<Product>
   = createEntityAdapter<Product>(

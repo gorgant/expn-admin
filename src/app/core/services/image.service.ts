@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
-import { SanitizedFileName } from '../models/images/sanitized-file-name.model';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { ImageType } from '../models/images/image-type.model';
-import { ImageDirectoryData } from '../models/images/image-directory-data.model';
-import { ImageMetadata } from '../models/images/image-metadata.model';
 import { UploadMetadata } from '@angular/fire/storage/interfaces';
-import { Post } from '../models/posts/post.model';
-import { Product } from '../models/products/product.model';
-import { ImageUrlObject } from '../models/images/image-url-object.model';
-import { ImageProps } from '../models/images/image-props.model';
-import { AdminFunctionNames } from '../models/routes-and-paths/fb-function-names';
-import { SharedCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
 import { environment } from 'src/environments/environment';
-import { ProductionCloudStorage, SandboxCloudStorage } from '../models/environments/env-vars.model';
+import { ProductionCloudStorage, SandboxCloudStorage } from 'shared-models/environments/env-vars.model';
+import { ImageType } from 'shared-models/images/image-type.model';
+import { ImageProps } from 'shared-models/images/image-props.model';
+import { ImageUrlObject } from 'shared-models/images/image-url-object.model';
+import { Post } from 'shared-models/posts/post.model';
+import { Product } from 'shared-models/products/product.model';
+import { ImageMetadata } from 'shared-models/images/image-metadata.model';
+import { AdminFunctionNames } from 'shared-models/routes-and-paths/fb-function-names';
+import { ImageDirectoryData } from 'shared-models/images/image-directory-data.model';
+import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { SanitizedFileName } from 'shared-models/images/sanitized-file-name.model';
 
 @Injectable({
   providedIn: 'root'
@@ -37,17 +37,17 @@ export class ImageService {
     switch (this.currentEnvironmentType) {
       case true:
         console.log('Setting storage to production');
-        this.blogStorageRef = firebase.app().storage(ProductionCloudStorage.ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.app().storage(ProductionCloudStorage.ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.app().storage(ProductionCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.app().storage(ProductionCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
       case false:
         console.log('Setting storage to sandbox');
-        this.blogStorageRef = firebase.app().storage(SandboxCloudStorage.ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.app().storage(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
       default:
-        this.blogStorageRef = firebase.app().storage(SandboxCloudStorage.ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.app().storage(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
     }
   }

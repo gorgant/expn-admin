@@ -1,7 +1,7 @@
 import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromContactForms from './reducer';
-import { ContactForm } from 'src/app/core/models/user/contact-form.model';
+import { ContactForm } from 'shared-models/user/contact-form.model';
 
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getContactFormsLoaded = (state: State): boolean => state.contactFormsLoaded;

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ContactForm } from 'src/app/core/models/user/contact-form.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ContactFormStoreSelectors, ContactFormStoreActions } from 'src/app/root-store';
 import { ActivatedRoute } from '@angular/router';
 import { withLatestFrom, map } from 'rxjs/operators';
+import { ContactForm } from 'shared-models/user/contact-form.model';
 
 @Component({
   selector: 'app-contact-form-page',

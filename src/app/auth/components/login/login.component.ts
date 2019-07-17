@@ -3,11 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { RootStoreState, AuthStoreSelectors, UserStoreSelectors, AuthStoreActions } from 'src/app/root-store';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { loginValidationMessages } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
 import { Observable } from 'rxjs';
-import { AuthData } from 'src/app/core/models/auth/auth-data.model';
-import { AuthenticateUserType } from 'src/app/core/models/auth/authenticate-user-type.model';
 import { ResetPasswordDialogueComponent } from '../reset-password-dialogue/reset-password-dialogue.component';
+import { loginValidationMessages } from 'shared-models/forms-and-components/admin-validation-messages.model';
+import { AuthData } from 'shared-models/auth/auth-data.model';
+import { AuthenticateUserType } from 'shared-models/auth/authenticate-user-type.model';
 
 @Component({
   selector: 'app-login',

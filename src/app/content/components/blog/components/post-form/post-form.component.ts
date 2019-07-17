@@ -1,26 +1,26 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ImageProps } from 'src/app/core/models/images/image-props.model';
 import { Observable, Subscription, of, Subject, from } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { take, withLatestFrom, map, takeWhile } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
-import { Post } from 'src/app/core/models/posts/post.model';
 
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Store } from '@ngrx/store';
 import { RootStoreState, UserStoreSelectors, PostStoreActions, PostStoreSelectors } from 'src/app/root-store';
-import { AdminUser } from 'src/app/core/models/user/admin-user.model';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { MatDialogConfig, MatDialog } from '@angular/material';
-import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { now } from 'moment';
-import { ImageType } from 'src/app/core/models/images/image-type.model';
 import { ImageService } from 'src/app/core/services/image.service';
-import { POST_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
 import { UtilsService } from 'src/app/core/services/utils.service';
-import { BlogDomains } from 'src/app/core/models/posts/blog-domains.model';
+import { AdminUser } from 'shared-models/user/admin-user.model';
+import { Post } from 'shared-models/posts/post.model';
+import { ImageProps } from 'shared-models/images/image-props.model';
+import { POST_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
+import { BlogDomains } from 'shared-models/posts/blog-domains.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
+import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
+import { ImageType } from 'shared-models/images/image-type.model';
 
 @Component({
   selector: 'app-post-form',
@@ -242,7 +242,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   private configureNewPost() {
     this.postForm = this.fb.group({
-      blogDomain: [BlogDomains.EXPLEARNING, Validators.required],
+      blogDomain: [BlogDomains.MARY_DAPHNE, Validators.required],
       title: ['', Validators.required],
       videoUrl: [''],
       description: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],

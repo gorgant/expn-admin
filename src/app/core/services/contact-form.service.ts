@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ContactForm } from '../models/user/contact-form.model';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, throwError, from, of } from 'rxjs';
 import { takeUntil, map, catchError } from 'rxjs/operators';
-import { AdminCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
-import { demoContactForms } from '../models/demo/demo-data.model';
+import { ContactForm } from 'shared-models/user/contact-form.model';
+import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'

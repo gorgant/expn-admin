@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AuthData } from '../models/auth/auth-data.model';
 import { UiService } from 'src/app/core/services/ui.service';
-import { AdminUser } from 'src/app/core/models/user/admin-user.model';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import { from, Observable, Subject, throwError } from 'rxjs';
-import { AdminAppRoutes } from '../models/routes-and-paths/app-routes.model';
 import { now } from 'moment';
+import { AuthData } from 'shared-models/auth/auth-data.model';
+import { AdminUser } from 'shared-models/user/admin-user.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 
 @Injectable({
   providedIn: 'root'

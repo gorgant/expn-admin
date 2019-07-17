@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Observable, throwError, from, Subject, of } from 'rxjs';
-import { Product } from '../models/products/product.model';
 import { AuthService } from './auth.service';
 import { takeUntil, map, catchError, switchMap, take } from 'rxjs/operators';
 import { UiService } from './ui.service';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { ImageService } from './image.service';
-import { ImageType } from '../models/images/image-type.model';
 import { PublicService } from './public.service';
-import { SharedCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { Product } from 'shared-models/products/product.model';
+import { ImageType } from 'shared-models/images/image-type.model';
+import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'

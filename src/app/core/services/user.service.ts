@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, from, throwError } from 'rxjs';
-import { AdminUser } from '../models/user/admin-user.model';
 import { map, takeUntil, catchError } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { AdminCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { AdminUser } from 'shared-models/user/admin-user.model';
+import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'

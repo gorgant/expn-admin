@@ -3,9 +3,9 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { RootStoreState, AuthStoreActions } from 'src/app/root-store';
-import { PASSWORD_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
-import { AdminUser } from 'src/app/core/models/user/admin-user.model';
 import { pwMustMatchValidator, pwMustNotMatchValidator } from 'src/app/core/validators/pw-match-validator.directive';
+import { PASSWORD_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
+import { AdminUser } from 'shared-models/user/admin-user.model';
 
 @Component({
   selector: 'app-edit-password-dialogue',

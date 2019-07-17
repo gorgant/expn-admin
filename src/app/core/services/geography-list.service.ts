@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Country } from '../models/forms-and-components/geography/country.model';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { map, tap } from 'rxjs/operators';
 import { Observable, zip } from 'rxjs';
-import { UsState } from '../models/forms-and-components/geography/us-state.model';
-import { GeographicData } from '../models/forms-and-components/geography/geographic-data.model';
-import { SharedCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { GeographicData } from 'shared-models/forms-and-components/geography/geographic-data.model';
+import { Country } from 'shared-models/forms-and-components/geography/country.model';
+import { UsState } from 'shared-models/forms-and-components/geography/us-state.model';
+import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'

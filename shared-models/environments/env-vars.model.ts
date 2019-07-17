@@ -4,13 +4,13 @@ export enum EnvironmentTypes {
 }
 
 export const PRODUCTION_APPS = {
-  publicApp: {
+  explearningPublicApp: {
     databaseURL: 'https://explearning-76d93.firebaseio.com',
     projectId: 'explearning-76d93',
     storageBucket: 'explearning-76d93.appspot.com',
     websiteDomain: 'myexplearning.com'
   },
-  adminApp: {
+  explearningAdminApp: {
     databaseURL: 'https://explearning-admin.firebaseio.com',
     projectId: 'explearning-admin',
     storageBucket: 'explearning-admin.appspot.com',
@@ -31,13 +31,13 @@ export const PRODUCTION_APPS = {
 };
 
 export const SANDBOX_APPS = {
-  publicApp: {
+  explearningPublicApp: {
     databaseURL: 'https://explearning-sandbox-public.firebaseio.com',
     projectId: 'explearning-sandbox-public',
     storageBucket: 'explearning-sandbox-public.appspot.com',
     websiteDomain: 'explearning-sandbox-public.firebaseapp.com'
   },
-  adminApp: {
+  explearningAdminApp: {
     databaseURL: 'https://explearning-sandbox-admin.firebaseio.com',
     projectId: 'explearning-sandbox-admin',
     storageBucket: 'explearning-sandbox-admin.appspot.com',
@@ -58,21 +58,21 @@ export const SANDBOX_APPS = {
 };
 
 export enum ProductionCloudStorage {
-  ADMIN_BLOG_STORAGE_AF_CF = 'explearning-admin-blog',
-  ADMIN_BLOG_STORAGE_FB = 'gs://explearning-admin-blog',
-  ADMIN_PRODUCTS_STORAGE_AF_CF = 'explearning-admin-products',
-  ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-admin-products',
-  ADMIN_BACKUP_STORAGE_AF_CF = 'explearning-admin-backup',
-  ADMIN_BACKUP_STORAGE_FB = 'gs://explearning-admin-backup',
+  EXPLEARNING_ADMIN_BLOG_STORAGE_AF_CF = 'explearning-admin-blog',
+  EXPLEARNING_ADMIN_BLOG_STORAGE_FB = 'gs://explearning-admin-blog',
+  EXPLEARNING_ADMIN_PRODUCTS_STORAGE_AF_CF = 'explearning-admin-products',
+  EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-admin-products',
+  EXPLEARNING_ADMIN_BACKUP_STORAGE_AF_CF = 'explearning-admin-backup',
+  EXPLEARNING_ADMIN_BACKUP_STORAGE_FB = 'gs://explearning-admin-backup',
 }
 
 export enum SandboxCloudStorage {
-  ADMIN_BLOG_STORAGE_AF_CF = 'explearning-sandbox-admin-blog',
-  ADMIN_BLOG_STORAGE_FB = 'gs://explearning-sandbox-admin-blog',
-  ADMIN_PRODUCTS_STORAGE_AF_CF = 'explearning-sandbox-admin-products',
-  ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-sandbox-admin-products',
-  ADMIN_BACKUP_STORAGE_AF_CF = 'explearning-sandbox-admin-backup',
-  ADMIN_BACKUP_STORAGE_FB = 'gs://explearning-sandbox-admin-backup',
+  EXPLEARNING_ADMIN_BLOG_STORAGE_AF_CF = 'explearning-sandbox-admin-blog',
+  EXPLEARNING_ADMIN_BLOG_STORAGE_FB = 'gs://explearning-sandbox-admin-blog',
+  EXPLEARNING_ADMIN_PRODUCTS_STORAGE_AF_CF = 'explearning-sandbox-admin-products',
+  EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB = 'gs://explearning-sandbox-admin-products',
+  EXPLEARNING_ADMIN_BACKUP_STORAGE_AF_CF = 'explearning-sandbox-admin-backup',
+  EXPLEARNING_ADMIN_BACKUP_STORAGE_FB = 'gs://explearning-sandbox-admin-backup',
 }
 
 export enum ProductionStripePublishableKeys {

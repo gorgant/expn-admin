@@ -1,6 +1,6 @@
 import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
-import { AdminUser } from 'src/app/core/models/user/admin-user.model';
+import { AdminUser } from 'shared-models/user/admin-user.model';
 
 export const getError = (state: State): any => state.error;
 export const getUserIsLoading = (state: State): boolean => state.isLoading;

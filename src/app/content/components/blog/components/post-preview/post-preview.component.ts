@@ -1,13 +1,12 @@
 import { Component, OnInit, SecurityContext, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Post } from 'src/app/core/models/posts/post.model';
-import { PostService } from 'src/app/core/services/post.service';
 import { Observable, Subscription } from 'rxjs';
 import { withLatestFrom, map } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { PageHeroData } from 'src/app/core/models/forms-and-components/page-hero-data.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreSelectors, PostStoreActions } from 'src/app/root-store';
+import { Post } from 'shared-models/posts/post.model';
+import { PageHeroData } from 'shared-models/forms-and-components/page-hero-data.model';
 
 @Component({
   selector: 'app-post-preview',

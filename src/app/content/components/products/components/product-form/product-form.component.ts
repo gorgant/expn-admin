@@ -2,23 +2,23 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'src/app/core/models/forms-and-components/admin-validation-messages.model';
 import { Subscription, Observable, of } from 'rxjs';
-import { Product } from 'src/app/core/models/products/product.model';
 import { take, withLatestFrom, map, takeWhile } from 'rxjs/operators';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
-import { DeleteConfData } from 'src/app/core/models/forms-and-components/delete-conf-data.model';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
-import { ImageType } from 'src/app/core/models/images/image-type.model';
-import { ImageProps } from 'src/app/core/models/images/image-props.model';
 import { ImageService } from 'src/app/core/services/image.service';
-import { ProductCardData } from 'src/app/core/models/products/product-card-data.model';
-import { PageHeroData } from 'src/app/core/models/forms-and-components/page-hero-data.model';
-import { BuyNowBoxData } from 'src/app/core/models/products/buy-now-box-data.model';
-import { CheckoutData } from 'src/app/core/models/products/checkout-data.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ProductStoreActions, ProductStoreSelectors } from 'src/app/root-store';
 import { UtilsService } from 'src/app/core/services/utils.service';
+import { Product } from 'shared-models/products/product.model';
+import { ImageProps } from 'shared-models/images/image-props.model';
+import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
+import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
+import { ImageType } from 'shared-models/images/image-type.model';
+import { ProductCardData } from 'shared-models/products/product-card-data.model';
+import { PageHeroData } from 'shared-models/forms-and-components/page-hero-data.model';
+import { BuyNowBoxData } from 'shared-models/products/buy-now-box-data.model';
+import { CheckoutData } from 'shared-models/products/checkout-data.model';
 
 @Component({
   selector: 'app-product-form',

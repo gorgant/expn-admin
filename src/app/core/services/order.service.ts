@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 import { Observable, throwError } from 'rxjs';
-import { Order } from '../models/orders/order.model';
 import { takeUntil, map, catchError } from 'rxjs/operators';
 import { AngularFirestoreCollection, AngularFirestoreDocument, AngularFirestore } from '@angular/fire/firestore';
-import { AdminCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { Order } from 'shared-models/orders/order.model';
+import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'

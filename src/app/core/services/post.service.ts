@@ -3,14 +3,14 @@ import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument 
 import { map, takeUntil, catchError, switchMap, take } from 'rxjs/operators';
 import { Observable, throwError, from, of } from 'rxjs';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
-import { Post } from '../models/posts/post.model';
-import { ImageType } from '../models/images/image-type.model';
 import { now } from 'moment';
 import { PublicService } from './public.service';
 import { ImageService } from './image.service';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
-import { SharedCollectionPaths } from '../models/routes-and-paths/fb-collection-paths';
+import { Post } from 'shared-models/posts/post.model';
+import { ImageType } from 'shared-models/images/image-type.model';
+import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 
 @Injectable({
   providedIn: 'root'

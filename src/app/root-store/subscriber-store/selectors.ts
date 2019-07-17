@@ -1,7 +1,7 @@
 import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromSubscribers from './reducer';
-import { EmailSubscriber } from 'src/app/core/models/subscribers/email-subscriber.model';
+import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
 
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getSubscribersLoaded = (state: State): boolean => state.subscribersLoaded;

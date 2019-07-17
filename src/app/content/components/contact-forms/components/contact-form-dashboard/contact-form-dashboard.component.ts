@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { ContactForm } from 'src/app/core/models/user/contact-form.model';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ContactFormStoreSelectors, ContactFormStoreActions } from 'src/app/root-store';
 import { Router } from '@angular/router';
-import { AdminAppRoutes } from 'src/app/core/models/routes-and-paths/app-routes.model';
 import { withLatestFrom, map } from 'rxjs/operators';
+import { ContactForm } from 'shared-models/user/contact-form.model';
+import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 
 @Component({
   selector: 'app-contact-form-dashboard',

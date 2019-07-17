@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { PageHeroData } from 'src/app/core/models/forms-and-components/page-hero-data.model';
-import { PublicImagePaths } from 'src/app/core/models/routes-and-paths/image-paths.model';
 import { Subscription } from 'rxjs';
 import { UiService } from 'src/app/core/services/ui.service';
+import { PageHeroData } from 'shared-models/forms-and-components/page-hero-data.model';
+import { PublicImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
 
 @Component({
   selector: 'app-page-hero',

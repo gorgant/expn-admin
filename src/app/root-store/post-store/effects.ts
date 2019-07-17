@@ -5,9 +5,9 @@ import { Action, Store } from '@ngrx/store';
 import * as postFeatureActions from './actions';
 import { switchMap, map, catchError, mergeMap, tap } from 'rxjs/operators';
 import { PostService } from 'src/app/core/services/post.service';
-import { Post } from 'src/app/core/models/posts/post.model';
 import { Update } from '@ngrx/entity';
 import { RootStoreState } from '..';
+import { Post } from 'shared-models/posts/post.model';
 
 @Injectable()
 export class PostStoreEffects {
