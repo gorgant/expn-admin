@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import { adminFirestore } from '../db';
 import * as sendGridMail from '@sendgrid/mail';
-import { publicAppUrl, remoteCoachProductId } from '../environments/config';
+import { remoteCoachProductId, explearningPublicAppUrl } from '../environments/config';
 import { PublicAppRoutes } from '../../../shared-models/routes-and-paths/app-routes.model';
 import { ProductUrlSlugList, ProductReferenceList } from '../../../shared-models/products/product-id-list.model';
 
@@ -22,7 +22,7 @@ export const getSgMail = () => {
 
 
 // Useful links for emails
-const appUrl = publicAppUrl;
+const appUrl = explearningPublicAppUrl;
 const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;
 const blogUrl = `https://${appUrl}${blogSlugWithSlashPrefix}`;
 const productListSlugWithSlashPrefix = PublicAppRoutes.PRODUCTS;

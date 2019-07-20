@@ -30,7 +30,7 @@ interface ResizeImageDataObject {
 }
 
 const blogHeroSizes = [ 300, 1500 ] // Actually just a thumbnail
-const blogInlineImages = [ 150 ]
+const blogInlineImages = [ 300, 700 ]
 const productCardSizes = [ 300 ]
 const productHeroSizes = [ 500, 1500 ]
 
@@ -41,16 +41,16 @@ const setBucketsBasedOnEnvironment = (): void => {
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      blogBucket = adminStorage.bucket(ProductionCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = adminStorage.bucket(ProductionCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      blogBucket = adminStorage.bucket(ProductionCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = adminStorage.bucket(ProductionCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_AF_CF);
       break;
     case EnvironmentTypes.SANDBOX:
-      blogBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      blogBucket = adminStorage.bucket(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = adminStorage.bucket(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_AF_CF);
       break;
     default:
-      blogBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_PRODUCTS_STORAGE_AF_CF);
+      blogBucket = adminStorage.bucket(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_AF_CF);
+      productsBucket = adminStorage.bucket(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_AF_CF);
       break;
   }
 }

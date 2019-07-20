@@ -9,13 +9,13 @@ const getAdminProjectId = (): string => {
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      projectId = PRODUCTION_APPS.adminApp.projectId
+      projectId = PRODUCTION_APPS.explearningAdminApp.projectId
       break;
     case EnvironmentTypes.SANDBOX:
-      projectId = SANDBOX_APPS.adminApp.projectId
+      projectId = SANDBOX_APPS.explearningAdminApp.projectId
       break;
     default:
-      projectId = SANDBOX_APPS.adminApp.projectId
+      projectId = SANDBOX_APPS.explearningAdminApp.projectId
       break;
   }
   return projectId;
@@ -27,31 +27,31 @@ const getPublicAppUrl = (): string => {
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      appUrl = PRODUCTION_APPS.publicApp.websiteDomain;
+      appUrl = PRODUCTION_APPS.explearningPublicApp.websiteDomain;
       break;
     case EnvironmentTypes.SANDBOX:
-      appUrl = SANDBOX_APPS.publicApp.websiteDomain;
+      appUrl = SANDBOX_APPS.explearningPublicApp.websiteDomain;
       break;
     default:
-      appUrl = SANDBOX_APPS.publicApp.websiteDomain;
+      appUrl = SANDBOX_APPS.explearningPublicApp.websiteDomain;
       break;
   }
   return appUrl
 }
-export const publicAppUrl = getPublicAppUrl();
+export const explearningPublicAppUrl = getPublicAppUrl();
 
 const getRemoteCoachId = (): string => {
   let remoteCoachId: string;
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      remoteCoachId = ProductIdList.REMOTE_COACH
+      remoteCoachId = ProductIdList.EXPLEARNING_REMOTE_COACH
       break;
     case EnvironmentTypes.SANDBOX:
-      remoteCoachId = ProductIdList.SANDBOX_REMOTE_COACH;
+      remoteCoachId = ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH;
       break;
     default:
-      remoteCoachId = ProductIdList.SANDBOX_REMOTE_COACH;
+      remoteCoachId = ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH;
       break;
   }
   return remoteCoachId

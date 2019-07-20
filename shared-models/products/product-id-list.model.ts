@@ -9,14 +9,15 @@ export enum ProductIdList {
 
 export enum ProductUrlSlugList {
   REMOTE_COACH = 'remote-coach',
-  SANDBOX_REMOTE_COACH = 'remote-coach',
-  SANDBOX_ANOTHER_COOL_PRODUCT = 'another-cool-product'
+  SANDBOX_REMOTE_COACH = 'sandbox-remote-coach',
+  SANDBOX_ANOTHER_COOL_PRODUCT = 'sandbox-another-cool-product'
 }
 
 // The Product/Template pair
 export interface ProductReference {
   productId: string;
   productUrlSlug: string;
+  mdOrExpSisterProduct: string;
 }
 
 // The object containing any number of Product/Template pairs
@@ -28,26 +29,32 @@ export interface ProductReferenceList {
 export const ProductReferenceList: ProductReferenceList = {
   [ProductIdList.EXPLEARNING_REMOTE_COACH]: {
     productId: ProductIdList.EXPLEARNING_REMOTE_COACH,
-    productUrlSlug: ProductUrlSlugList.REMOTE_COACH
+    productUrlSlug: ProductUrlSlugList.REMOTE_COACH,
+    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_REMOTE_COACH
   },
   [ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH]: {
     productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_REMOTE_COACH
+    productUrlSlug: ProductUrlSlugList.SANDBOX_REMOTE_COACH,
+    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH
   },
   [ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT]: {
     productId: ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_ANOTHER_COOL_PRODUCT
+    productUrlSlug: ProductUrlSlugList.SANDBOX_ANOTHER_COOL_PRODUCT,
+    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT
   },
   [ProductIdList.MARY_DAPHNE_REMOTE_COACH]: {
     productId: ProductIdList.MARY_DAPHNE_REMOTE_COACH,
-    productUrlSlug: ProductUrlSlugList.REMOTE_COACH
+    productUrlSlug: ProductUrlSlugList.REMOTE_COACH,
+    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_REMOTE_COACH
   },
   [ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH]: {
     productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_REMOTE_COACH
+    productUrlSlug: ProductUrlSlugList.SANDBOX_REMOTE_COACH,
+    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH,
   },
   [ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT]: {
     productId: ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_ANOTHER_COOL_PRODUCT
+    productUrlSlug: ProductUrlSlugList.SANDBOX_ANOTHER_COOL_PRODUCT,
+    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT
   }
 };

@@ -19,8 +19,8 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
   const toFirstName: string = (subscriber.publicUserData.billingDetails as BillingDetails).firstName;
   let toEmail: string;
   let bccEmail: string;
-  const templateId: string = EmailTemplateIds.SUBSCRIPTION_CONFIRMATION;
-  const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.COMMUNICATIONS_STRATEGIES;
+  const templateId: string = EmailTemplateIds.EXPLEARNING_SUBSCRIPTION_CONFIRMATION;
+  const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.EXPLEARNING_COMMUNICATIONS_STRATEGIES;
   let categories: string[];
   
   switch (currentEnvironmentType) {

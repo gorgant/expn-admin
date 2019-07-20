@@ -13,13 +13,13 @@ const setBucketsBasedOnEnvironment = (): Bucket => {
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      backupBucket = adminStorage.bucket(ProductionCloudStorage.ADMIN_BACKUP_STORAGE_AF_CF);
+      backupBucket = adminStorage.bucket(ProductionCloudStorage.EXPLEARNING_ADMIN_BACKUP_STORAGE_AF_CF);
       break;
     case EnvironmentTypes.SANDBOX:
-      backupBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_BACKUP_STORAGE_AF_CF);
+      backupBucket = adminStorage.bucket(SandboxCloudStorage.EXPLEARNING_ADMIN_BACKUP_STORAGE_AF_CF);
       break;
     default:
-      backupBucket = adminStorage.bucket(SandboxCloudStorage.ADMIN_BACKUP_STORAGE_AF_CF);
+      backupBucket = adminStorage.bucket(SandboxCloudStorage.EXPLEARNING_ADMIN_BACKUP_STORAGE_AF_CF);
       break;
   }
 

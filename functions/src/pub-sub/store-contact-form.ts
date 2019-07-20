@@ -16,7 +16,7 @@ const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
   const toFirstName = (contactForm.firstName);
   let toEmail: string;
   let bccEmail: string;
-  const templateId = EmailTemplateIds.CONTACT_FORM_CONFIRMATION;
+  const templateId = EmailTemplateIds.EXPLEARNING_CONTACT_FORM_CONFIRMATION;
   let categories: string[];
 
   // Prevents test emails from going to the actual address used
