@@ -34,8 +34,9 @@ $form-border-color: #EEEEEE;
 
 $text-block-font-weight: $font-weight-regular;
 $text-block-font-size: 22px;
-$text-block-mobile-font-size: 16px;
+$text-block-mobile-font-size: 20px;
 $text-block-max-width: 670px;
+$text-block-padding: 16px 24px 16px 24px;
 
 
 $inactive-item-opacity: 0.8;
@@ -65,7 +66,7 @@ $opacity-minimal: 0.1;
     width: 100%;
     max-width: 1200px;
     margin-top: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 32px;
 }
 
 // Courtesty of https://stackoverflow.com/a/26634773/6572208
@@ -114,6 +115,7 @@ $opacity-minimal: 0.1;
         list-style: none;
         padding: 0px;
         margin: 1em 0;
+        font-size: 1em;
     }
       
     ul li {
@@ -129,7 +131,7 @@ $opacity-minimal: 0.1;
     @media screen and (max-width: $mobile-cutoff-width) {
         ul li {
             background-size: 12px;
-            background-position: 0px 6px;
+            background-position: 0px 5px;
             padding-left: 30px;
         }
     }
