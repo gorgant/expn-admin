@@ -242,7 +242,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   private configureNewPost() {
     this.postForm = this.fb.group({
-      blogDomain: [BlogDomains.MARY_DAPHNE, Validators.required],
+      blogDomain: [BlogDomains.EXPLEARNING, Validators.required],
       title: ['', Validators.required],
       videoUrl: [''],
       description: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],

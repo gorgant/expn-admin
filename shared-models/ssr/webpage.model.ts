@@ -1,6 +1,6 @@
 export interface Webpage {
   expires: number;
-  headers: string;
+  userAgent: string;
   payload: string;
   saved: number;
   url: string;
