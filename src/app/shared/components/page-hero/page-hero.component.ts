@@ -69,7 +69,8 @@ export class PageHeroComponent implements OnInit, OnDestroy {
     this.heroContentContainerMobileFlexValue = '70';
     this.heroActionContainerMobileFlexValue = '30';
 
-    this.imageUrl = PublicImagePaths.POST_HERO; // Fixed post image
+    const imageSrcSet = this.heroData.imageProps.srcset.split(' ');
+    this.imageUrl = imageSrcSet[imageSrcSet.length - 2] ? imageSrcSet[imageSrcSet.length - 2] : PublicImagePaths.POST_HERO;
   }
 
   private initalizeNonPostConfig() {

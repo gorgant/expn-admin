@@ -1,3 +1,5 @@
+import { PublicImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
+
 export const metaTagDefaults = {
   maryDaphnePublic: {
     metaTagDefaultTitle: 'Mary Daphne - Equip Yourself For Opportunity',
@@ -8,18 +10,20 @@ export const metaTagDefaults = {
     metaTagSiteName: 'Mary Daphne',
     metaTagFbAppId: '2361383644073374',
     metaTagTwitterHandle: '@MaryDaphne',
-    metaTagTwitterCardType: 'summary_large_image'
+    metaTagTwitterCardType: 'summary_large_image',
+    metaTagDefaultImage: PublicImagePaths.LINK_SHARE_IMAGE
   },
   explearningPublic: {
-    metaTagDefaultTitle: 'Explearning - Communicate With Clarity',
+    metaTagDefaultTitle: 'Explearning - A Richer Life Begins with Better Communication',
     // tslint:disable-next-line:max-line-length
-    metaTagDefaultDescription: 'Improve your speaking skills and communication skills with research-backed techniques to ensure effective communication. We teach you public speaking techniques, interview strategies, negotiation tactics, and much more. Our goal is to make you the best communicator you can be.',
+    metaTagDefaultDescription: 'A richer life begins with better communication. Equip yourself for personal and professional success by improving your speaking skills and communication skills using our research-backed techniques. We teach you public speaking techniques, interview strategies, negotiation tactics, and much more.',
     metaTagAuthor: 'Explearning, LLC',
     // tslint:disable-next-line:max-line-length
     metaTagDefaultKeywords: 'speaking skills, importance of speaking skills, effective communication, what is effective communication, what is communication skills, effective communication techniques, public speaking techniques, interview strategies, mary daphne root',
     metaTagSiteName: 'Explearning',
     metaTagFbAppId: '2401296806861214',
     metaTagTwitterHandle: '@ExplearningCo',
-    metaTagTwitterCardType: 'summary_large_image'
+    metaTagTwitterCardType: 'summary_large_image',
+    metaTagDefaultImage: PublicImagePaths.LINK_SHARE_IMAGE
   }
 };

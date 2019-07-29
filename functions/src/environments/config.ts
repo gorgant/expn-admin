@@ -23,6 +23,25 @@ const getAdminProjectId = (): string => {
 }
 export const adminProjectId = getAdminProjectId();
 
+const getPublicProjectId = (): string => {
+  let projectId: string;
+
+  switch (currentEnvironmentType) {
+    case EnvironmentTypes.PRODUCTION:
+      projectId = PRODUCTION_APPS.explearningPublicApp.projectId;
+      break;
+    case EnvironmentTypes.SANDBOX:
+      projectId = SANDBOX_APPS.explearningPublicApp.projectId;
+      break;
+    default:
+      projectId = SANDBOX_APPS.explearningPublicApp.projectId;
+      break;
+  }
+  return projectId;
+}
+
+export const publicProjectId = getPublicProjectId();
+
 const getPublicAppUrl = (): string => {
   let appUrl: string;
 
@@ -39,7 +58,7 @@ const getPublicAppUrl = (): string => {
   }
   return appUrl
 }
-export const explearningPublicAppUrl = getPublicAppUrl();
+export const publicAppUrl = getPublicAppUrl();
 
 const getRemoteCoachId = (): string => {
   let remoteCoachId: string;
@@ -78,6 +97,6 @@ export const remoteCoachProductSlug = getRemoteCoachSlug();
 
 export const getProductUrlById = (productId: string): string => {
   const productSlug = ProductReferenceList[productId].productUrlSlug;
-  const url = `https://${explearningPublicAppUrl}${PublicAppRoutes.PRODUCTS}/${productId}/${productSlug}`;
+  const url = `https://${publicAppUrl}${PublicAppRoutes.PRODUCTS}/${productId}/${productSlug}`;
   return url;
 };
