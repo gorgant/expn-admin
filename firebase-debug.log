@@ -1,0 +1,22 @@
+[debug] [2019-07-30T05:42:06.975Z] ----------------------------------------------------------------------
+[debug] [2019-07-30T05:42:06.977Z] Command:       /home/gorgantx1/.nvm/versions/node/v10.14.2/bin/node /home/gorgantx1/.nvm/versions/node/v10.14.2/bin/firebase deploy
+[debug] [2019-07-30T05:42:06.977Z] CLI Version:   7.2.1
+[debug] [2019-07-30T05:42:06.977Z] Platform:      linux
+[debug] [2019-07-30T05:42:06.977Z] Node Version:  v10.14.2
+[debug] [2019-07-30T05:42:06.978Z] Time:          Tue Jul 30 2019 08:42:06 GMT+0300 (GMT+03:00)
+[debug] [2019-07-30T05:42:06.978Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-07-30T05:42:06.981Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-07-30T05:42:06.981Z] > authorizing via signed-in user
+[debug] [2019-07-30T05:42:06.982Z] [iam] checking project explearning-sandbox-admin for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2019-07-30T05:42:06.983Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/explearning-sandbox-admin:testIamPermissions  
+
+[debug] [2019-07-30T05:42:08.184Z] <<< HTTP RESPONSE 200
+[debug] [2019-07-30T05:42:08.191Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/explearning-sandbox-admin  
+ 
+[debug] [2019-07-30T05:42:08.584Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'explearning-sandbox-admin'...
+[info] 
+[info] i  deploying storage, firestore, functions, hosting
+[info] Running command: npm --prefix "$RESOURCE_DIR" run lint

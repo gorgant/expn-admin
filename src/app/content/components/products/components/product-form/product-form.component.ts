@@ -288,26 +288,27 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private initializeProduct(): void {
 
+    const productName = (this.name.value as string).trim();
 
     const productCardData: ProductCardData = {
-      name: this.name.value,
+      name: productName,
       tagline: this.tagline.value,
       highlights: this.highlights.value,
     };
 
     const heroData: PageHeroData = {
-      pageTitle: this.name.value,
+      pageTitle: productName,
       pageSubtitle: this.heroSubtitle.value,
     };
 
     const buyNowData: BuyNowBoxData = {
-      title: this.name.value,
+      title: productName,
       subtitle: this.buyNowBoxSubtitle.value,
     };
 
     const checkoutData: CheckoutData = {
       header: this.checkoutHeader.value,
-      productName: this.name.value,
+      productName,
       price: this.price.value,
       description: this.checkoutDescription.value,
       tagline: this.tagline.value
@@ -315,7 +316,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
     const product: Product = {
       id: this.productId,
-      name: this.name.value ? this.name.value : this.tempProductTitle,
+      name: this.name.value ? productName : this.tempProductTitle,
       price: this.price.value,
       listOrder: this.listOrder.value,
       tagline: this.tagline.value,
@@ -363,7 +364,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private changesDetected(product: Product): boolean {
     if (
-      (product.name === this.name.value || product.name === this.tempProductTitle) &&
+      (product.name === (this.name.value as string).trim() || product.name === this.tempProductTitle) &&
       product.price === this.price.value &&
       product.listOrder === this.listOrder.value &&
       product.tagline === this.tagline.value &&
@@ -412,25 +413,28 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   private saveProduct() {
+
+    const productName = (this.name.value as string).trim();
+
     const productCardData: ProductCardData = {
-      name: this.name.value,
+      name: productName,
       tagline: this.tagline.value,
       highlights: this.highlights.value,
     };
 
     const heroData: PageHeroData = {
-      pageTitle: this.name.value,
+      pageTitle: productName,
       pageSubtitle: this.heroSubtitle.value,
     };
 
     const buyNowData: BuyNowBoxData = {
-      title: this.name.value,
+      title: productName,
       subtitle: this.buyNowBoxSubtitle.value,
     };
 
     const checkoutData: CheckoutData = {
       header: this.checkoutHeader.value,
-      productName: this.name.value,
+      productName,
       price: this.price.value,
       description: this.checkoutDescription.value,
       tagline: this.tagline.value
@@ -438,7 +442,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
     const product: Product = {
       id: this.productId,
-      name: this.name.value ? this.name.value : this.tempProductTitle,
+      name: this.name.value ? productName : this.tempProductTitle,
       price: this.price.value,
       listOrder: this.listOrder.value,
       tagline: this.tagline.value,

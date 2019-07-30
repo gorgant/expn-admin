@@ -29,7 +29,7 @@ import { ImageType } from 'shared-models/images/image-type.model';
 })
 export class PostFormComponent implements OnInit, OnDestroy {
 
-  publicUser$: Observable<AdminUser>;
+  adminUser$: Observable<AdminUser>;
   private post$: Observable<Post>;
   postLoaded: boolean;
   heroImageProps$: Observable<ImageProps>;
@@ -77,7 +77,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
     this.loadExistingPostData(); // Only loads if exists
 
-    this.publicUser$ = this.store$.select(UserStoreSelectors.selectUser);
+    this.adminUser$ = this.store$.select(UserStoreSelectors.selectUser);
 
     console.log('Blog domains', this.blogDomains);
 
@@ -282,20 +282,20 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private initializePost(): void {
-    this.publicUser$
+    this.adminUser$
       .pipe(take(1))
-      .subscribe(publicUser => {
+      .subscribe(adminUser => {
         console.log('Post initialized');
         const data: Post = {
           blogDomain: this.blogDomain.value,
-          author: publicUser.displayName || publicUser.email,
-          authorId: publicUser.id,
+          author: adminUser.email,
+          authorId: adminUser.id,
           videoUrl: this.videoUrl.value,
           description: this.description.value,
           keywords: this.keywords.value,
           content: this.content.value,
           modifiedDate: now(),
-          title: this.title.value ? this.title.value : this.tempPostTitle,
+          title: this.title.value ? (this.title.value as string).trim() : this.tempPostTitle,
           id: this.postId
         };
         this.store$.dispatch(new PostStoreActions.AddPostRequested({post: data}));
@@ -338,7 +338,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   private changesDetected(post: Post): boolean {
     if (
       post.blogDomain === this.blogDomain.value &&
-      (post.title === this.title.value || post.title === this.tempPostTitle) &&
+      (post.title === (this.title.value as string).trim() || post.title === this.tempPostTitle) &&
       post.videoUrl === this.videoUrl.value &&
       post.description === this.description.value &&
       post.keywords === this.keywords.value &&
@@ -379,7 +379,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private savePost(): void {
-    this.publicUser$
+    this.adminUser$
       .pipe(take(1))
       .subscribe(publicUser => {
         const post: Post = {
@@ -391,7 +391,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           keywords: this.keywords.value,
           content: this.content.value,
           modifiedDate: now(),
-          title: this.title.value ? this.title.value : this.tempPostTitle,
+          title: this.title.value ? (this.title.value as string).trim() : this.tempPostTitle,
           id: this.postId,
           readyToPublish: this.readyToPublish()
         };
