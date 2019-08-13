@@ -9,7 +9,9 @@ export enum AdminCollectionPaths {
 export enum PublicCollectionPaths {
   PUBLIC_USERS = 'publicUsers',
   NAVIGATION_STAMPS = 'navigationStamps',
-  PUBLIC_SITE_CACHE = 'publicSiteCache'
+  PUBLIC_SITE_CACHE = 'publicSiteCache',
+  PODCAST_FEED_CACHE = 'podcastFeedCache',
+  PODCAST_FEED_EPISODES = 'podcastFeedEpisodes'
 }
 
 export enum SharedCollectionPaths {

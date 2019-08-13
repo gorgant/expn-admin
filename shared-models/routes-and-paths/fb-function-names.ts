@@ -23,5 +23,8 @@ export enum PublicFunctionNames {
   TRANSMIT_EMAIL_SUB_TO_ADMIN = 'transmitEmailSubToAdmin',
   TRANSMIT_CONTACT_FORM_TO_ADMIN = 'transmitContactFormToAdmin',
   TRANSMIT_WEBPAGE_URL_TO_PUPPETEER = 'transmitWebpageUrlToPuppeteer',
-  SAVE_WEBPAGE_TO_CACHE_TOPIC = 'saveWebpageToCache'
+  SAVE_WEBPAGE_TO_CACHE_TOPIC = 'saveWebpageToCache',
+  UPDATE_WEBPAGE_CACHE = 'updateWebpageCache',
+  PURGE_INACTIVE_USERS = 'purgeInactiveUsers',
+  UPDATE_PODCAST_FEED_CACHE = 'updatePodcastFeedCache'
 }

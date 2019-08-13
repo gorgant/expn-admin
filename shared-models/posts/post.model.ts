@@ -20,5 +20,6 @@ export interface Post {
   videoUrl?: string;
   featured?: boolean;
   readyToPublish?: boolean;
+  podcastEpisodeUrl?: string;
 }
 

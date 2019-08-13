@@ -24,6 +24,7 @@ export enum PublicAppRoutes {
   CHECKOUT = '/products/checkout',
   PURCHASE_CONFIRMATION = '/products/purchase-confirmation',
   BLOG = '/blog',
+  PODCAST = '/podcast',
   CONTACT = '/contact',
   PRIVACY_POLICY = '/legal/privacy-policy',
   TERMS_AND_CONDITIONS = '/legal/terms-and-conditions',

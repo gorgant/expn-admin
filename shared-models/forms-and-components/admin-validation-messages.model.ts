@@ -31,6 +31,11 @@ export const POST_FORM_VALIDATION_MESSAGES = {
   ],
   videoUrl: [
     { type: 'required', message: 'Video URL is required.'},
+    { type: 'pattern', message: 'Invalid url.' }
+  ],
+  podcastEpisodeUrl: [
+    { type: 'required', message: 'Podcast episode URL is required.'},
+    { type: 'pattern', message: 'Invalid url.' }
   ],
   description: [
     { type: 'required', message: 'Description is required'},

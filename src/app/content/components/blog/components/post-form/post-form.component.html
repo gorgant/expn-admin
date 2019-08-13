@@ -43,6 +43,13 @@
         </mat-error>
       </mat-form-field>
 
+      <mat-form-field class="podcast-episode-url">
+        <input matInput formControlName="podcastEpisodeUrl" type="text" placeholder="Podcast Episode Url">
+        <mat-error *ngFor="let validation of postValidationMessages.podcastEpisodeUrl">
+          <mat-error *ngIf="podcastEpisodeUrl.hasError(validation.type) && podcastEpisodeUrl.invalid && (podcastEpisodeUrl.dirty || podcastEpisodeUrl.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+
       <mat-form-field class="description">
         <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="description" type="text" placeholder="Post Description"></textarea>
         <mat-hint>Max {{ descriptionMaxLength }} characters <span style="float: right;">{{ description.value.length }} / {{ descriptionMaxLength }}</span></mat-hint>

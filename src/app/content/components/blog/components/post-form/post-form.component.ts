@@ -203,6 +203,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
               blogDomain: post.blogDomain,
               title: post.title,
               videoUrl: post.videoUrl,
+              podcastEpisodeUrl: post.podcastEpisodeUrl,
               description: post.description,
               keywords: post.keywords,
               content: post.content,
@@ -244,7 +245,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
     this.postForm = this.fb.group({
       blogDomain: [BlogDomains.EXPLEARNING, Validators.required],
       title: ['', Validators.required],
-      videoUrl: [''],
+      videoUrl: ['', [Validators.pattern(/^\S*(?:https\:\/\/youtu\.be)\S*$/)]],
+      podcastEpisodeUrl: ['', [Validators.pattern(/^\S*(?:https\:\/\/soundcloud\.com)\S*$/)]],
       description: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],
       keywords: ['', [Validators.required, Validators.maxLength(this.keywordsMaxLength)]],
       content: [{value: '', disabled: false }, Validators.required],
@@ -340,6 +342,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       post.blogDomain === this.blogDomain.value &&
       (post.title === (this.title.value as string).trim() || post.title === this.tempPostTitle) &&
       post.videoUrl === this.videoUrl.value &&
+      post.podcastEpisodeUrl === this.podcastEpisodeUrl.value &&
       post.description === this.description.value &&
       post.keywords === this.keywords.value &&
       post.content === this.content.value &&
@@ -355,6 +358,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       this.heroImageAdded ||
       this.title.value ||
       this.videoUrl.value ||
+      this.podcastEpisodeUrl.value ||
       this.description.value ||
       this.keywords.value ||
       this.content.value ||
@@ -387,6 +391,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           author: publicUser.displayName || publicUser.email,
           authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
+          podcastEpisodeUrl: this.podcastEpisodeUrl.value,
           description: this.description.value,
           keywords: this.keywords.value,
           content: this.content.value,
@@ -413,6 +418,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   get blogDomain() { return this.postForm.get('blogDomain'); }
   get title() { return this.postForm.get('title'); }
   get videoUrl() { return this.postForm.get('videoUrl'); }
+  get podcastEpisodeUrl() { return this.postForm.get('podcastEpisodeUrl'); }
   get description() { return this.postForm.get('description'); }
   get keywords() { return this.postForm.get('keywords'); }
   get content() { return this.postForm.get('content'); }
