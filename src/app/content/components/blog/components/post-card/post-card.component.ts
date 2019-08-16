@@ -9,6 +9,7 @@ import { Post } from 'shared-models/posts/post.model';
 import { AdminImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
+import { SchedulePostDialogueComponent } from '../schedule-post-dialogue/schedule-post-dialogue.component';
 
 @Component({
   selector: 'app-post-card',
@@ -40,6 +41,18 @@ export class PostCardComponent implements OnInit {
   onTogglePublishPost() {
     console.log('Publish post toggled');
     this.store$.dispatch(new PostStoreActions.TogglePublishedRequested({post: this.post}));
+  }
+
+  onSchedulePost() {
+    console.log('Post schedule selected');
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.data = this.post;
+    dialogConfig.autoFocus = false;
+    dialogConfig.minWidth = 300;
+
+    const dialogRef = this.dialog.open(SchedulePostDialogueComponent, dialogConfig);
+
   }
 
   onTogglePostFeatured() {

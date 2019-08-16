@@ -11,24 +11,34 @@
       <p><small>Modified by {{ post.author }} &bull; {{ post.modifiedDate | date }}</small></p>
     </div>
   </mat-card-content>
-  <mat-card-actions fxLayout="row">
-    <button *ngIf="!post.published" [disabled]="!post.readyToPublish" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Publish</button>
-    <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Un-Publish</button>
-    <div *ngIf="post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
-      <button *ngIf="post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
-        <mat-icon>star</mat-icon>
-      </button>
-      <button *ngIf="!post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
-        <mat-icon>star_border</mat-icon>
-      </button>
+  <mat-card-actions fxLayout="column" fxLayoutGap="8px">
+    <div class="card-actions" fxLayout="row">
+      <div class="primary-actions" fxLayout="row" fxLayoutGap="16px">
+        <button *ngIf="!post.published" [disabled]="!post.readyToPublish" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Publish</button>
+        <button *ngIf="!post.published" [disabled]="!post.readyToPublish" mat-icon-button class="schedule-button" color="accent" (click)="onSchedulePost()">
+          <mat-icon>access_time</mat-icon>
+        </button>
+        <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Un-Publish</button>
+      </div>
+      <div *ngIf="post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
+        <button *ngIf="post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
+          <mat-icon>star</mat-icon>
+        </button>
+        <button *ngIf="!post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
+          <mat-icon>star_border</mat-icon>
+        </button>
+      </div>
+      <div *ngIf="!post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
+        <button mat-icon-button class="edit-button" (click)="onSelectBlogItem()">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button class="delete-button" (click)="onDelete()">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </div>
-    <div *ngIf="!post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
-      <button mat-icon-button class="edit-button" (click)="onSelectBlogItem()">
-        <mat-icon>edit</mat-icon>
-      </button>
-      <button mat-icon-button class="delete-button" (click)="onDelete()">
-        <mat-icon>delete</mat-icon>
-      </button>
+    <div *ngIf="post.scheduledPublishTime" class="scheduled-post-message">
+      *Auto-publish on {{ post.scheduledPublishTime | date: 'M/dd/yy' }} at ~{{ post.scheduledPublishTime | date: 'HH:mm' }}
     </div>
   </mat-card-actions>
 </mat-card>

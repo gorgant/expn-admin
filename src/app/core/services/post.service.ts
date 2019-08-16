@@ -123,7 +123,8 @@ export class PostService {
       updatedPost = {
         ...updatedPost,
         published: true,
-        publishedDate: post.publishedDate ? post.publishedDate : now() // Only add publish date if doesn't already exist
+        publishedDate: post.publishedDate ? post.publishedDate : now(), // Only add publish date if doesn't already exist
+        scheduledPublishTime: null // Clear the scheduled time when published so it doesn't trigger unwanted publish requests
       };
     } else {
       updatedPost = {

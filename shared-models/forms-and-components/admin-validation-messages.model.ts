@@ -111,3 +111,19 @@ export const PASSWORD_FORM_VALIDATION_MESSAGES = {
     { type: 'match', message: 'Your new password cannot match your old password.'}
   ]
 };
+
+export const SCHEDULE_POST_FORM_VALIDATION_MESSAGES = {
+  publishDate: [
+    { type: 'required', message: 'You must provide a scheduled date.'},
+  ],
+  publishHour: [
+    { type: 'required', message: 'Provide an hour between 0 and 23'},
+    { type: 'min', message: 'Value must be between 0 and 23.'},
+    { type: 'max', message: 'Value be between 0 and 23.'},
+  ],
+  publishMin: [
+    { type: 'required', message: 'Provide a minute between 0 and 60'},
+    { type: 'min', message: 'Value must be between 0 and 59.'},
+    { type: 'max', message: 'Value must be between 0 and 59.'},
+  ]
+};

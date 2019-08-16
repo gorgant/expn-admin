@@ -398,8 +398,14 @@ export class PostFormComponent implements OnInit, OnDestroy {
           modifiedDate: now(),
           title: this.title.value ? (this.title.value as string).trim() : this.tempPostTitle,
           id: this.postId,
-          readyToPublish: this.readyToPublish()
+          readyToPublish: this.readyToPublish(),
         };
+
+        // If post isn't ready to publish, remove scheduled publish time
+        if (!this.readyToPublish()) {
+          post.scheduledPublishTime = null;
+        }
+
         this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post}));
         console.log('Post saved', post);
         this.imagesModifiedSinceLastSave = false; // Reset image change detection

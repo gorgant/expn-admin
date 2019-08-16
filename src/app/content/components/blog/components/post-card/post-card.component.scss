@@ -18,3 +18,12 @@ mat-card-actions {
   padding: 0px;
   margin-bottom: 0px !important; // Clears a default bottom margin setting
 }
+
+.card-actions {
+  width: 100%;
+}
+
+.scheduled-post-message {
+  font-size: 12px;
+  color: $accent;
+}
