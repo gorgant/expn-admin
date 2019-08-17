@@ -15,7 +15,7 @@ const routes: Routes = [
     path: 'existing/:id', component: PostFormComponent
   },
   {
-    path: 'preview/:id', component: PostPreviewComponent
+    path: 'preview/:id/:postTitle', component: PostPreviewComponent
   },
   {
     path: '',

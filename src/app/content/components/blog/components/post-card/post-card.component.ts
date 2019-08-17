@@ -10,6 +10,7 @@ import { AdminImagePaths } from 'shared-models/routes-and-paths/image-paths.mode
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 import { SchedulePostDialogueComponent } from '../schedule-post-dialogue/schedule-post-dialogue.component';
+import { UiService } from 'src/app/core/services/ui.service';
 
 @Component({
   selector: 'app-post-card',
@@ -19,19 +20,27 @@ import { SchedulePostDialogueComponent } from '../schedule-post-dialogue/schedul
 export class PostCardComponent implements OnInit {
 
   @Input() post: Post;
+  postUrlSlug: string;
   heroPlaceholderPath = AdminImagePaths.HERO_PLACEHOLDER;
   thumbnailSrc: string;
 
   constructor(
     private router: Router,
     private dialog: MatDialog,
-    private store$: Store<RootStoreState.State>
+    private store$: Store<RootStoreState.State>,
+    private uiService: UiService
   ) { }
 
   ngOnInit() {
+    this.setUserFriendlyUrlString();
     if (this.post.imageProps) {
       this.thumbnailSrc = this.post.imageProps.srcset.split(' ')[0]; // Get smallest image in the src set
     }
+  }
+
+  private setUserFriendlyUrlString() {
+    this.postUrlSlug = this.uiService.convertToFriendlyUrlFormat(this.post.title);
+    console.log('will use this slug', this.postUrlSlug);
   }
 
   onSelectBlogItem() {
@@ -61,7 +70,7 @@ export class PostCardComponent implements OnInit {
   }
 
   onPreviewBlogItem() {
-    this.router.navigate([AdminAppRoutes.BLOG_PREVIEW_POST, this.post.id]);
+    this.router.navigate([AdminAppRoutes.BLOG_PREVIEW_POST, this.post.id, this.postUrlSlug]);
   }
 
   onDelete() {
