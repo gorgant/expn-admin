@@ -74,7 +74,8 @@ export class SchedulePostDialogueComponent implements OnInit, OnDestroy {
 
   onSave() {
 
-    const publishDateInMs: number = this.publishDate.value;
+    const dateNoTime = moment(this.publishDate.value).format('YYYY-MM-DD'); // Purge time from date value so that it adds properly
+    const publishDateInMs: number = moment(dateNoTime, 'YYYY-MM-DD').valueOf(); // Convert purged value back to ms
 
     let publishHourInMs = 0;
     if (this.publishHour.value) {

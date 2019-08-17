@@ -39,8 +39,10 @@ const publishExpiredPosts = async () => {
   const publishExpiredPostRequestArray = postCollectionSnapshot.docs.map( async doc => {
     const post: Post = doc.data() as Post;
 
+    const scheduledPublishTime = post.scheduledPublishTime || null;
+
     // Confirm that publish time is prior to current time
-    if (post.scheduledPublishTime && post.scheduledPublishTime < now()) {
+    if (scheduledPublishTime && scheduledPublishTime < now()) {
       console.log(`expired publish request detected`, post);
 
       // First update post on admin

@@ -298,7 +298,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
           content: this.content.value,
           modifiedDate: now(),
           title: this.title.value ? (this.title.value as string).trim() : this.tempPostTitle,
-          id: this.postId
+          id: this.postId,
+          published: false
         };
         this.store$.dispatch(new PostStoreActions.AddPostRequested({post: data}));
         this.postInitialized = true;
@@ -391,7 +392,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           author: publicUser.displayName || publicUser.email,
           authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
-          podcastEpisodeUrl: this.podcastEpisodeUrl.value,
+          podcastEpisodeUrl: this.podcastEpisodeUrl.value || null,
           description: this.description.value,
           keywords: this.keywords.value,
           content: this.content.value,
