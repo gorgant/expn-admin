@@ -21,6 +21,6 @@ export interface Post {
   featured?: boolean;
   readyToPublish?: boolean;
   podcastEpisodeUrl?: string;
-  scheduledPublishTime?: number;
+  scheduledPublishTime?: number | null;
 }
 

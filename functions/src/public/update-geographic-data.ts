@@ -1,13 +1,13 @@
 import * as functions from 'firebase-functions';
 import { GeographicData } from '../../../shared-models/forms-and-components/geography/geographic-data.model';
 import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
-import { explearningPublicFirestore } from '../db';
+import { publicFirestore } from '../db';
 
 
 
 const updateGeoLists = async (geographicData: GeographicData) => {
 
-  const db = explearningPublicFirestore;
+  const db = publicFirestore;
 
   console.log('About to set geographic data', geographicData);
   const fbRes = await db.collection(SharedCollectionPaths.PUBLIC_RESOURCES).doc('geographicData').set(geographicData)

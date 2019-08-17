@@ -2,8 +2,7 @@ import * as functions from 'firebase-functions';
 import { PubSub } from '@google-cloud/pubsub';
 import { Post } from '../../../shared-models/posts/post.model';
 import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
-import { explearningPublicFirestore, maryDaphnePublicFirestore } from '../db';
-import { BlogDomains } from '../../../shared-models/posts/blog-domains.model';
+import { publicFirestore } from '../db';
 import { PublicAppRoutes } from '../../../shared-models/routes-and-paths/app-routes.model';
 import { convertToFriendlyUrlFormat } from './helpers';
 import { WebpageUrl } from '../../../shared-models/ssr/webpage-url.model';
@@ -37,15 +36,9 @@ const updatePostCache = async (post: Post) => {
   return topicPublishRes;
 }
 
-const publishPost = async (post: Post) => {
+export const publishPostOnPublic = async (post: Post) => {
 
-  let db: FirebaseFirestore.Firestore = explearningPublicFirestore;
-
-  // Switch to Mary Daphne firestore if flagged
-  if (post.blogDomain === BlogDomains.MARY_DAPHNE) {
-    db = maryDaphnePublicFirestore;
-  }
-  console.log('Public firestore', db);
+  const db: FirebaseFirestore.Firestore = publicFirestore;
 
   // If post is published on admin, publish updates on public and update cache
   if (post.published) {
@@ -74,6 +67,6 @@ const publishPost = async (post: Post) => {
 
 export const updatePublicBlogPost = functions.https.onCall(async (data: Post, context) => {
   console.log('Updating public post with this data', data);
-  const outcome = await publishPost(data);
+  const outcome = await publishPostOnPublic(data);
   return {outcome}
 });
