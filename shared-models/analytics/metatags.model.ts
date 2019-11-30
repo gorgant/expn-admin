@@ -1,4 +1,4 @@
-import { PublicImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
+import { PublicImagePaths } from '../../shared-models/routes-and-paths/image-paths.model';
 
 export const metaTagDefaults = {
   maryDaphnePublic: {
@@ -11,7 +11,9 @@ export const metaTagDefaults = {
     metaTagFbAppId: '2361383644073374',
     metaTagTwitterHandle: '@MaryDaphne',
     metaTagTwitterCardType: 'summary_large_image',
-    metaTagDefaultImage: PublicImagePaths.LINK_SHARE_IMAGE
+    metaTagDefaultImage: PublicImagePaths.LINK_SHARE_IMAGE,
+    metaTagCachedHtml: 'cachedHtml',
+    metaTagIsBot: 'isBot'
   },
   explearningPublic: {
     metaTagDefaultTitle: 'Explearning - A Richer Life Begins with Better Communication',
@@ -24,6 +26,8 @@ export const metaTagDefaults = {
     metaTagFbAppId: '2401296806861214',
     metaTagTwitterHandle: '@ExplearningCo',
     metaTagTwitterCardType: 'summary_large_image',
-    metaTagDefaultImage: PublicImagePaths.LINK_SHARE_IMAGE
+    metaTagDefaultImage: PublicImagePaths.LINK_SHARE_IMAGE,
+    metaTagCachedHtml: 'cachedHtml',
+    metaTagIsBot: 'isBot'
   }
 };

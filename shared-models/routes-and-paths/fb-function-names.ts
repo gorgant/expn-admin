@@ -22,9 +22,10 @@ export enum PublicFunctionNames {
   TRANSMIT_ORDER_TO_ADMIN = 'transmitOrderToAdmin',
   TRANSMIT_EMAIL_SUB_TO_ADMIN = 'transmitEmailSubToAdmin',
   TRANSMIT_CONTACT_FORM_TO_ADMIN = 'transmitContactFormToAdmin',
-  TRANSMIT_WEBPAGE_URL_TO_PUPPETEER = 'transmitWebpageUrlToPuppeteer',
+  TRANSMIT_WEBPAGE_URL_TO_SSR = 'transmitWebpageUrlToSsr',
   SAVE_WEBPAGE_TO_CACHE_TOPIC = 'saveWebpageToCache',
   UPDATE_WEBPAGE_CACHE = 'updateWebpageCache',
   PURGE_INACTIVE_USERS = 'purgeInactiveUsers',
-  UPDATE_PODCAST_FEED_CACHE = 'updatePodcastFeedCache'
+  UPDATE_PODCAST_FEED_CACHE = 'updatePodcastFeedCache',
+  UNIVERSAL_SSR = 'universalSsr'
 }

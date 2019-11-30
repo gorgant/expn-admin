@@ -40,7 +40,6 @@ export class PostCardComponent implements OnInit {
 
   private setUserFriendlyUrlString() {
     this.postUrlSlug = this.uiService.convertToFriendlyUrlFormat(this.post.title);
-    console.log('will use this slug', this.postUrlSlug);
   }
 
   onSelectBlogItem() {

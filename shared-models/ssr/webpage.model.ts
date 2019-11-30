@@ -4,4 +4,6 @@ export interface Webpage {
   payload: string;
   saved: number;
   url: string;
+  htmlSegmentIdArray?: string[];
+  segmentId?: string;
 }
