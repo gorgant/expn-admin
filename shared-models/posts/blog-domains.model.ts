@@ -1,6 +1,6 @@
 
 export enum BlogDomains {
-  EXPLEARNING = 'myexplearning.com',
+  EXPLEARNING = 'explearning.co',
   MARY_DAPHNE = 'marydaphne.com'
 }
 

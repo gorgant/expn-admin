@@ -6,7 +6,8 @@ export enum AdminFunctionNames {
   SAVE_ORDER_TOPIC = 'save-order',
   SAVE_EMAIL_SUB_TOPIC = 'save-email-sub',
   SAVE_CONTACT_FORM_TOPIC = 'save-contact-form',
-  BACKUP_ADMIN_DATABASE = 'backup-admin-database'
+  BACKUP_ADMIN_DATABASE = 'backup-admin-database',
+  SEND_SENDGRID_TEST = 'sendSendgridTest'
 }
 
 export enum PublicFunctionNames {

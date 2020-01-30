@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { RootStoreState } from 'src/app/root-store';
+import { EmailStoreActions, EmailStoreSelectors } from 'src/app/root-store/email-store';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -7,9 +11,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  testEmailProcessing$: Observable<boolean>;
+
+  constructor(
+    private store$: Store<RootStoreState.State>
+  ) { }
 
   ngOnInit() {
+  }
+
+  monitorEmailTestDelivery() {
+    this.testEmailProcessing$ = this.store$.select(EmailStoreSelectors.selectEmailSendProcessing);
+  }
+
+  onSendgridTest() {
+    console.log('Send test email triggered');
+    const emailContent = 'Empty test email message';
+    this.store$.dispatch(new EmailStoreActions.SendTestEmailRequested({emailContent}));
+    return;
   }
 
 }

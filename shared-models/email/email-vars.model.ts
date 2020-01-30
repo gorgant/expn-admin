@@ -5,20 +5,21 @@ export enum EmailCategories {
   SUBSCRIPTION_CONFIRMATION = 'subscription-confirmation',
   CONTACT_FORM_CONFIRMATION = 'contact-form-confirmation',
   PURCHASE_CONFIRMATION = 'purchase-confirmation',
-  TEST_SEND = 'test-send'
+  TEST_SEND = 'test-send',
+  MARKETING_NEWSLETTER = 'marketing-newsletter'
 }
 
 // Ids sourced from Sendgrid template system
 export enum EmailTemplateIds {
-  EXPLEARNING_SUBSCRIPTION_CONFIRMATION = 'd-a5178c4ee40244649122e684d244f6cc',
-  EXPLEARNING_CONTACT_FORM_CONFIRMATION = 'd-c333f6f223d24ba8925e35e08caa37b5',
-  EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION = 'd-a1dd923aa818453d8de0b30253af7a05',
+  EXPLEARNING_SUBSCRIPTION_CONFIRMATION = 'd-7327446fd2714cf0a605884dc9ce67fa',
+  EXPLEARNING_CONTACT_FORM_CONFIRMATION = 'd-0dbb4cd9b1a74e6faf8a62d2765046f2',
+  EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION = 'd-ee7b672fe47a4570b9ad381486604a1d',
   MARY_DAPHNE_SUBSCRIPTION_CONFIRMATION = 'd-1d5174c867e445be9fc4f4eaed7bc241',
   MARY_DAPHNE_CONTACT_FORM_CONFIRMATION = 'd-68ffed5939564e2181e07f17b1380869',
 }
 
 export enum EmailUnsubscribeGroupIds {
-  EXPLEARNING_COMMUNICATIONS_STRATEGIES = 10288,
+  EXPLEARNING_COMMUNICATIONS_STRATEGIES = 13988,
   MARY_DAPHNE_COMMUNICATIONS_STRATEGIES = 10012,
 }
 
@@ -52,8 +53,8 @@ export const ProductEmailTemplates: ProductEmailTemplateList = {
 };
 
 export enum EmailSenderAddresses {
-  EXPLEARNING_DEFAULT = 'hello@myexplearning.com',
-  EXPLEARNING_ORDERS = 'orders@myexplearning.com',
+  EXPLEARNING_DEFAULT = 'hello@explearning.co',
+  EXPLEARNING_ORDERS = 'orders@explearning.co',
   MARY_DAPHNE_DEFAULT = 'hello@marydaphne.com',
   MARY_DAPHNE_ORDERS = 'orders@marydaphne.com'
 }
@@ -64,8 +65,8 @@ export enum EmailSenderNames {
 }
 
 export const AdminEmailAddresses = {
-  EXPLEARNING_GREG_ONLY: 'greg@myexplearning.com',
-  EXPLEARNING_GREG_AND_MD: ['greg@myexplearning.com, marydaphne@myexplearning.com'],
+  EXPLEARNING_GREG_ONLY: 'greg@explearning.co',
+  EXPLEARNING_GREG_AND_MD: ['greg@explearning.co, md@explearning.co'],
   MARY_DAPHNE_GREG_ONLY: 'greg@marydaphne.com',
   MARY_DAPHNE_GREG_AND_MD: ['greg@marydaphne.com, marydaphne@marydaphne.com']
 };

@@ -16,12 +16,12 @@ export const metaTagDefaults = {
     metaTagIsBot: 'isBot'
   },
   explearningPublic: {
-    metaTagDefaultTitle: 'Explearning - A Richer Life Begins with Better Communication',
+    metaTagDefaultTitle: 'Explearning - Supercharge Your Social Skills',
     // tslint:disable-next-line:max-line-length
-    metaTagDefaultDescription: 'A richer life begins with better communication. Equip yourself for personal and professional success by improving your speaking skills and communication skills using our research-backed techniques. We teach you public speaking techniques, interview strategies, negotiation tactics, and much more.',
+    metaTagDefaultDescription: 'social skills, make friends, build trust, be authentic, what is effective communication, what is communication skills, effective communication techniques, public speaking techniques, interview strategies, mary daphne root',
     metaTagAuthor: 'Explearning, LLC',
     // tslint:disable-next-line:max-line-length
-    metaTagDefaultKeywords: 'speaking skills, importance of speaking skills, effective communication, what is effective communication, what is communication skills, effective communication techniques, public speaking techniques, interview strategies, mary daphne root',
+    metaTagDefaultKeywords: 'social skills, make friends, build trust, be authentic, what is effective communication, what is communication skills, effective communication techniques, public speaking techniques, interview strategies, mary daphne root',
     metaTagSiteName: 'Explearning',
     metaTagFbAppId: '2401296806861214',
     metaTagTwitterHandle: '@ExplearningCo',

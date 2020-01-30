@@ -10,16 +10,25 @@ import { publicProjectId, publicAppUrl } from '../environments/config';
 import { PublicFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
 
 const pubSub = new PubSub();
+const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;
 
-const updatePostCache = async (post: Post) => {
+const generateBlogUrlObject = (): WebpageUrl => {
+  const blogUrl: string = `https://${publicAppUrl}${blogSlugWithSlashPrefix}`;
+  const urlObject: WebpageUrl = { url: blogUrl };
+  return urlObject;
+}
 
-  const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;
+const generatePostUrlObject = (post: Post): WebpageUrl => {
   const postSlug: string = convertToFriendlyUrlFormat(post.title);
   const postUrl: string = `https://${publicAppUrl}${blogSlugWithSlashPrefix}/${post.id}/${postSlug}`;
-
   const urlObject: WebpageUrl = { url: postUrl };
-  console.log('Commencing url trasmission based on this data', urlObject);
+  return urlObject;
+}
 
+
+const submitCacheUpdateRequest = async (urlObject: WebpageUrl) => {
+
+  console.log('Commencing url trasmission based on this data', urlObject);
   const publicProject = publicProjectId;
   console.log('Publishing to this project topic', publicProject);
 
@@ -45,12 +54,20 @@ export const publishPostOnPublic = async (post: Post) => {
     const fbRes = await db.collection(SharedCollectionPaths.POSTS).doc(post.id as string).set(post)
       .catch((error: any) => console.log(error));
     console.log('Post published');
-    
-    const cacheUpdateRes = await updatePostCache(post)
-      .catch((error: any) => console.log(error));
-    console.log('Cache update transmitted');
 
-    return fbRes && cacheUpdateRes;
+    // Update post page cache
+    const postUrlObject = generatePostUrlObject(post);
+    const postCacheUpdateRes = await submitCacheUpdateRequest(postUrlObject)
+      .catch((error: any) => console.log(error));
+    console.log('Post cache update transmitted');
+
+    // Update blog page cache (to include new post page)
+    const blogUrlObject = generateBlogUrlObject();
+    const blogCacheUpdateRes = await submitCacheUpdateRequest(blogUrlObject)
+      .catch((error: any) => console.log(error));
+    console.log('Blog cache update transmitted');
+
+    return fbRes && postCacheUpdateRes && blogCacheUpdateRes;
   }
 
   // If post not published on admin, unpublish on public

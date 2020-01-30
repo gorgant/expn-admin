@@ -8,13 +8,13 @@ export const PRODUCTION_APPS = {
     databaseURL: 'https://explearning-76d93.firebaseio.com',
     projectId: 'explearning-76d93',
     storageBucket: 'explearning-76d93.appspot.com',
-    websiteDomain: 'myexplearning.com'
+    websiteDomain: 'explearning.co'
   },
   explearningAdminApp: {
     databaseURL: 'https://explearning-admin.firebaseio.com',
     projectId: 'explearning-admin',
     storageBucket: 'explearning-admin.appspot.com',
-    websiteDomain: 'admin.myexplearning.com'
+    websiteDomain: 'admin.explearning.co'
   },
   maryDaphnePublicApp: {
     databaseURL: 'https://marydaphne-public.firebaseio.com',

@@ -14,6 +14,7 @@ import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router
 import { CustomSerializer } from '../core/utils/router-state-serializer';
 import { SubscriberStoreModule } from './subscriber-store';
 import { ContactFormStoreModule } from './contact-form-store';
+import { EmailStoreModule } from './email-store';
 
 @NgModule({
   declarations: [],
@@ -26,6 +27,7 @@ import { ContactFormStoreModule } from './contact-form-store';
     OrderStoreModule,
     SubscriberStoreModule,
     ContactFormStoreModule,
+    EmailStoreModule,
     StoreModule.forRoot({}, {metaReducers}),
     EffectsModule.forRoot([]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
