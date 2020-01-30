@@ -13,7 +13,7 @@ import { withLatestFrom } from 'rxjs/operators';
 })
 export class AppComponent implements OnInit {
   title = 'Admin - Explearning';
-  appVersion = '1.8.3';
+  appVersion = '1.8.4';
 
   @ViewChild('sidenav', { static: true }) sidenav: MatSidenav;
 
