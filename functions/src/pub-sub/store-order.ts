@@ -36,7 +36,7 @@ const sendOrderConfirmationEmail = async (order: Order) => {
     case EnvironmentTypes.PRODUCTION:
       toEmail = order.email;
       categories = [EmailCategories.PURCHASE_CONFIRMATION];
-      bccEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      bccEmail = AdminEmailAddresses.EXPLEARNING_DEFAULT;
       break;
     case EnvironmentTypes.SANDBOX:
       toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;

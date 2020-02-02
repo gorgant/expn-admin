@@ -14,8 +14,8 @@ import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, AdminEmailAdd
 
 const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
   const sgMail = getSgMail();
-  const fromEmail: string = EmailSenderAddresses.EXPLEARNING_DEFAULT;
-  const fromName: string = EmailSenderNames.EXPLEARNING_DEFAULT;
+  const fromEmail: string = EmailSenderAddresses.EXPLEARNING_NEWSLETTER;
+  const fromName: string = EmailSenderNames.EXPLEARNING_NEWSLETTER;
   const toFirstName: string = (subscriber.publicUserData.billingDetails as BillingDetails).firstName;
   let toEmail: string;
   let bccEmail: string;
@@ -26,17 +26,17 @@ const sendSubConfirmationEmail = async (subscriber: EmailSubscriber) => {
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       toEmail = subscriber.id;
-      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION];
-      bccEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.MARKETING_NEWSLETTER];
+      bccEmail = AdminEmailAddresses.EXPLEARNING_DEFAULT;
       break;
     case EnvironmentTypes.SANDBOX:
       toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
-      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.TEST_SEND];
+      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.MARKETING_NEWSLETTER, EmailCategories.TEST_SEND];
       bccEmail = '';
       break;
     default:
       toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
-      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.TEST_SEND];
+      categories = [EmailCategories.SUBSCRIPTION_CONFIRMATION, EmailCategories.MARKETING_NEWSLETTER, EmailCategories.TEST_SEND];
       bccEmail = '';
       break;
   }
