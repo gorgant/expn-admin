@@ -20,6 +20,7 @@
     "fs-extra": "^7.0.1",
     "google-auth-library": "^4.2.2",
     "moment": "^2.24.0",
+    "request": "^2.88.0",
     "sharp": "^0.22.0"
   },
   "devDependencies": {

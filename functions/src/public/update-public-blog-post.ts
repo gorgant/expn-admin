@@ -33,7 +33,7 @@ const submitCacheUpdateRequest = async (urlObject: WebpageUrl) => {
   console.log('Publishing to this project topic', publicProject);
 
   // Target topic in the PubSub (must add this project's service account to target project)
-  const topic = pubSub.topic(`projects/${publicProject}/topics/${PublicFunctionNames.SAVE_WEBPAGE_TO_CACHE_TOPIC}`);
+  const topic = pubSub.topic(`projects/${publicProject}/topics/${PublicFunctionNames.UPDATE_WEBPAGE_CACHE}`);
 
   const topicPublishRes = await topic.publishJSON(urlObject)
     .catch(err => {
