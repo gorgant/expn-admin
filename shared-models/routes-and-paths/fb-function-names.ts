@@ -11,7 +11,16 @@ export enum AdminFunctionNames {
   SG_EMAIL_WEBHOOK_ENDPOINT = 'sgEmailWebhookEndpoint',
   AUTO_PUBLISH_BLOG_POSTS = 'autoPublishBlogPosts',
   SEND_SENDGRID_TEST = 'sendSendgridTest',
-  UPDATE_SENDGRID_CONTACT = 'updateSendgridContact'
+  UPDATE_SENDGRID_CONTACT = 'updateSendgridContact',
+  TRIGGER_EMAIL_SEND = 'triggerEmailSend'
+}
+
+export enum AdminTopicNames {
+  BACKUP_ADMIN_DATABASE_TOPIC = 'backup-admin-database-topic',
+  SAVE_ORDER_TOPIC = 'save-order-topic',
+  SAVE_EMAIL_SUB_TOPIC = 'save-email-sub-topic',
+  SAVE_CONTACT_FORM_TOPIC = 'save-contact-form-topic',
+  TRIGGER_EMAIL_SEND_TOPIC = 'trigger-email-send-topic'
 }
 
 export enum PublicFunctionNames {
@@ -24,5 +33,10 @@ export enum PublicFunctionNames {
   UPDATE_WEBPAGE_CACHE = 'updateWebpageCache',
   PURGE_INACTIVE_USERS = 'purgeInactiveUsers',
   UPDATE_PODCAST_FEED_CACHE = 'updatePodcastFeedCache',
-  UNIVERSAL_SSR = 'universalSsr'
+  UNIVERSAL_SSR = 'universalSsr',
+  CONFIRM_SUB_OPT_IN_ON_ADMIN = 'confirmSubOptInOnAdmin'
+}
+
+export enum PublicTopicNames {
+  SAVE_WEBPAGE_TO_CACHE_TOPIC = 'save-webpage-to-cache-topic',
 }

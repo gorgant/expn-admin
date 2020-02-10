@@ -75,7 +75,7 @@ const handleGroupResubscribe = async (rawEventData: EmailEvent, subDocRef: Fireb
     .catch(error => console.log(`Error updating subscriber because`, error));
 }
 
-// If global unsubscribe, add that to subscriber data
+// If global unsubscribe, add that to subscriber data and remove optIn designation
 const handleGlobalUnsubscribe = async (subDocRef: FirebaseFirestore.DocumentReference) => {
   console.log('Global unsubscribe detected');
   
@@ -83,7 +83,8 @@ const handleGlobalUnsubscribe = async (subDocRef: FirebaseFirestore.DocumentRefe
     unsubscribeDate: now(),
   }
   const subscriberUpdates: Partial<EmailSubscriber> = {
-    globalUnsubscribe: globalUnsubscribeObject
+    globalUnsubscribe: globalUnsubscribeObject,
+    optInConfirmed: false
   };
   
   console.log('Updating subscriber with global unsubscribe', subscriberUpdates);

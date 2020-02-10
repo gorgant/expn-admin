@@ -27,10 +27,13 @@ const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;
 const blogUrl = `https://${appUrl}${blogSlugWithSlashPrefix}`;
 const productListSlugWithSlashPrefix = PublicAppRoutes.PRODUCTS;
 const remoteCoachUrl = `https://${appUrl}${productListSlugWithSlashPrefix}/${remoteCoachProductId}/${remoteCoachProductSlug}`;
+const confirmationSlugWithSlahPrefeix = PublicAppRoutes.CONFIRMATION;
+const optInConfirmationUrlNoParams = `https://${appUrl}${confirmationSlugWithSlahPrefeix}`
 
 export const EmailWebsiteLinks = {
   BLOG_URL: blogUrl,
-  REMOTE_COACH_URL: remoteCoachUrl
+  REMOTE_COACH_URL: remoteCoachUrl,
+  OPT_IN_CONFIRMATION_URL_NO_PARAMS: optInConfirmationUrlNoParams
 };
 
 export const getProductUrlById = (productId: string): string => {

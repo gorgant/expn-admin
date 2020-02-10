@@ -2,86 +2,32 @@ import * as functions from 'firebase-functions';
 import { Order } from '../../../shared-models/orders/order.model';
 import { adminFirestore } from '../db';
 import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
-import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
-import { getSgMail, getProductUrlById } from '../sendgrid/config';
-import { EmailSenderAddresses, EmailSenderNames, AdminEmailAddresses, EmailCategories, ProductEmailTemplates } from '../../../shared-models/email/email-vars.model';
-import { currentEnvironmentType } from '../environments/config';
-import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
-import { MailData } from '@sendgrid/helpers/classes/mail';
+import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
+import { EmailCategories } from '../../../shared-models/email/email-vars.model';
+import { adminProjectId } from '../environments/config';
+import { PubSub } from '@google-cloud/pubsub';
+import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.model';
 
-const getProductEmailTemplateIdFromProductId = (order: Order): string => {
-  try {
-    // Fetch the template based on the product ID
-    const template = ProductEmailTemplates[order.productId].templateId;
-    return template;
-  } catch(error) {
-    console.log(`Error fetching email template from product id ${order.productId}`, error);
-    return error;
+const pubSub = new PubSub();
+
+// Trigger email send
+const triggerPurchaseConfirmationEmail = async(order: Order) => {
+  const topicName = AdminTopicNames.TRIGGER_EMAIL_SEND_TOPIC;
+  const emailCategory = EmailCategories.PURCHASE_CONFIRMATION;
+  const topic = pubSub.topic(`projects/${adminProjectId}/topics/${topicName}`);
+  const pubsubMsg: EmailPubMessage = {
+    emailCategory,
+    order
   }
-}
-
-const sendOrderConfirmationEmail = async (order: Order) => {
-  const sgMail = getSgMail();
-  const fromEmail = EmailSenderAddresses.EXPLEARNING_ORDERS;
-  const fromName = EmailSenderNames.EXPLEARNING_DEFAULT;
-  const toFirstName = order.firstName;
-  let toEmail: string;
-  let bccEmail: string;
-  const templateId = getProductEmailTemplateIdFromProductId(order);
-  let categories: string[];
-  const productUrl: string = getProductUrlById(order.productId);
-
-  // Prevents test emails from going to the actual address used
-  switch (currentEnvironmentType) {
-    case EnvironmentTypes.PRODUCTION:
-      toEmail = order.email;
-      categories = [EmailCategories.PURCHASE_CONFIRMATION];
-      bccEmail = AdminEmailAddresses.EXPLEARNING_DEFAULT;
-      break;
-    case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
-      categories = [EmailCategories.PURCHASE_CONFIRMATION, EmailCategories.TEST_SEND];
-      bccEmail = '';
-      break;
-    default:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
-      categories = [EmailCategories.PURCHASE_CONFIRMATION, EmailCategories.TEST_SEND];
-      bccEmail = '';
-      break;
-  }
-
-  const msg: MailData = {
-    to: {
-      email: toEmail,
-      name: toFirstName
-    },
-    from: {
-      email: fromEmail,
-      name: fromName,
-    },
-    bcc: bccEmail,
-    templateId,
-    dynamicTemplateData: {
-      firstName: toFirstName, // Will populate first name greeting if name exists
-      orderNumber: order.orderNumber,
-      productUrl
-    },
-    categories,
-    customArgs: {
-      productId: order.productId,
-      orderId: order.id
-    }
-  };
-  await sgMail.send(msg)
-    .catch(err => console.log(`Error sending email: ${msg} because `, err));
-
-  console.log('Email sent', msg);
+  const topicPublishRes = await topic.publishJSON(pubsubMsg)
+    .catch(err => {throw new Error(`Publish to topic ${topicName} failed with error: ${err}`)});
+  console.log(`Res from ${topicName}: ${topicPublishRes}`);
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 // Listen for pubsub message
-export const storeOrder = functions.pubsub.topic(AdminFunctionNames.SAVE_ORDER_TOPIC).onPublish( async (message, context) => {
+export const storeOrder = functions.pubsub.topic(AdminTopicNames.SAVE_ORDER_TOPIC).onPublish( async (message, context) => {
   const db = adminFirestore;
 
   console.log('Context from pubsub', context);
@@ -103,8 +49,12 @@ export const storeOrder = functions.pubsub.topic(AdminFunctionNames.SAVE_ORDER_T
     });
     console.log('Order stored', subOrderFbRes);  
 
-  await sendOrderConfirmationEmail(order)
-    .catch(error => console.log('Error sending contact form email', error));    
+  // Trigger purchase confirmation email
+  await triggerPurchaseConfirmationEmail(order)
+    .catch(error => {throw new Error(`Error publishing purchase confirmation topic to admin: ${error}`)});
+
+  // await sendOrderConfirmationEmail(order)
+  //   .catch(error => console.log('Error sending contact form email', error));    
 
   return fbRes && subOrderFbRes;
 })

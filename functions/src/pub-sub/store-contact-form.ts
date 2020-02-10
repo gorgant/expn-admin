@@ -2,79 +2,41 @@ import * as functions from 'firebase-functions';
 import { adminFirestore } from '../db';
 import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { ContactForm } from '../../../shared-models/user/contact-form.model';
-import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
-import { getSgMail, EmailWebsiteLinks } from '../sendgrid/config';
-import { currentEnvironmentType } from '../environments/config';
-import { EnvironmentTypes } from '../../../shared-models/environments/env-vars.model';
-import { MailData } from '@sendgrid/helpers/classes/mail';
-import { EmailTemplateIds, EmailSenderAddresses, EmailSenderNames, AdminEmailAddresses, EmailCategories } from '../../../shared-models/email/email-vars.model';
+import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
+import { PubSub } from '@google-cloud/pubsub';
+import { adminProjectId } from '../environments/config';
+import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.model';
+import { EmailCategories } from '../../../shared-models/email/email-vars.model';
 
-const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
-  const sgMail = getSgMail();
-  const fromEmail = EmailSenderAddresses.EXPLEARNING_DEFAULT;
-  const fromName = EmailSenderNames.EXPLEARNING_DEFAULT;
-  const toFirstName = (contactForm.firstName);
-  let toEmail: string;
-  let bccEmail: string;
-  const templateId = EmailTemplateIds.EXPLEARNING_CONTACT_FORM_CONFIRMATION;
-  let categories: string[];
+const pubSub = new PubSub();
 
-  // Prevents test emails from going to the actual address used
-  switch (currentEnvironmentType) {
-    case EnvironmentTypes.PRODUCTION:
-      toEmail = contactForm.email;
-      categories = [EmailCategories.CONTACT_FORM_CONFIRMATION];
-      bccEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
-      break;
-    case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
-      categories = [EmailCategories.CONTACT_FORM_CONFIRMATION, EmailCategories.TEST_SEND];
-      bccEmail = '';
-      break;
-    default:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
-      categories = [EmailCategories.CONTACT_FORM_CONFIRMATION, EmailCategories.TEST_SEND];
-      bccEmail = '';
-      break;
+
+// Trigger email send
+const triggerContactFormConfirmationEmail = async(contactForm: ContactForm) => {
+  const topicName = AdminTopicNames.TRIGGER_EMAIL_SEND_TOPIC;
+  const emailCategory = EmailCategories.CONTACT_FORM_CONFIRMATION;
+  const topic = pubSub.topic(`projects/${adminProjectId}/topics/${topicName}`);
+  const pubsubMsg: EmailPubMessage = {
+    emailCategory,
+    contactForm
   }
-
-  const msg: MailData = {
-    to: {
-      email: toEmail,
-      name: toFirstName
-    },
-    from: {
-      email: fromEmail,
-      name: fromName,
-    },
-    bcc: bccEmail,
-    templateId,
-    dynamicTemplateData: {
-      firstName: toFirstName, // Will populate first name greeting if name exists
-      contactFormMessage: contactForm.message, // Message sent by the user,
-      blogUrl: EmailWebsiteLinks.BLOG_URL,
-      remoteCoachUrl: EmailWebsiteLinks.REMOTE_COACH_URL,
-      replyEmailAddress: fromEmail
-    },
-    categories
-  };
-  await sgMail.send(msg)
-    .catch(err => console.log(`Error sending email: ${msg} because `, err));
-
-  console.log('Email sent', msg);
+  const topicPublishRes = await topic.publishJSON(pubsubMsg)
+    .catch(err => {throw new Error(`Publish to topic ${topicName} failed with error: ${err}`)});
+  console.log(`Res from ${topicName}: ${topicPublishRes}`);
 }
+
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 // Listen for pubsub message
-export const storeContactForm = functions.pubsub.topic(AdminFunctionNames.SAVE_CONTACT_FORM_TOPIC).onPublish( async (message, context) => {
+export const storeContactForm = functions.pubsub.topic(AdminTopicNames.SAVE_CONTACT_FORM_TOPIC).onPublish( async (message, context) => {
   const db = adminFirestore;
 
   console.log('Context from pubsub', context);
   const contactForm = message.json as ContactForm;
   console.log('Message from pubsub', contactForm);
 
- 
+ // Store contact form
   const fbRes = await db.collection(AdminCollectionPaths.CONTACT_FORMS).doc(contactForm.id).set(contactForm)
     .catch(error => console.log(error));
     console.log('Contact form stored', fbRes);
@@ -89,8 +51,9 @@ export const storeContactForm = functions.pubsub.topic(AdminFunctionNames.SAVE_C
     });
     console.log('Contact form stored', subContactFormFbRes);  
 
-  await sendContactFormConfirmationEmail(contactForm)
-    .catch(error => console.log('Error sending contact form email', error));
+  // Trigger contact form confirmation email
+  await triggerContactFormConfirmationEmail(contactForm)
+    .catch(error => {throw new Error(`Error publishing contact form topic to admin: ${error}`)});
 
   return fbRes && subContactFormFbRes;
 })

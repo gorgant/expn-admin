@@ -7,7 +7,7 @@ import { PublicAppRoutes } from '../../../shared-models/routes-and-paths/app-rou
 import { convertToFriendlyUrlFormat } from './helpers';
 import { WebpageUrl } from '../../../shared-models/ssr/webpage-url.model';
 import { publicProjectId, publicAppUrl } from '../environments/config';
-import { PublicFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
+import { PublicTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
 
 const pubSub = new PubSub();
 const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;
@@ -33,7 +33,7 @@ const submitCacheUpdateRequest = async (urlObject: WebpageUrl) => {
   console.log('Publishing to this project topic', publicProject);
 
   // Target topic in the PubSub (must add this project's service account to target project)
-  const topic = pubSub.topic(`projects/${publicProject}/topics/${PublicFunctionNames.UPDATE_WEBPAGE_CACHE}`);
+  const topic = pubSub.topic(`projects/${publicProject}/topics/${PublicTopicNames.SAVE_WEBPAGE_TO_CACHE_TOPIC}`);
 
   const topicPublishRes = await topic.publishJSON(urlObject)
     .catch(err => {

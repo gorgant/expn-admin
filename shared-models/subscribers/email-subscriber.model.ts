@@ -12,4 +12,6 @@ export interface EmailSubscriber {
   introEmailSent?: boolean;
   groupUnsubscribes?: GroupUnsubscribeRecordList;
   globalUnsubscribe?: UnsubscribeRecord;
+  optInConfirmed?: boolean;
+  sendgridContactId?: string;
 }

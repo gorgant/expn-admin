@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { auth } from 'google-auth-library';
-import { AdminFunctionNames } from '../../../shared-models/routes-and-paths/fb-function-names';
+import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
 import { adminProjectId, currentEnvironmentType } from '../environments/config';
 import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '../../../shared-models/environments/env-vars.model';
 import { Bucket } from '@google-cloud/storage';
@@ -64,4 +64,4 @@ const processBackup = async () => {
 /////// DEPLOYABLE FUNCTIONS ///////
 
 // Listen for pubsub message
-export const backupAdminDatabase = functions.pubsub.topic(AdminFunctionNames.BACKUP_ADMIN_DATABASE).onPublish(processBackup);
+export const backupAdminDatabase = functions.pubsub.topic(AdminTopicNames.BACKUP_ADMIN_DATABASE_TOPIC).onPublish(processBackup);

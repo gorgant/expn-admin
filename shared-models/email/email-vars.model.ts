@@ -2,7 +2,8 @@ import { ProductIdList } from '../products/product-id-list.model';
 import { ProductEmailTemplateList } from './product-email-template.model';
 
 export enum EmailCategories {
-  SUBSCRIPTION_CONFIRMATION = 'subscription-confirmation',
+  OPT_IN_CONFIRMATION = 'opt-in-confirmation',
+  WELCOME_EMAIL = 'welcome-email',
   CONTACT_FORM_CONFIRMATION = 'contact-form-confirmation',
   PURCHASE_CONFIRMATION = 'purchase-confirmation',
   TEST_SEND = 'test-send',
@@ -11,10 +12,12 @@ export enum EmailCategories {
 
 // Ids sourced from Sendgrid template system
 export enum EmailTemplateIds {
-  EXPLEARNING_SUBSCRIPTION_CONFIRMATION = 'd-7327446fd2714cf0a605884dc9ce67fa',
+  EXPLEARNING_WELCOME_EMAIL = 'd-7327446fd2714cf0a605884dc9ce67fa',
+  EXPLEARNING_OPT_IN_CONFIRMATION = 'd-b6beec26f3d644e3b4eafc4213d281db',
   EXPLEARNING_CONTACT_FORM_CONFIRMATION = 'd-0dbb4cd9b1a74e6faf8a62d2765046f2',
   EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION = 'd-ee7b672fe47a4570b9ad381486604a1d',
-  MARY_DAPHNE_SUBSCRIPTION_CONFIRMATION = 'd-1d5174c867e445be9fc4f4eaed7bc241',
+  MARY_DAPHNE_WELCOME_EMAIL = 'd-1d5174c867e445be9fc4f4eaed7bc241',
+  MARY_DAPHNE_OPT_IN_CONFIRMATION = 'd-ff70ac624ec243e789efa74b0411f971',
   MARY_DAPHNE_CONTACT_FORM_CONFIRMATION = 'd-68ffed5939564e2181e07f17b1380869',
 }
 

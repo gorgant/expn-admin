@@ -26,3 +26,5 @@ export { autoPublishBlogPosts } from './cron-jobs/auto-publish-blog-posts';
 export { sendSendgridTest } from './sendgrid/send-sendgrid-test';
 
 export { updateSendgridContact } from './sendgrid/update-sendgrid-contact';
+
+export { triggerEmailSend } from './pub-sub/trigger-email-send';
