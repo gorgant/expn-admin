@@ -22,7 +22,8 @@ export enum EmailTemplateIds {
 }
 
 export enum EmailContactListIds {
-  EXPLEARNING_COMMUNICATIONS_STRATEGIES = '12e2e831-4713-458f-a103-f96bc48c314b'
+  EXPLEARNING_COMMUNICATIONS_STRATEGIES = '12e2e831-4713-458f-a103-f96bc48c314b',
+  MARY_DAPHNE_COMMUNICATIONS_STRATEGIES = 'e0b66287-629c-4365-b1ed-fbec6f71db67',
 }
 
 export enum EmailUnsubscribeGroupIds {

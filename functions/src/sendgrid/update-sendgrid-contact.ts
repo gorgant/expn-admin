@@ -312,17 +312,11 @@ export const updateSendgridContact = functions.firestore.document(`${AdminCollec
   const subscriberEmail = context.params[wildcardParamKey];
   console.log('Subscriber collection write detected for this email:', subscriberEmail);
 
-  // Exit function if in sandbox to prevent bad data getting to sendGrid
-  if (currentEnvironmentType === EnvironmentTypes.SANDBOX) {
-    console.log('Sandbox detected, exit function with no updates to SengGrid');
-    return;
-  }
-
   const newSubscriberData: EmailSubscriber | null = change.after.exists ? change.after.data() as EmailSubscriber : null; // Check for deletions
   const oldSubscriberData: EmailSubscriber | null = change.before.exists ? change.before.data() as EmailSubscriber : null; // Check for additions
 
   const deleteRequest = !newSubscriberData; // If no new subscriber data, document has been deleted
-  const noOptInRequested = newSubscriberData && !newSubscriberData.optInConfirmed;
+  const notOptedInYet = newSubscriberData && !newSubscriberData.optInConfirmed;
   const optInRequested = oldSubscriberData && newSubscriberData && !oldSubscriberData.optInConfirmed && newSubscriberData.optInConfirmed; // Opt in chagned from false to true
   const subscriberAlreadyOptedIn = oldSubscriberData && oldSubscriberData.optInConfirmed;
   const otherValidSendgridUpdate = oldSubscriberData && // Detect name change
@@ -330,16 +324,23 @@ export const updateSendgridContact = functions.firestore.document(`${AdminCollec
     (newSubscriberData.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData.publicUserData.billingDetails as BillingDetails).firstName;
   const subscriberMissingSGContactId = newSubscriberData && !newSubscriberData.sendgridContactId;
 
-  // Remove contact from Sendgrid
-  if (deleteRequest) {
-    console.log('Deleting contact from SendGrid');
-    await deleteSendgridContact(oldSubscriberData as EmailSubscriber);
-    return;
+  // If this is a new opt in, send welcome email
+  if (optInRequested) {
+    console.log('New subscriber detected, sending welcome email');
+    await triggerWelcomeEmail(newSubscriberData as EmailSubscriber)
+      .catch(error => {throw new Error(`Error publishing purchase confirmation topic to admin: ${error}`)});
   }
 
   // Exit function if subscriber not opted in (we only update SG with opted-in subscribers)
-  if(noOptInRequested) {
+  if(notOptedInYet) {
     console.log('Subscriber not yet opted in, exiting function');
+    return;
+  }
+
+  // ALL SENDGRID RELATED FUNCTIONS MUST GO BELOW THIS
+  // Exit function if in sandbox to prevent bad data getting to sendGrid
+  if (currentEnvironmentType === EnvironmentTypes.SANDBOX) {
+    console.log('Sandbox detected, exit function with no updates to SengGrid');
     return;
   }
 
@@ -354,7 +355,14 @@ export const updateSendgridContact = functions.firestore.document(`${AdminCollec
 
   // If subscriber is opted in but the update is not a name update, don't transmit updates to Sendgrid
   if (subscriberAlreadyOptedIn && !otherValidSendgridUpdate) {
-    console.log('No change to first name detected, exiting function with no further actions');
+    console.log('No change to first name detected, exiting function');
+    return;
+  }
+
+  // Remove contact from Sendgrid
+  if (deleteRequest) {
+    console.log('Deleting contact from SendGrid');
+    await deleteSendgridContact(oldSubscriberData as EmailSubscriber);
     return;
   }
 
@@ -364,15 +372,6 @@ export const updateSendgridContact = functions.firestore.document(`${AdminCollec
       console.log('Error creating Sendgrid contact')
       return error;
     })
-
-  // If this is a new opt in, send welcome email
-  if (optInRequested) {
-
-    // Trigger welcome email
-    console.log('New subscriber detected, sending welcome email');
-    await triggerWelcomeEmail(newSubscriberData as EmailSubscriber)
-      .catch(error => {throw new Error(`Error publishing purchase confirmation topic to admin: ${error}`)});
-  }
 
   return contactUpdateJobIdResponse;
 
