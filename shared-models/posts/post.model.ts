@@ -1,7 +1,8 @@
 import { ImageProps } from '../images/image-props.model';
 import { BlogDomains } from './blog-domains.model';
+import { BlogIndexPostRef } from './blog-index-post-ref.model';
 
-export interface Post {
+export interface Post extends BlogIndexPostRef {
   title: string;
   author: string;
   authorId: string;
@@ -23,4 +24,5 @@ export interface Post {
   podcastEpisodeUrl?: string;
   scheduledPublishTime?: number | null;
 }
+
 

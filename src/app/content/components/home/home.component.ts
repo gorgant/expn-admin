@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { RootStoreState } from 'src/app/root-store';
+import { RootStoreState, PostStoreActions } from 'src/app/root-store';
 import { EmailStoreActions, EmailStoreSelectors } from 'src/app/root-store/email-store';
 import { Observable } from 'rxjs';
 
@@ -28,7 +28,16 @@ export class HomeComponent implements OnInit {
     console.log('Send test email triggered');
     const emailContent = 'Empty test email message';
     this.store$.dispatch(new EmailStoreActions.SendTestEmailRequested({emailContent}));
-    return;
+  }
+
+  onRefreshPublicBlogIndex() {
+    console.log('Refresh public blog index triggered');
+    this.store$.dispatch(new PostStoreActions.RefreshPublicBlogIndexRequested());
+  }
+
+  onRefreshPublicBlogCache() {
+    console.log('Refresh public blog cache triggered');
+    this.store$.dispatch(new PostStoreActions.RefreshPublicBlogCacheRequested());
   }
 
 }

@@ -82,6 +82,16 @@ export function featureReducer(state = initialState, action: Actions): State {
         ...state
       };
 
+    case ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_COMPLETE:
+      return {
+        ...state
+      };
+
+    case ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_COMPLETE:
+      return {
+        ...state
+      };
+
     case ActionTypes.POST_LOAD_FAILURE: {
       return {
         ...state,

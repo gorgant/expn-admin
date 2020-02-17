@@ -12,7 +12,9 @@ export enum AdminFunctionNames {
   AUTO_PUBLISH_BLOG_POSTS = 'autoPublishBlogPosts',
   SEND_SENDGRID_TEST = 'sendSendgridTest',
   UPDATE_SENDGRID_CONTACT = 'updateSendgridContact',
-  TRIGGER_EMAIL_SEND = 'triggerEmailSend'
+  TRIGGER_EMAIL_SEND = 'triggerEmailSend',
+  REFRESH_PUBLIC_BLOG_INDEX = 'refreshPublicBlogIndex',
+  REFRESH_PUBLIC_BLOG_CACHE = 'refreshPublicBlogCache'
 }
 
 export enum AdminTopicNames {

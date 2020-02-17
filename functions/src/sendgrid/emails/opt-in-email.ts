@@ -1,6 +1,6 @@
 import { EmailSubscriber } from "../../../../shared-models/subscribers/email-subscriber.model";
 import { getSgMail, EmailWebsiteLinks } from "../config";
-import { EmailSenderAddresses, EmailSenderNames, EmailTemplateIds, EmailUnsubscribeGroupIds, EmailCategories, AdminEmailAddresses } from "../../../../shared-models/email/email-vars.model";
+import { EmailSenderAddresses, EmailSenderNames, EmailTemplateIds, EmailCategories, AdminEmailAddresses } from "../../../../shared-models/email/email-vars.model";
 import { BillingDetails } from "../../../../shared-models/billing/billing-details.model";
 import { currentEnvironmentType } from "../../environments/config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
@@ -18,7 +18,6 @@ export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber)
   let toEmail: string;
   let bccEmail: string;
   const templateId: string = EmailTemplateIds.EXPLEARNING_OPT_IN_CONFIRMATION;
-  const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.EXPLEARNING_COMMUNICATIONS_STRATEGIES;
   let categories: string[];
   const optInConfirmationUrl = `${EmailWebsiteLinks.OPT_IN_CONFIRMATION_URL_NO_PARAMS}/${subscriber.publicUserData.id}/${subscriber.id}`;
   
@@ -54,14 +53,6 @@ export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber)
     dynamicTemplateData: {
       firstName: toFirstName, // Will populate first name greeting if name exists
       optInConfirmationUrl // Unique to subscriber
-    },
-    trackingSettings: {
-      subscriptionTracking: {
-        enable: true, // Enable tracking in order to catch the unsubscribe webhook
-      },
-    },
-    asm: {
-      groupId: unsubscribeGroupId, // Set the unsubscribe group
     },
     categories
   };

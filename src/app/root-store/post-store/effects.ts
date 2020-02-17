@@ -163,6 +163,46 @@ export class PostStoreEffects {
     ),
   );
 
+  @Effect()
+  refreshPublicBlogIndexEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<postFeatureActions.RefreshPublicBlogIndexRequested>(
+      postFeatureActions.ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_REQUESTED
+    ),
+    switchMap(action => this.postService.refreshBlogIndex()
+      .pipe(
+          map(response => {
+            if (!response) {
+              throw new Error('Error refreshing blog index');
+            }
+            return  new postFeatureActions.RefreshPublicBlogIndexComplete();
+          }),
+          catchError(error => {
+            return of(new postFeatureActions.LoadErrorDetected({ error }));
+          })
+        )
+    ),
+  );
+
+  @Effect()
+  refreshPublicBlogCacheEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<postFeatureActions.RefreshPublicBlogCacheRequested>(
+      postFeatureActions.ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_REQUESTED
+    ),
+    switchMap(action => this.postService.refreshBlogCache()
+      .pipe(
+          map(response => {
+            if (!response) {
+              throw new Error('Error refreshing blog cache');
+            }
+            return  new postFeatureActions.RefreshPublicBlogCacheComplete();
+          }),
+          catchError(error => {
+            return of(new postFeatureActions.LoadErrorDetected({ error }));
+          })
+        )
+    ),
+  );
+
 
 
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { map, takeUntil, catchError, switchMap, take } from 'rxjs/operators';
+import { map, takeUntil, catchError, switchMap, take, tap } from 'rxjs/operators';
 import { Observable, throwError, from, of } from 'rxjs';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import { now } from 'moment';
@@ -11,6 +11,8 @@ import { UiService } from './ui.service';
 import { Post } from 'shared-models/posts/post.model';
 import { ImageType } from 'shared-models/images/image-type.model';
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { AdminFunctionNames } from 'shared-models/routes-and-paths/fb-function-names';
+import { AngularFireFunctions } from '@angular/fire/functions';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +26,7 @@ export class PostService {
     private imageService: ImageService,
     private uiService: UiService,
     private authService: AuthService,
+    private fns: AngularFireFunctions,
   ) { }
 
   fetchAllPosts(): Observable<Post[]> {
@@ -175,6 +178,34 @@ export class PostService {
 
     // For instant UI updates, don't wait for server response
     return of(updatedPost);
+  }
+
+  refreshBlogIndex(): Observable<string> {
+    const refreshPublicblogIndexHttpCall = this.fns.httpsCallable(AdminFunctionNames.REFRESH_PUBLIC_BLOG_INDEX);
+
+    return refreshPublicblogIndexHttpCall({})
+      .pipe(
+        take(1),
+        tap(response => console.log('Refresh public blog index complete', response)),
+        catchError(error => {
+          console.log('Error with refreshPublicBlogIndexHttpCall', error);
+          return throwError(error);
+        })
+      );
+  }
+
+  refreshBlogCache(): Observable<string> {
+    const refreshPublicblogCacheHttpCall = this.fns.httpsCallable(AdminFunctionNames.REFRESH_PUBLIC_BLOG_CACHE);
+
+    return refreshPublicblogCacheHttpCall({})
+      .pipe(
+        take(1),
+        tap(response => console.log('Refresh public blog cache complete', response)),
+        catchError(error => {
+          console.log('Error with refreshPublicBlogCacheHttpCall', error);
+          return throwError(error);
+        })
+      );
   }
 
   generateNewPostId(): string {

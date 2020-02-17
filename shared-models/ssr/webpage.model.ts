@@ -6,4 +6,6 @@ export interface Webpage {
   url: string;
   htmlSegmentIdArray?: string[];
   segmentId?: string;
+  segmentCharLength?: number;
+  pageCharLength?: number;
 }

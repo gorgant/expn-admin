@@ -11,7 +11,8 @@ export enum PublicCollectionPaths {
   NAVIGATION_STAMPS = 'navigationStamps',
   PUBLIC_SITE_CACHE = 'publicSiteCache',
   PODCAST_FEED_CACHE = 'podcastFeedCache',
-  PODCAST_FEED_EPISODES = 'podcastFeedEpisodes'
+  PODCAST_FEED_EPISODES = 'podcastFeedEpisodes',
+  BLOG_INDEX = 'blogIndex'
 }
 
 export enum SharedCollectionPaths {

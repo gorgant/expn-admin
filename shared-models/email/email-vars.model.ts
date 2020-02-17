@@ -7,7 +7,8 @@ export enum EmailCategories {
   CONTACT_FORM_CONFIRMATION = 'contact-form-confirmation',
   PURCHASE_CONFIRMATION = 'purchase-confirmation',
   TEST_SEND = 'test-send',
-  MARKETING_NEWSLETTER = 'marketing-newsletter'
+  MARKETING_NEWSLETTER = 'marketing-newsletter',
+  WEBPAGE_DATA_LOAD_FAILURE = 'webpage-data-load-failure'
 }
 
 // Ids sourced from Sendgrid template system
@@ -64,16 +65,20 @@ export enum EmailSenderAddresses {
   EXPLEARNING_DEFAULT = 'hello@explearning.co',
   EXPLEARNING_NEWSLETTER = 'newsletter@explearning.co',
   EXPLEARNING_ORDERS = 'orders@explearning.co',
+  EXPLEARNING_ADMIN = 'admin@explearning.co',
   MARY_DAPHNE_DEFAULT = 'hello@marydaphne.com',
-  MARY_DAPHNE_NEWSLETTER = 'newsletter@marydaphne.co',
-  MARY_DAPHNE_ORDERS = 'orders@marydaphne.com'
+  MARY_DAPHNE_NEWSLETTER = 'newsletter@marydaphne.com',
+  MARY_DAPHNE_ORDERS = 'orders@marydaphne.com',
+  MARY_DAPHNE_ADMIN = 'admin@marydaphne.com'
 }
 
 export enum EmailSenderNames {
   EXPLEARNING_DEFAULT = 'Explearning',
   EXPLEARNING_NEWSLETTER = 'Mary Daphne with Explearning',
+  EXPLEARNING_ADMIN = 'Explearning ADMIN',
   MARY_DAPHNE_DEFAULT = 'Mary Daphne',
-  MARY_DAPHNE_NEWSLETTER = 'Mary Daphne'
+  MARY_DAPHNE_NEWSLETTER = 'Mary Daphne',
+  MARY_DAPHNE_ADMIN = 'Mary Daphne ADMIN'
 }
 
 export const AdminEmailAddresses = {

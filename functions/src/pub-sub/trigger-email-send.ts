@@ -6,6 +6,7 @@ import { EmailCategories } from '../../../shared-models/email/email-vars.model';
 import { sendSubOptInConfirmationEmail } from '../sendgrid/emails/opt-in-email';
 import { sendContactFormConfirmationEmail } from '../sendgrid/emails/contact-form-email';
 import { sendPurchaseConfirmationEmail } from '../sendgrid/emails/purchase-confirmation-email';
+import { sendWebpageDataLoadFailureEmail } from '../sendgrid/emails/webpage-data-load-failure-email';
 
 
 /////// DEPLOYABLE FUNCTIONS ///////
@@ -52,6 +53,13 @@ export const triggerEmailSend = functions.pubsub.topic(AdminTopicNames.TRIGGER_E
       }
       await sendPurchaseConfirmationEmail(emailData.order)
         .catch(error => {throw new Error(`Error sending purchaseConfirmationEmail: ${error}`)});
+      return;
+    case EmailCategories.WEBPAGE_DATA_LOAD_FAILURE:
+      if (!emailData.webpageLoadFailureData) {
+        throw new Error('Error, no webpage load failiure data provided, failed to send webpageDataLoadFailure email;');
+      }
+      await sendWebpageDataLoadFailureEmail(emailData.webpageLoadFailureData)
+        .catch(error => {throw new Error(`Error sending webpageDataLoadFailure: ${error}`)});
       return;
     default:
       throw new Error(`Error, no matching email category for ${emailCategory}`);

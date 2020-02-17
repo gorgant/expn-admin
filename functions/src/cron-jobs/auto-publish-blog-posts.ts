@@ -3,7 +3,7 @@ import { adminFirestore } from '../db';
 import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { Post } from '../../../shared-models/posts/post.model';
 import { now } from 'moment';
-import { publishPostOnPublic } from '../public/update-public-blog-post';
+import { updatePostOnPublic } from '../public/update-public-blog-post';
 
 const adminDb = adminFirestore;
 
@@ -53,7 +53,7 @@ const publishExpiredPosts = async () => {
         });
 
       // Then update post on public
-      const pubPostResponse = await publishPostOnPublic(updatedAdminPost)
+      const pubPostResponse = await updatePostOnPublic(updatedAdminPost)
         .catch(error => {
           console.log('Error publishing post', error)
           return error;

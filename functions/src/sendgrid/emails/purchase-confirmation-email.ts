@@ -17,6 +17,9 @@ const getProductEmailTemplateIdFromProductId = (order: Order): string => {
 }
 
 export const sendPurchaseConfirmationEmail = async (order: Order) => {
+
+  console.log('Sending Purchase Confirmation Email to this subscriber', order.email);
+
   const sgMail = getSgMail();
   const fromEmail = EmailSenderAddresses.EXPLEARNING_ORDERS;
   const fromName = EmailSenderNames.EXPLEARNING_DEFAULT;

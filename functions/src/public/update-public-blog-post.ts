@@ -1,89 +1,100 @@
 import * as functions from 'firebase-functions';
-import { PubSub } from '@google-cloud/pubsub';
 import { Post } from '../../../shared-models/posts/post.model';
-import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
+import { SharedCollectionPaths, PublicCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { publicFirestore } from '../db';
-import { PublicAppRoutes } from '../../../shared-models/routes-and-paths/app-routes.model';
-import { convertToFriendlyUrlFormat } from './helpers';
-import { WebpageUrl } from '../../../shared-models/ssr/webpage-url.model';
-import { publicProjectId, publicAppUrl } from '../environments/config';
-import { PublicTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
+import { BlogIndexPostRef } from '../../../shared-models/posts/blog-index-post-ref.model';
+import { submitCacheUpdateRequest } from './submit-cache-update-request';
+import { generatePostUrlObject, generateBlogUrlObject } from './helpers';
 
-const pubSub = new PubSub();
-const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;
 
-const generateBlogUrlObject = (): WebpageUrl => {
-  const blogUrl: string = `https://${publicAppUrl}${blogSlugWithSlashPrefix}`;
-  const urlObject: WebpageUrl = { url: blogUrl };
-  return urlObject;
+const publicDb: FirebaseFirestore.Firestore = publicFirestore;
+
+const publishPost = async (post: Post) => {
+  const fbRes = await publicDb.collection(SharedCollectionPaths.POSTS).doc(post.id as string).set(post)
+    .catch((error: any) => {throw new Error(`Error publishing post: ${error}`)});
+  console.log('Post published');
+
+  return fbRes;
 }
 
-const generatePostUrlObject = (post: Post): WebpageUrl => {
-  const postSlug: string = convertToFriendlyUrlFormat(post.title);
-  const postUrl: string = `https://${publicAppUrl}${blogSlugWithSlashPrefix}/${post.id}/${postSlug}`;
-  const urlObject: WebpageUrl = { url: postUrl };
-  return urlObject;
+const deletePost = async (post: Post) => {
+  const fbRes = await publicDb.collection(SharedCollectionPaths.POSTS).doc(post.id as string).delete()
+    .catch((error: any) => {throw new Error(`Error deleting post: ${error}`)});
+  console.log('Post unpublished');
+  return fbRes;
 }
 
-
-const submitCacheUpdateRequest = async (urlObject: WebpageUrl) => {
-
-  console.log('Commencing url trasmission based on this data', urlObject);
-  const publicProject = publicProjectId;
-  console.log('Publishing to this project topic', publicProject);
-
-  // Target topic in the PubSub (must add this project's service account to target project)
-  const topic = pubSub.topic(`projects/${publicProject}/topics/${PublicTopicNames.SAVE_WEBPAGE_TO_CACHE_TOPIC}`);
-
-  const topicPublishRes = await topic.publishJSON(urlObject)
-    .catch(err => {
-      console.log('Publish to topic failed', err);
-      return err;
-    });
-  console.log('Res from topic publish', topicPublishRes);
-
-  return topicPublishRes;
-}
-
-export const publishPostOnPublic = async (post: Post) => {
-
-  const db: FirebaseFirestore.Firestore = publicFirestore;
-
-  // If post is published on admin, publish updates on public and update cache
-  if (post.published) {
-    const fbRes = await db.collection(SharedCollectionPaths.POSTS).doc(post.id as string).set(post)
-      .catch((error: any) => console.log(error));
-    console.log('Post published');
-
-    // Update post page cache
-    const postUrlObject = generatePostUrlObject(post);
-    const postCacheUpdateRes = await submitCacheUpdateRequest(postUrlObject)
-      .catch((error: any) => console.log(error));
-    console.log('Post cache update transmitted');
-
-    // Update blog page cache (to include new post page)
-    const blogUrlObject = generateBlogUrlObject();
-    const blogCacheUpdateRes = await submitCacheUpdateRequest(blogUrlObject)
-      .catch((error: any) => console.log(error));
-    console.log('Blog cache update transmitted');
-
-    return fbRes && postCacheUpdateRes && blogCacheUpdateRes;
+const publishPostRef = async (post: Post) => {
+  const postRef: BlogIndexPostRef = {
+    title: post.title,
+    published: post.published,
+    publishedDate: post.publishedDate,
+    imageProps: post.imageProps,
+    id: post.id
   }
 
-  // If post not published on admin, unpublish on public
+  const fbRes = await publicDb.collection(PublicCollectionPaths.BLOG_INDEX).doc(post.id as string).set(postRef)
+    .catch((error: any) => {throw new Error(`Error publishing post index ref: ${error}`)});
+  console.log('Post published');
+
+  return fbRes;
+}
+
+const deletePostRef = async (post: Post) => {
+  const fbRes = await publicDb.collection(PublicCollectionPaths.BLOG_INDEX).doc(post.id as string).delete()
+    .catch((error: any) => {throw new Error(`Error deleting post index ref: ${error}`)});
+  console.log('Post index deleted');
+  return fbRes;
+}
+
+
+// Publish updates on public and update cache
+export const updatePostOnPublic = async (post: Post) => {
+
+  const postUrlObject = generatePostUrlObject(post);
+  const blogUrlObject = generateBlogUrlObject();
+  let postFbRes;
+  let postRefFbRes;
+  let postCacheUpdateRes;
+  let blogCacheUpdateRes;
+
+  // If post not published on admin, unpublish on public and update cache
   if (!post.published) {
-    const fbRes = await db.collection(SharedCollectionPaths.POSTS).doc(post.id as string).delete()
-      .catch((error: any) => console.log(error));
-    console.log('Post unpublished');
-    return fbRes;
+    postFbRes = await deletePost(post)
+      .catch ((error: any) => {throw new Error(`Error deleting post ${post}: ${error}`)});
+    postRefFbRes = await deletePostRef(post)
+      .catch ((error: any) => {throw new Error(`Error deleting postRef for ${post}: ${error}`)});
+    blogCacheUpdateRes = await submitCacheUpdateRequest(blogUrlObject)
+      .catch ((error: any) => {throw new Error(`Error submitting blog cache update request: ${error}`)});
+    console.log('Blog cache update transmitted');
+    return postFbRes && postRefFbRes && blogCacheUpdateRes;
   }
 
+  // Publish post
+  postFbRes = await publishPost(post)
+    .catch ((error: any) => {throw new Error(`Error publishing post: ${error}`)});
+
+  // Publish post index ref
+  postRefFbRes = await publishPostRef(post)
+    .catch ((error: any) => {throw new Error(`Error publishing postRef: ${error}`)});
+
+  // Update post page cache
+  postCacheUpdateRes = await submitCacheUpdateRequest(postUrlObject)
+    .catch ((error: any) => {throw new Error(`Error submitting post cache update request: ${error}`)});
+  console.log('Post cache update transmitted');
+
+  // Update blog page cache (to include new post page)
+  blogCacheUpdateRes = await submitCacheUpdateRequest(blogUrlObject)
+    .catch ((error: any) => {throw new Error(`Error submitting blog cache update request: ${error}`)});
+  console.log('Blog cache update transmitted');
+
+  return postFbRes && postRefFbRes && postCacheUpdateRes && blogCacheUpdateRes;
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 export const updatePublicBlogPost = functions.https.onCall(async (data: Post, context) => {
   console.log('Updating public post with this data', data);
-  const outcome = await publishPostOnPublic(data);
+  const outcome = await updatePostOnPublic(data);
   return {outcome}
 });

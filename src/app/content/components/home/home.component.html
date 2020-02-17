@@ -1,11 +1,19 @@
 <p>
   Admin Home
 </p>
-<div class="test-email-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
-  <button class="create-post-button" mat-raised-button color="accent" (click)="onSendgridTest()">Send Test Email</button>
-  <div class="processing-status" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="16px">
-    <div class="header">Email Processing Status:</div>
-    <div class="is-processing" *ngIf="testEmailProcessing$ | async" color="primary">Send in Progress</div>
-    <div class="not-processing" *ngIf="!(testEmailProcessing$ | async)">Send Not Processing</div>
+<div class="actions-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="32px">
+  <div class="test-email-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+    <button class="send-test-email-button" mat-raised-button color="accent" (click)="onSendgridTest()">Send Test Email</button>
+    <div class="processing-status" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="16px">
+      <div class="header">Email Processing Status:</div>
+      <div class="is-processing" *ngIf="testEmailProcessing$ | async" color="primary">Send in Progress</div>
+      <div class="not-processing" *ngIf="!(testEmailProcessing$ | async)">Send Not Processing</div>
+    </div>
+  </div>
+  <div class="refresh-blog-index-container" fxLayout="column" fxLayoutAlign="center center">
+    <button class="refresh-blog-index-button" mat-raised-button color="accent" (click)="onRefreshPublicBlogIndex()">Refresh Public Blog Index</button>
+  </div>
+  <div class="refresh-blog-cache-container" fxLayout="column" fxLayoutAlign="center center">
+    <button class="refresh-blog-cache-button" mat-raised-button color="accent" (click)="onRefreshPublicBlogCache()">Refresh Public Blog Cache</button>
   </div>
 </div>

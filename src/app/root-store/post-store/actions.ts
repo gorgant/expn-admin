@@ -17,6 +17,10 @@ export enum ActionTypes {
   TOGGLE_PUBLISHED_COMPLETE = '[Posts] Toggle Post Published Complete',
   TOGGLE_FEATURED_REQUESTED = '[Posts] Toggle Post Featured Requested',
   TOGGLE_FEATURED_COMPLETE = '[Posts] Toggle Post Featured Complete',
+  REFRESH_PUBLIC_BLOG_INDEX_REQUESTED = '[Posts] Refresh Public Blog Index Requested',
+  REFRESH_PUBLIC_BLOG_INDEX_COMPLETE = '[Posts] Refresh Public Blog Index Complete',
+  REFRESH_PUBLIC_BLOG_CACHE_REQUESTED = '[Posts] Refresh Public Blog Cache Requested',
+  REFRESH_PUBLIC_BLOG_CACHE_COMPLETE = '[Posts] Refresh Public Blog Cache Complete',
   POST_LOAD_FAILURE = '[Posts] Load Failure',
 }
 
@@ -95,6 +99,23 @@ export class ToggleFeaturedComplete implements Action {
   readonly type = ActionTypes.TOGGLE_FEATURED_COMPLETE;
 }
 
+export class RefreshPublicBlogIndexRequested implements Action {
+  readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_REQUESTED;
+}
+
+export class RefreshPublicBlogIndexComplete implements Action {
+  readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_COMPLETE;
+}
+
+export class RefreshPublicBlogCacheRequested implements Action {
+  readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_REQUESTED;
+}
+
+export class RefreshPublicBlogCacheComplete implements Action {
+  readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_COMPLETE;
+}
+
+
 export class LoadErrorDetected implements Action {
   readonly type = ActionTypes.POST_LOAD_FAILURE;
   constructor(public payload: { error: string }) {}
@@ -115,5 +136,9 @@ export type Actions =
   TogglePublishedComplete |
   ToggleFeaturedRequested |
   ToggleFeaturedComplete |
+  RefreshPublicBlogIndexRequested |
+  RefreshPublicBlogIndexComplete |
+  RefreshPublicBlogCacheRequested |
+  RefreshPublicBlogCacheComplete |
   LoadErrorDetected
   ;
