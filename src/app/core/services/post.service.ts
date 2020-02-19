@@ -195,14 +195,28 @@ export class PostService {
   }
 
   refreshBlogCache(): Observable<string> {
-    const refreshPublicblogCacheHttpCall = this.fns.httpsCallable(AdminFunctionNames.REFRESH_PUBLIC_BLOG_CACHE);
+    const refreshPublicBlogCacheHttpCall = this.fns.httpsCallable(AdminFunctionNames.REFRESH_PUBLIC_BLOG_CACHE);
 
-    return refreshPublicblogCacheHttpCall({})
+    return refreshPublicBlogCacheHttpCall({})
       .pipe(
         take(1),
         tap(response => console.log('Refresh public blog cache complete', response)),
         catchError(error => {
           console.log('Error with refreshPublicBlogCacheHttpCall', error);
+          return throwError(error);
+        })
+      );
+  }
+
+  refreshFeaturedPostsCache(): Observable<string> {
+    const refreshPublicFeaturedPostsCacheHttpCall = this.fns.httpsCallable(AdminFunctionNames.REFRESH_PUBLIC_FEATURED_POSTS_CACHE);
+
+    return refreshPublicFeaturedPostsCacheHttpCall({})
+      .pipe(
+        take(1),
+        tap(response => console.log('Refresh public featured posts cache complete', response)),
+        catchError(error => {
+          console.log('Error with refreshPublicFeaturedPostsCacheHttpCall', error);
           return throwError(error);
         })
       );

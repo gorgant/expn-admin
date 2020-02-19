@@ -203,6 +203,26 @@ export class PostStoreEffects {
     ),
   );
 
+  @Effect()
+  refreshPublicFeaturedPostsCacheEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<postFeatureActions.RefreshPublicFeaturedPostsCacheRequested>(
+      postFeatureActions.ActionTypes.REFRESH_PUBLIC_FEATURED_POSTS_CACHE_REQUESTED
+    ),
+    switchMap(action => this.postService.refreshFeaturedPostsCache()
+      .pipe(
+          map(response => {
+            if (!response) {
+              throw new Error('Error refreshing featured posts cache');
+            }
+            return  new postFeatureActions.RefreshPublicFeaturedPostsCacheComplete();
+          }),
+          catchError(error => {
+            return of(new postFeatureActions.LoadErrorDetected({ error }));
+          })
+        )
+    ),
+  );
+
 
 
 }

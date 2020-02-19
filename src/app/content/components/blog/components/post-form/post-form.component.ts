@@ -61,6 +61,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   public Editor = ClassicEditor;
 
+  private currentImageProps: ImageProps; // Keeps a local copy of current image props for realtime usage
+
   constructor(
     private store$: Store<RootStoreState.State>,
     private utilsService: UtilsService,
@@ -169,6 +171,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       this.imageService.uploadImageAndGetProps(file, this.postId, ImageType.BLOG_HERO)
         .then(imageProps => {
           this.heroImageAdded = true;
+          this.currentImageProps = imageProps;
           this.imagesModifiedSinceLastSave = true; // Used for auto-save change detection only after image uploaded
           return imageProps;
         })
@@ -199,7 +202,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
         )
         .subscribe(post => {
           if (post) {
-            const data = {
+            const data: Partial<Post> = {
               blogDomain: post.blogDomain,
               title: post.title,
               videoUrl: post.videoUrl,
@@ -213,6 +216,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
             this.heroImageProps$ = of(post.imageProps);
             if (post.imageProps) {
               this.heroImageAdded = true;
+              this.currentImageProps = post.imageProps;
             }
             this.isNewPost = false;
             this.originalPost = post;
@@ -288,7 +292,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe(adminUser => {
         console.log('Post initialized');
-        const data: Post = {
+        const post: Post = {
           blogDomain: this.blogDomain.value,
           author: adminUser.email,
           authorId: adminUser.id,
@@ -299,9 +303,12 @@ export class PostFormComponent implements OnInit, OnDestroy {
           modifiedDate: now(),
           title: this.title.value ? (this.title.value as string).trim() : this.tempPostTitle,
           id: this.postId,
-          published: false
+          published: false,
+          publishedDate: null,
+          imageProps: null,
+          featured: false
         };
-        this.store$.dispatch(new PostStoreActions.AddPostRequested({post: data}));
+        this.store$.dispatch(new PostStoreActions.AddPostRequested({post}));
         this.postInitialized = true;
       });
   }
@@ -400,6 +407,10 @@ export class PostFormComponent implements OnInit, OnDestroy {
           title: this.title.value ? (this.title.value as string).trim() : this.tempPostTitle,
           id: this.postId,
           readyToPublish: this.readyToPublish(),
+          published: false,
+          publishedDate: this.originalPost ? this.originalPost.publishedDate : null,
+          imageProps: this.currentImageProps ? this.currentImageProps : null,
+          featured: this.originalPost ? this.originalPost.featured : false
         };
 
         // If post isn't ready to publish, remove scheduled publish time
@@ -407,7 +418,9 @@ export class PostFormComponent implements OnInit, OnDestroy {
           post.scheduledPublishTime = null;
         }
 
-        this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post}));
+        const postWrapper = post as Post; // Wrap partial post into post shell to play nice with store
+
+        this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post: postWrapper}));
         console.log('Post saved', post);
         this.imagesModifiedSinceLastSave = false; // Reset image change detection
       });

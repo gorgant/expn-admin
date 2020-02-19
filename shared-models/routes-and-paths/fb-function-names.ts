@@ -14,7 +14,8 @@ export enum AdminFunctionNames {
   UPDATE_SENDGRID_CONTACT = 'updateSendgridContact',
   TRIGGER_EMAIL_SEND = 'triggerEmailSend',
   REFRESH_PUBLIC_BLOG_INDEX = 'refreshPublicBlogIndex',
-  REFRESH_PUBLIC_BLOG_CACHE = 'refreshPublicBlogCache'
+  REFRESH_PUBLIC_BLOG_CACHE = 'refreshPublicBlogCache',
+  REFRESH_PUBLIC_FEATURED_POSTS_CACHE = 'refreshPublicFeaturedPostsCache',
 }
 
 export enum AdminTopicNames {

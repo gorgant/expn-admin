@@ -17,7 +17,7 @@ const publishPostOnAdmin = async (post: Post) => {
     scheduledPublishTime: null // Clear the scheduled time when published so it doesn't trigger unwanted publish requests
   };
 
-  const fbRes = await adminDb.collection(SharedCollectionPaths.POSTS).doc(updatedPost.id as string).set(updatedPost)
+  const fbRes = await adminDb.collection(SharedCollectionPaths.POSTS).doc(updatedPost.id).set(updatedPost)
     .catch((error: any) => console.log(error));
     console.log('Post published');
 

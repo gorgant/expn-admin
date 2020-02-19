@@ -22,3 +22,9 @@ export const generatePostUrlObject = (post: Post): WebpageUrl => {
   const urlObject: WebpageUrl = { url: postUrl };
   return urlObject;
 }
+
+export const generateHomeUrlObject = (): WebpageUrl => {
+  const homeUrl: string = `https://${publicAppUrl}`;
+  const urlObject: WebpageUrl = { url: homeUrl };
+  return urlObject;
+}

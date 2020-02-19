@@ -21,6 +21,8 @@ export enum ActionTypes {
   REFRESH_PUBLIC_BLOG_INDEX_COMPLETE = '[Posts] Refresh Public Blog Index Complete',
   REFRESH_PUBLIC_BLOG_CACHE_REQUESTED = '[Posts] Refresh Public Blog Cache Requested',
   REFRESH_PUBLIC_BLOG_CACHE_COMPLETE = '[Posts] Refresh Public Blog Cache Complete',
+  REFRESH_PUBLIC_FEATURED_POSTS_CACHE_REQUESTED = '[Posts] Refresh Public Featured Posts Cache Requested',
+  REFRESH_PUBLIC_FEATURED_POSTS_CACHE_COMPLETE = '[Posts] Refresh Public Featured Posts Cache Complete',
   POST_LOAD_FAILURE = '[Posts] Load Failure',
 }
 
@@ -115,6 +117,14 @@ export class RefreshPublicBlogCacheComplete implements Action {
   readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_COMPLETE;
 }
 
+export class RefreshPublicFeaturedPostsCacheRequested implements Action {
+  readonly type = ActionTypes.REFRESH_PUBLIC_FEATURED_POSTS_CACHE_REQUESTED;
+}
+
+export class RefreshPublicFeaturedPostsCacheComplete implements Action {
+  readonly type = ActionTypes.REFRESH_PUBLIC_FEATURED_POSTS_CACHE_COMPLETE;
+}
+
 
 export class LoadErrorDetected implements Action {
   readonly type = ActionTypes.POST_LOAD_FAILURE;
@@ -140,5 +150,7 @@ export type Actions =
   RefreshPublicBlogIndexComplete |
   RefreshPublicBlogCacheRequested |
   RefreshPublicBlogCacheComplete |
+  RefreshPublicFeaturedPostsCacheRequested |
+  RefreshPublicFeaturedPostsCacheComplete |
   LoadErrorDetected
   ;

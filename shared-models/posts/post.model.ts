@@ -11,18 +11,16 @@ export interface Post extends BlogIndexPostRef {
   keywords: string;
   modifiedDate: number;
   blogDomain: BlogDomains;
-  published?: boolean;
-  publishedDate?: number;
-  imageProps?: ImageProps;
-  id?: string;
+  published: boolean;
+  publishedDate: number;
+  imageProps: ImageProps;
+  id: string;
+  featured: boolean;
   imagesUpdated?: Date;
   imageSizes?: number[];
   imageFilePathList?: string[];
   videoUrl?: string;
-  featured?: boolean;
   readyToPublish?: boolean;
   podcastEpisodeUrl?: string;
   scheduledPublishTime?: number | null;
 }
-
-

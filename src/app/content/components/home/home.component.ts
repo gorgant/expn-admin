@@ -40,4 +40,9 @@ export class HomeComponent implements OnInit {
     this.store$.dispatch(new PostStoreActions.RefreshPublicBlogCacheRequested());
   }
 
+  onRefreshPublicFeaturedPostsCache() {
+    console.log('Refresh public featured posts cache triggered');
+    this.store$.dispatch(new PostStoreActions.RefreshPublicFeaturedPostsCacheRequested());
+  }
+
 }

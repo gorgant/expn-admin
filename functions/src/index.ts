@@ -32,3 +32,5 @@ export { triggerEmailSend } from './pub-sub/trigger-email-send';
 export { refreshPublicBlogIndex } from './public/refresh-public-blog-index';
 
 export { refreshPublicBlogCache } from './public/refresh-public-blog-cache';
+
+export { refreshPublicFeaturedPostsCache } from './public/refresh-public-featured-posts-cache';
