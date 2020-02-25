@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import { adminFirestore } from '../db';
+import { adminFirestore } from '../config/db-config';
 import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { Post } from '../../../shared-models/posts/post.model';
 import { now } from 'moment';

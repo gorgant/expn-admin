@@ -346,6 +346,16 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private changesDetected(post: Post): boolean {
+    // // Enable for debugging
+    // console.log(`Server post blogDomain: ${post.blogDomain} vs local post blogDomain: ${this.blogDomain.value}`);
+    // console.log(`Server post title: ${post.title} vs local post title: ${this.title.value}`);
+    // console.log(`Server post videoUrl: ${post.videoUrl} vs local post videoUrl: ${this.videoUrl.value}`);
+    // tslint:disable-next-line:max-line-length
+    // console.log(`Server post podcastEpisodeUrl: ${post.podcastEpisodeUrl} vs local post podcastEpisodeUrl: ${this.podcastEpisodeUrl.value}`);
+    // console.log(`Server post description: ${post.description} vs local post description: ${this.description.value}`);
+    // console.log(`Server post keywords: ${post.keywords} vs local post keywords: ${this.keywords.value}`);
+    // console.log(`Server post content: ${post.content} vs local post content: ${this.content.value}`);
+    // console.log(`Images modified since last save: ${this.imagesModifiedSinceLastSave}`);
     if (
       post.blogDomain === this.blogDomain.value &&
       (post.title === (this.title.value as string).trim() || post.title === this.tempPostTitle) &&
@@ -399,7 +409,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           author: publicUser.displayName || publicUser.email,
           authorId: publicUser.id,
           videoUrl: this.videoUrl.value,
-          podcastEpisodeUrl: this.podcastEpisodeUrl.value || null,
+          podcastEpisodeUrl: this.podcastEpisodeUrl.value,
           description: this.description.value,
           keywords: this.keywords.value,
           content: this.content.value,

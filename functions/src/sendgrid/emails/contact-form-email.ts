@@ -1,7 +1,7 @@
 import { ContactForm } from "../../../../shared-models/user/contact-form.model";
 import { getSgMail, EmailWebsiteLinks } from "../config";
 import { EmailSenderAddresses, EmailSenderNames, EmailTemplateIds, EmailCategories, AdminEmailAddresses } from "../../../../shared-models/email/email-vars.model";
-import { currentEnvironmentType } from "../../environments/config";
+import { currentEnvironmentType } from "../../config/environments-config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
 import { MailData } from "@sendgrid/helpers/classes/mail";
 
@@ -59,7 +59,7 @@ export const sendContactFormConfirmationEmail = async (contactForm: ContactForm)
     categories
   };
   await sgMail.send(msg)
-    .catch(err => console.log(`Error sending email: ${msg} because `, err));
+    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); return err});
 
   console.log('Email sent', msg);
 }

@@ -1,11 +1,14 @@
 import * as functions from 'firebase-functions';
 import { auth } from 'google-auth-library';
 import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
-import { adminProjectId, currentEnvironmentType } from '../environments/config';
+import { adminProjectId, currentEnvironmentType } from '../config/environments-config';
 import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '../../../shared-models/environments/env-vars.model';
 import { Bucket } from '@google-cloud/storage';
-import { adminStorage } from '../db';
 import { now } from 'moment';
+import { catchErrors } from '../config/global-helpers';
+import { explearningAdminStorage } from '../config/storage-config';
+
+const adminStorage = explearningAdminStorage;
 
 let backupBucket: Bucket;
 
@@ -31,7 +34,9 @@ const setBucketsBasedOnEnvironment = (): Bucket => {
 const processBackup = async () => {
   const projectId = adminProjectId;
   const bucket = setBucketsBasedOnEnvironment();
-  console.log('Deploying to this bucket name', bucket.name);
+  // Check for api updates: https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases/exportDocuments
+  const url = `https://firestore.googleapis.com/v1beta1/projects/${projectId}/databases/(default):exportDocuments`;
+  console.log(`Deploying backup data to this bucket: ${bucket.name} and this url ${url}`);
 
   // Must add import/export IAM to default service account
   const admin = await auth.getClient({
@@ -40,28 +45,18 @@ const processBackup = async () => {
     ]
   });
 
-  // Check for api updates: https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases/exportDocuments
-  const url = `https://firestore.googleapis.com/v1beta1/projects/${projectId}/databases/(default):exportDocuments`;
-
-  const test = false;
-
-  if (test) {
-    console.log('Function test deployed to this url', url);
-    return true;
-  } else {
-    console.log('Function actually deployed to this url', url);
-    return admin.request({
-      url,
-      method: 'POST',
-      data: {
-        outputUriPrefix: `gs://${bucket.name}/database-backup/${now()}`
-      }
-    })
-  }
-
+  return admin.request({
+    url,
+    method: 'POST',
+    data: {
+      outputUriPrefix: `gs://${bucket.name}/database-backup/${now()}`
+    }
+  })
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 // Listen for pubsub message
-export const backupAdminDatabase = functions.pubsub.topic(AdminTopicNames.BACKUP_ADMIN_DATABASE_TOPIC).onPublish(processBackup);
+export const backupAdminDatabase = functions.pubsub.topic(AdminTopicNames.BACKUP_ADMIN_DATABASE_TOPIC).onPublish( (message, context) => {
+  return catchErrors(processBackup());
+});

@@ -16,8 +16,7 @@ const getAdminProjectId = (): string => {
       projectId = SANDBOX_APPS.explearningAdminApp.projectId
       break;
     default:
-      projectId = SANDBOX_APPS.explearningAdminApp.projectId
-      break;
+      throw new functions.https.HttpsError('failed-precondition', `No environment type detected when getting admin project ID`);
   }
   return projectId;
 }
@@ -34,8 +33,7 @@ const getPublicProjectId = (): string => {
       projectId = SANDBOX_APPS.explearningPublicApp.projectId;
       break;
     default:
-      projectId = SANDBOX_APPS.explearningPublicApp.projectId;
-      break;
+      throw new functions.https.HttpsError('failed-precondition', `No environment type detected when getting public project ID`);
   }
   return projectId;
 }
@@ -53,14 +51,13 @@ const getPublicAppUrl = (): string => {
       appUrl = SANDBOX_APPS.explearningPublicApp.websiteDomain;
       break;
     default:
-      appUrl = SANDBOX_APPS.explearningPublicApp.websiteDomain;
-      break;
+      throw new functions.https.HttpsError('failed-precondition', `No environment type detected when getting public project ID`);
   }
   return appUrl
 }
 export const publicAppUrl = getPublicAppUrl();
 
-const getRemoteCoachId = (): string => {
+const getRemoteCoachProductId = (): string => {
   let remoteCoachId: string;
 
   switch (currentEnvironmentType) {
@@ -71,12 +68,11 @@ const getRemoteCoachId = (): string => {
       remoteCoachId = ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH;
       break;
     default:
-      remoteCoachId = ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH;
-      break;
+      throw new functions.https.HttpsError('failed-precondition', `No environment type detected when getting Remote Coach product ID`);
   }
   return remoteCoachId
 }
-export const remoteCoachProductId = getRemoteCoachId();
+export const remoteCoachProductId = getRemoteCoachProductId();
 
 const getRemoteCoachSlug = (): string => {
   let slug: string;
@@ -88,8 +84,7 @@ const getRemoteCoachSlug = (): string => {
       slug = ProductUrlSlugList.SANDBOX_REMOTE_COACH;
       break;
     default:
-      slug = ProductUrlSlugList.SANDBOX_REMOTE_COACH;
-      break;
+      throw new functions.https.HttpsError('failed-precondition', `No environment type detected when getting Remote Coach slug`);
   }
   return slug;
 }

@@ -1,12 +1,8 @@
 import { WebpageUrl } from "../../../shared-models/ssr/webpage-url.model";
 import { Post } from "../../../shared-models/posts/post.model";
 import { PublicAppRoutes } from "../../../shared-models/routes-and-paths/app-routes.model";
-import { publicAppUrl } from "../environments/config";
-
-// Replace spaces with dashes and set lower case
-export const convertToFriendlyUrlFormat = (stringWithSpaces: string): string => {
-  return stringWithSpaces.split(' ').join('-').toLowerCase();
-}
+import { publicAppUrl } from "../config/environments-config";
+import { convertToFriendlyUrlFormat } from "../config/global-helpers";
 
 export const generateBlogUrlObject = (): WebpageUrl => {
   const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;

@@ -1,6 +1,6 @@
 import { getSgMail } from "../config";
 import { EmailSenderAddresses, EmailSenderNames, EmailCategories, AdminEmailAddresses } from "../../../../shared-models/email/email-vars.model";
-import { currentEnvironmentType } from "../../environments/config";
+import { currentEnvironmentType } from "../../config/environments-config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
 import { MailData } from "@sendgrid/helpers/classes/mail";
 import { WebpageLoadFailureData } from '../../../../shared-models/ssr/webpage-load-failure-data.model';
@@ -60,7 +60,7 @@ export const sendWebpageDataLoadFailureEmail = async (webpageLoadFailureData: We
     categories
   };
   await sgMail.send(msg)
-    .catch(err => console.log(`Error sending email: ${msg} because `, (err as string).toString()));
+    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); return err});
 
   console.log('Email sent', msg);
 }

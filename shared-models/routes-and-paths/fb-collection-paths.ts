@@ -19,4 +19,5 @@ export enum SharedCollectionPaths {
   PRODUCTS = 'products',
   POSTS = 'posts',
   PUBLIC_RESOURCES = 'publicResources',
+  GEOGRAPHIC_DATA = 'geographicData'
 }

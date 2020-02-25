@@ -1,8 +1,9 @@
 import * as functions from 'firebase-functions';
 import { SharedCollectionPaths, PublicCollectionPaths } from "../../../shared-models/routes-and-paths/fb-collection-paths";
-import { publicFirestore } from "../db";
+import { publicFirestore } from "../config/db-config";
 import { Post } from "../../../shared-models/posts/post.model";
 import { BlogIndexPostRef } from '../../../shared-models/posts/blog-index-post-ref.model';
+import { catchErrors, assertUID } from '../config/global-helpers';
 
 const publicDb = publicFirestore;
 const publicPostCollection = publicDb.collection(SharedCollectionPaths.POSTS);
@@ -11,8 +12,8 @@ const publicBlogIndexCollection = publicDb.collection(PublicCollectionPaths.BLOG
 const deleteBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null> => {
 
   const blogIndexCollectionSnapshot: FirebaseFirestore.QuerySnapshot = await publicBlogIndexCollection.get()
-    .catch(error => {throw new Error(`Error fetching public blog index collection: ${error}`)});
-
+    .catch(err => {console.log(`Error fetching public blog index collection:`, err); return err;});
+    
   const blogIndexArray = blogIndexCollectionSnapshot.docs;
   
   // Exit function if array is empty
@@ -38,7 +39,7 @@ const deleteBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null
   }
 
   const batchDelete = await batch.commit()
-    .catch(error => {throw new Error(`Error with batch delete: ${error}`)});
+    .catch(err => {console.log(`Error with batch delete:`, err); return err;});
 
   console.log(`Batch deleted ${batchSize} index refs, should equal batch delete response length: ${batchDelete.length}`);
 
@@ -54,7 +55,7 @@ const deleteBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null
 const createBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null> => {
 
   const publicPostCollectionSnapshot: FirebaseFirestore.QuerySnapshot = await publicPostCollection.get()
-    .catch(error => {throw new Error(`Error fetching public post collection: ${error}`)});
+    .catch(err => {console.log(`Error fetching public post collection:`, err); return err;});
 
   const postArray = publicPostCollectionSnapshot.docs;
   
@@ -97,7 +98,7 @@ const createBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null
   }
 
   const batchCreate = await batch.commit()
-    .catch(error => {throw new Error(`Error with batch creation: ${error}`)});
+    .catch(err => {console.log(`Error with batch creation:`, err); return err;});
 
   console.log(`Batch created ${batchSize} index refs, should equal batch creation response length: ${batchCreate.length}`);
 
@@ -114,7 +115,7 @@ const createBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null
 //   const adminDb = adminFirestore;
 //   const adminPostCollection = adminDb.collection(SharedCollectionPaths.POSTS);
 //   const adminPostCollectionSnapshot: FirebaseFirestore.QuerySnapshot = await adminPostCollection.get()
-//     .catch(error => {throw new Error(`Error fetching admin post collection: ${error}`)});
+//     .catch(err => {console.log(`Error fetching admin post collection:`, err); return err;});
 //   const batch = adminDb.batch();
 
 //   adminPostCollectionSnapshot.docs.forEach( async (doc) => {
@@ -123,30 +124,33 @@ const createBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null
 //   });
 
 //   const batchUpdate = await batch.commit()
-//     .catch(error => {throw new Error(`Error with batch update: ${error}`)});
+//     .catch(err => {console.log(`Error with batch update:`, err); return err;});
 
 //   console.log(`Batch updated ${batchUpdate.length} blog domains`);
 
 //   return batchUpdate;
 // }
 
+const executeActions = async () => {
+  await deleteBlogIndex()
+    .catch(err => {console.log(`Error deleting old public post index:`, err); return err});
+
+  await createBlogIndex()
+    .catch(err => {console.log(`Error creating new public post index:`, err); return err});
+
+  // await tempUpdateAdminPostBlogDomain()
+  //   .catch(error => {console.log(`Error updating admin post blog domain:` error)});
+}
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 
 export const refreshPublicBlogIndex = functions.https.onCall(async (data: any, context) => {
   console.log('Received request to refresh public blog index with this data', data);
-  
-  await deleteBlogIndex()
-    .catch(error => {throw new Error(`Error deleting old public post index: ${error}`)});
-  
-  await createBlogIndex()
-    .catch(error => {throw new Error(`Error creating new public post index: ${error}`)});
 
-  // await tempUpdateAdminPostBlogDomain()
-  //   .catch(error => {throw new Error(`Error updating admin post blog domain: ${error}`)});
+  assertUID(context);
   
-  return;
+  return catchErrors(executeActions());
 });
 
 

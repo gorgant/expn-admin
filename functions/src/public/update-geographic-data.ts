@@ -1,24 +1,23 @@
 import * as functions from 'firebase-functions';
 import { GeographicData } from '../../../shared-models/forms-and-components/geography/geographic-data.model';
 import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
-import { publicFirestore } from '../db';
-
-
+import { publicFirestore } from '../config/db-config';
+import { catchErrors, assertUID } from '../config/global-helpers';
 
 const updateGeoLists = async (geographicData: GeographicData) => {
-
   const db = publicFirestore;
-
-  console.log('About to set geographic data', geographicData);
-  const fbRes = await db.collection(SharedCollectionPaths.PUBLIC_RESOURCES).doc('geographicData').set(geographicData)
-    .catch(error => console.log(error));
-    console.log('Geographic data updated');
-    return fbRes;
+  const fbRes = await db.collection(SharedCollectionPaths.PUBLIC_RESOURCES).doc(SharedCollectionPaths.GEOGRAPHIC_DATA).set(geographicData)
+    .catch(err => {console.log(`Failed to update geographic data in public database`, err); return err;});
+  console.log('Geographic data updated in public database:', fbRes);
+  return fbRes;
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 export const updateGeographicData = functions.https.onCall(async (data: GeographicData, context) => {
-  const outcome = await updateGeoLists(data);
-  return {outcome}
+
+  console.log('Received request to update geographic data on public database with this data', data);
+  assertUID(context);
+  
+  return catchErrors(updateGeoLists(data));
 });

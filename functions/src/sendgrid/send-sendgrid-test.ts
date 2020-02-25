@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import { getSgMail } from './config';
+import { catchErrors, assertUID } from '../config/global-helpers';
 
 
 const sendTestEmail = async (): Promise<any> => {
@@ -13,19 +14,15 @@ const sendTestEmail = async (): Promise<any> => {
     text: 'and easy to do anywhere, even with Node.js',
     html: '<strong>and easy to do anywhere, even with Node.js</strong>',
   };
-  sgMail.send(msg)
-    .catch(error => {
-      console.log(error);
-      return error;
-    });
+  await sgMail.send(msg)
+    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); return err});
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 export const sendSendgridTest = functions.https.onCall(async (data: any, context) => {
   console.log('Received request to send test email with this data', data);
+  assertUID(context);
   
-  const sgRes = await sendTestEmail().catch(error => console.log('Error in send email funciton', error));
-
-  return sgRes;
+  return catchErrors(sendTestEmail());
 });

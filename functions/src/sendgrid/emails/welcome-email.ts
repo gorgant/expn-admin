@@ -6,12 +6,12 @@ import { EmailSenderAddresses, EmailSenderNames, EmailTemplateIds, EmailUnsubscr
 
 import { BillingDetails } from "../../../../shared-models/billing/billing-details.model";
 
-import { currentEnvironmentType } from "../../environments/config";
+import { currentEnvironmentType } from "../../config/environments-config";
 
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
 
 import { MailData } from "@sendgrid/helpers/classes/mail";
-import { adminFirestore } from "../../db";
+import { adminFirestore } from "../../config/db-config";
 import { AdminCollectionPaths } from "../../../../shared-models/routes-and-paths/fb-collection-paths";
 
 const db = adminFirestore;
@@ -23,10 +23,7 @@ const markIntroEmailSent = async (subscriber: EmailSubscriber) => {
   }
 
   const fbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subscriber.id).update(introEmailSent)
-    .catch(error => {
-      console.log('Error updating subscriber doc', error)
-      return error;
-    });
+    .catch(err => {console.log(`Failed to update subscriber data in admin database`, err); return err;});
 
   console.log('Marked intro email sent', fbRes);
   return fbRes;
@@ -91,12 +88,12 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
     categories
   };
   const sendgridResponse = await sgMail.send(msg)
-    .catch(err => console.log(`Error sending email: ${msg} because `, err));
+    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); return err});
   
   // If email is successful, mark intro email sent
   if (sendgridResponse) {
     await markIntroEmailSent(subscriber)
-      .catch(error => {throw new Error(`Error marking intro email sent: ${error}`)});
+      .catch(err => {console.log(`Error marking intro email sent:`, err); return err});
   }
 
   console.log('Email sent', msg);

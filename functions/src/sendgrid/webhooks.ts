@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import { EmailEvent } from '../../../shared-models/email/email-event.model';
 import { updateEmailRecord } from './handlers';
 import { EmailCategories } from '../../../shared-models/email/email-vars.model';
+import { catchErrors } from '../config/global-helpers';
 
 
 const isSandbox = (events: EmailEvent[], req: functions.Request, res: functions.Response): Promise<boolean> => {
@@ -72,9 +73,8 @@ export const sgEmailWebhookEndpoint = functions.https.onRequest(
     
     try {
       console.log('Sending webhook data to handler', events);
-      await updateEmailRecord(events)
-        .catch(error => console.log('Error updating email records when contacting handler', error));
-
+      catchErrors(updateEmailRecord(events))
+        .catch(error => error);
       res.sendStatus(200);
     } catch (err) {
       res.status(400).send(err);

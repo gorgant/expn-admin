@@ -1,7 +1,7 @@
 import { Order } from "../../../../shared-models/orders/order.model";
 import { ProductEmailTemplates, EmailSenderAddresses, EmailSenderNames, EmailCategories, AdminEmailAddresses } from "../../../../shared-models/email/email-vars.model";
 import { getSgMail } from "../config";
-import { getProductUrlById, currentEnvironmentType } from "../../environments/config";
+import { getProductUrlById, currentEnvironmentType } from "../../config/environments-config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
 import { MailData } from "@sendgrid/helpers/classes/mail";
 
@@ -72,7 +72,7 @@ export const sendPurchaseConfirmationEmail = async (order: Order) => {
     }
   };
   await sgMail.send(msg)
-    .catch(err => console.log(`Error sending email: ${msg} because `, err));
+    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); return err});
 
   console.log('Email sent', msg);
 }

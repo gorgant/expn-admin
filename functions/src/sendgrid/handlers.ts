@@ -1,6 +1,6 @@
 import { EmailEvent } from "../../../shared-models/email/email-event.model";
 import { EmailRecord, EmailRecordWithClicks } from "../../../shared-models/email/email-record.model";
-import { adminFirestore } from "../db";
+import { adminFirestore } from "../config/db-config";
 import { AdminCollectionPaths } from "../../../shared-models/routes-and-paths/fb-collection-paths";
 import { EmailEventType } from "../../../shared-models/email/email-event-type.model";
 import { EmailSubscriber } from '../../../shared-models/subscribers/email-subscriber.model';
@@ -12,7 +12,8 @@ let eventKey: EmailEventType | string;
 
 // Update email record with clicks
 const handleClickEvent = async (emailRecordDocRef: FirebaseFirestore.DocumentReference): Promise<Partial<EmailRecordWithClicks>> => {
-  const emailRecordDoc = await emailRecordDocRef.get();
+  const emailRecordDoc = await emailRecordDocRef.get()
+    .catch(err => {console.log(`Failed to fetch email record doc from admin database`, err); return err;});
   const emailRecordData: EmailRecordWithClicks = emailRecordDoc.data() as EmailRecord;
   const emailRecordClickUpdates: Partial<EmailRecordWithClicks> = {};
   console.log('Click type detected, fetched this email record data', emailRecordData);
@@ -48,13 +49,14 @@ const handleGroupUnsubscribe = async (rawEventData: EmailEvent, subDocRef: Fireb
   };
 
   console.log('Updating subscriber with group unsubscribe', subscriberUpdates);
-  await subDocRef.set(subscriberUpdates, {merge: true})
-    .catch(error => console.log(`Error updating subscriber because`, error));
+  await subDocRef.set(subscriberUpdates, {merge: true}) // Set {merge: true} in case the subscriber doesn't exist yet
+    .catch(err => {console.log(`Failed to update subscriber in admin database`, err); return err;});
 }
 
 // If group resubscribe, remove that from subscriber data
 const handleGroupResubscribe = async (rawEventData: EmailEvent, subDocRef: FirebaseFirestore.DocumentReference) => {
-  const subscriberDoc = await subDocRef.get();
+  const subscriberDoc = await subDocRef.get()
+    .catch(err => {console.log(`Failed to fetch subscriber doc from admin database`, err); return err;});
   const subscriberData: EmailSubscriber = subscriberDoc.data() as EmailSubscriber;
   console.log('Group resubscribe type detected, fetched this email record data', subscriberData);
   const unsubGroupId: number = rawEventData.asm_group_id as number;
@@ -72,7 +74,7 @@ const handleGroupResubscribe = async (rawEventData: EmailEvent, subDocRef: Fireb
 
   console.log('Updating subscriber with group resubscribe', updatedSubscriber);
   await subDocRef.set(updatedSubscriber) // No merge here because purposefully removing the gropuUnsubscribe value (if merge it wouldn't get removed)
-    .catch(error => console.log(`Error updating subscriber because`, error));
+    .catch(err => {console.log(`Failed to update subscriber in admin database`, err); return err;});
 }
 
 // If global unsubscribe, add that to subscriber data and remove optIn designation
@@ -89,20 +91,11 @@ const handleGlobalUnsubscribe = async (subDocRef: FirebaseFirestore.DocumentRefe
   
   console.log('Updating subscriber with global unsubscribe', subscriberUpdates);
   await subDocRef.set(subscriberUpdates, {merge: true})
-    .catch(error => console.log(`Error updating subscriber because`, error));
+    .catch(err => {console.log(`Failed to update subscriber in admin database`, err); return err;});
 }
 
+const executeActions = async (emailEvents: EmailEvent[]) => {
 
-
-
-/////// CORE FUNCTION ///////
-
-export const updateEmailRecord = async (emailEvents: EmailEvent[]) => {
-
-  if (emailEvents.length < 1) {
-    return 'No events in email record';
-  }
-  
   const subId = emailEvents[0].email;
   const recordId = emailEvents[0].sg_message_id;
 
@@ -118,16 +111,20 @@ export const updateEmailRecord = async (emailEvents: EmailEvent[]) => {
     // Handle event-specific actions
     switch (eventKey) {
       case EmailEventType.CLICK:
-        emailRecordUpdates = await handleClickEvent(emailRecordDocRef);
+        emailRecordUpdates = await handleClickEvent(emailRecordDocRef)
+          .catch(err => {console.log(`Error handling click event`, err); return err;});
         break;
       case EmailEventType.GROUP_UNSUBSCRIBE:
-        await handleGroupUnsubscribe(rawEventData, subDocRef);
+        await handleGroupUnsubscribe(rawEventData, subDocRef)
+          .catch(err => {console.log(`Error handling group unsubscribe`, err); return err;});
         break;
       case EmailEventType.GROUP_RESUBSCRIBE:
-        await handleGroupResubscribe(rawEventData, subDocRef);
+        await handleGroupResubscribe(rawEventData, subDocRef)
+          .catch(err => {console.log(`Error handling group resubscribe`, err); return err;});
         break;
       case EmailEventType.UNSUBSCRIBE:
-        await handleGlobalUnsubscribe(subDocRef);
+        await handleGlobalUnsubscribe(subDocRef)
+          .catch(err => {console.log(`Error handling global unsubscribe`, err); return err;});
         break;
       default:
         break;
@@ -139,10 +136,10 @@ export const updateEmailRecord = async (emailEvents: EmailEvent[]) => {
 
     // Update the email record in database
     console.log('Updating email record with this event object', emailRecordUpdates);
-    await emailRecordDocRef.set(emailRecordUpdates, {merge: true})
-      .catch(error => console.log(`Error updating email record with this event object ${emailRecordUpdates} because`, error));
-
-    return 'Event recorded';
+    
+    return emailRecordDocRef.set(emailRecordUpdates, {merge: true})
+      .catch(err => {console.log(`Error updating email record with this event object ${emailRecordUpdates}:`, err); return err;});
+;
   });
 
   const res = await Promise.all(logEvents)
@@ -150,4 +147,18 @@ export const updateEmailRecord = async (emailEvents: EmailEvent[]) => {
   console.log('All events logged in email record', res);
 
   return res;
+}
+
+
+
+
+/////// CORE FUNCTION ///////
+
+export const updateEmailRecord = async (emailEvents: EmailEvent[]) => {
+
+  if (emailEvents.length < 1) {
+    return 'No events in email record';
+  }
+
+  return executeActions(emailEvents);
 }

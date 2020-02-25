@@ -7,20 +7,14 @@ import { sendSubOptInConfirmationEmail } from '../sendgrid/emails/opt-in-email';
 import { sendContactFormConfirmationEmail } from '../sendgrid/emails/contact-form-email';
 import { sendPurchaseConfirmationEmail } from '../sendgrid/emails/purchase-confirmation-email';
 import { sendWebpageDataLoadFailureEmail } from '../sendgrid/emails/webpage-data-load-failure-email';
+import { catchErrors } from '../config/global-helpers';
 
 
-/////// DEPLOYABLE FUNCTIONS ///////
-
-
-// Listen for pubsub message
-export const triggerEmailSend = functions.pubsub.topic(AdminTopicNames.TRIGGER_EMAIL_SEND_TOPIC).onPublish( async (message, context) => {
-
-  console.log('Recieved triggerEmailSend request with this context', context);
-  const emailData = message.json as EmailPubMessage;
-  console.log('Message from pubsub', emailData);
+const executeActions = async (emailData: EmailPubMessage) => {
   
   if (!emailData.emailCategory) {
-    throw new Error('Error, no email category found in pubsub message');
+    console.log('Error, no email category found in pubsub message');
+    return new Error('Error, no email category found in pubsub message');
   }
 
   const emailCategory = emailData.emailCategory;
@@ -28,42 +22,53 @@ export const triggerEmailSend = functions.pubsub.topic(AdminTopicNames.TRIGGER_E
   switch(emailCategory) {
     case EmailCategories.OPT_IN_CONFIRMATION:
       if (!emailData.subscriber) {
-        throw new Error('No subscriber data in message');
+        console.log('No subscriber data in message');
+        return new Error('No subscriber data in message');
       }
-      await sendSubOptInConfirmationEmail(emailData.subscriber)
-        .catch(error => {throw new Error(`Error sending subOptInConfirmationEmail: ${error}`)});
-      return;
+      return sendSubOptInConfirmationEmail(emailData.subscriber)
+        .catch(err => {console.log(`Error sending subOptInConfirmationEmail:`, err); return err;});
     case EmailCategories.WELCOME_EMAIL:
       if (!emailData.subscriber) {
-        throw new Error('No subscriber data in message');
+        console.log('No subscriber data in message');
+        return new Error('No subscriber data in message');
       }
-      await sendWelcomeEmail(emailData.subscriber)
-        .catch(error => {throw new Error(`Error sending welcomeEmail: ${error}`)});
-      return;
+      return sendWelcomeEmail(emailData.subscriber)
+        .catch(err => {console.log(`Error sending welcomeEmail:`, err); return err;});
     case EmailCategories.CONTACT_FORM_CONFIRMATION:
       if (!emailData.contactForm) {
-        throw new Error('Error, no contact form provided, failed to send contact form confirmation');
+        console.log('Error, no contact form provided, failed to send contact form confirmation')
+        return new Error('Error, no contact form provided, failed to send contact form confirmation');
       }
-      await sendContactFormConfirmationEmail(emailData.contactForm)
-        .catch(error => {throw new Error(`Error sending welcomeEmail: ${error}`)});
-      return;
+      return sendContactFormConfirmationEmail(emailData.contactForm)
+        .catch(err => {console.log(`Error sending welcomeEmail:`, err); return err;});
     case EmailCategories.PURCHASE_CONFIRMATION:
       if (!emailData.order) {
-        throw new Error('Error, no order provided, failed to send purchase confirmation');
+        return new Error('Error, no order provided, failed to send purchase confirmation');
       }
-      await sendPurchaseConfirmationEmail(emailData.order)
-        .catch(error => {throw new Error(`Error sending purchaseConfirmationEmail: ${error}`)});
-      return;
+      return sendPurchaseConfirmationEmail(emailData.order)
+        .catch(err => {console.log(`Error sending purchaseConfirmationEmail:`, err); return err;});
     case EmailCategories.WEBPAGE_DATA_LOAD_FAILURE:
       if (!emailData.webpageLoadFailureData) {
-        throw new Error('Error, no webpage load failiure data provided, failed to send webpageDataLoadFailure email;');
+        return new Error('Error, no webpage load failiure data provided, failed to send webpageDataLoadFailure email;');
       }
-      await sendWebpageDataLoadFailureEmail(emailData.webpageLoadFailureData)
-        .catch(error => {throw new Error(`Error sending webpageDataLoadFailure: ${error}`)});
-      return;
+      return sendWebpageDataLoadFailureEmail(emailData.webpageLoadFailureData)
+        .catch(err => {console.log(`Error sending webpageDataLoadFailure:`, err); return err;});
     default:
-      throw new Error(`Error, no matching email category for ${emailCategory}`);
+    console.log(`Error, no matching email category for ${emailCategory}`);
+    return new Error(`Error, no matching email category for ${emailCategory}`);
   }
+}
 
+
+/////// DEPLOYABLE FUNCTIONS ///////
+
+
+// Listen for pubsub message
+export const triggerEmailSend = functions.pubsub.topic(AdminTopicNames.TRIGGER_EMAIL_SEND_TOPIC).onPublish( async (message, context) => {
+  const emailData = message.json as EmailPubMessage;
+  console.log('Trigger email request received with this data:', emailData);
+  console.log('Context from pubsub:', context);
+
+  return catchErrors(executeActions(emailData));
 
 });

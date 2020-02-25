@@ -16,7 +16,7 @@ export interface Post extends BlogIndexPostRef {
   imageProps: ImageProps;
   id: string;
   featured: boolean;
-  imagesUpdated?: Date;
+  imagesUpdated?: number;
   imageSizes?: number[];
   imageFilePathList?: string[];
   videoUrl?: string;
