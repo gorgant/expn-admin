@@ -37,9 +37,11 @@ export enum PublicFunctionNames {
   PURGE_INACTIVE_USERS = 'purgeInactiveUsers',
   UPDATE_PODCAST_FEED_CACHE = 'updatePodcastFeedCache',
   UNIVERSAL_SSR = 'universalSsr',
-  CONFIRM_SUB_OPT_IN_ON_ADMIN = 'confirmSubOptInOnAdmin'
+  MARK_SUB_OPTED_IN = 'markSubOptedIn',
+  VALIDATE_DISCOUNT_COUPON = 'validateDiscountCoupon'
 }
 
 export enum PublicTopicNames {
   SAVE_WEBPAGE_TO_CACHE_TOPIC = 'save-webpage-to-cache-topic',
+  UPDATE_DISCOUNT_COUPON_DATA = 'update-discount-coupon-data'
 }

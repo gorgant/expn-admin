@@ -81,8 +81,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
     this.adminUser$ = this.store$.select(UserStoreSelectors.selectUser);
 
-    console.log('Blog domains', this.blogDomains);
-
   }
 
   onSave() {

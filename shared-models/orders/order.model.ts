@@ -11,6 +11,8 @@ export interface Order {
   email: string;
   publicUser: PublicUser;
   productId: string;
+  listPrice: number;
+  discountCouponCode: string;
   amountPaid: number;
   status: 'activated' | 'inactive';
 }

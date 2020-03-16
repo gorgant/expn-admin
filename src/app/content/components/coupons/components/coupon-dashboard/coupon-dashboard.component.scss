@@ -1,0 +1,37 @@
+@import '../../../../../variables';
+
+:host {
+  width: 100%;
+  max-width: 1000px;
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+.page-container {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.search-bar {
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.table-container {
+  width: 100%;
+}
+
+.coupon-table {
+  width: 100%;
+}
+
+.coupon-code-cell {
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-row:hover {
+  cursor: pointer;
+  @include background-opacity($primary, $opacity-faded);
+}

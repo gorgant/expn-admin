@@ -20,6 +20,7 @@ import {
   MatPaginatorModule,
   MatSnackBarModule,
   MatExpansionModule,
+  MatSlideToggleModule
 } from '@angular/material';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { LayoutModule } from '@angular/cdk/layout';
@@ -48,6 +49,7 @@ import { LayoutModule } from '@angular/cdk/layout';
     MatPaginatorModule,
     MatSnackBarModule,
     MatExpansionModule,
+    MatSlideToggleModule,
     LayoutModule
   ],
   exports: [
@@ -71,6 +73,7 @@ import { LayoutModule } from '@angular/cdk/layout';
     MatPaginatorModule,
     MatSnackBarModule,
     MatExpansionModule,
+    MatSlideToggleModule,
     LayoutModule
   ]
 })

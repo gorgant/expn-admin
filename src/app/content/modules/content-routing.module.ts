@@ -36,6 +36,10 @@ const routes: Routes = [
     loadChildren: () => import('../components/profile/modules/profile.module').then(m => m.ProfileModule),
   },
   {
+    path: 'coupons',
+    loadChildren: () => import('../components/coupons/modules/coupons.module').then(m => m.CouponsModule),
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'

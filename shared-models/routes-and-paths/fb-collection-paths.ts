@@ -3,7 +3,11 @@ export enum AdminCollectionPaths {
   ORDERS = 'orders',
   SUBSCRIBERS = 'subscribers',
   CONTACT_FORMS = 'contactForms',
-  EMAIL_RECORDS = 'emailRecords'
+  EMAIL_RECORDS = 'emailRecords',
+  DISCOUNT_COUPONS = 'discountCoupons',
+  DISCOUNT_COUPON_USER_IDS = 'discountCouponUserIds',
+  DISCOUNT_COUPON_USER_EMAILS = 'discountCouponUserEmails',
+  DISCOUNT_COUPON_PRODUCTS = 'discountCouponProducts'
 }
 
 export enum PublicCollectionPaths {

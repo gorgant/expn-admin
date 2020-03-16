@@ -63,3 +63,30 @@ export const assertUID = (context: functions.https.CallableContext) => {
     return context.auth.uid;
   }
 }
+
+/**
+ * Rounds a number to the nearest digits desired
+ * @param number Number to round
+ * @param digitsToRoundTo Number of digits desired
+ */
+
+// Courtesy of: https://stackoverflow.com/questions/15762768/javascript-math-round-to-two-decimal-places
+export const generateRoundedNumber = (number: number, digitsToRoundTo: number) => {
+  let n = number;
+  let digits = digitsToRoundTo; 
+  let negative = false;
+    if (digits === undefined) {
+        digits = 0;
+    }
+        if( n < 0) {
+        negative = true;
+      n = n * -1;
+    }
+    const multiplicator = Math.pow(10, digits);
+    n = parseFloat((n * multiplicator).toFixed(11));
+    n = parseFloat((Math.round(n) / multiplicator).toFixed(2));
+    if( negative ) {    
+        n = parseFloat((n * -1).toFixed(2));
+    }
+    return n;
+}

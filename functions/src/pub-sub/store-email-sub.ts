@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import { adminFirestore } from '../config/db-config';
 import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
-import { EmailSubscriber } from '../../../shared-models/subscribers/email-subscriber.model';
+import { EmailSubscriber, EmailSubscriberKeys } from '../../../shared-models/subscribers/email-subscriber.model';
 import { now } from 'moment';
 import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
 import { SubscriptionSource } from '../../../shared-models/subscribers/subscription-source.model';
@@ -10,6 +10,7 @@ import { PubSub } from '@google-cloud/pubsub';
 import { adminProjectId } from '../config/environments-config';
 import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.model';
 import { catchErrors } from '../config/global-helpers';
+import admin = require('firebase-admin');
 
 const pubSub = new PubSub();
 
@@ -33,62 +34,41 @@ const executeActions = async (susbscriberData: EmailSubscriber) => {
   const subId = newSubscriberData.id;
 
   const db = adminFirestore;
-  const subDoc: FirebaseFirestore.DocumentSnapshot = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).get()
-    .catch(err => {console.log('Error fetching subscriber doc:', err); return err;});
+  const subDocRef: FirebaseFirestore.DocumentReference = db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId);
+  const subDoc: FirebaseFirestore.DocumentSnapshot = await subDocRef.get()
+    .catch(err => {console.log('Error fetching subscriber doc from admin database:', err); return err;});
 
-  let existingSubscriberData: EmailSubscriber | undefined = undefined // Will be assigned if it exists
-  let subFbRes;
-
+  const isContactForm: boolean = newSubscriberData.lastSubSource === SubscriptionSource.CONTACT_FORM;
   const isExistingSubscriber: boolean = subDoc.exists;
   let subscriberHasOptedIn: boolean = false;
-  const isContactForm: boolean = newSubscriberData.lastSubSource === SubscriptionSource.CONTACT_FORM;
-  
-  // Actions if is an existing subscriber
-  if (isExistingSubscriber) { 
+  if (isExistingSubscriber) {
+    const existingSubscriberData = subDoc.data() as EmailSubscriber;
+    subscriberHasOptedIn = existingSubscriberData.optInConfirmed ? true : false;
+  }
 
-    existingSubscriberData = subDoc.data() as EmailSubscriber;
+  // Set or update subscriber sources
+  const updateSubSources = {
+    [EmailSubscriberKeys.SUBSCRIPTION_SOURCES]: admin.firestore.FieldValue.arrayUnion(newSubscriberData.lastSubSource),
+  }
 
-    if (existingSubscriberData.optInConfirmed) {
-      subscriberHasOptedIn = true;
-    };
+  // Set create date if new subscriber
+  const setCreatedDate: Partial<EmailSubscriber> = isExistingSubscriber ? {} : {createdDate: now()};
+
+  // Combine subscriber update data and set modified data
+  const subscriberUpdate = {
+    ...newSubscriberData,
+    ...updateSubSources,
+    ...setCreatedDate,
+    [EmailSubscriberKeys.MODIFIED_DATE]: now()
+  }
+
+  console.log('Updating or creating subscriber with this data', subscriberUpdate);
+
+  // Udpate subscriber with combined data
+  await subDocRef.set(subscriberUpdate, {merge: true})
+    .catch(err => {console.log('Error storing subscriber data in admin database:', err); return err;});
     
-    // Merge lastSubSource to the existing subscriptionSources array
-    const existingSubSources = existingSubscriberData.subscriptionSources; // Fetch existing sub sources
-    const updatedSubSources = [...existingSubSources, newSubscriberData.lastSubSource];
-
-    const updatedSubscriber: EmailSubscriber = {
-      ...newSubscriberData,
-      subscriptionSources: updatedSubSources,
-    }
-    console.log('Updating subscriber with this data', updatedSubscriber);
-
-    subFbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).update(updatedSubscriber)
-      .catch(err => {console.log('Error storing subscriber doc:', err); return err;});
-    console.log('Existing subscriber updated', subFbRes);
-
-  };
-
-  // Actions if subscriber doesn't exist
-  if (!isExistingSubscriber) {
-    // Create new subscriber with a fresh subscriptionSource array
-    const newSubscriber: EmailSubscriber = {
-      ...newSubscriberData,
-      subscriptionSources: [newSubscriberData.lastSubSource],
-      createdDate: now()
-    };
-    console.log('Creating subscriber with this data', newSubscriber);
-
-    subFbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId).set(newSubscriber)
-      .catch(err => {console.log('Error storing subscriber doc:', err); return err;});
-    console.log('New subscriber created', subFbRes);
-  };
-
-  // Don't send anything if optInConfirmed === true
-  if (subscriberHasOptedIn) {
-    console.log('Subscriber has already opted in, will not send opt-in email', existingSubscriberData);
-  };
-
-  // Send if NOT a contact form request and if subscriber hasn't opted in
+  // Send opt in email if NOT a contact form request and if subscriber has NOT opted in
   if (!isContactForm && !subscriberHasOptedIn) {
     
     console.log('Subscriber has not opted in yet and this is not a contact form, sending opt in confirmation email');

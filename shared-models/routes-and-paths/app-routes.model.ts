@@ -14,7 +14,9 @@ export enum AdminAppRoutes {
   CONTACT_FORM_DASHBOARD = '/contact-forms/dashboard',
   CONTACT_FORM_DETAILS = '/contact-forms/existing', // Note this also requires an ID route param to be appended to it
   DATA_IMPORTS = '/data-imports',
-  PROFILE = '/profile'
+  PROFILE = '/profile',
+  COUPONS_DASHBOARD = '/coupons/dashboard',
+  COUPONS_COUPON_DETAILS = '/coupons/existing'
 }
 
 export enum PublicAppRoutes {
@@ -28,5 +30,5 @@ export enum PublicAppRoutes {
   CONTACT = '/contact',
   PRIVACY_POLICY = '/legal/privacy-policy',
   TERMS_AND_CONDITIONS = '/legal/terms-and-conditions',
-  CONFIRMATION = '/confirmation'
+  SUB_CONFIRMATION = '/sub-confirmation'
 }

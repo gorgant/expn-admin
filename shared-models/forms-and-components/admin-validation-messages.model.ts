@@ -127,3 +127,42 @@ export const SCHEDULE_POST_FORM_VALIDATION_MESSAGES = {
     { type: 'max', message: 'Value must be between 0 and 59.'},
   ]
 };
+
+export const COUPON_FORM_VALIDATION_MESSAGES = {
+  couponCode: [
+    {type: 'required', message: 'This field is required.'},
+    {type: 'pattern', message: 'Coupon code can only contain letters and numbers with no spaces.'},
+  ],
+  discountPercentage: [
+    { type: 'required', message: 'This field is required.'},
+    { type: 'max', message: 'Value cannot exceed 100'},
+    { type: 'min', message: 'Value cannot be less than 1'},
+  ],
+  expirationDate: [
+    { type: 'required', message: 'This field is required.'},
+  ],
+  expirationHour: [
+    { type: 'required', message: 'Provide an hour between 0 and 23'},
+    { type: 'min', message: 'Value must be between 0 and 23.'},
+    { type: 'max', message: 'Value be between 0 and 23.'},
+  ],
+  expirationMin: [
+    { type: 'required', message: 'Provide a minute between 0 and 60'},
+    { type: 'min', message: 'Value must be between 0 and 59.'},
+    { type: 'max', message: 'Value must be between 0 and 59.'},
+  ],
+  maxUses: [
+    { type: 'required', message: 'This field is required.'},
+    { type: 'min', message: 'Value cannot be less than 1.' }
+  ],
+  userSpecific: [
+    { type: 'required', message: 'This field is required.'},
+  ],
+  productSpecific: [
+    { type: 'required', message: 'This field is required.'},
+  ],
+  maxUsesPerUser: [
+    { type: 'min', message: 'Value cannot be less than 1.'},
+    { type: 'max', message: 'Value cannot exceed overall max use limit above.'},
+  ],
+};

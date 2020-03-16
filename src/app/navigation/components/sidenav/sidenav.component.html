@@ -50,6 +50,14 @@
 
   <a mat-list-item 
     routerLinkActive="active-list-item"
+    [routerLink]="appRoutes.COUPONS_DASHBOARD"
+    (click)="onToggleSideNav()">
+    <mat-icon mat-list-icon>card_giftcard</mat-icon>
+    <p mat-line>Coupons</p>
+  </a>
+
+  <a mat-list-item 
+    routerLinkActive="active-list-item"
     [routerLink]="appRoutes.DATA_IMPORTS"
     (click)="onToggleSideNav()">
     <mat-icon mat-list-icon>cloud_upload</mat-icon>

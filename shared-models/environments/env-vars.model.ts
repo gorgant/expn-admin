@@ -70,7 +70,6 @@ export enum ProductionCloudStorage {
   MARY_DAPHNE_ADMIN_PRODUCTS_STORAGE_FB = 'gs://marydaphne-admin-products',
   MARY_DAPHNE_ADMIN_BACKUP_STORAGE_AF_CF = 'marydaphne-admin-backup',
   MARY_DAPHNE_ADMIN_BACKUP_STORAGE_FB = 'gs://marydaphne-admin-backup',
-
 }
 
 export enum SandboxCloudStorage {
@@ -92,3 +91,17 @@ export const StripePublishableKeys = {
   production: 'pk_live_2ybMSK15jNXw8mpoJ1MmIrfW00PvuSsi2F',
   sandbox: 'pk_test_qiAhFPd39eG3eqgEtWM9Yx0v00p7PxdzcH'
 };
+
+export enum ProductionSsrDataLoadChecks {
+  EXPLEARNING_BLOG_MIN = 100,
+  EXPLEARNING_PODCAST_MIN = 50,
+  MARY_DAPHNE_BLOG_MIN = 6,
+  MARY_DAPHNE_PODCAST_MIN = 0
+}
+
+export enum SandboxSsrDataLoadChecks {
+  EXPLEARNING_BLOG_MIN = 2,
+  EXPLEARNING_PODCAST_MIN = 2,
+  MARY_DAPHNE_BLOG_MIN = 1,
+  MARY_DAPHNE_PODCAST_MIN = 0
+}

@@ -1,8 +1,11 @@
 import { Product } from '../products/product.model';
+import { DiscountCouponChild } from './discount-coupon.model';
+import { Stripe as StripeDefs} from 'stripe';
 
 export interface StripeChargeData {
-  source: stripe.Source;
+  source: StripeDefs.Source;
   publicUserId: string;
-  amountPaid: number;
   product: Product;
+  quantity: number;
+  discountCoupon: DiscountCouponChild;
 }

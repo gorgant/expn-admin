@@ -1,0 +1,115 @@
+<form [formGroup]="couponForm" (ngSubmit)="onSave()" fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="16px">
+
+  <h2 mat-dialog-title class="section-header" mat-dialog-title>{{ formTitle }}</h2>
+  <div mat-dialog-content fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="12px" fxLayoutGap.gt-sm="8px">
+
+    <mat-form-field>
+      <mat-label>Coupon Code</mat-label>
+      <input formControlName="couponCode" matInput type="text">
+      <mat-hint *ngIf="isNewCoupon">Letters and numbers. No spaces.</mat-hint>
+      <mat-error *ngFor="let validation of couponValidationMessages.couponCode">
+        <mat-error *ngIf="couponCode.hasError(validation.type) && couponCode.invalid && (couponCode.dirty || couponCode.touched)">{{ validation.message }}</mat-error>
+      </mat-error>
+    </mat-form-field>
+    
+    <mat-form-field>
+      <mat-label>Discount (%)</mat-label>
+      <input formControlName="discountPercentage" matInput type="number">
+      <mat-hint>1 - 100</mat-hint>
+      <mat-error *ngFor="let validation of couponValidationMessages.discountPercentage">
+        <mat-error *ngIf="discountPercentage.hasError(validation.type) && discountPercentage.invalid && (discountPercentage.dirty || discountPercentage.touched)">{{ validation.message }}</mat-error>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Max Uses</mat-label>
+      <input formControlName="maxUses" matInput type="number">
+      <mat-hint>Must be greater than 0.</mat-hint>
+      <mat-error *ngFor="let validation of couponValidationMessages.maxUses">
+        <mat-error *ngIf="maxUses.hasError(validation.type) && maxUses.invalid && (maxUses.dirty || maxUses.touched)">{{ validation.message }}</mat-error>
+      </mat-error>
+    </mat-form-field>
+ 
+    <div class="expiration-date-picker" fxLayout="column" fxLayoutGap="0px" fxLayoutGap.gt-sm="16px" fxLayout.gt-sm="row">
+      <mat-form-field class="date-picker">
+        <input formControlName="expirationDate" matInput [min]="minDate" [matDatepicker]="picker" placeholder="Expiration Date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker [touchUi]="useTouchUi" #picker></mat-datepicker>
+        <mat-error *ngFor="let validation of couponValidationMessages.expirationDate">
+          <mat-error *ngIf="expirationDate.hasError(validation.type) && expirationDate.invalid && (expirationDate.dirty || expirationDate.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <div class="time-picker" fxLayout="row" fxLayoutGap="16px">
+        <mat-form-field class="hour-picker">
+          <mat-label>Hour</mat-label>
+          <input formControlName="expirationHour" matInput type="number" min="0" max="23">
+          <mat-hint>0 - 23</mat-hint>
+          <mat-error *ngFor="let validation of couponValidationMessages.expirationHour">
+            <mat-error *ngIf="expirationHour.hasError(validation.type) && expirationHour.invalid && (expirationHour.dirty || expirationHour.touched)">{{ validation.message }}</mat-error>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="min-picker">
+          <mat-label>Min</mat-label>
+          <input formControlName="expirationMin" matInput type="number" min="0" max="59">
+          <mat-hint>0 - 59</mat-hint>
+          <mat-error *ngFor="let validation of couponValidationMessages.expirationMin">
+            <mat-error *ngIf="expirationMin.hasError(validation.type) && expirationMin.invalid && (expirationMin.dirty || expirationMin.touched)">{{ validation.message }}</mat-error>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <mat-slide-toggle formControlName="userSpecific" matInput placeholder="User Specific" [checked]="userSpecific.value" (change)="onToggleUserSpecific($event)">
+      Limit Uses Per User
+      <mat-error *ngFor="let validation of couponValidationMessages.userSpecific">
+        <mat-error *ngIf="userSpecific.hasError(validation.type) && userSpecific.invalid && (userSpecific.dirty || userSpecific.touched)">{{ validation.message }}</mat-error>
+      </mat-error>
+    </mat-slide-toggle>
+
+    <div class="user-specific-details" [fxHide]="!userSpecific.value">
+      <mat-form-field>
+        <mat-label>Max Uses Per User</mat-label>
+        <input formControlName="maxUsesPerUser" matInput type="number">
+        <mat-hint>Cannot exceed overall max use limit: {{ maxUses.value || 1 }}.</mat-hint>
+        <mat-error *ngFor="let validation of couponValidationMessages.maxUsesPerUser">
+          <mat-error *ngIf="maxUsesPerUser.hasError(validation.type) && maxUsesPerUser.invalid && (maxUsesPerUser.dirty || maxUsesPerUser.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <mat-slide-toggle formControlName="productSpecific" matInput placeholder="User Specific" [checked]="productSpecific.value">
+      Limit to Specific Products
+      <mat-error *ngFor="let validation of couponValidationMessages.productSpecific">
+        <mat-error *ngIf="productSpecific.hasError(validation.type) && productSpecific.invalid && (productSpecific.dirty || productSpecific.touched)">{{ validation.message }}</mat-error>
+      </mat-error>
+    </mat-slide-toggle>
+
+    <div class="product-specific-details" [fxHide]="!productSpecific.value">
+      <mat-form-field>
+        <mat-label>Select Approved Products</mat-label>
+        <mat-select multiple formControlName="approvedProductIds">
+          <mat-option *ngFor="let product of (products$ | async)" [value]="product.id">{{ product.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </div>
+  
+  <div mat-dialog-actions fxLayout="row">
+    <button
+      [disabled]="couponForm.invalid"
+      mat-raised-button
+      color="primary"
+      type="submit"
+      >
+        Save
+    </button>
+    <button 
+      mat-raised-button
+      (click)="onClose()"
+      type="button"
+      >
+        Cancel
+    </button>
+  </div>
+</form>

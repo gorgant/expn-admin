@@ -66,10 +66,12 @@ export enum EmailSenderAddresses {
   EXPLEARNING_NEWSLETTER = 'newsletter@explearning.co',
   EXPLEARNING_ORDERS = 'orders@explearning.co',
   EXPLEARNING_ADMIN = 'admin@explearning.co',
+  EXPLEARNING_SUPPORT = 'support@explearning.co',
   MARY_DAPHNE_DEFAULT = 'hello@marydaphne.com',
   MARY_DAPHNE_NEWSLETTER = 'newsletter@marydaphne.com',
   MARY_DAPHNE_ORDERS = 'orders@marydaphne.com',
-  MARY_DAPHNE_ADMIN = 'admin@marydaphne.com'
+  MARY_DAPHNE_ADMIN = 'admin@marydaphne.com',
+  MARY_DAPHNE_SUPPORT = 'support@marydaphne.com'
 }
 
 export enum EmailSenderNames {

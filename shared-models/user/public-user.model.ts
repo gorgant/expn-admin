@@ -9,4 +9,5 @@ export interface PublicUser {
   billingDetails?: BillingDetails | Partial<BillingDetails>;
   stripeCustomerId?: string;
   orderHistory?: OrderHistory;
+  optInConfirmed?: boolean;
 }

@@ -15,6 +15,7 @@ import { CustomSerializer } from '../core/utils/router-state-serializer';
 import { SubscriberStoreModule } from './subscriber-store';
 import { ContactFormStoreModule } from './contact-form-store';
 import { EmailStoreModule } from './email-store';
+import { CouponStoreModule } from './coupon-store';
 
 @NgModule({
   declarations: [],
@@ -27,6 +28,7 @@ import { EmailStoreModule } from './email-store';
     OrderStoreModule,
     SubscriberStoreModule,
     ContactFormStoreModule,
+    CouponStoreModule,
     EmailStoreModule,
     StoreModule.forRoot({}, {metaReducers}),
     EffectsModule.forRoot([]),

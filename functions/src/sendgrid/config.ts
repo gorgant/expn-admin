@@ -27,7 +27,7 @@ const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;
 const blogUrl = `https://${appUrl}${blogSlugWithSlashPrefix}`;
 const productListSlugWithSlashPrefix = PublicAppRoutes.PRODUCTS;
 const remoteCoachUrl = `https://${appUrl}${productListSlugWithSlashPrefix}/${remoteCoachProductId}/${remoteCoachProductSlug}`;
-const confirmationSlugWithSlahPrefeix = PublicAppRoutes.CONFIRMATION;
+const confirmationSlugWithSlahPrefeix = PublicAppRoutes.SUB_CONFIRMATION;
 const optInConfirmationUrlNoParams = `https://${appUrl}${confirmationSlugWithSlahPrefeix}`
 
 export const EmailWebsiteLinks = {

@@ -61,6 +61,7 @@ export function featureReducer(state = initialState, action: Actions): State {
       return {
         ...state,
         deletionProcessing: true,
+        error: null
       };
 
     case ActionTypes.DELETE_POST_COMPLETE:

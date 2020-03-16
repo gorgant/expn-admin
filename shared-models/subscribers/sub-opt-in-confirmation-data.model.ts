@@ -1,4 +1,4 @@
 export interface SubOptInConfirmationData {
-  pubId: string;
-  subId: string;
+  publicId: string;
+  subscriberId: string;
 }
