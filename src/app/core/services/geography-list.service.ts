@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { map, tap } from 'rxjs/operators';
-import { Observable, zip } from 'rxjs';
+import { map, tap, take, catchError } from 'rxjs/operators';
+import { Observable, zip, from, throwError } from 'rxjs';
 import { GeographicData } from 'shared-models/forms-and-components/geography/geographic-data.model';
 import { Country } from 'shared-models/forms-and-components/geography/country.model';
 import { UsState } from 'shared-models/forms-and-components/geography/us-state.model';
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { UiService } from './ui.service';
 
 @Injectable({
   providedIn: 'root'
@@ -34,17 +35,32 @@ export class GeographyListService {
         }),
         tap(geographicData => {
           this.updateGeographicDataLocally(geographicData);
+        }),
+        catchError(error => {
+          console.log('Error updating geographic data locally', error);
+          return throwError(error);
         })
       );
   }
 
   private updateGeographicDataLocally(geographicData: GeographicData) {
     const geographicDataDoc = this.getPublicCollection().doc<GeographicData>('geographicData');
-    geographicDataDoc.set(geographicData).then(res => {
-      console.log('Geographic data updated locally', geographicData);
-    }).catch(error => {
-      console.log('Error updating local geographic data', error);
+
+    const fbResponse = from(geographicDataDoc.set(geographicData));
+
+    fbResponse.pipe(
+      take(1),
+      tap(empty => {
+        console.log('Geographic data updated locally', geographicData);
+      }),
+      catchError(error => {
+        return throwError(error);
+      })
+    ).subscribe((res) => res, error => {
+      console.log('Error updating geographic data locally', error);
+      throw error;
     });
+
   }
 
   // Data courtesy of: https://datahub.io/core/country-list and https://datahub.io/core/country-codes
@@ -55,6 +71,10 @@ export class GeographyListService {
           const parsedContent = this.parseCSV(data);
           const countryObjectArray = this.convertArrayToCountryObjectsArray(parsedContent);
           return countryObjectArray;
+        }),
+        catchError(error => {
+          console.log('Error fetching country data', error);
+          return throwError(error);
         })
       );
   }
@@ -67,6 +87,10 @@ export class GeographyListService {
           const parsedContent = this.parseCSV(data);
           const stateObjectArray = this.convertArrayToStateObjectsArray(parsedContent);
           return stateObjectArray;
+        }),
+        catchError(error => {
+          console.log('Error fetching US State data', error);
+          return throwError(error);
         })
       );
   }

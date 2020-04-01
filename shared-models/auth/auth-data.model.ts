@@ -1,5 +1,11 @@
+export enum AuthKeys {
+  EMAIL = 'email',
+  PASSWORD = 'password',
+  NAME = 'name'
+}
+
 export interface AuthData {
-  email: string;
-  password: string;
-  name?: string;
+  [AuthKeys.EMAIL]: string;
+  [AuthKeys.PASSWORD]: string;
+  [AuthKeys.NAME]?: string;
 }

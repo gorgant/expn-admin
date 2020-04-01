@@ -1,5 +1,7 @@
+export enum ProductCardKeys {
+  HIGHLIGHTS = 'highlights'
+}
+
 export interface ProductCardData {
-  name: string;
-  tagline: string;
-  highlights: string[];
+  [ProductCardKeys.HIGHLIGHTS]: string[];
 }

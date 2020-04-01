@@ -7,8 +7,6 @@ export enum ActionTypes {
   SINGLE_POST_LOADED = '[Posts] Single Post Loaded',
   ALL_POSTS_REQUESTED = '[Posts] All Posts Requested',
   ALL_POSTS_LOADED = '[Posts] All Posts Loaded',
-  ADD_POST_REQUESTED = '[Posts] Add Post Requested',
-  ADD_POST_COMPLETE = '[Posts] Add Post Complete',
   UPDATE_POST_REQUESTED = '[Posts] Update Post Requested',
   UPDATE_POST_COMPLETE = '[Posts] Update Post Complete',
   DELETE_POST_REQUESTED = '[Posts] Delete Post Requested',
@@ -23,7 +21,10 @@ export enum ActionTypes {
   REFRESH_PUBLIC_BLOG_CACHE_COMPLETE = '[Posts] Refresh Public Blog Cache Complete',
   REFRESH_PUBLIC_FEATURED_POSTS_CACHE_REQUESTED = '[Posts] Refresh Public Featured Posts Cache Requested',
   REFRESH_PUBLIC_FEATURED_POSTS_CACHE_COMPLETE = '[Posts] Refresh Public Featured Posts Cache Complete',
-  POST_LOAD_FAILURE = '[Posts] Load Failure',
+  LOAD_FAILED = '[Posts] Load Failed',
+  SAVE_FAILED = '[Posts] Save Failed',
+  DELETE_FAILED = '[Posts] Delete Failed',
+  PUBLIC_UPDATE_FAILED = '[Posts] Public Update Failed'
 }
 
 export class SinglePostRequested implements Action {
@@ -43,18 +44,6 @@ export class AllPostsRequested implements Action {
 export class AllPostsLoaded implements Action {
   readonly type = ActionTypes.ALL_POSTS_LOADED;
   constructor(public payload: { posts: Post[] }) {}
-}
-
-export class AddPostRequested implements Action {
-  readonly type = ActionTypes.ADD_POST_REQUESTED;
-
-  constructor(public payload: { post: Post }) {}
-}
-
-export class AddPostComplete implements Action {
-  readonly type = ActionTypes.ADD_POST_COMPLETE;
-
-  constructor(public payload: { post: Post }) {}
 }
 
 export class UpdatePostRequested implements Action {
@@ -126,8 +115,23 @@ export class RefreshPublicFeaturedPostsCacheComplete implements Action {
 }
 
 
-export class LoadErrorDetected implements Action {
-  readonly type = ActionTypes.POST_LOAD_FAILURE;
+export class LoadFailed implements Action {
+  readonly type = ActionTypes.LOAD_FAILED;
+  constructor(public payload: { error: string }) {}
+}
+
+export class SaveFailed implements Action {
+  readonly type = ActionTypes.SAVE_FAILED;
+  constructor(public payload: { error: string }) {}
+}
+
+export class DeleteFailed implements Action {
+  readonly type = ActionTypes.DELETE_FAILED;
+  constructor(public payload: { error: string }) {}
+}
+
+export class PublicUpdateFailed implements Action {
+  readonly type = ActionTypes.PUBLIC_UPDATE_FAILED;
   constructor(public payload: { error: string }) {}
 }
 
@@ -136,8 +140,6 @@ export type Actions =
   SinglePostLoaded |
   AllPostsRequested |
   AllPostsLoaded |
-  AddPostRequested |
-  AddPostComplete |
   UpdatePostRequested |
   UpdatePostComplete |
   DeletePostRequested |
@@ -152,5 +154,8 @@ export type Actions =
   RefreshPublicBlogCacheComplete |
   RefreshPublicFeaturedPostsCacheRequested |
   RefreshPublicFeaturedPostsCacheComplete |
-  LoadErrorDetected
+  LoadFailed |
+  SaveFailed |
+  DeleteFailed |
+  PublicUpdateFailed
   ;

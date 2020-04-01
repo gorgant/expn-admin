@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { DiscountCouponParent, DiscountCouponQueryFields } from 'shared-models/billing/discount-coupon.model';
+import { DiscountCouponParent, DiscountCouponKeys } from 'shared-models/billing/discount-coupon.model';
 import { MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { RootStoreState, CouponStoreSelectors, CouponStoreActions } from 'src/app/root-store';
@@ -19,7 +19,7 @@ export class CouponDashboardComponent implements OnInit, OnDestroy {
 
   coupons$: Observable<DiscountCouponParent[]>;
   private couponsSubscription: Subscription;
-  couponObjectKeys = DiscountCouponQueryFields;
+  couponObjectKeys = DiscountCouponKeys;
 
   displayedColumns = [
     this.couponObjectKeys.COUPON_CODE,
@@ -48,7 +48,7 @@ export class CouponDashboardComponent implements OnInit, OnDestroy {
   }
 
   onSelectCoupon(coupon: DiscountCouponParent) {
-    this.router.navigate([AdminAppRoutes.COUPONS_COUPON_DETAILS, coupon.couponCode]);
+    this.router.navigate([AdminAppRoutes.COUPONS_COUPON_DETAILS, coupon[DiscountCouponKeys.COUPON_CODE]]);
   }
 
   onCreateCoupon() {

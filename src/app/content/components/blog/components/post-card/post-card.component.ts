@@ -4,13 +4,14 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { RootStoreState, PostStoreActions } from 'src/app/root-store';
+import { RootStoreState, PostStoreActions, PostStoreSelectors } from 'src/app/root-store';
 import { Post } from 'shared-models/posts/post.model';
 import { AdminImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 import { SchedulePostDialogueComponent } from '../schedule-post-dialogue/schedule-post-dialogue.component';
 import { UiService } from 'src/app/core/services/ui.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-post-card',
@@ -23,6 +24,8 @@ export class PostCardComponent implements OnInit {
   postUrlSlug: string;
   heroPlaceholderPath = AdminImagePaths.HERO_PLACEHOLDER;
   thumbnailSrc: string;
+  isTogglingPublished$: Observable<boolean>;
+  isTogglingFeatured$: Observable<boolean>;
 
   constructor(
     private router: Router,
@@ -48,6 +51,7 @@ export class PostCardComponent implements OnInit {
 
   onTogglePublishPost() {
     console.log('Publish post toggled');
+    this.isTogglingPublished$ = this.store$.select(PostStoreSelectors.selectIsTogglingPublished);
     this.store$.dispatch(new PostStoreActions.TogglePublishedRequested({post: this.post}));
   }
 
@@ -65,6 +69,7 @@ export class PostCardComponent implements OnInit {
 
   onTogglePostFeatured() {
     console.log('Publish featured toggled');
+    this.isTogglingFeatured$ = this.store$.select(PostStoreSelectors.selectIsTogglingFeatured);
     this.store$.dispatch(new PostStoreActions.ToggleFeaturedRequested({post: this.post}));
   }
 

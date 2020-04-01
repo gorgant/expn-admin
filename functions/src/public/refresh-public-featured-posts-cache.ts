@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import { submitCacheUpdateRequest } from './submit-cache-update-request';
 import { generateHomeUrlObject } from './helpers';
-import { catchErrors, assertUID } from '../config/global-helpers';
+import { assertUID } from '../config/global-helpers';
 
 
 /////// DEPLOYABLE FUNCTIONS ///////
@@ -14,5 +14,5 @@ export const refreshPublicFeaturedPostsCache = functions.https.onCall(async (dat
 
   const blogUrlObject = generateHomeUrlObject();
   
-  return catchErrors(submitCacheUpdateRequest(blogUrlObject));
+  return submitCacheUpdateRequest(blogUrlObject);
 });

@@ -22,12 +22,16 @@ export class UiService {
     this.sideNavSignal$.next();
   }
 
-  showSnackBar(message, action, duration: number) {
+  showSnackBar(message: string, duration: number, action: string = 'Dismiss', ) {
     const config = new MatSnackBarConfig();
     config.duration = duration;
     config.panelClass = ['custom-snack-bar']; // CSS managed in global styles.css
 
     const snackBarRef = this.snackbar.open(message, action, config);
+
+    snackBarRef.onAction().subscribe(() => {
+      snackBarRef.dismiss();
+    });
   }
 
   monitorScreenSize() {

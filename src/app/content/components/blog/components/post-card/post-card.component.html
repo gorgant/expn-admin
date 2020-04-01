@@ -14,19 +14,21 @@
   <mat-card-actions fxLayout="column" fxLayoutGap="8px">
     <div class="card-actions" fxLayout="row">
       <div class="primary-actions" fxLayout="row" fxLayoutGap="16px">
-        <button *ngIf="!post.published" [disabled]="!post.readyToPublish" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Publish</button>
+        <button *ngIf="!(isTogglingPublished$ | async) && !post.published" [disabled]="!post.readyToPublish" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Publish</button>
         <button *ngIf="!post.published" [disabled]="!post.readyToPublish" mat-icon-button class="schedule-button" color="accent" (click)="onSchedulePost()">
           <mat-icon>access_time</mat-icon>
         </button>
-        <button *ngIf="post.published" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Un-Publish</button>
+        <button *ngIf="!(isTogglingPublished$ | async) && post.published" mat-raised-button class="publish-button" color="accent" (click)="onTogglePublishPost()">Un-Publish</button>
+        <mat-progress-spinner *ngIf="isTogglingPublished$ | async" diameter=40 color="accent" mode="indeterminate"></mat-progress-spinner>
       </div>
       <div *ngIf="post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
-        <button *ngIf="post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
+        <button *ngIf="!(isTogglingFeatured$ | async) && post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
           <mat-icon>star</mat-icon>
         </button>
-        <button *ngIf="!post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
+        <button *ngIf="!(isTogglingFeatured$ | async) && !post.featured" mat-icon-button class="edit-button" (click)="onTogglePostFeatured()">
           <mat-icon>star_border</mat-icon>
         </button>
+        <mat-progress-spinner *ngIf="isTogglingFeatured$ | async" diameter=40 color="accent" mode="indeterminate"></mat-progress-spinner>
       </div>
       <div *ngIf="!post.published" class="other-actions" fxFlex fxLayoutAlign="end center">
         <button mat-icon-button class="edit-button" (click)="onSelectBlogItem()">

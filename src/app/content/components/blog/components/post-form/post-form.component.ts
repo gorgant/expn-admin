@@ -14,7 +14,7 @@ import { now } from 'moment';
 import { ImageService } from 'src/app/core/services/image.service';
 import { UtilsService } from 'src/app/core/services/utils.service';
 import { AdminUser } from 'shared-models/user/admin-user.model';
-import { Post } from 'shared-models/posts/post.model';
+import { Post, PostKeys } from 'shared-models/posts/post.model';
 import { ImageProps } from 'shared-models/images/image-props.model';
 import { POST_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
 import { BlogDomains } from 'shared-models/posts/blog-domains.model';
@@ -36,6 +36,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   imageUploadProcessing$: Subject<boolean>;
 
   postForm: FormGroup;
+  postFormKeys = PostKeys;
   postValidationMessages = POST_FORM_VALIDATION_MESSAGES;
   descriptionMaxLength = 320;
   keywordsMaxLength = 100;
@@ -57,6 +58,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
   // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
   private autoSaveTicker: NodeJS.Timer;
   private autoSavePostSubscription: Subscription;
+  private savePostSubscription: Subscription;
+  private deletePostSubscription: Subscription;
   private imageProcessingSubscription: Subscription;
 
   public Editor = ClassicEditor;
@@ -106,10 +109,18 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .subscribe(userConfirmed => {
         if (userConfirmed) {
           this.postDiscarded = true;
-          this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
+          // If new item, delete it entirely
           if (this.isNewPost) {
+            if (this.deletePostSubscription) {
+              this.deletePostSubscription.unsubscribe();
+            }
             this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId: this.postId}));
+            this.reactToDeletOutcome();
           } else {
+            if (this.savePostSubscription) {
+              this.savePostSubscription.unsubscribe();
+            }
+            // If existing item, revert to original version (but use current image list)
             this.post$
               .pipe(take(1))
               .subscribe(post => {
@@ -122,6 +133,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
                 console.log('Original item to revert to', this.originalPost);
                 console.log('Original item with current image list', originalItemWithCurrentImageList);
                 this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post: originalItemWithCurrentImageList}));
+                this.reactToSaveOutcome(post);
               });
           }
         }
@@ -157,7 +169,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       return alert('only images allowed');
     }
 
-    // Initialize product if not yet done
+    // Initialize post if not yet done
     if (!this.postInitialized) {
       this.initializePost();
     } else {
@@ -201,13 +213,13 @@ export class PostFormComponent implements OnInit, OnDestroy {
         .subscribe(post => {
           if (post) {
             const data: Partial<Post> = {
-              blogDomain: post.blogDomain,
-              title: post.title,
-              videoUrl: post.videoUrl,
-              podcastEpisodeUrl: post.podcastEpisodeUrl,
-              description: post.description,
-              keywords: post.keywords,
-              content: post.content,
+              [PostKeys.BLOG_DOMAIN]: post[PostKeys.BLOG_DOMAIN],
+              [PostKeys.TITLE]: post[PostKeys.TITLE],
+              [PostKeys.VIDEO_URL]: post[PostKeys.VIDEO_URL],
+              [PostKeys.PODCAST_EPISODE_URL]: post[PostKeys.PODCAST_EPISODE_URL],
+              [PostKeys.DESCRIPTION]: post[PostKeys.DESCRIPTION],
+              [PostKeys.KEYWORDS]: post[PostKeys.KEYWORDS],
+              [PostKeys.CONTENT]: post[PostKeys.CONTENT],
             };
             console.log('Patching post data into form', data);
             this.postForm.patchValue(data);
@@ -228,7 +240,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     return this.store$.select(PostStoreSelectors.selectPostById(postId))
     .pipe(
       withLatestFrom(
-        this.store$.select(PostStoreSelectors.selectPostsLoaded)
+        this.store$.select(PostStoreSelectors.selectLoaded)
       ),
       map(([post, postsLoaded]) => {
         // Check if items are loaded, if not fetch from server
@@ -245,13 +257,13 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   private configureNewPost() {
     this.postForm = this.fb.group({
-      blogDomain: [BlogDomains.EXPLEARNING, Validators.required],
-      title: ['', Validators.required],
-      videoUrl: ['', [Validators.pattern(/^\S*(?:https\:\/\/youtu\.be)\S*$/)]],
-      podcastEpisodeUrl: ['', [Validators.pattern(/^\S*(?:https\:\/\/soundcloud\.com)\S*$/)]],
-      description: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],
-      keywords: ['', [Validators.required, Validators.maxLength(this.keywordsMaxLength)]],
-      content: [{value: '', disabled: false }, Validators.required],
+      [PostKeys.BLOG_DOMAIN]: [BlogDomains.EXPLEARNING, Validators.required],
+      [PostKeys.TITLE]: ['', Validators.required],
+      [PostKeys.VIDEO_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/youtu\.be)\S*$/)]],
+      [PostKeys.PODCAST_EPISODE_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/soundcloud\.com)\S*$/)]],
+      [PostKeys.DESCRIPTION]: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],
+      [PostKeys.KEYWORDS]: ['', [Validators.required, Validators.maxLength(this.keywordsMaxLength)]],
+      [PostKeys.CONTENT]: [{value: '', disabled: false }, Validators.required],
     });
 
     this.imageUploadProcessing$ = this.imageService.getImageProcessing(); // Monitor image processing
@@ -276,11 +288,11 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .subscribe(imageProcessing => {
         switch (imageProcessing) {
           case true:
-            return this.content.disable();
+            return this[PostKeys.CONTENT].disable();
           case false:
-            return this.content.enable();
+            return this[PostKeys.CONTENT].enable();
           default:
-            return this.content.enable();
+            return this[PostKeys.CONTENT].enable();
         }
       });
   }
@@ -291,22 +303,22 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .subscribe(adminUser => {
         console.log('Post initialized');
         const post: Post = {
-          blogDomain: this.blogDomain.value,
+          [PostKeys.BLOG_DOMAIN]: this[PostKeys.BLOG_DOMAIN].value,
           author: adminUser.email,
           authorId: adminUser.id,
-          videoUrl: this.videoUrl.value,
-          description: this.description.value,
-          keywords: this.keywords.value,
-          content: this.content.value,
+          [PostKeys.VIDEO_URL]: this[PostKeys.VIDEO_URL].value,
+          [PostKeys.DESCRIPTION]: this[PostKeys.DESCRIPTION].value,
+          [PostKeys.KEYWORDS]: this[PostKeys.KEYWORDS].value,
+          [PostKeys.CONTENT]: this[PostKeys.CONTENT].value,
           modifiedDate: now(),
-          title: this.title.value ? (this.title.value as string).trim() : this.tempPostTitle,
+          [PostKeys.TITLE]: this[PostKeys.TITLE].value ? (this[PostKeys.TITLE].value as string).trim() : this.tempPostTitle,
           id: this.postId,
           published: false,
           publishedDate: null,
           imageProps: null,
           featured: false
         };
-        this.store$.dispatch(new PostStoreActions.AddPostRequested({post}));
+        this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post}));
         this.postInitialized = true;
       });
   }
@@ -345,23 +357,28 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   private changesDetected(post: Post): boolean {
     // // Enable for debugging
-    // console.log(`Server post blogDomain: ${post.blogDomain} vs local post blogDomain: ${this.blogDomain.value}`);
-    // console.log(`Server post title: ${post.title} vs local post title: ${this.title.value}`);
-    // console.log(`Server post videoUrl: ${post.videoUrl} vs local post videoUrl: ${this.videoUrl.value}`);
     // tslint:disable-next-line:max-line-length
-    // console.log(`Server post podcastEpisodeUrl: ${post.podcastEpisodeUrl} vs local post podcastEpisodeUrl: ${this.podcastEpisodeUrl.value}`);
-    // console.log(`Server post description: ${post.description} vs local post description: ${this.description.value}`);
-    // console.log(`Server post keywords: ${post.keywords} vs local post keywords: ${this.keywords.value}`);
-    // console.log(`Server post content: ${post.content} vs local post content: ${this.content.value}`);
+    // console.log(`Server [PostKeys.BLOG_DOMAIN]: ${post[PostKeys.BLOG_DOMAIN]} vs local [PostKeys.BLOG_DOMAIN]: ${this[PostKeys.BLOG_DOMAIN].value}`);
+    // console.log(`Server post [PostKeys.TITLE]: ${post[PostKeys.TITLE]} vs local post [PostKeys.TITLE]: ${this[PostKeys.TITLE].value}`);
+    // tslint:disable-next-line:max-line-length
+    // console.log(`Server post [PostKeys.VIDEO_URL]: ${post[PostKeys.VIDEO_URL]} vs local post [PostKeys.VIDEO_URL]: ${this[PostKeys.VIDEO_URL].value}`);
+    // tslint:disable-next-line:max-line-length
+    // console.log(`Server post [PostKeys.PODCAST_EPISODE_URL]: ${post[PostKeys.PODCAST_EPISODE_URL]} vs local post [PostKeys.PODCAST_EPISODE_URL]: ${this[PostKeys.PODCAST_EPISODE_URL].value}`);
+    // tslint:disable-next-line:max-line-length
+    // console.log(`Server post [PostKeys.DESCRIPTION]: ${post[PostKeys.DESCRIPTION]} vs local post [PostKeys.DESCRIPTION]: ${this[PostKeys.DESCRIPTION].value}`);
+    // tslint:disable-next-line:max-line-length
+    // console.log(`Server post [PostKeys.KEYWORDS]: ${post[PostKeys.KEYWORDS]} vs local post [PostKeys.KEYWORDS]: ${this[PostKeys.KEYWORDS].value}`);
+    // tslint:disable-next-line:max-line-length
+    // console.log(`Server post [PostKeys.CONTENT]: ${post[PostKeys.CONTENT]} vs local post [PostKeys.CONTENT]: ${this[PostKeys.CONTENT].value}`);
     // console.log(`Images modified since last save: ${this.imagesModifiedSinceLastSave}`);
     if (
-      post.blogDomain === this.blogDomain.value &&
-      (post.title === (this.title.value as string).trim() || post.title === this.tempPostTitle) &&
-      post.videoUrl === this.videoUrl.value &&
-      post.podcastEpisodeUrl === this.podcastEpisodeUrl.value &&
-      post.description === this.description.value &&
-      post.keywords === this.keywords.value &&
-      post.content === this.content.value &&
+      post[PostKeys.BLOG_DOMAIN] === this[PostKeys.BLOG_DOMAIN].value &&
+      (post[PostKeys.TITLE] === (this[PostKeys.TITLE].value as string).trim() || post[PostKeys.TITLE] === this.tempPostTitle) &&
+      post[PostKeys.VIDEO_URL] === this[PostKeys.VIDEO_URL].value &&
+      post[PostKeys.PODCAST_EPISODE_URL] === this[PostKeys.PODCAST_EPISODE_URL].value &&
+      post[PostKeys.DESCRIPTION] === this[PostKeys.DESCRIPTION].value &&
+      post[PostKeys.KEYWORDS] === this[PostKeys.KEYWORDS].value &&
+      post[PostKeys.CONTENT] === this[PostKeys.CONTENT].value &&
       !this.imagesModifiedSinceLastSave
     ) {
       return false;
@@ -372,12 +389,12 @@ export class PostFormComponent implements OnInit, OnDestroy {
   private postIsBlank(): boolean {
     if (
       this.heroImageAdded ||
-      this.title.value ||
-      this.videoUrl.value ||
-      this.podcastEpisodeUrl.value ||
-      this.description.value ||
-      this.keywords.value ||
-      this.content.value ||
+      this[PostKeys.TITLE].value ||
+      this[PostKeys.VIDEO_URL].value ||
+      this[PostKeys.PODCAST_EPISODE_URL].value ||
+      this[PostKeys.DESCRIPTION].value ||
+      this[PostKeys.KEYWORDS].value ||
+      this[PostKeys.CONTENT].value ||
       this.imagesModifiedSinceLastSave
     ) {
       return false;
@@ -403,16 +420,16 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe(publicUser => {
         const post: Post = {
-          blogDomain: this.blogDomain.value,
+          [PostKeys.BLOG_DOMAIN]: this[PostKeys.BLOG_DOMAIN].value,
           author: publicUser.displayName || publicUser.email,
           authorId: publicUser.id,
-          videoUrl: this.videoUrl.value,
-          podcastEpisodeUrl: this.podcastEpisodeUrl.value,
-          description: this.description.value,
-          keywords: this.keywords.value,
-          content: this.content.value,
+          [PostKeys.VIDEO_URL]: this[PostKeys.VIDEO_URL].value,
+          [PostKeys.PODCAST_EPISODE_URL]: this[PostKeys.PODCAST_EPISODE_URL].value,
+          [PostKeys.DESCRIPTION]: this[PostKeys.DESCRIPTION].value,
+          [PostKeys.KEYWORDS]: this[PostKeys.KEYWORDS].value,
+          [PostKeys.CONTENT]: this[PostKeys.CONTENT].value,
           modifiedDate: now(),
-          title: this.title.value ? (this.title.value as string).trim() : this.tempPostTitle,
+          [PostKeys.TITLE]: this[PostKeys.TITLE].value ? (this[PostKeys.TITLE].value as string).trim() : this.tempPostTitle,
           id: this.postId,
           readyToPublish: this.readyToPublish(),
           published: false,
@@ -429,8 +446,53 @@ export class PostFormComponent implements OnInit, OnDestroy {
         const postWrapper = post as Post; // Wrap partial post into post shell to play nice with store
 
         this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post: postWrapper}));
-        console.log('Post saved', post);
-        this.imagesModifiedSinceLastSave = false; // Reset image change detection
+
+        this.reactToSaveOutcome(post);
+      });
+  }
+
+  private reactToSaveOutcome(post: Post) {
+    this.savePostSubscription = this.store$.select(PostStoreSelectors.selectIsSaving)
+      .pipe(
+        withLatestFrom(
+          this.store$.select(PostStoreSelectors.selectSaveError)
+        )
+      )
+      .subscribe(([isSaving, saveError]) => {
+        if (!isSaving && !saveError) {
+          console.log('Post saved', post);
+          this.imagesModifiedSinceLastSave = false; // Reset image change detection
+          // Navigate to dashboard if save is complete and is a manual save
+          if (this.manualSave || this.postDiscarded) {
+            this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
+          }
+        }
+        if (saveError) {
+          console.log('Error saving coupon');
+          this.postDiscarded = false;
+        }
+      });
+  }
+
+  private reactToDeletOutcome() {
+    this.deletePostSubscription = this.store$.select(PostStoreSelectors.selectIsDeleting)
+      .pipe(
+        withLatestFrom(
+          this.store$.select(PostStoreSelectors.selectDeleteError)
+        )
+      )
+      .subscribe(([isDeleting, deleteError]) => {
+        if (!isDeleting && !deleteError) {
+          console.log('Post deleted', this.postId);
+          // Navigate to dashboard if save is complete and is a manual save
+          if (this.postDiscarded) {
+            this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
+          }
+        }
+        if (deleteError) {
+          console.log('Error saving coupon');
+          this.postDiscarded = false;
+        }
       });
   }
 
@@ -442,14 +504,13 @@ export class PostFormComponent implements OnInit, OnDestroy {
     clearTimeout(this.initPostTimeout);
   }
 
-
-  get blogDomain() { return this.postForm.get('blogDomain'); }
-  get title() { return this.postForm.get('title'); }
-  get videoUrl() { return this.postForm.get('videoUrl'); }
-  get podcastEpisodeUrl() { return this.postForm.get('podcastEpisodeUrl'); }
-  get description() { return this.postForm.get('description'); }
-  get keywords() { return this.postForm.get('keywords'); }
-  get content() { return this.postForm.get('content'); }
+  get [PostKeys.BLOG_DOMAIN]() { return this.postForm.get(PostKeys.BLOG_DOMAIN); }
+  get [PostKeys.TITLE]() { return this.postForm.get(PostKeys.TITLE); }
+  get [PostKeys.VIDEO_URL]() { return this.postForm.get(PostKeys.VIDEO_URL); }
+  get [PostKeys.PODCAST_EPISODE_URL]() { return this.postForm.get(PostKeys.PODCAST_EPISODE_URL); }
+  get [PostKeys.DESCRIPTION]() { return this.postForm.get(PostKeys.DESCRIPTION); }
+  get [PostKeys.KEYWORDS]() { return this.postForm.get(PostKeys.KEYWORDS); }
+  get [PostKeys.CONTENT]() { return this.postForm.get(PostKeys.CONTENT); }
 
   ngOnDestroy(): void {
     if (this.postInitialized && !this.postDiscarded && !this.manualSave && !this.postIsBlank()) {
@@ -475,6 +536,14 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
     if (this.initPostTimeout) {
       this.killInitPostTimeout();
+    }
+
+    if (this.savePostSubscription) {
+      this.savePostSubscription.unsubscribe();
+    }
+
+    if (this.deletePostSubscription) {
+      this.deletePostSubscription.unsubscribe();
     }
   }
 

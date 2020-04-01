@@ -5,9 +5,10 @@ import { RootStoreState, AuthStoreSelectors, UserStoreSelectors, AuthStoreAction
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { Observable } from 'rxjs';
 import { ResetPasswordDialogueComponent } from '../reset-password-dialogue/reset-password-dialogue.component';
-import { loginValidationMessages } from 'shared-models/forms-and-components/admin-validation-messages.model';
-import { AuthData } from 'shared-models/auth/auth-data.model';
+import { LOGIN_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
+import { AuthData, AuthKeys } from 'shared-models/auth/auth-data.model';
 import { AuthenticateUserType } from 'shared-models/auth/authenticate-user-type.model';
+import { ShorthandBusinessNames } from 'shared-models/forms-and-components/legal-vars.model';
 
 @Component({
   selector: 'app-login',
@@ -16,10 +17,11 @@ import { AuthenticateUserType } from 'shared-models/auth/authenticate-user-type.
 })
 export class LoginComponent implements OnInit {
 
-  LOGIN_FORM_VALIDATION_MESSAGES = loginValidationMessages;
+  loginValidationMessages = LOGIN_VALIDATION_MESSAGES;
   loginForm: FormGroup;
   userAuth$: Observable<boolean>;
   userLoaded$: Observable<boolean>;
+  shorthandBusinessName = ShorthandBusinessNames.EXPLEARNING;
 
   constructor(
     private fb: FormBuilder,
@@ -33,15 +35,15 @@ export class LoginComponent implements OnInit {
     this.userLoaded$ = this.store$.select(UserStoreSelectors.selectUserLoaded);
 
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      [AuthKeys.EMAIL]: ['', [Validators.required, Validators.email]],
+      [AuthKeys.PASSWORD]: ['', Validators.required],
     });
   }
 
   onEmailLogin() {
     const userAuthData: AuthData = {
-      email: this.email.value,
-      password: this.password.value
+      [AuthKeys.EMAIL]: this[AuthKeys.EMAIL].value,
+      [AuthKeys.PASSWORD]: this[AuthKeys.PASSWORD].value
     };
     this.store$.dispatch(new AuthStoreActions.AuthenticationRequested(
       {authData: userAuthData, requestType: AuthenticateUserType.EMAIL_AUTH}
@@ -55,13 +57,13 @@ export class LoginComponent implements OnInit {
     dialogConfig.autoFocus = true;
     dialogConfig.width = '300px';
 
-    dialogConfig.data = this.email.value;
+    dialogConfig.data = this[AuthKeys.EMAIL].value;
 
     const dialogRef = this.dialog.open(ResetPasswordDialogueComponent, dialogConfig);
   }
 
   // Getters for easy access to form fields
-  get email() { return this.loginForm.get('email'); }
-  get password() { return this.loginForm.get('password'); }
+  get [AuthKeys.EMAIL]() { return this.loginForm.get(AuthKeys.EMAIL); }
+  get [AuthKeys.PASSWORD]() { return this.loginForm.get(AuthKeys.PASSWORD); }
 
 }

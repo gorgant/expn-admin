@@ -43,7 +43,7 @@ export class AuthGuard implements CanActivate, CanLoad {
         }),
         catchError(error => {
           this.store$.dispatch(new AuthStoreActions.LoadErrorDetected({error}));
-          this.uiService.showSnackBar(error, null, 5000);
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
           return of(error);
         })
       );
@@ -76,7 +76,7 @@ export class AuthGuard implements CanActivate, CanLoad {
         }),
         catchError(error => {
           this.store$.dispatch(new AuthStoreActions.LoadErrorDetected({error}));
-          this.uiService.showSnackBar(error, null, 5000);
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
           return of(error);
         })
       );

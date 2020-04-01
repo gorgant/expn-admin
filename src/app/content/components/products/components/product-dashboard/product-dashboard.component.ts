@@ -31,12 +31,12 @@ export class ProductDashboardComponent implements OnInit {
   }
 
   private initializeProducts() {
-    this.deletionProcessing$ = this.store$.select(ProductStoreSelectors.selectDeletionProcessing);
+    this.deletionProcessing$ = this.store$.select(ProductStoreSelectors.selectIsDeleting);
     this.products$ = this.store$.select(ProductStoreSelectors.selectAllProducts)
     .pipe(
       withLatestFrom(
-        this.store$.select(ProductStoreSelectors.selectProductsLoaded),
-        this.store$.select(ProductStoreSelectors.selectDeletionProcessing), // Prevents error loading deleted data
+        this.store$.select(ProductStoreSelectors.selectLoaded),
+        this.store$.select(ProductStoreSelectors.selectIsDeleting), // Prevents error loading deleted data
       ),
       map(([products, productsLoaded, deletionProcessing]) => {
         // Check if products are loaded, if not fetch from server

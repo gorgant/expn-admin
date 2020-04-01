@@ -5,6 +5,7 @@ import { Store } from '@ngrx/store';
 import { RootStoreState, UserStoreActions } from 'src/app/root-store';
 import { NAME_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
 import { AdminUser } from 'shared-models/user/admin-user.model';
+import { AuthKeys } from 'shared-models/auth/auth-data.model';
 
 @Component({
   selector: 'app-edit-name-dialogue',
@@ -25,18 +26,18 @@ export class EditNameDialogueComponent implements OnInit {
 
   ngOnInit() {
     this.nameForm = this.fb.group({
-      name: ['', Validators.required]
+      [AuthKeys.NAME]: ['', Validators.required]
     });
 
     this.nameForm.patchValue({
-      name: this.appUser.displayName
+      [AuthKeys.NAME]: this.appUser.displayName
     });
   }
 
   onSave() {
     const updatedUser: AdminUser = {
       ...this.appUser,
-      displayName: this.name.value
+      displayName: this[AuthKeys.NAME].value
     };
     this.store$.dispatch(new UserStoreActions.StoreUserDataRequested({userData: updatedUser}));
     this.dialogRef.close();
@@ -47,6 +48,6 @@ export class EditNameDialogueComponent implements OnInit {
   }
 
   // These getters are used for easy access in the HTML template
-  get name() { return this.nameForm.get('name'); }
+  get [AuthKeys.NAME]() { return this.nameForm.get(AuthKeys.NAME); }
 
 }

@@ -5,7 +5,6 @@ import { AdminUser } from '../../../shared-models/user/admin-user.model';
 import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { adminFirestore } from '../config/db-config';
 import { now } from 'moment';
-import { catchErrors } from '../config/global-helpers';
 
 const addUserToDb = async (authUser: admin.auth.UserRecord) => {
   
@@ -20,7 +19,7 @@ const addUserToDb = async (authUser: admin.auth.UserRecord) => {
   }
 
   await adminFirestore.collection(AdminCollectionPaths.ADMIN_USERS).doc(authUser.uid).set(publicUser)
-    .catch(err => {console.log(`Failed to create admin user in admin database`, err); return err;});
+    .catch(err => {console.log(`Failed to create admin user in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
   console.log('Admin user created', publicUser);
 }
 
@@ -28,6 +27,6 @@ const addUserToDb = async (authUser: admin.auth.UserRecord) => {
 
 export const createAdminUser = functions.auth.user().onCreate( async (user) => {
     
-  return catchErrors(addUserToDb(user));
+  return addUserToDb(user);
 });
 

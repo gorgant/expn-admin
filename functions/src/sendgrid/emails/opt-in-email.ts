@@ -5,6 +5,7 @@ import { BillingDetails } from "../../../../shared-models/billing/billing-detail
 import { currentEnvironmentType } from "../../config/environments-config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
 import { MailData } from "@sendgrid/helpers/classes/mail";
+import * as functions from 'firebase-functions';
 
 
 export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber) => {
@@ -57,7 +58,7 @@ export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber)
     categories
   };
   await sgMail.send(msg)
-    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); return err});
+    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
 
   console.log('Email sent', msg);
 }

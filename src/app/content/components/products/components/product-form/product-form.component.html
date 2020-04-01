@@ -60,6 +60,12 @@
           <mat-error *ngIf="tagline.hasError(validation.type) && tagline.invalid && (tagline.dirty || tagline.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
+      <mat-form-field>
+        <mat-label>Product Category</mat-label>
+        <mat-select formControlName="productCategory">
+          <mat-option *ngFor="let category of productCategories" [value]="category.id" (selectionChange)="updateProductCategory($event)">{{ category.name }} </mat-option>
+        </mat-select>
+      </mat-form-field>
       <div class="highlights-array-container" fxLayout="column" fxLayoutAlign="center center">
         <button class="add-highlight-button" mat-raised-button color="primary" type="button" (click)="onAddHighlight()">
           <mat-icon>add</mat-icon> Add Highlight
@@ -67,7 +73,7 @@
         <div class="highlight-container" formArrayName="highlights" *ngFor="let highlight of highlights.controls; let i = index;" fxLayout="row" fxLayoutAlign="center center">
           <mat-form-field class="highlight">
             <input matInput [formControl]="highlight" type="text" placeholder="Product Highlight">
-            <mat-error *ngFor="let validation of productValidationMessages.highlight">
+            <mat-error *ngFor="let validation of productValidationMessages.highlights">
               <mat-error *ngIf="highlight.hasError(validation.type) && highlight.invalid && (highlight.dirty || highlight.touched)">{{ validation.message }}</mat-error>
             </mat-error>
           </mat-form-field>
@@ -76,10 +82,10 @@
           </button>
         </div>
       </div>
-      <mat-form-field class="heroSubtitle">
-        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="heroSubtitle" type="text" placeholder="Hero Subtitle"></textarea>
-        <mat-error *ngFor="let validation of productValidationMessages.heroSubtitle">
-          <mat-error *ngIf="heroSubtitle.hasError(validation.type) && heroSubtitle.invalid && (heroSubtitle.dirty || heroSubtitle.touched)">{{ validation.message }}</mat-error>
+      <mat-form-field class="pageHeroSubtitle">
+        <textarea matInput cdkTextareaAutosize (keydown.enter)="textareaEnterPressed($event)" formControlName="pageHeroSubtitle" type="text" placeholder="Hero Subtitle"></textarea>
+        <mat-error *ngFor="let validation of productValidationMessages.pageHeroSubtitle">
+          <mat-error *ngIf="pageHeroSubtitle.hasError(validation.type) && pageHeroSubtitle.invalid && (pageHeroSubtitle.dirty || pageHeroSubtitle.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
       <mat-form-field class="buyNowBoxSubtitle">

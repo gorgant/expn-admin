@@ -10,7 +10,6 @@ const getLoadError = (state: State): any => state.loadError;
 const getSaveError = (state: State): boolean => state.saveError;
 const getDeleteError = (state: State): boolean => state.deleteError;
 const getCouponsLoaded = (state: State): boolean => state.couponsLoaded;
-const getCouponSaved = (state: State): boolean => state.couponSaved;
 
 export const selectCouponState: MemoizedSelector<object, State>
 = createFeatureSelector<State>('coupons');
@@ -50,11 +49,5 @@ export const selectLoaded: MemoizedSelector<object, boolean>
 export const selectIsSaving: MemoizedSelector<object, boolean>
 = createSelector(selectCouponState, getIsSaving);
 
-export const selectCouponSaved: MemoizedSelector<object, boolean>
-= createSelector(selectCouponState, getCouponSaved);
-
 export const selectIsDeleting: MemoizedSelector<object, boolean>
 = createSelector(selectCouponState, getIsDeleting);
-
-
-

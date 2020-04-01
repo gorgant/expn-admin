@@ -12,7 +12,6 @@ import { adminFirestore } from '../config/db-config';
 import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
 import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.model';
 import { PubSub } from '@google-cloud/pubsub';
-import { catchErrors } from '../config/global-helpers';
 
 const pubSub = new PubSub();
 const db = adminFirestore;
@@ -36,7 +35,7 @@ const submitRequest = async (requestOptions: request.Options): Promise<{}> => {
       if (response.statusCode >= 400) {
         reject(`400 status detected from request to sendgrid: ${response.statusCode} ${response.statusMessage}`);
         console.log(`Error with request to sendgrid: ${response.statusCode} ${response.statusMessage}`);
-        return new Error(`Error with request to sendgrid: ${response.statusCode} ${response.statusMessage}`);
+        return new functions.https.HttpsError('internal', `Error with request to sendgrid: ${response.statusCode} ${response.statusMessage}`);        
       }
 
       console.log('Body from request', body);
@@ -73,8 +72,7 @@ const getImportStatus = async (jobId: string): Promise<SendgridImportStatusRespo
 
   console.log('Checking job status with these options', requestOptions);
 
-  const importStatusResponse: SendgridImportStatusResponse = await submitRequest(requestOptions)
-    .catch(err => {console.log(`Error submitting request`, err); return err;});
+  const importStatusResponse: SendgridImportStatusResponse = await submitRequest(requestOptions) as SendgridImportStatusResponse;
 
     
   console.log('Got this job status:', importStatusResponse);
@@ -114,7 +112,7 @@ const checkUpdateComplete = async (jobId: string): Promise<boolean> => {
       } else {
         resolve(true);
       }
-    }).catch(err => {console.log(`Error with jobDone request`, err); return err;});
+    });
 
 
     attemptCount ++;
@@ -145,8 +143,7 @@ const getSendgridContactId = async (email: string): Promise<string | null> => {
 
   console.log('Searching SG for contact with these options', requestOptions);
 
-  const searchResponse: SendgridSearchContactsResponse = await submitRequest(requestOptions)
-    .catch(err => {console.log(`Error submitting request`, err); return err;});
+  const searchResponse: SendgridSearchContactsResponse = await submitRequest(requestOptions) as SendgridSearchContactsResponse;
   
   if (searchResponse.contact_count < 1) {
     console.log('No contacts found, aborting getSendgridContactId with null value');
@@ -167,8 +164,7 @@ const deleteSendgridContact = async (subscriber: EmailSubscriber): Promise<Sendg
   if (subscriber.sendgridContactId) {
     contactId = subscriber.sendgridContactId;
   } else {
-    contactId = await getSendgridContactId(subscriber.id)
-      .catch(err => {console.log(`Error getting sendgrid contact ID`, err); return err;});
+    contactId = await getSendgridContactId(subscriber.id) as string;
   }
 
 
@@ -194,8 +190,7 @@ const deleteSendgridContact = async (subscriber: EmailSubscriber): Promise<Sendg
 
   console.log('Transmitting delete request with these options', requestOptions);
   
-  const sgJobResponse: SendgridStandardJobResponse = await submitRequest(requestOptions)
-    .catch(err => {console.log(`Error submitting request`, err); return err;});
+  const sgJobResponse: SendgridStandardJobResponse = await submitRequest(requestOptions) as SendgridStandardJobResponse;
 
   return sgJobResponse;
 
@@ -235,8 +230,7 @@ const createOrUpdateSendgridContact = async (subscriber: EmailSubscriber): Promi
 
   console.log('Transmitting SG update with these options', requestOptions);
   
-  const sgJobResponse: SendgridStandardJobResponse = await submitRequest(requestOptions)
-    .catch(err => {console.log(`Error submitting request`, err); return err;});
+  const sgJobResponse: SendgridStandardJobResponse = await submitRequest(requestOptions) as SendgridStandardJobResponse;
 
   return sgJobResponse;
 
@@ -250,8 +244,7 @@ const addSendgridContactIdToSubscriber = async (subscriber: EmailSubscriber, con
   // If contactUpdateJobId provided, use it to screen addition request
   if (contactUpdateJobId) {
     // Wait for sendgrid update job to complete
-    const updateJobComplete = await checkUpdateComplete(contactUpdateJobId)
-      .catch(err => {console.log(`Error checking for update complete`, err); return err;});
+    const updateJobComplete = await checkUpdateComplete(contactUpdateJobId);
     
     // Abort if update job takes too long (will not be able to fetch contact ID if contact isn't in Sendgrid system yet)
     if (!updateJobComplete) {
@@ -274,7 +267,7 @@ const addSendgridContactIdToSubscriber = async (subscriber: EmailSubscriber, con
   }
   
   const subFbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subscriber.id).update(sendgridContactId)
-    .catch(err => {console.log(`Failed to update subscriber`, err); return err;});
+    .catch(err => {console.log(`Failed to update subscriber:`, err); throw new functions.https.HttpsError('internal', err);});
   
   console.log('Added Sendgrid contact ID to subscriber', subFbRes);
   return subFbRes;
@@ -291,7 +284,7 @@ const triggerWelcomeEmail = async(subscriber: EmailSubscriber) => {
     subscriber
   }
   const topicPublishRes = await topic.publishJSON(pubsubMsg)
-    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); return err;});
+    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); throw new functions.https.HttpsError('internal', err);});
   console.log(`Publish to topic "${topicName}" on project "${projectId}" succeeded:`, topicPublishRes);
 }
 
@@ -309,8 +302,7 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
   // If this is a new opt in, send welcome email
   if (optInRequested) {
     console.log('New subscriber detected, sending welcome email');
-    await triggerWelcomeEmail(newSubscriberData as EmailSubscriber)
-      .catch(err => {console.log(`Failed to trigger welcome email`, err); return err;});
+    await triggerWelcomeEmail(newSubscriberData as EmailSubscriber);
   }
 
   // Exit function if subscriber not opted in (we only update SG with opted-in subscribers)
@@ -320,6 +312,7 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
   }
 
   // ALL SENDGRID RELATED FUNCTIONS MUST GO BELOW THIS
+  
   // Exit function if in sandbox to prevent bad data getting to sendGrid
   if (currentEnvironmentType === EnvironmentTypes.SANDBOX) {
     console.log('Sandbox detected, exit function with no updates to SengGrid');
@@ -328,8 +321,14 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
 
   // If existing subscriber doesn't have a Sengrid contact id, attempt to add it (often fails because contact isn't searchable right after upload)
   if (subscriberAlreadyOptedIn && subscriberMissingSGContactId) {
-    await addSendgridContactIdToSubscriber(newSubscriberData as EmailSubscriber)
-      .catch(err => {console.log(`Error adding sendgrid contact ID to subscriber`, err); return err;});
+    await addSendgridContactIdToSubscriber(newSubscriberData as EmailSubscriber);
+  }
+
+  // Remove contact from Sendgrid
+  if (deleteRequest) {
+    console.log('Deleting contact from SendGrid');
+    await deleteSendgridContact(oldSubscriberData as EmailSubscriber);
+    return;
   }
 
   // If subscriber is opted in but the update is not a name update, don't transmit updates to Sendgrid
@@ -338,17 +337,8 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
     return;
   }
 
-  // Remove contact from Sendgrid
-  if (deleteRequest) {
-    console.log('Deleting contact from SendGrid');
-    await deleteSendgridContact(oldSubscriberData as EmailSubscriber)
-      .catch(err => {console.log(`Error deleting sendgrid contact`, err); return err;});
-    return;
-  }
-
   // Create or update Sendgrid Contact
-  await createOrUpdateSendgridContact(newSubscriberData as EmailSubscriber)
-    .catch(err => {console.log(`Error creating or updating sendgrid contact`, err); return err;});
+  await createOrUpdateSendgridContact(newSubscriberData as EmailSubscriber);
 
 }
 
@@ -363,7 +353,7 @@ export const updateSendgridContact = functions.firestore.document(`${AdminCollec
   const newSubscriberData: EmailSubscriber | null = change.after.exists ? change.after.data() as EmailSubscriber : null; // Check for deletions
   const oldSubscriberData: EmailSubscriber | null = change.before.exists ? change.before.data() as EmailSubscriber : null; // Check for additions
 
-  return catchErrors(executeActions(newSubscriberData, oldSubscriberData));
+  return executeActions(newSubscriberData, oldSubscriberData);
 
 });
 

@@ -63,7 +63,7 @@ export class OrderPageComponent implements OnInit {
       .pipe(
         take(1),
         withLatestFrom(
-          this.store$.select(ProductStoreSelectors.selectProductsLoaded)
+          this.store$.select(ProductStoreSelectors.selectLoaded)
         ),
         map(([products, productsLoaded]) => {
           // Check if items are loaded, if not fetch from server

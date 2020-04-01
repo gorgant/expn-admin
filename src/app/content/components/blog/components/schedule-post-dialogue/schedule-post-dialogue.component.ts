@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { EditEmailDialogueComponent } from '../../../profile/components/edit-email-dialogue/edit-email-dialogue.component';
-import { Post } from 'shared-models/posts/post.model';
+import { Post, PostKeys } from 'shared-models/posts/post.model';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreActions } from 'src/app/root-store';
 import { SCHEDULE_POST_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
@@ -41,7 +41,7 @@ export class SchedulePostDialogueComponent implements OnInit, OnDestroy {
   private configScheduleForm() {
 
     this.scheduleForm = this.fb.group({
-      publishDate: [moment.now(), [Validators.required]],
+      [PostKeys.PUBLISHED_DATE]: [moment.now(), [Validators.required]],
       publishHour: ['', [Validators.min(0), Validators.max(23)]],
       publishMin: ['', [Validators.min(0), Validators.max(59)]]
     });
@@ -51,7 +51,7 @@ export class SchedulePostDialogueComponent implements OnInit, OnDestroy {
 
       const dateString = this.post.scheduledPublishTime;
       this.scheduleForm.patchValue({
-        publishDate: moment(dateString),
+        [PostKeys.PUBLISHED_DATE]: moment(dateString),
         publishHour: moment(dateString).hours(),
         publishMin: moment(dateString).minutes(),
       });
@@ -74,7 +74,9 @@ export class SchedulePostDialogueComponent implements OnInit, OnDestroy {
 
   onSave() {
 
-    const dateNoTime = moment(this.publishDate.value).format('YYYY-MM-DD'); // Purge time from date value so that it adds properly
+    const dateNoTime = moment(
+      this[PostKeys.PUBLISHED_DATE].value
+    ).format('YYYY-MM-DD'); // Purge time from date value so that it adds properly
     const publishDateInMs: number = moment(dateNoTime, 'YYYY-MM-DD').valueOf(); // Convert purged value back to ms
 
     let publishHourInMs = 0;
@@ -126,7 +128,7 @@ export class SchedulePostDialogueComponent implements OnInit, OnDestroy {
   }
 
   // These getters are used for easy access in the HTML template
-  get publishDate() { return this.scheduleForm.get('publishDate'); }
+  get [PostKeys.PUBLISHED_DATE]() { return this.scheduleForm.get(PostKeys.PUBLISHED_DATE); }
   get publishHour() { return this.scheduleForm.get('publishHour'); }
   get publishMin() { return this.scheduleForm.get('publishMin'); }
 

@@ -32,7 +32,7 @@ export class ProductStoreEffects {
             return new productFeatureActions.SingleProductLoaded({ product });
           }),
           catchError(error => {
-            return of(new productFeatureActions.LoadErrorDetected({ error }));
+            return of(new productFeatureActions.LoadFailed({ error }));
           })
         )
     )
@@ -53,28 +53,10 @@ export class ProductStoreEffects {
             return new productFeatureActions.AllProductsLoaded({ products });
           }),
           catchError(error => {
-            return of(new productFeatureActions.LoadErrorDetected({ error }));
+            return of(new productFeatureActions.LoadFailed({ error }));
           })
         )
     )
-  );
-
-  @Effect()
-  addProductEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<productFeatureActions.AddProductRequested>(
-      productFeatureActions.ActionTypes.ADD_PRODUCT_REQUESTED
-    ),
-    mergeMap(action => this.productService.createProduct(action.payload.product).pipe(
-      map(product => {
-        if (!product) {
-          throw new Error('Error adding product');
-        }
-        return new productFeatureActions.AddProductComplete({product});
-      }),
-      catchError(error => {
-        return of(new productFeatureActions.LoadErrorDetected({ error }));
-      })
-    )),
   );
 
   @Effect()
@@ -91,7 +73,7 @@ export class ProductStoreEffects {
             return new productFeatureActions.DeleteProductComplete({productId});
           }),
           catchError(error => {
-            return of(new productFeatureActions.LoadErrorDetected({ error }));
+            return of(new productFeatureActions.DeleteFailed({ error }));
           })
         )
     ),
@@ -115,7 +97,7 @@ export class ProductStoreEffects {
             return new productFeatureActions.UpdateProductComplete({ product: productUpdate });
           }),
           catchError(error => {
-            return of(new productFeatureActions.LoadErrorDetected({ error }));
+            return of(new productFeatureActions.SaveFailed({ error }));
           })
         )
     ),
@@ -128,6 +110,7 @@ export class ProductStoreEffects {
     ),
     switchMap(action => this.productService.toggleProductActive(action.payload.product)
       .pipe(
+          // Update product locally once server update confirmed
           tap(product => {
             if (!product) {
               throw new Error('Error toggling product active');
@@ -136,7 +119,7 @@ export class ProductStoreEffects {
           }),
           map(product => new productFeatureActions.ToggleActiveComplete()),
           catchError(error => {
-            return of(new productFeatureActions.LoadErrorDetected({ error }));
+            return of(new productFeatureActions.PublicUpdateFailed({ error }));
           })
         )
     ),

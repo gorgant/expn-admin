@@ -21,8 +21,7 @@ export interface State extends EntityState<DiscountCouponParent> {
   loadError: any;
   saveError: any;
   deleteError: any;
-  couponsLoaded?: boolean;
-  couponSaved: boolean;
+  couponsLoaded: boolean;
 }
 
 export const initialState: State = featureAdapter.getInitialState(
@@ -34,6 +33,5 @@ export const initialState: State = featureAdapter.getInitialState(
     saveError: null,
     deleteError: null,
     couponsLoaded: false,
-    couponSaved: false,
   }
 );

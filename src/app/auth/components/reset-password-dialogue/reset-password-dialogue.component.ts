@@ -3,7 +3,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { RootStoreState, AuthStoreActions } from 'src/app/root-store';
-import { resetPasswordFormValidationMessages } from 'shared-models/forms-and-components/admin-validation-messages.model';
+import { RESET_PASSWORD_FROM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
+import { AuthKeys } from 'shared-models/auth/auth-data.model';
 
 @Component({
   selector: 'app-reset-password',
@@ -13,7 +14,7 @@ import { resetPasswordFormValidationMessages } from 'shared-models/forms-and-com
 export class ResetPasswordDialogueComponent implements OnInit {
 
   resetPasswordForm: FormGroup;
-  RESET_PASSWORD_FORM_VALIDATION_MESSAGES = resetPasswordFormValidationMessages;
+  resetPasswordFormValidationMessage = RESET_PASSWORD_FROM_VALIDATION_MESSAGES;
 
   constructor(
     private fb: FormBuilder,
@@ -24,12 +25,12 @@ export class ResetPasswordDialogueComponent implements OnInit {
 
   ngOnInit() {
     this.resetPasswordForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
+      [AuthKeys.EMAIL]: ['', [Validators.required, Validators.email]]
     });
 
     if (this.emailFromSignIn) {
       this.resetPasswordForm.patchValue({
-        email: this.emailFromSignIn
+        [AuthKeys.EMAIL]: this.emailFromSignIn
       });
     }
   }
@@ -40,7 +41,7 @@ export class ResetPasswordDialogueComponent implements OnInit {
   }
 
   // These getters are used for easy access in the HTML template
-  get email() { return this.resetPasswordForm.get('email'); }
+  get [AuthKeys.EMAIL]() { return this.resetPasswordForm.get(AuthKeys.EMAIL); }
 
 }
 

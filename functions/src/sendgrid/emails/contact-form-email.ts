@@ -4,6 +4,7 @@ import { EmailSenderAddresses, EmailSenderNames, EmailTemplateIds, EmailCategori
 import { currentEnvironmentType } from "../../config/environments-config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
 import { MailData } from "@sendgrid/helpers/classes/mail";
+import * as functions from 'firebase-functions';
 
 
 export const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
@@ -59,7 +60,7 @@ export const sendContactFormConfirmationEmail = async (contactForm: ContactForm)
     categories
   };
   await sgMail.send(msg)
-    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); return err});
+    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
 
   console.log('Email sent', msg);
 }

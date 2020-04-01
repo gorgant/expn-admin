@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatDialog, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatDialogConfig, MatSelectChange } from '@angular/material';
 import { Subscription, Observable, of } from 'rxjs';
 import { take, withLatestFrom, map, takeWhile } from 'rxjs/operators';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
@@ -9,16 +9,16 @@ import { ImageService } from 'src/app/core/services/image.service';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ProductStoreActions, ProductStoreSelectors } from 'src/app/root-store';
 import { UtilsService } from 'src/app/core/services/utils.service';
-import { Product } from 'shared-models/products/product.model';
+import { Product, ProductKeys, ProductCategory, ProductCategoryList } from 'shared-models/products/product.model';
 import { ImageProps } from 'shared-models/images/image-props.model';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 import { ImageType } from 'shared-models/images/image-type.model';
-import { ProductCardData } from 'shared-models/products/product-card-data.model';
-import { PageHeroData } from 'shared-models/forms-and-components/page-hero-data.model';
-import { BuyNowBoxData } from 'shared-models/products/buy-now-box-data.model';
-import { CheckoutData } from 'shared-models/products/checkout-data.model';
+import { ProductCardData, ProductCardKeys } from 'shared-models/products/product-card-data.model';
+import { PageHeroData, PageHeroKeys } from 'shared-models/forms-and-components/page-hero-data.model';
+import { BuyNowBoxData, BuyNowBoxKeys } from 'shared-models/products/buy-now-box-data.model';
+import { CheckoutData, CheckoutKeys } from 'shared-models/products/checkout-data.model';
 
 @Component({
   selector: 'app-product-form',
@@ -37,6 +37,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   minHighlightsLength = 3;
   productValidationMessages = PRODUCT_FORM_VALIDATION_MESSAGES;
   isNewProduct: boolean;
+  productCategories: ProductCategory[] = ProductCategoryList;
 
   private productId: string;
   private tempProductTitle: string;
@@ -51,6 +52,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private initProductTimeout: NodeJS.Timer; // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
   private autoSaveTicker: NodeJS.Timer; // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
   private autoSaveSubscription: Subscription;
+  private saveProductSubscription: Subscription;
+  private deleteProductSubscription: Subscription;
 
   constructor(
     private store$: Store<RootStoreState.State>,
@@ -70,7 +73,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   onSave() {
     this.manualSave = true;
     this.saveProduct();
-    this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
   }
 
   onDiscardEdits() {
@@ -90,11 +92,18 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     .subscribe(userConfirmed => {
       if (userConfirmed) {
         this.productDiscarded = true;
-        this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
+        // If new item, delete it entirely
         if (this.isNewProduct) {
+          if (this.deleteProductSubscription) {
+            this.deleteProductSubscription.unsubscribe();
+          }
           this.store$.dispatch(new ProductStoreActions.DeleteProductRequested({productId: this.productId}));
+          this.reactToDeletOutcome();
         } else {
-          // Changes discarded, so revert to original product (with current image list)
+          if (this.saveProductSubscription) {
+            this.saveProductSubscription.unsubscribe();
+          }
+          // If existing item, revert to original version (but use current image list)
           this.product$
             .pipe(take(1))
             .subscribe(product => {
@@ -107,6 +116,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
               console.log('Original item to revert to', this.originalProduct);
               console.log('Original item with current image list', originalItemWithCurrentImageList);
               this.store$.dispatch(new ProductStoreActions.UpdateProductRequested({product: originalItemWithCurrentImageList}));
+              this.reactToSaveOutcome(product);
             });
         }
       }
@@ -114,11 +124,11 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   onAddHighlight(): void {
-    this.highlights.push(this.createHighlight());
+    this[ProductCardKeys.HIGHLIGHTS].push(this.createHighlight());
   }
 
   onRemoveHighlight(index: number): void {
-    this.highlights.removeAt(index);
+    this[ProductCardKeys.HIGHLIGHTS].removeAt(index);
   }
 
   onUploadCardImage(event: any) {
@@ -129,6 +139,13 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   onUploadHeroImage(event: any) {
     const file: File = event.target.files[0];
     this.uploadProductImage(file, ImageType.PRODUCT_HERO);
+  }
+
+  updateProductCategory(event: MatSelectChange) {
+    console.log('Product category updated', event.value);
+    this.productForm.patchValue({
+      [ProductKeys.PRODUCT_CATEGORY]: event.value
+    });
   }
 
   private uploadProductImage(file: File, imageType: ImageType): void {
@@ -194,19 +211,20 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         .subscribe(product => {
           if (product) {
             const productFormObject = {
-              name: product.name,
-              price: product.price,
-              listOrder: product.listOrder,
-              tagline: product.tagline,
-              highlights: product.productCardData.highlights,
-              heroSubtitle: product.heroData.pageSubtitle,
-              buyNowBoxSubtitle: product.buyNowData.subtitle,
-              checkoutHeader: product.checkoutData.header,
-              checkoutDescription: product.checkoutData.description,
+              [ProductKeys.NAME]: product[ProductKeys.NAME],
+              [ProductKeys.PRICE]: product[ProductKeys.PRICE],
+              [ProductKeys.LIST_ORDER]: product[ProductKeys.LIST_ORDER],
+              [ProductKeys.TAGLINE]: product[ProductKeys.TAGLINE],
+              [ProductKeys.PRODUCT_CATEGORY]: product[ProductKeys.PRODUCT_CATEGORY],
+              [ProductCardKeys.HIGHLIGHTS]: product.productCardData[ProductCardKeys.HIGHLIGHTS],
+              [PageHeroKeys.PAGE_HERO_SUBTITLE]: product.heroData[PageHeroKeys.PAGE_HERO_SUBTITLE],
+              [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: product.buyNowData[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE],
+              [CheckoutKeys.CHECKOUT_HEADER]: product.checkoutData[CheckoutKeys.CHECKOUT_HEADER],
+              [CheckoutKeys.CHECKOUT_DESCRIPTION]: product.checkoutData[CheckoutKeys.CHECKOUT_DESCRIPTION],
             };
 
             // Add additional highlight form controls if more than min amount
-            const highlightsLength = productFormObject.highlights.length;
+            const highlightsLength = productFormObject[ProductCardKeys.HIGHLIGHTS].length;
             if (highlightsLength > this.minHighlightsLength) {
               const numberOfControlsToAdd = highlightsLength - this.minHighlightsLength;
               for (let i = 0; i < numberOfControlsToAdd; i++ ) {
@@ -229,7 +247,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     return this.store$.select(ProductStoreSelectors.selectProductById(productId))
     .pipe(
       withLatestFrom(
-        this.store$.select(ProductStoreSelectors.selectProductsLoaded)
+        this.store$.select(ProductStoreSelectors.selectLoaded)
       ),
       map(([product, productsLoaded]) => {
         // Check if items are loaded, if not fetch from server
@@ -262,19 +280,20 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     this.tempProductTitle = `Untitled Product ${this.productId.substr(0, 4)}`;
 
     this.productForm = this.fb.group({
-      name: ['', [Validators.required]],
-      price: ['', [Validators.required]],
-      listOrder: ['', [Validators.required]],
-      tagline: ['', [Validators.required]],
-      highlights: this.fb.array([
+      [ProductKeys.NAME]: ['', [Validators.required]],
+      [ProductKeys.PRICE]: ['', [Validators.required]],
+      [ProductKeys.LIST_ORDER]: ['', [Validators.required]],
+      [ProductKeys.TAGLINE]: ['', [Validators.required]],
+      [ProductKeys.PRODUCT_CATEGORY]: ['', [Validators.required]],
+      [ProductCardKeys.HIGHLIGHTS]: this.fb.array([
         this.createHighlight(),
         this.createHighlight(),
         this.createHighlight(),
       ]),
-      heroSubtitle: ['', [Validators.required]],
-      buyNowBoxSubtitle: ['', [Validators.required]],
-      checkoutHeader: ['', [Validators.required]],
-      checkoutDescription: ['', [Validators.required]],
+      [PageHeroKeys.PAGE_HERO_SUBTITLE]: ['', [Validators.required]],
+      [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: ['', [Validators.required]],
+      [CheckoutKeys.CHECKOUT_HEADER]: ['', [Validators.required]],
+      [CheckoutKeys.CHECKOUT_DESCRIPTION]: ['', [Validators.required]],
     });
 
     // Auto-init product if it hasn't already been initialized and it has content
@@ -288,44 +307,40 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private initializeProduct(): void {
 
-    const productName = (this.name.value as string).trim();
+    const productName = (this[ProductKeys.NAME].value as string).trim();
 
     const productCardData: ProductCardData = {
-      name: productName,
-      tagline: this.tagline.value,
-      highlights: this.highlights.value,
+      [ProductCardKeys.HIGHLIGHTS]: this[ProductCardKeys.HIGHLIGHTS].value,
     };
 
     const heroData: PageHeroData = {
       pageTitle: productName,
-      pageSubtitle: this.heroSubtitle.value,
+      [PageHeroKeys.PAGE_HERO_SUBTITLE]: this[PageHeroKeys.PAGE_HERO_SUBTITLE].value,
     };
 
     const buyNowData: BuyNowBoxData = {
       title: productName,
-      subtitle: this.buyNowBoxSubtitle.value,
+      [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: this[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE].value,
     };
 
     const checkoutData: CheckoutData = {
-      header: this.checkoutHeader.value,
-      productName,
-      price: this.price.value,
-      description: this.checkoutDescription.value,
-      tagline: this.tagline.value
+      [CheckoutKeys.CHECKOUT_HEADER]: this[CheckoutKeys.CHECKOUT_HEADER].value,
+      [CheckoutKeys.CHECKOUT_DESCRIPTION]: this[CheckoutKeys.CHECKOUT_DESCRIPTION].value,
     };
 
     const product: Product = {
       id: this.productId,
-      name: this.name.value ? productName : this.tempProductTitle,
-      price: this.price.value,
-      listOrder: this.listOrder.value,
-      tagline: this.tagline.value,
+      [ProductKeys.NAME]: this[ProductKeys.NAME].value ? productName : this.tempProductTitle,
+      [ProductKeys.PRICE]: this[ProductKeys.PRICE].value,
+      [ProductKeys.LIST_ORDER]: this[ProductKeys.LIST_ORDER].value,
+      [ProductKeys.TAGLINE]: this[ProductKeys.TAGLINE].value,
+      [ProductKeys.PRODUCT_CATEGORY]: this[ProductKeys.PRODUCT_CATEGORY].value,
       productCardData,
       heroData,
       buyNowData,
       checkoutData,
     };
-    this.store$.dispatch(new ProductStoreActions.AddProductRequested({product}));
+    this.store$.dispatch(new ProductStoreActions.UpdateProductRequested({product}));
     this.productInitialized = true;
     console.log('Product initialized');
   }
@@ -358,21 +373,23 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       console.log('No changes to content, no auto save');
       return;
     }
+    console.log('Initiating auto save');
     this.saveProduct();
-    console.log('Auto saving');
   }
 
   private changesDetected(product: Product): boolean {
     if (
-      (product.name === (this.name.value as string).trim() || product.name === this.tempProductTitle) &&
-      product.price === this.price.value &&
-      product.listOrder === this.listOrder.value &&
-      product.tagline === this.tagline.value &&
-      this.sortedArraysEqual(product.productCardData.highlights, this.highlights.value) &&
-      product.heroData.pageSubtitle === this.heroSubtitle.value &&
-      product.buyNowData.subtitle === this.buyNowBoxSubtitle.value &&
-      product.checkoutData.header === this.checkoutHeader.value &&
-      product.checkoutData.description === this.checkoutDescription.value &&
+      // tslint:disable-next-line:max-line-length
+      (product[ProductKeys.NAME] === (this[ProductKeys.NAME].value as string).trim() || product[ProductKeys.NAME] === this.tempProductTitle) &&
+      product[ProductKeys.PRICE] === this[ProductKeys.PRICE].value &&
+      product[ProductKeys.LIST_ORDER] === this[ProductKeys.LIST_ORDER].value &&
+      product[ProductKeys.TAGLINE] === this[ProductKeys.TAGLINE].value &&
+      product[ProductKeys.PRODUCT_CATEGORY] === this[ProductKeys.PRODUCT_CATEGORY].value &&
+      this.sortedArraysEqual(product.productCardData[ProductCardKeys.HIGHLIGHTS], this[ProductCardKeys.HIGHLIGHTS].value) &&
+      product.heroData[PageHeroKeys.PAGE_HERO_SUBTITLE] === this[PageHeroKeys.PAGE_HERO_SUBTITLE].value &&
+      product.buyNowData[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE] === this[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE].value &&
+      product.checkoutData[CheckoutKeys.CHECKOUT_HEADER] === this[CheckoutKeys.CHECKOUT_HEADER].value &&
+      product.checkoutData[CheckoutKeys.CHECKOUT_DESCRIPTION] === this[CheckoutKeys.CHECKOUT_DESCRIPTION].value &&
       !this.imagesModifiedSinceLastSave
     ) {
       return false;
@@ -384,13 +401,14 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     if (
       this.cardImageAdded ||
       this.heroImageAdded ||
-      this.name.value ||
-      this.price.value ||
-      this.listOrder.value ||
-      !this.highlightsArrayIsBlank() ||
-      this.tagline.value ||
-      this.checkoutHeader.value ||
-      this.checkoutDescription.value ||
+      this[ProductKeys.NAME].value ||
+      this[ProductKeys.PRICE].value ||
+      this[ProductKeys.LIST_ORDER].value ||
+      this[ProductKeys.PRODUCT_CATEGORY].value ||
+      !this.highlightsArrayIsBlank ||
+      this[ProductKeys.TAGLINE].value ||
+      this[CheckoutKeys.CHECKOUT_HEADER].value ||
+      this[CheckoutKeys.CHECKOUT_DESCRIPTION].value ||
       this.imagesModifiedSinceLastSave
     ) {
       return false;
@@ -414,47 +432,93 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private saveProduct() {
 
-    const productName = (this.name.value as string).trim();
+    if (this.saveProductSubscription) {
+      this.saveProductSubscription.unsubscribe();
+    }
+
+    const productName = (this[ProductKeys.NAME].value as string).trim();
 
     const productCardData: ProductCardData = {
-      name: productName,
-      tagline: this.tagline.value,
-      highlights: this.highlights.value,
+      [ProductCardKeys.HIGHLIGHTS]: this[ProductCardKeys.HIGHLIGHTS].value,
     };
 
     const heroData: PageHeroData = {
       pageTitle: productName,
-      pageSubtitle: this.heroSubtitle.value,
+      [PageHeroKeys.PAGE_HERO_SUBTITLE]: this[PageHeroKeys.PAGE_HERO_SUBTITLE].value,
     };
 
     const buyNowData: BuyNowBoxData = {
       title: productName,
-      subtitle: this.buyNowBoxSubtitle.value,
+      [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: this[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE].value,
     };
 
     const checkoutData: CheckoutData = {
-      header: this.checkoutHeader.value,
-      productName,
-      price: this.price.value,
-      description: this.checkoutDescription.value,
-      tagline: this.tagline.value
+      [CheckoutKeys.CHECKOUT_HEADER]: this[CheckoutKeys.CHECKOUT_HEADER].value,
+      [CheckoutKeys.CHECKOUT_DESCRIPTION]: this[CheckoutKeys.CHECKOUT_DESCRIPTION].value,
     };
 
     const product: Product = {
       id: this.productId,
-      name: this.name.value ? productName : this.tempProductTitle,
-      price: this.price.value,
-      listOrder: this.listOrder.value,
-      tagline: this.tagline.value,
+      [ProductKeys.NAME]: this[ProductKeys.NAME].value ? productName : this.tempProductTitle,
+      [ProductKeys.PRICE]: this[ProductKeys.PRICE].value,
+      [ProductKeys.LIST_ORDER]: this[ProductKeys.LIST_ORDER].value,
+      [ProductKeys.TAGLINE]: this[ProductKeys.TAGLINE].value,
+      [ProductKeys.PRODUCT_CATEGORY]: this[ProductKeys.PRODUCT_CATEGORY].value,
       productCardData,
       heroData,
       buyNowData,
       checkoutData,
       readyToActivate: this.readyToActivate(),
     };
+
     this.store$.dispatch(new ProductStoreActions.UpdateProductRequested({product}));
-    console.log('Product saved', product);
-    this.imagesModifiedSinceLastSave = false; // Reset image change detection
+
+    this.reactToSaveOutcome(product);
+  }
+
+  private reactToSaveOutcome(product: Product) {
+    this.saveProductSubscription = this.store$.select(ProductStoreSelectors.selectIsSaving)
+      .pipe(
+        withLatestFrom(
+          this.store$.select(ProductStoreSelectors.selectSaveError)
+        )
+      )
+      .subscribe(([isSaving, saveError]) => {
+        if (!isSaving && !saveError) {
+          console.log('Product saved', product);
+          this.imagesModifiedSinceLastSave = false; // Reset image change detection
+          // Navigate to dashboard if save is complete and is a manual save
+          if (this.manualSave || this.productDiscarded) {
+            this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
+          }
+        }
+        if (saveError) {
+          console.log('Error saving coupon');
+          this.productDiscarded = false;
+        }
+      });
+  }
+
+  private reactToDeletOutcome() {
+    this.deleteProductSubscription = this.store$.select(ProductStoreSelectors.selectIsDeleting)
+      .pipe(
+        withLatestFrom(
+          this.store$.select(ProductStoreSelectors.selectDeleteError)
+        )
+      )
+      .subscribe(([isDeleting, deleteError]) => {
+        if (!isDeleting && !deleteError) {
+          console.log('Product deleted', this.productId);
+          // Navigate to dashboard if save is complete and is a manual save
+          if (this.productDiscarded) {
+            this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
+          }
+        }
+        if (deleteError) {
+          console.log('Error saving coupon');
+          this.productDiscarded = false;
+        }
+      });
   }
 
   // Courtesy of: https://stackoverflow.com/a/4025958/6572208
@@ -494,20 +558,21 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     clearTimeout(this.initProductTimeout);
   }
 
-  get name() { return this.productForm.get('name'); }
-  get price() { return this.productForm.get('price'); }
-  get listOrder() { return this.productForm.get('listOrder'); }
-  get tagline() { return this.productForm.get('tagline'); }
-  get highlights() { return this.productForm.get('highlights') as FormArray; }
+  get [ProductKeys.NAME]() { return this.productForm.get(ProductKeys.NAME); }
+  get [ProductKeys.PRICE]() { return this.productForm.get(ProductKeys.PRICE); }
+  get [ProductKeys.LIST_ORDER]() { return this.productForm.get(ProductKeys.LIST_ORDER); }
+  get [ProductKeys.TAGLINE]() { return this.productForm.get(ProductKeys.TAGLINE); }
+  get [ProductKeys.PRODUCT_CATEGORY]() { return this.productForm.get(ProductKeys.PRODUCT_CATEGORY); }
+  get [ProductCardKeys.HIGHLIGHTS]() { return this.productForm.get(ProductCardKeys.HIGHLIGHTS) as FormArray; }
   get highlightsArray(): string[] {
-    return this.highlights.controls.map(control => {
+    return this[ProductCardKeys.HIGHLIGHTS].controls.map(control => {
       return control.value;
     });
   }
-  get heroSubtitle() { return this.productForm.get('heroSubtitle'); }
-  get buyNowBoxSubtitle() { return this.productForm.get('buyNowBoxSubtitle'); }
-  get checkoutHeader() { return this.productForm.get('checkoutHeader'); }
-  get checkoutDescription() { return this.productForm.get('checkoutDescription'); }
+  get [PageHeroKeys.PAGE_HERO_SUBTITLE]() { return this.productForm.get(PageHeroKeys.PAGE_HERO_SUBTITLE); }
+  get [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]() { return this.productForm.get(BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE); }
+  get [CheckoutKeys.CHECKOUT_HEADER]() { return this.productForm.get(CheckoutKeys.CHECKOUT_HEADER); }
+  get [CheckoutKeys.CHECKOUT_DESCRIPTION]() { return this.productForm.get(CheckoutKeys.CHECKOUT_DESCRIPTION); }
 
   ngOnDestroy(): void {
     // Auto save product if navigating away
@@ -531,6 +596,14 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
     if (this.initProductTimeout) {
       this.killInitProductTimeout();
+    }
+
+    if (this.saveProductSubscription) {
+      this.saveProductSubscription.unsubscribe();
+    }
+
+    if (this.deleteProductSubscription) {
+      this.deleteProductSubscription.unsubscribe();
     }
   }
 

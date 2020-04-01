@@ -41,30 +41,9 @@ export function featureReducer(state = initialState, action: Actions): State {
       );
     }
 
-    // case ActionTypes.ADD_COUPON_REQUESTED: {
-    //   return {
-    //     ...state,
-    //     couponSaved: false,
-    //     isSaving: true,
-    //     saveError: null
-    //   };
-    // }
-
-    // case ActionTypes.ADD_COUPON_COMPLETE:
-    //   return featureAdapter.addOne(
-    //     action.payload.coupon,
-    //     {
-    //       ...state,
-    //       couponSaved: true,
-    //       isSaving: false,
-    //       saveFailure: null
-    //     }
-    //   );
-
     case ActionTypes.UPDATE_COUPON_REQUESTED: {
       return {
         ...state,
-        couponSaved: false,
         isSaving: true,
         saveError: null
       };
@@ -75,7 +54,6 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.coupon,
         {
           ...state,
-          couponSaved: true,
           isSaving: false,
           saveError: null
         }
@@ -109,9 +87,16 @@ export function featureReducer(state = initialState, action: Actions): State {
     case ActionTypes.SAVE_FAILED: {
       return {
         ...state,
-        couponSaved: false,
         isSaving: false,
         saveError: action.payload.error
+      };
+    }
+
+    case ActionTypes.DELETE_FAILED: {
+      return {
+        ...state,
+        isDeleting: false,
+        deleteError: action.payload.error
       };
     }
 

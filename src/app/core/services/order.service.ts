@@ -28,7 +28,7 @@ export class OrderService {
           return orders;
         }),
         catchError(error => {
-          this.uiService.showSnackBar(error, null, 5000);
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
           return throwError(error);
         })
       );
@@ -41,7 +41,7 @@ export class OrderService {
         takeUntil(this.authService.unsubTrigger$),
         map(order => order),
         catchError(error => {
-          this.uiService.showSnackBar(error, null, 5000);
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
           return throwError(error);
         })
       );

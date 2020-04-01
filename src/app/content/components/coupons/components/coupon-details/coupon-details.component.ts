@@ -116,7 +116,7 @@ export class CouponDetailsComponent implements OnInit, OnDestroy {
     this.products$ = this.store$.select(ProductStoreSelectors.selectAllProducts)
       .pipe(
         withLatestFrom(
-          this.store$.select(ProductStoreSelectors.selectProductsLoaded)
+          this.store$.select(ProductStoreSelectors.selectLoaded)
         ),
         map(([products, productsLoaded]) => {
           // Check if items are loaded, if not fetch from server

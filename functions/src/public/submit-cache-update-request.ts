@@ -2,6 +2,7 @@ import { publicProjectId } from "../config/environments-config";
 import { PublicTopicNames } from "../../../shared-models/routes-and-paths/fb-function-names";
 import { PubSub } from "@google-cloud/pubsub";
 import { WebpageUrl } from "../../../shared-models/ssr/webpage-url.model";
+import * as functions from 'firebase-functions';
 
 const pubSub = new PubSub();
 
@@ -13,7 +14,7 @@ export const submitCacheUpdateRequest = async (urlObject: WebpageUrl) => {
   const pubsubMsg: WebpageUrl = urlObject;
 
   const topicPublishRes = await topic.publishJSON(pubsubMsg)
-    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); return err;});
+    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); throw new functions.https.HttpsError('internal', err);});
   console.log(`Publish to topic "${topicName}" on project "${projectId}" succeeded:`, topicPublishRes);
 
   return topicPublishRes;

@@ -1,7 +1,7 @@
 import { Product } from '../products/product.model';
 
 // Used to allow dynamic query fields in Firestore
-export enum DiscountCouponQueryFields {
+export enum DiscountCouponKeys {
   ACTIVE = 'active',
   COUPON_CODE = 'couponCode',
   CREATED_DATE = 'createdDate',
@@ -20,38 +20,38 @@ export enum DiscountCouponQueryFields {
 }
 
 export interface DiscountCouponChild {
-  [DiscountCouponQueryFields.COUPON_CODE]: string;
-  [DiscountCouponQueryFields.DISCOUNT_PERCENTAGE]: number;
+  [DiscountCouponKeys.COUPON_CODE]: string;
+  [DiscountCouponKeys.DISCOUNT_PERCENTAGE]: number;
   valid?: boolean;
   invalidReason?: string;
 }
 
 export interface DiscountCouponParent extends DiscountCouponChild {
-  [DiscountCouponQueryFields.EXPIRATION_DATE]: number;
-  [DiscountCouponQueryFields.USE_COUNT]: number;
-  [DiscountCouponQueryFields.MAX_USES]: number;
-  [DiscountCouponQueryFields.USER_SPECIFIC]: boolean;
-  [DiscountCouponQueryFields.PRODUCT_SPECIFIC]: boolean;
-  [DiscountCouponQueryFields.CREATED_DATE]: number;
+  [DiscountCouponKeys.EXPIRATION_DATE]: number;
+  [DiscountCouponKeys.USE_COUNT]: number;
+  [DiscountCouponKeys.MAX_USES]: number;
+  [DiscountCouponKeys.USER_SPECIFIC]: boolean;
+  [DiscountCouponKeys.PRODUCT_SPECIFIC]: boolean;
+  [DiscountCouponKeys.CREATED_DATE]: number;
   modifiedDate: number;
   creatorId: string;
-  [DiscountCouponQueryFields.ACTIVE]: boolean;
-  [DiscountCouponQueryFields.MAX_USES_PER_USER]?: number;
-  [DiscountCouponQueryFields.APPROVED_PRODUCT_IDS]?: string[];
+  [DiscountCouponKeys.ACTIVE]: boolean;
+  [DiscountCouponKeys.MAX_USES_PER_USER]?: number;
+  [DiscountCouponKeys.APPROVED_PRODUCT_IDS]?: string[];
 }
 
 export interface DiscountCouponUser {
-  [DiscountCouponQueryFields.USER_EMAIL]: string;
-  [DiscountCouponQueryFields.USER_ID]: string;
-  [DiscountCouponQueryFields.USE_COUNT]: number;
-  [DiscountCouponQueryFields.USE_TIMESTAMPS]: number[];
-  [DiscountCouponQueryFields.PRODUCT_ID_LIST]: string[];
+  [DiscountCouponKeys.USER_EMAIL]: string;
+  [DiscountCouponKeys.USER_ID]: string;
+  [DiscountCouponKeys.USE_COUNT]: number;
+  [DiscountCouponKeys.USE_TIMESTAMPS]: number[];
+  [DiscountCouponKeys.PRODUCT_ID_LIST]: string[];
 }
 
 export interface DiscountCouponValidationData {
   couponCode: string;
-  [DiscountCouponQueryFields.USER_EMAIL]: string;
-  [DiscountCouponQueryFields.USER_ID]: string;
+  [DiscountCouponKeys.USER_EMAIL]: string;
+  [DiscountCouponKeys.USER_ID]: string;
   product: Product;
   isStripeCharge: boolean;
 }
@@ -65,5 +65,6 @@ export enum DiscountCouponErrors {
   EXCEEDED_VALIDATION_ATTEMPTS = 'You have exceed the max allowed validation attempts.',
   EXCEEDED_MAX_USES_PER_USER = 'Coupon exceeded usage limit.',
   FORM_NOT_COMPLETE = 'Please complete the billing details above before applying your coupon.',
-  INVALID_PRODUCT = 'Coupon is not valid for this product.'
+  INVALID_PRODUCT = 'Coupon is not valid for this product.',
+  SYSTEM_ERROR = 'System error. Please contact support.'
 }

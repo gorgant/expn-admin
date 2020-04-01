@@ -9,6 +9,7 @@ import { now } from 'moment';
 import { AuthData } from 'shared-models/auth/auth-data.model';
 import { AdminUser } from 'shared-models/user/admin-user.model';
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
+import { take, map, catchError, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -38,72 +39,89 @@ export class AuthService {
 
   // Currently, registration is not available (done with admin console)
   registerUser(authData: AuthData): Observable<AdminUser> {
-    const authResponse = this.afAuth.auth.createUserWithEmailAndPassword(
+
+    const authResponse = from(this.afAuth.auth.createUserWithEmailAndPassword(
       authData.email,
       authData.password
-    ).then(creds => {
-      const publicUser: AdminUser = {
-        id: creds.user.uid,
-        displayName: authData.name,
-        email: authData.email,
-        lastAuthenticated: now(),
-        createdDate: now()
-      };
-      return publicUser;
-    })
-    .catch(error => {
-      this.uiService.showSnackBar(error, null, 5000);
-      return throwError(error).toPromise();
-    });
+    ));
 
-    return from(authResponse);
+    return authResponse.pipe(
+      take(1),
+      map(creds => {
+        const adminUser: AdminUser = {
+          id: creds.user.uid,
+          displayName: authData.name,
+          email: authData.email,
+          lastAuthenticated: now(),
+          createdDate: now()
+        };
+        console.log('Public user registered', adminUser);
+        return adminUser;
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error registering user', error);
+        return throwError(error);
+      })
+    );
   }
 
   // Currently, Google Login is not available (done with admin console)
   loginWithGoogle(): Observable<AdminUser> {
-    const authResponse = this.afAuth.auth.signInWithPopup(
-      new firebase.auth.GoogleAuthProvider()
-    ).then(creds => {
-      const newUser = creds.additionalUserInfo.isNewUser; // Check if this is a new user
-      const publicUser: AdminUser = {
-        displayName: creds.user.displayName,
-        email: creds.user.email,
-        avatarUrl: creds.user.photoURL,
-        id: creds.user.uid,
-        isNewUser: newUser,
-        lastAuthenticated: now()
-      };
-      if (newUser) {
-        publicUser.createdDate = now();
-      }
-      return publicUser;
-    })
-    .catch(error => {
-      this.uiService.showSnackBar(error, null, 5000);
-      return throwError(error).toPromise();
-    });
 
-    return from(authResponse);
+    const authResponse = from(this.afAuth.auth.signInWithPopup(
+      new firebase.auth.GoogleAuthProvider()
+    ));
+
+    return authResponse.pipe(
+      take(1),
+      map(creds => {
+        const newUser = creds.additionalUserInfo.isNewUser; // Check if this is a new user
+        const adminUser: AdminUser = {
+          displayName: creds.user.displayName,
+          email: creds.user.email,
+          avatarUrl: creds.user.photoURL,
+          id: creds.user.uid,
+          isNewUser: newUser,
+          lastAuthenticated: now()
+        };
+        if (newUser) {
+          adminUser.createdDate = now();
+        }
+        return adminUser;
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error registering user', error);
+        return throwError(error);
+      })
+    );
   }
 
   loginWithEmail(authData: AuthData): Observable<Partial<AdminUser>> {
-    const authResponse = this.afAuth.auth.signInWithEmailAndPassword(
+
+    const authResponse = from(this.afAuth.auth.signInWithEmailAndPassword(
       authData.email,
       authData.password
-    ).then(creds => {
-      // Create a partial user object to log last authenticated
-      const partialUser: Partial<AdminUser> = {
-        id: creds.user.uid,
-        lastAuthenticated: now()
-      };
-      return partialUser;
-    })
-    .catch(error => {
-      this.uiService.showSnackBar(error, null, 5000);
-      return throwError(error).toPromise();
-    });
+    ));
 
-    return from(authResponse);
+    return authResponse.pipe(
+      take(1),
+      map(creds => {
+        // Create a partial user object to log last authenticated
+        const partialUser: Partial<AdminUser> = {
+          id: creds.user.uid,
+          lastAuthenticated: now()
+        };
+        return partialUser;
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error registering user', error);
+        return throwError(error);
+      })
+    );
+
   }
 
   logout(): void {
@@ -116,69 +134,85 @@ export class AuthService {
 
     const credentials = this.getUserCredentials(publicUser.email, password);
 
-    const authResponse = this.afAuth.auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credentials)
-      .then(userCreds => {
-        const updateResponse = this.afAuth.auth.currentUser.updateEmail(newEmail)
-          .then(empty => {
+    const authResponse = from(this.afAuth.auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credentials));
+
+    return authResponse.pipe(
+      take(1),
+      switchMap(userCreds => {
+        const updateResponse = from(this.afAuth.auth.currentUser.updateEmail(newEmail));
+        return updateResponse.pipe(
+          take(1),
+          map(empty => {
             const newUserData: AdminUser = {
               ...publicUser,
               email: newEmail
             };
-            this.uiService.showSnackBar(`Email successfully updated: ${newEmail}`, null, 3000);
+            this.uiService.showSnackBar(`Email successfully updated: ${newEmail}`, 5000);
             return {userData: newUserData, userId: publicUser.id};
+          }),
+          catchError(error => {
+            this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+            console.log('Error updating email', error);
+            return throwError(error);
           })
-          .catch(error => {
-            this.uiService.showSnackBar(error, null, 3000);
-            return error;
-          });
-        return updateResponse;
+        );
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error reauthenticating user', error);
+        return throwError(error);
       })
-      .catch(error => {
-        this.uiService.showSnackBar(error, null, 3000);
-        return throwError(error).toPromise();
-      });
-
-    return from(authResponse);
+    );
   }
 
   updatePassword(publicUser: AdminUser, oldPassword: string, newPassword: string): Observable<string> {
     const credentials = this.getUserCredentials(publicUser.email, oldPassword);
 
-    const authResponse = this.afAuth.auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credentials)
-      .then(userCreds => {
-        const updateResponse = this.afAuth.auth.currentUser.updatePassword(newPassword)
-          .then(empty => {
-            this.uiService.showSnackBar(`Password successfully updated`, null, 3000);
-            return 'success';
-          })
-          .catch(error => {
-            this.uiService.showSnackBar(error, null, 3000);
-            return error;
-          });
-        return updateResponse;
-      })
-      .catch(error => {
-        this.uiService.showSnackBar(error, null, 3000);
-        return throwError(error).toPromise();
-      });
+    const authResponse = from(this.afAuth.auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credentials));
 
-    return from(authResponse);
+    return authResponse.pipe(
+      take(1),
+      switchMap(userCreds => {
+        const updateResponse = from(this.afAuth.auth.currentUser.updatePassword(newPassword));
+        return updateResponse.pipe(
+          take(1),
+          map(empty => {
+            this.uiService.showSnackBar(`Password successfully updated`, 5000);
+            return 'success';
+          }),
+          catchError(error => {
+            this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+            console.log('Error updating password', error);
+            return throwError(error);
+          })
+        );
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error reauthenticating user', error);
+        return throwError(error);
+      })
+    );
   }
 
   sendResetPasswordEmail(email: string): Observable<string> {
-    const authResponse = this.afAuth.auth.sendPasswordResetEmail(email)
-      .then(empty => {
+
+    const authResponse = from(this.afAuth.auth.sendPasswordResetEmail(email));
+
+    return authResponse.pipe(
+      take(1),
+      map(creds => {
         this.uiService.showSnackBar(
-          `Password reset link sent to ${email}. Please check your email for instructions.`, null, 5000
+          `Password reset link sent to ${email}. Please check your email for instructions.`, 10000
         );
         return 'success';
-      } )
-      .catch(error => {
-        this.uiService.showSnackBar(error, null, 5000);
-        return throwError(error).toPromise();
-      });
-
-    return from(authResponse);
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error sending reset password email', error);
+        return throwError(error);
+      })
+    );
   }
 
   get unsubTrigger$() {

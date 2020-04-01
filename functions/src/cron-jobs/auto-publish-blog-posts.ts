@@ -18,8 +18,8 @@ const publishPostOnAdmin = async (post: Post) => {
   };
 
   const fbRes = await adminDb.collection(SharedCollectionPaths.POSTS).doc(updatedPost.id).set(updatedPost)
-    .catch((error: any) => console.log(error));
-    console.log('Post published');
+    .catch(err => {console.log(`Error updating post on admin`, err); throw new functions.https.HttpsError('internal', err);});
+  console.log('Post published');
 
   return fbRes && updatedPost;
 }
@@ -30,13 +30,10 @@ const publishExpiredPosts = async () => {
   const postCollectionSnapshot: FirebaseFirestore.QuerySnapshot = await adminDb.collection(SharedCollectionPaths.POSTS)
     .where('published', '==', false)
     .get()
-    .catch(error => {
-      console.log('Error fetching post collection', error)
-      return error;
-    });
+    .catch(err => {console.log(`Error fetching post collection:`, err); throw new functions.https.HttpsError('internal', err);});
 
-  // Scan for outstanding publish requests
-  const publishExpiredPostRequestArray = postCollectionSnapshot.docs.map( async doc => {
+  // Scan for and publish outstanding publish requests
+  for (const doc of postCollectionSnapshot.docs) {
     const post: Post = doc.data() as Post;
 
     const scheduledPublishTime = post.scheduledPublishTime || null;
@@ -46,28 +43,12 @@ const publishExpiredPosts = async () => {
       console.log(`expired publish request detected`, post);
 
       // First update post on admin
-      const updatedAdminPost: Post = await publishPostOnAdmin(post)
-        .catch(error => {
-          console.log('Error updating post on admin');
-          return error;
-        });
+      const updatedAdminPost: Post = await publishPostOnAdmin(post);
 
       // Then update post on public
-      const pubPostResponse = await updatePostOnPublic(updatedAdminPost)
-        .catch(error => {
-          console.log('Error publishing post', error)
-          return error;
-        });
-      
-      return pubPostResponse;
+      await updatePostOnPublic(updatedAdminPost);
     }
-  });
-
-  // Execute publish requests
-  const publishPostsResponse = await Promise.all(publishExpiredPostRequestArray)
-    .catch(error => console.log('Error in publish post group promise', error));
-  
-  return publishPostsResponse;
+  }
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////
@@ -81,8 +62,8 @@ export const autoPublishBlogPosts = functions.https.onRequest( async (req, res )
     return;
   }
 
-  const publishResponse = await publishExpiredPosts();
+  await publishExpiredPosts();
 
   console.log('All expired posts published', res);
-  return res.status(200).send(publishResponse);
+  return res.status(200).send('All expired posts published');
 })

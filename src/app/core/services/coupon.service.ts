@@ -28,8 +28,8 @@ export class CouponService {
           return coupons;
         }),
         catchError(error => {
-          console.log('Error getting coupons', error);
-          this.uiService.showSnackBar(error, null, 5000);
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+          console.log('Error fetching all coupons', error);
           return throwError(error);
         })
       );
@@ -38,60 +38,50 @@ export class CouponService {
   fetchSingleCoupon(id: string): Observable<DiscountCouponParent> {
     const couponDoc = this.getCouponDoc(id);
     return couponDoc.valueChanges()
-    .pipe(
-      take(1), // Prevents load attempts after deletion
-      map(coupon => {
-        console.log('Fetched this item', coupon);
+      .pipe(
+        take(1), // Prevents load attempts after deletion
+        map(coupon => {
+          console.log('Fetched this item', coupon);
+          return coupon;
+        }),
+        catchError(error => {
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+          console.log('Error fetching single coupon', error);
+          return throwError(error);
+        })
+      );
+  }
+
+  updateCoupon(coupon: DiscountCouponParent): Observable<DiscountCouponParent> {
+    const fbResponse = from(this.getCouponDoc(coupon.couponCode).set(coupon, {merge: true}));
+    return fbResponse.pipe(
+      take(1),
+      map(empty => {
+        console.log('Coupon updated', coupon);
         return coupon;
       }),
       catchError(error => {
-        this.uiService.showSnackBar(error, null, 5000);
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error updating coupon', error);
         return throwError(error);
       })
     );
   }
 
-  // createCoupon(coupon: DiscountCouponParent): Observable<DiscountCouponParent> {
-  //   const fbResponse = this.getCouponDoc(coupon.couponCode).set(coupon)
-  //     .then(empty => {
-  //       console.log('Coupon created', coupon);
-  //       return coupon;
-  //     })
-  //     .catch(error => {
-  //       console.log('Error creating coupon', error);
-  //       return error;
-  //     });
-
-  //   return from(fbResponse);
-  // }
-
-  updateCoupon(coupon: DiscountCouponParent): Observable<DiscountCouponParent> {
-    const fbResponse = this.getCouponDoc(coupon.couponCode).set(coupon, {merge: true})
-      .then(empty => {
-        console.log('Coupon updated', coupon);
-        return coupon;
-      })
-      .catch(error => {
-        console.log('Error updating coupon', error);
-        return error;
-      });
-
-    return from(fbResponse);
-  }
-
   deleteCoupon(couponId: string): Observable<string> {
-
-    const fbResponse = this.getCouponDoc(couponId).delete()
-      .then(empty => {
+    const fbResponse = from(this.getCouponDoc(couponId).delete());
+    return fbResponse.pipe(
+      take(1),
+      map(empty => {
         console.log('Coupon deleted', couponId);
         return couponId;
-      })
-      .catch(error => {
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
         console.log('Error deleting coupon', error);
-        return throwError(error).toPromise();
-      });
-
-    return from(fbResponse);
+        return throwError(error);
+      })
+    );
   }
 
   getCouponDoc(id: string): AngularFirestoreDocument<DiscountCouponParent> {

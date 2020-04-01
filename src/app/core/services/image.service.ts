@@ -377,6 +377,11 @@ export class ImageService {
       .catch(error => {console.log('Error getting item', error); });
     const item: Post | Product = itemDoc ? itemDoc.data() as Post | Product : null;
 
+    if (!item) {
+      console.log('Failed to retrieve document');
+      throw new Error('Failed to retreive document when deleting images');
+    }
+
     const imagePathList = item.imageFilePathList;
     imageCount = imagePathList ? imagePathList.length : 0;
 
@@ -408,18 +413,25 @@ export class ImageService {
   // The following are helper function used in both core functions
 
   private getItemRef(itemId: string, imageType: ImageType): firebase.firestore.DocumentReference {
+    let docRef: firebase.firestore.DocumentReference;
+
     switch (imageType) {
       case ImageType.BLOG_HERO:
-        return this.db.collection(SharedCollectionPaths.POSTS).doc(itemId);
+        docRef = this.db.collection(SharedCollectionPaths.POSTS).doc(itemId);
+        break;
       case ImageType.BLOG_INLINE:
-        return this.db.collection(SharedCollectionPaths.POSTS).doc(itemId);
+        docRef = this.db.collection(SharedCollectionPaths.POSTS).doc(itemId);
+        break;
       case ImageType.PRODUCT_CARD:
-        return this.db.collection(SharedCollectionPaths.PRODUCTS).doc(itemId);
+        docRef = this.db.collection(SharedCollectionPaths.PRODUCTS).doc(itemId);
+        break;
       case ImageType.PRODUCT_HERO:
-        return this.db.collection(SharedCollectionPaths.PRODUCTS).doc(itemId);
-      default: return this.db.collection(SharedCollectionPaths.PRODUCTS).doc(itemId);
+        docRef = this.db.collection(SharedCollectionPaths.PRODUCTS).doc(itemId);
+        break;
+      default:
+        throw new Error(`Invalid image type ${imageType}`);
     }
-
+    return docRef;
   }
 
   private getItemFileRef(path: string, imageType: ImageType): firebase.storage.Reference {

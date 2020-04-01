@@ -13,6 +13,7 @@ import { EnvironmentTypes } from "../../../../shared-models/environments/env-var
 import { MailData } from "@sendgrid/helpers/classes/mail";
 import { adminFirestore } from "../../config/db-config";
 import { AdminCollectionPaths } from "../../../../shared-models/routes-and-paths/fb-collection-paths";
+import * as functions from 'firebase-functions';
 
 const db = adminFirestore;
 
@@ -88,12 +89,11 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
     categories
   };
   const sendgridResponse = await sgMail.send(msg)
-    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); return err});
+    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
   
   // If email is successful, mark intro email sent
   if (sendgridResponse) {
-    await markIntroEmailSent(subscriber)
-      .catch(err => {console.log(`Error marking intro email sent:`, err); return err});
+    await markIntroEmailSent(subscriber);
   }
 
   console.log('Email sent', msg);

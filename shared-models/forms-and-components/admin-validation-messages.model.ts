@@ -1,94 +1,99 @@
-export const SUBSCRIBE_VALIDATION_MESSAGES = {
-  email: [
-    { type: 'required', message: 'Email is required.'},
-    { type: 'email', message: 'Not a valid email.'},
-  ],
-};
+import { ProductKeys } from 'shared-models/products/product.model';
+import { ProductCardKeys } from 'shared-models/products/product-card-data.model';
+import { PageHeroKeys } from './page-hero-data.model';
+import { BuyNowBoxKeys } from 'shared-models/products/buy-now-box-data.model';
+import { CheckoutKeys } from 'shared-models/products/checkout-data.model';
+import { PostKeys } from 'shared-models/posts/post.model';
+import { DiscountCouponKeys } from 'shared-models/billing/discount-coupon.model';
+import { AuthKeys } from 'shared-models/auth/auth-data.model';
 
-export const loginValidationMessages = {
-  email: [
+export const LOGIN_VALIDATION_MESSAGES = {
+  [AuthKeys.EMAIL]: [
     { type: 'required', message: 'Email is required.'},
     { type: 'email', message: 'Not a valid email.'},
   ],
-  password: [
+  [AuthKeys.PASSWORD]: [
     { type: 'required', message: 'Password is required.' },
   ]
 };
 
-export const resetPasswordFormValidationMessages = {
-  email: [
+export const RESET_PASSWORD_FROM_VALIDATION_MESSAGES = {
+  [AuthKeys.EMAIL]: [
     { type: 'required', message: 'Email is required.'},
     { type: 'email', message: 'Not a valid email.'},
   ],
 };
 
 export const POST_FORM_VALIDATION_MESSAGES = {
-  blogDomain: [
+  [PostKeys.BLOG_DOMAIN]: [
     {type: 'required', message: 'Blog domain is required.'}
   ],
-  title: [
+  [PostKeys.TITLE]: [
     { type: 'required', message: 'Title is required.'},
   ],
-  videoUrl: [
+  [PostKeys.VIDEO_URL]: [
     { type: 'required', message: 'Video URL is required.'},
     { type: 'pattern', message: 'Invalid url.' }
   ],
-  podcastEpisodeUrl: [
+  [PostKeys.PODCAST_EPISODE_URL]: [
     { type: 'required', message: 'Podcast episode URL is required.'},
     { type: 'pattern', message: 'Invalid url.' }
   ],
-  description: [
+  [PostKeys.DESCRIPTION]: [
     { type: 'required', message: 'Description is required'},
     { type: 'maxlength', message: 'Entry exceeds max length' }
   ],
-  keywords: [
+  [PostKeys.KEYWORDS]: [
     { type: 'requried', message: 'Keywords are required'},
     { type: 'maxlength', message: 'Entry exceeds max length' }
   ],
 };
 
 export const PRODUCT_FORM_VALIDATION_MESSAGES = {
-  name: [
+  [ProductKeys.NAME]: [
     { type: 'required', message: 'Name is required.'},
   ],
-  price: [
+  [ProductKeys.PRICE]: [
     { type: 'required', message: 'Price is required.'},
   ],
-  listOrder: [
+  [ProductKeys.LIST_ORDER]: [
     { type: 'required', message: 'List order is required.'},
   ],
-  tagline: [
+  [ProductKeys.TAGLINE]: [
     { type: 'required', message: 'Tagline is required.'},
   ],
-  highlight: [
+  [ProductKeys.PRODUCT_CATEGORY]: [
+    { type: 'required', message: 'Tagline is required.'},
+  ],
+  [ProductCardKeys.HIGHLIGHTS]: [
     { type: 'required', message: 'Highlight cannot be blank.'},
   ],
-  heroSubtitle: [
+  [PageHeroKeys.PAGE_HERO_SUBTITLE]: [
     { type: 'required', message: 'Hero subtitle required.'},
   ],
-  buyNowBoxSubtitle: [
+  [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: [
     { type: 'required', message: 'Buy now box subtitle required.'},
   ],
-  checkoutHeader: [
+  [CheckoutKeys.CHECKOUT_HEADER]: [
     { type: 'required', message: 'Checkout header is required.'},
   ],
-  checkoutDescription: [
+  [CheckoutKeys.CHECKOUT_DESCRIPTION]: [
     { type: 'required', message: 'Checkout description is required.'},
   ],
 };
 
 export const EMAIL_FORM_VALIDATION_MESSAGES = {
-  email: [
+  [AuthKeys.EMAIL]: [
     { type: 'required', message: 'You must provide an email.'},
     { type: 'email', message: 'Not a valid email.'},
   ],
-  password: [
+  [AuthKeys.PASSWORD]: [
     { type: 'required', message: 'You must confirm your current password.'},
   ]
 };
 
 export const NAME_FORM_VALIDATION_MESSAGES = {
-  name: [
+  [AuthKeys.NAME]: [
     { type: 'required', message: 'You must provide a name.'},
   ]
 };
@@ -113,7 +118,7 @@ export const PASSWORD_FORM_VALIDATION_MESSAGES = {
 };
 
 export const SCHEDULE_POST_FORM_VALIDATION_MESSAGES = {
-  publishDate: [
+  [PostKeys.PUBLISHED_DATE]: [
     { type: 'required', message: 'You must provide a scheduled date.'},
   ],
   publishHour: [
@@ -129,16 +134,16 @@ export const SCHEDULE_POST_FORM_VALIDATION_MESSAGES = {
 };
 
 export const COUPON_FORM_VALIDATION_MESSAGES = {
-  couponCode: [
+  [DiscountCouponKeys.COUPON_CODE]: [
     {type: 'required', message: 'This field is required.'},
     {type: 'pattern', message: 'Coupon code can only contain letters and numbers with no spaces.'},
   ],
-  discountPercentage: [
+  [DiscountCouponKeys.DISCOUNT_PERCENTAGE]: [
     { type: 'required', message: 'This field is required.'},
     { type: 'max', message: 'Value cannot exceed 100'},
     { type: 'min', message: 'Value cannot be less than 1'},
   ],
-  expirationDate: [
+  [DiscountCouponKeys.EXPIRATION_DATE]: [
     { type: 'required', message: 'This field is required.'},
   ],
   expirationHour: [
@@ -151,17 +156,17 @@ export const COUPON_FORM_VALIDATION_MESSAGES = {
     { type: 'min', message: 'Value must be between 0 and 59.'},
     { type: 'max', message: 'Value must be between 0 and 59.'},
   ],
-  maxUses: [
+  [DiscountCouponKeys.MAX_USES]: [
     { type: 'required', message: 'This field is required.'},
     { type: 'min', message: 'Value cannot be less than 1.' }
   ],
-  userSpecific: [
+  [DiscountCouponKeys.USER_SPECIFIC]: [
     { type: 'required', message: 'This field is required.'},
   ],
-  productSpecific: [
+  [DiscountCouponKeys.PRODUCT_SPECIFIC]: [
     { type: 'required', message: 'This field is required.'},
   ],
-  maxUsesPerUser: [
+  [DiscountCouponKeys.MAX_USES_PER_USER]: [
     { type: 'min', message: 'Value cannot be less than 1.'},
     { type: 'max', message: 'Value cannot exceed overall max use limit above.'},
   ],

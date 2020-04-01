@@ -8,7 +8,7 @@ export function featureReducer(state = initialState, action: Actions): State {
       return {
         ...state,
         isLoading: true,
-        error: null
+        loadError: null
       };
     }
 
@@ -17,7 +17,7 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.post, {
           ...state,
           isLoading: false,
-          error: null
+          loadError: null
         }
       );
     }
@@ -26,7 +26,7 @@ export function featureReducer(state = initialState, action: Actions): State {
       return {
         ...state,
         isLoading: true,
-        error: null
+        loadError: null
       };
     }
 
@@ -36,32 +36,33 @@ export function featureReducer(state = initialState, action: Actions): State {
           ...state,
           isLoading: false,
           postsLoaded: true,
-          error: null,
+          loadError: null,
         }
       );
     }
 
-    case ActionTypes.ADD_POST_COMPLETE:
-      return featureAdapter.addOne(
-        action.payload.post,
-        {
-          ...state,
-        }
-      );
+    case ActionTypes.UPDATE_POST_COMPLETE:
+      return {
+        ...state,
+        isSaving: true,
+        saveError: null
+      };
 
     case ActionTypes.UPDATE_POST_COMPLETE:
       return featureAdapter.updateOne(
         action.payload.post,
         {
           ...state,
+          isSaving: false,
+          saveError: null
         }
       );
 
     case ActionTypes.DELETE_POST_REQUESTED:
       return {
         ...state,
-        deletionProcessing: true,
-        error: null
+        isDeleting: true,
+        deleteError: null
       };
 
     case ActionTypes.DELETE_POST_COMPLETE:
@@ -69,18 +70,33 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.postId,
         {
           ...state,
-          deletionProcessing: false,
+          isDeleting: false,
+          deleteError: null
         }
       );
 
+    case ActionTypes.TOGGLE_PUBLISHED_REQUESTED:
+      return {
+        ...state,
+        isTogglingPublished: true,
+      };
+
     case ActionTypes.TOGGLE_PUBLISHED_COMPLETE:
       return {
-        ...state
+        ...state,
+        isTogglingPublished: false,
+      };
+
+    case ActionTypes.TOGGLE_FEATURED_REQUESTED:
+      return {
+        ...state,
+        isTogglingFeatured: true,
       };
 
     case ActionTypes.TOGGLE_FEATURED_COMPLETE:
       return {
-        ...state
+        ...state,
+        isTogglingFeatured: false,
       };
 
     case ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_COMPLETE:
@@ -98,11 +114,36 @@ export function featureReducer(state = initialState, action: Actions): State {
         ...state
       };
 
-    case ActionTypes.POST_LOAD_FAILURE: {
+    case ActionTypes.LOAD_FAILED: {
       return {
         ...state,
         isLoading: false,
-        error: action.payload.error
+        loadError: action.payload.error
+      };
+    }
+
+    case ActionTypes.SAVE_FAILED: {
+      return {
+        ...state,
+        isSaving: false,
+        saveError: action.payload.error
+      };
+    }
+
+    case ActionTypes.DELETE_FAILED: {
+      return {
+        ...state,
+        isDeleting: false,
+        deleteError: action.payload.error
+      };
+    }
+
+    case ActionTypes.PUBLIC_UPDATE_FAILED: {
+      return {
+        ...state,
+        isTogglingPublished: false,
+        isTogglingFeatured: false,
+        publicUpdateError: action.payload.error
       };
     }
 

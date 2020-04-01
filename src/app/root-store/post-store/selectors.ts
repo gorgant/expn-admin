@@ -3,10 +3,15 @@ import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/s
 import * as fromPosts from './reducer';
 import { Post } from 'shared-models/posts/post.model';
 
-const getError = (state: State): any => state.error;
 const getIsLoading = (state: State): boolean => state.isLoading;
+const getIsSaving = (state: State): boolean => state.isSaving;
+const getIsDeleting = (state: State): boolean => state.isDeleting;
+const getIsTogglingPublished = (state: State): boolean => state.isTogglingPublished;
+const getIsTogglingFeatured = (state: State): boolean => state.isTogglingFeatured;
+const getLoadError = (state: State): any => state.loadError;
+const getSaveError = (state: State): boolean => state.saveError;
+const getDeleteError = (state: State): boolean => state.deleteError;
 const getPostsLoaded = (state: State): boolean => state.postsLoaded;
-const getDeletionProcessing = (state: State): boolean => state.deletionProcessing;
 
 export const selectPostState: MemoizedSelector<object, State>
 = createFeatureSelector<State>('posts');
@@ -22,16 +27,35 @@ export const selectPostById: (postId: string) => MemoizedSelector<object, Post>
   postsState => postsState.entities[postId]
 );
 
-export const selectPostError: MemoizedSelector<object, any> = createSelector(
+export const selectLoadError: MemoizedSelector<object, any> = createSelector(
   selectPostState,
-  getError
+  getLoadError
 );
 
-export const selectPostIsLoading: MemoizedSelector<object, boolean>
+export const selectSaveError: MemoizedSelector<object, any> = createSelector(
+  selectPostState,
+  getSaveError
+);
+
+export const selectDeleteError: MemoizedSelector<object, any> = createSelector(
+  selectPostState,
+  getDeleteError
+);
+
+export const selectIsLoading: MemoizedSelector<object, boolean>
 = createSelector(selectPostState, getIsLoading);
 
-export const selectPostsLoaded: MemoizedSelector<object, boolean>
+export const selectLoaded: MemoizedSelector<object, boolean>
 = createSelector(selectPostState, getPostsLoaded);
 
-export const selectDeletionProcessing: MemoizedSelector<object, boolean>
-= createSelector(selectPostState, getDeletionProcessing);
+export const selectIsSaving: MemoizedSelector<object, boolean>
+= createSelector(selectPostState, getIsSaving);
+
+export const selectIsDeleting: MemoizedSelector<object, boolean>
+= createSelector(selectPostState, getIsDeleting);
+
+export const selectIsTogglingPublished: MemoizedSelector<object, boolean>
+= createSelector(selectPostState, getIsTogglingPublished);
+
+export const selectIsTogglingFeatured: MemoizedSelector<object, boolean>
+= createSelector(selectPostState, getIsTogglingFeatured);

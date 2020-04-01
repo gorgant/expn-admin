@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, from, throwError } from 'rxjs';
-import { map, takeUntil, catchError } from 'rxjs/operators';
+import { map, takeUntil, catchError, take } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { AdminUser } from 'shared-models/user/admin-user.model';
 import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { UiService } from './ui.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class UserService {
   constructor(
     private db: AngularFirestore,
     private authService: AuthService,
+    private uiService: UiService
   ) { }
 
   fetchUserData(userId: string): Observable<AdminUser> {
@@ -37,16 +39,19 @@ export class UserService {
   storeUserData(user: AdminUser | Partial<AdminUser>): Observable<string> {
     const userDoc = this.getUserDoc(user.id) as AngularFirestoreDocument<AdminUser | Partial<AdminUser>>;
     // Use set here because may be generating a new user or updating existing user
-    const fbResponse = userDoc.set(user, {merge: true})
-      .then(res => {
+    const fbResponse = from(userDoc.set(user, {merge: true}));
+    return fbResponse.pipe(
+      take(1),
+      map(empty => {
         console.log('User data stored in database');
         return user.id;
-      } )
-      .catch(error => {
-        console.log('Error storing data in database', error);
-        return throwError(error).toPromise();
-      });
-    return from(fbResponse);
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error storing user data', error);
+        return throwError(error);
+      })
+    );
   }
 
   // Provides easy access to user doc throughout the app

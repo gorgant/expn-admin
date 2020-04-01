@@ -39,8 +39,8 @@ export class PostService {
           return posts;
         }),
         catchError(error => {
-          console.log('Error getting posts', error);
-          this.uiService.showSnackBar(error, null, 5000);
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+          console.log('Error fetching all posts', error);
           return throwError(error);
         })
       );
@@ -57,64 +57,48 @@ export class PostService {
         return post;
       }),
       catchError(error => {
-        this.uiService.showSnackBar(error, null, 5000);
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error fetching single post', error);
         return throwError(error);
       })
     );
   }
 
-  createPost(post: Post): Observable<Post> {
-    const fbResponse = this.getPostDoc(post.id).set(post)
-      .then(empty => {
-        console.log('Post created', post);
-        return post;
-      })
-      .catch(error => {
-        console.log('Error creating post', error);
-        return error;
-      });
-
-    return from(fbResponse);
-  }
-
   updatePost(post: Post): Observable<Post> {
-    const fbResponse = this.getPostDoc(post.id).update(post)
-      .then(empty => {
+    const fbResponse = from(this.getPostDoc(post.id).set(post, {merge: true}));
+
+    return fbResponse.pipe(
+      take(1),
+      map(empty => {
         console.log('Post updated', post);
         return post;
-      })
-      .catch(error => {
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
         console.log('Error updating post', error);
-        return error;
-      });
-
-    return from(fbResponse);
+        return throwError(error);
+      })
+    );
   }
 
   deletePost(postId: string): Observable<string> {
 
     // Be sure to delete images before deleting the item doc
-    const deleteImagePromise = this.imageService.deleteAllItemImages(postId, ImageType.BLOG_HERO)
-      .catch(err => {
-        console.log('Error deleting post images', err);
-        return err;
-      });
+    const deleteImageRes = from(this.imageService.deleteAllItemImages(postId, ImageType.BLOG_HERO));
 
-    return from(deleteImagePromise)
-      .pipe(
-        switchMap(res => {
-          const fbResponse = this.getPostDoc(postId).delete()
-          .then(empty => {
-            console.log('Post deleted', postId);
-            return postId;
-          })
-          .catch(error => {
-            console.log('Error deleting post', error);
-            return throwError(error).toPromise();
-          });
-          return from(fbResponse);
-        })
-      );
+    // First delete doc images from storage, then delete doc itself
+    return deleteImageRes.pipe(
+      switchMap(empty => {
+        return from(this.getPostDoc(postId).delete()).pipe(
+          map(empt => postId)
+        );
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error deleting post', error);
+        return throwError(error);
+      })
+    );
   }
 
   // Update post on server (local update happens in store effects)
@@ -136,18 +120,7 @@ export class PostService {
       };
     }
 
-    const serverRes = this.publicService.updatePublicPost(updatedPost)
-      .then(res => {
-        console.log('Server call succeded', res);
-        return updatedPost;
-      })
-      .catch(error => {
-        console.log('Error updating post', error);
-        return error;
-      });
-
-    // For instant UI updates, don't wait for server response
-    return of(updatedPost);
+    return this.submitPubPostUpdate(updatedPost);
   }
 
   togglePostFeatured(post: Post): Observable<Post> {
@@ -166,18 +139,23 @@ export class PostService {
       };
     }
 
-    const serverRes = this.publicService.updatePublicPost(updatedPost)
-      .then(res => {
+    return this.submitPubPostUpdate(updatedPost);
+  }
+
+  private submitPubPostUpdate(updatedPost: Post): Observable<Post> {
+    const serverRes = this.publicService.updatePublicPost(updatedPost);
+
+    return serverRes.pipe(
+      map(res => {
         console.log('Server call succeded', res);
         return updatedPost;
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error updating post on public server', error);
+        return throwError(error);
       })
-      .catch(error => {
-        console.log('Error updating post', error);
-        return error;
-      });
-
-    // For instant UI updates, don't wait for server response
-    return of(updatedPost);
+    );
   }
 
   refreshBlogIndex(): Observable<string> {

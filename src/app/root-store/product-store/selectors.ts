@@ -3,10 +3,15 @@ import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/s
 import * as fromProducts from './reducer';
 import { Product } from 'shared-models/products/product.model';
 
-const getError = (state: State): any => state.error;
 const getIsLoading = (state: State): boolean => state.isLoading;
+const getIsSaving = (state: State): boolean => state.isSaving;
+const getIsDeleting = (state: State): boolean => state.isDeleting;
+const getIsTogglingActive = (state: State): boolean => state.isTogglingActive;
+const getLoadError = (state: State): any => state.loadError;
+const getSaveError = (state: State): boolean => state.saveError;
+const getDeleteError = (state: State): boolean => state.deleteError;
 const getProductsLoaded = (state: State): boolean => state.productsLoaded;
-const getDeletionProcessing = (state: State): boolean => state.deletionProcessing;
+
 
 export const selectProductState: MemoizedSelector<object, State>
 = createFeatureSelector<State>('products');
@@ -22,16 +27,32 @@ export const selectProductById: (productId: string) => MemoizedSelector<object, 
   productState => productState.entities[productId]
 );
 
-export const selectProductError: MemoizedSelector<object, any> = createSelector(
+export const selectLoadError: MemoizedSelector<object, any> = createSelector(
   selectProductState,
-  getError
+  getLoadError
 );
 
-export const selectProductIsLoading: MemoizedSelector<object, boolean>
+export const selectSaveError: MemoizedSelector<object, any> = createSelector(
+  selectProductState,
+  getSaveError
+);
+
+export const selectDeleteError: MemoizedSelector<object, any> = createSelector(
+  selectProductState,
+  getDeleteError
+);
+
+export const selectIsLoading: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getIsLoading);
 
-export const selectProductsLoaded: MemoizedSelector<object, boolean>
+export const selectLoaded: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getProductsLoaded);
 
-export const selectDeletionProcessing: MemoizedSelector<object, boolean>
-= createSelector(selectProductState, getDeletionProcessing);
+export const selectIsSaving: MemoizedSelector<object, boolean>
+= createSelector(selectProductState, getIsSaving);
+
+export const selectIsDeleting: MemoizedSelector<object, boolean>
+= createSelector(selectProductState, getIsDeleting);
+
+export const selectIsTogglingActive: MemoizedSelector<object, boolean>
+= createSelector(selectProductState, getIsTogglingActive);

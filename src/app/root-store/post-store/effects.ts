@@ -32,7 +32,7 @@ export class PostStoreEffects {
             return new postFeatureActions.SinglePostLoaded({ post });
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.LoadFailed({ error }));
           })
         )
     )
@@ -53,28 +53,10 @@ export class PostStoreEffects {
             return new postFeatureActions.AllPostsLoaded({ posts });
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.LoadFailed({ error }));
           })
         )
     )
-  );
-
-  @Effect()
-  addPostEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.AddPostRequested>(
-      postFeatureActions.ActionTypes.ADD_POST_REQUESTED
-    ),
-    mergeMap(action => this.postService.createPost(action.payload.post).pipe(
-      map(post => {
-        if (!post) {
-          throw new Error('Error adding post');
-        }
-        return new postFeatureActions.AddPostComplete({post});
-      }),
-      catchError(error => {
-        return of(new postFeatureActions.LoadErrorDetected({ error }));
-      })
-    )),
   );
 
   @Effect()
@@ -91,7 +73,7 @@ export class PostStoreEffects {
             return new postFeatureActions.DeletePostComplete({postId});
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.DeleteFailed({ error }));
           })
         )
     ),
@@ -115,7 +97,7 @@ export class PostStoreEffects {
             return new postFeatureActions.UpdatePostComplete({ post: postUpdate });
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.SaveFailed({ error }));
           })
         )
     ),
@@ -136,7 +118,7 @@ export class PostStoreEffects {
           }),
           map(post => new postFeatureActions.TogglePublishedComplete()),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.PublicUpdateFailed({ error }));
           })
         )
     ),
@@ -157,7 +139,7 @@ export class PostStoreEffects {
           }),
           map(post => new postFeatureActions.ToggleFeaturedComplete()),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.PublicUpdateFailed({ error }));
           })
         )
     ),
@@ -177,7 +159,7 @@ export class PostStoreEffects {
             return  new postFeatureActions.RefreshPublicBlogIndexComplete();
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.PublicUpdateFailed({ error }));
           })
         )
     ),
@@ -197,7 +179,7 @@ export class PostStoreEffects {
             return  new postFeatureActions.RefreshPublicBlogCacheComplete();
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.PublicUpdateFailed({ error }));
           })
         )
     ),
@@ -217,7 +199,7 @@ export class PostStoreEffects {
             return  new postFeatureActions.RefreshPublicFeaturedPostsCacheComplete();
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadErrorDetected({ error }));
+            return of(new postFeatureActions.PublicUpdateFailed({ error }));
           })
         )
     ),

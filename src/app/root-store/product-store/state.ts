@@ -16,17 +16,27 @@ export const featureAdapter: EntityAdapter<Product>
   );
 
 export interface State extends EntityState<Product> {
-  isLoading?: boolean;
-  error?: any;
-  productsLoaded?: boolean;
-  deletionProcessing: boolean;
+  isLoading: boolean;
+  isSaving: boolean;
+  isDeleting: boolean;
+  isTogglingActive: boolean;
+  loadError: any;
+  saveError: any;
+  deleteError: any;
+  publicUpdateError: any;
+  productsLoaded: boolean;
 }
 
 export const initialState: State = featureAdapter.getInitialState(
   {
     isLoading: false,
-    error: null,
+    isSaving: false,
+    isDeleting: false,
+    isTogglingActive: false,
+    loadError: null,
+    saveError: null,
+    deleteError: null,
+    publicUpdateError: null,
     productsLoaded: false,
-    deletionProcessing: false,
   }
 );

@@ -8,7 +8,7 @@ export function featureReducer(state = initialState, action: Actions): State {
       return {
         ...state,
         isLoading: true,
-        error: null
+        loadError: null
       };
     }
 
@@ -17,7 +17,7 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.product, {
           ...state,
           isLoading: false,
-          error: null
+          loadError: null
         }
       );
     }
@@ -26,7 +26,7 @@ export function featureReducer(state = initialState, action: Actions): State {
       return {
         ...state,
         isLoading: true,
-        error: null
+        loadError: null
       };
     }
 
@@ -36,31 +36,34 @@ export function featureReducer(state = initialState, action: Actions): State {
           ...state,
           isLoading: false,
           productsLoaded: true,
-          error: null,
+          loadError: null,
         }
       );
     }
 
-    case ActionTypes.ADD_PRODUCT_COMPLETE:
-      return featureAdapter.addOne(
-        action.payload.product,
-        {
-          ...state,
-        }
-      );
+    case ActionTypes.UPDATE_PRODUCT_REQUESTED: {
+      return {
+        ...state,
+        isSaving: true,
+        saveError: null
+      };
+    }
 
     case ActionTypes.UPDATE_PRODUCT_COMPLETE:
       return featureAdapter.updateOne(
         action.payload.product,
         {
           ...state,
+          isSaving: false,
+          saveError: null
         }
       );
 
     case ActionTypes.DELETE_PRODUCT_REQUESTED:
       return {
         ...state,
-        deletionProcessing: true,
+        isDeleting: true,
+        deleteError: null
       };
 
     case ActionTypes.DELETE_PRODUCT_COMPLETE:
@@ -68,20 +71,52 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.productId,
         {
           ...state,
-          deletionProcessing: false,
+          isDeleting: false,
+          deleteError: null
         }
       );
 
-    case ActionTypes.TOGGLE_ACTIVE_COMPLETE:
+    case ActionTypes.TOGGLE_ACTIVE_REQUESTED:
       return {
-        ...state
+        ...state,
+        isTogglingActive: true,
       };
 
-    case ActionTypes.PRODUCT_LOAD_FAILURE: {
+    case ActionTypes.TOGGLE_ACTIVE_COMPLETE:
+      return {
+        ...state,
+        isTogglingActive: false
+      };
+
+    case ActionTypes.LOAD_FAILED: {
       return {
         ...state,
         isLoading: false,
-        error: action.payload.error
+        loadError: action.payload.error
+      };
+    }
+
+    case ActionTypes.SAVE_FAILED: {
+      return {
+        ...state,
+        isSaving: false,
+        saveError: action.payload.error
+      };
+    }
+
+    case ActionTypes.DELETE_FAILED: {
+      return {
+        ...state,
+        isDeleting: false,
+        deleteError: action.payload.error
+      };
+    }
+
+    case ActionTypes.PUBLIC_UPDATE_FAILED: {
+      return {
+        ...state,
+        isTogglingActive: false,
+        publicUpdateError: action.payload.error
       };
     }
 

@@ -1,8 +1,11 @@
+import { BillingKeys } from 'shared-models/billing/billing-details.model';
+import { ContactFormKeys } from 'shared-models/user/contact-form.model';
+
 export const SUBSCRIBE_VALIDATION_MESSAGES = {
-  firstName: [
+  [BillingKeys.FIRST_NAME]: [
     { type: 'required', message: 'First name is required.'},
   ],
-  email: [
+  [BillingKeys.EMAIL]: [
     { type: 'required', message: 'Email is required.'},
     { type: 'email', message: 'Not a valid email.'},
   ],
@@ -13,38 +16,38 @@ export const BILLING_VALIDATION_MESSAGES = {
     { type: 'required', message: 'Billing details are missing.'},
     { type: 'invalid', message: 'Billing details have an error.'},
   ],
-  firstName: [
+  [BillingKeys.FIRST_NAME]: [
     { type: 'required', message: 'First name is required.'},
   ],
-  lastName: [
+  [BillingKeys.LAST_NAME]: [
     { type: 'required', message: 'Last name is required.'},
   ],
-  email: [
+  [BillingKeys.EMAIL]: [
     { type: 'required', message: 'Email is required.'},
     { type: 'email', message: 'Not a valid email.'},
   ],
-  phone: [
+  [BillingKeys.PHONE]: [
     { type: 'required', message: 'Phone is required.'},
   ],
-  billingOne: [
+  [BillingKeys.BILLING_ONE]: [
     { type: 'required', message: 'Billing address is required.'},
   ],
-  billingTwo: [
+  [BillingKeys.BILLING_TWO]: [
     { type: 'required', message: 'Billing address is required.'},
   ],
-  city: [
+  [BillingKeys.CITY]: [
     { type: 'required', message: 'City is required.'},
   ],
-  state: [
+  [BillingKeys.STATE]: [
     { type: 'required', message: 'State/Province is required.'},
   ],
-  usStateCode: [
+  [BillingKeys.US_STATE_CODE]: [
     { type: 'required', message: 'State is required.'},
   ],
-  postalCode: [
+  [BillingKeys.POSTAL_CODE]: [
     { type: 'required', message: 'Zip/Postal Code is required.'},
   ],
-  countryCode: [
+  [BillingKeys.COUNTRY_CODE]: [
     { type: 'required', message: 'Country is required.'},
   ],
 };
@@ -72,14 +75,14 @@ export const CREDIT_CARD_VALIDATION_MESSAGES = {
 };
 
 export const CONTACT_VALIDATION_MESSAGES = {
-  firstName: [
+  [BillingKeys.FIRST_NAME]: [
     { type: 'required', message: 'Name is required.'},
   ],
-  email: [
+  [BillingKeys.EMAIL]: [
     { type: 'required', message: 'Email is required.'},
     { type: 'email', message: 'Not a valid email.'},
   ],
-  message: [
+  [ContactFormKeys.MESSAGE]: [
     { type: 'required', message: 'Message is required.'},
   ]
 };

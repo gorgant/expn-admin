@@ -2,7 +2,7 @@ import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@ang
 import { DomSanitizer } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { UiService } from 'src/app/core/services/ui.service';
-import { PageHeroData } from 'shared-models/forms-and-components/page-hero-data.model';
+import { PageHeroData, PageHeroKeys } from 'shared-models/forms-and-components/page-hero-data.model';
 import { PublicImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
 
 @Component({
@@ -49,7 +49,7 @@ export class PageHeroComponent implements OnInit, OnDestroy {
 
   private initializeInputData() {
     this.pageTitle = this.heroData.pageTitle;
-    this.pageSubtitle = this.heroData.pageSubtitle;
+    this.pageSubtitle = this.heroData[PageHeroKeys.PAGE_HERO_SUBTITLE];
     this.actionMessage = this.heroData.actionMessage;
 
     if (this.heroData.isPost) {

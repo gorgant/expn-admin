@@ -1,7 +1,9 @@
+export enum CheckoutKeys {
+  CHECKOUT_HEADER = 'checkoutHeader',
+  CHECKOUT_DESCRIPTION = 'checkoutDescription'
+}
+
 export interface CheckoutData {
-  header: string;
-  productName: string;
-  price: number;
-  description: string;
-  tagline: string;
+  [CheckoutKeys.CHECKOUT_HEADER]: string;
+  [CheckoutKeys.CHECKOUT_DESCRIPTION]: string;
 }

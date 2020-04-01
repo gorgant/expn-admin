@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { Observable, throwError, from } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { takeUntil, map, catchError } from 'rxjs/operators';
 import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
 import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
@@ -28,7 +28,7 @@ export class SubscriberService {
           return subscribers;
         }),
         catchError(error => {
-          this.uiService.showSnackBar(error, null, 5000);
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
           return throwError(error);
         })
       );
@@ -46,24 +46,10 @@ export class SubscriberService {
         }),
         catchError(error => {
           console.log('Error fetching subscriber', error);
-          this.uiService.showSnackBar(error, null, 5000);
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
           return throwError(error);
         })
       );
-
-    // const serverPromise: Promise<EmailSubscriber> = new Promise((resolve, reject) => {
-    //   setTimeout(() => {
-    //     if (subscriberId === 'bob@tim.com') {
-    //       resolve(demoSubscriber);
-    //     } else {
-    //       reject('No such id found');
-    //     }
-    //   }, 1000);
-    // });
-
-    // const serverResponse = serverPromise.then(subscriber => subscriber);
-
-    // return from(serverResponse);
   }
 
   private getSubscribersCollection(): AngularFirestoreCollection<EmailSubscriber> {

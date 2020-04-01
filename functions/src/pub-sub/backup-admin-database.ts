@@ -5,7 +5,6 @@ import { adminProjectId, currentEnvironmentType } from '../config/environments-c
 import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '../../../shared-models/environments/env-vars.model';
 import { Bucket } from '@google-cloud/storage';
 import { now } from 'moment';
-import { catchErrors } from '../config/global-helpers';
 import { explearningAdminStorage } from '../config/storage-config';
 
 const adminStorage = explearningAdminStorage;
@@ -43,7 +42,8 @@ const processBackup = async () => {
     scopes: [                               // scopes required to make a request
         'https://www.googleapis.com/auth/datastore',
     ]
-  });
+  })
+    .catch(err => {console.log(`Error getting auth client:`, err); throw new functions.https.HttpsError('internal', err);});;
 
   return admin.request({
     url,
@@ -52,11 +52,12 @@ const processBackup = async () => {
       outputUriPrefix: `gs://${bucket.name}/database-backup/${now()}`
     }
   })
+    .catch(err => {console.log(`Error submitting backup POST request:`, err); throw new functions.https.HttpsError('internal', err);});;
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////
 
 // Listen for pubsub message
 export const backupAdminDatabase = functions.pubsub.topic(AdminTopicNames.BACKUP_ADMIN_DATABASE_TOPIC).onPublish( (message, context) => {
-  return catchErrors(processBackup());
+  return processBackup();
 });

@@ -7,7 +7,6 @@ import { EmailCategories } from '../../../shared-models/email/email-vars.model';
 import { adminProjectId } from '../config/environments-config';
 import { PubSub } from '@google-cloud/pubsub';
 import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.model';
-import { catchErrors } from '../config/global-helpers';
 
 const pubSub = new PubSub();
 
@@ -22,7 +21,7 @@ const triggerPurchaseConfirmationEmail = async(order: Order) => {
     order
   }
   const topicPublishRes = await topic.publishJSON(pubsubMsg)
-    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); return err;});
+    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); throw new functions.https.HttpsError('internal', err);});
   console.log(`Publish to topic "${topicName}" on project "${projectId}" succeeded:`, topicPublishRes);
 }
 
@@ -31,19 +30,18 @@ const executeActions = async (order: Order) => {
 
   // Store order
   const orderFbRes = await db.collection(AdminCollectionPaths.ORDERS).doc(order.id).set(order)
-    .catch(err => {console.log(`Failed to store order in admin database`, err); return err;});
+    .catch(err => {console.log(`Failed to store order in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
   console.log('Order stored in admin database:', orderFbRes);
   
   // Also update subscriber with order data
   const subOrderFbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(order.email)
     .collection(AdminCollectionPaths.ORDERS).doc(order.id)
     .set(order)
-    .catch(err => {console.log(`Failed to update subscriber order data in admin database`, err); return err;});
+    .catch(err => {console.log(`Failed to update subscriber order data in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
   console.log('Subscriber updated with order data', subOrderFbRes);  
 
   // Trigger purchase confirmation email
-  await triggerPurchaseConfirmationEmail(order)
-    .catch(err => {console.log(`Error publishing purchase confirmation topic to admin: ${err}`); return err});
+  await triggerPurchaseConfirmationEmail(order);
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////
@@ -55,7 +53,7 @@ export const storeOrder = functions.pubsub.topic(AdminTopicNames.SAVE_ORDER_TOPI
   console.log('Store order request received with this data:', order);
   console.log('Context from pubsub:', context);
 
-  return catchErrors(executeActions(order));
+  return executeActions(order);
 })
 
 

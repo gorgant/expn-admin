@@ -17,7 +17,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatSlideToggleChange } from '@angular/ma
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { take, withLatestFrom, map } from 'rxjs/operators';
 import * as moment from 'moment';
-import { DiscountCouponParent, DiscountCouponQueryFields } from 'shared-models/billing/discount-coupon.model';
+import { DiscountCouponParent, DiscountCouponKeys } from 'shared-models/billing/discount-coupon.model';
 import { Product } from 'shared-models/products/product.model';
 import { UiService } from 'src/app/core/services/ui.service';
 
@@ -86,7 +86,7 @@ export class CouponFormComponent implements OnInit, OnDestroy {
     this.products$ = this.store$.select(ProductStoreSelectors.selectAllProducts)
       .pipe(
         withLatestFrom(
-          this.store$.select(ProductStoreSelectors.selectProductsLoaded)
+          this.store$.select(ProductStoreSelectors.selectLoaded)
         ),
         map(([products, productsLoaded]) => {
           // Check if items are loaded, if not fetch from server
@@ -102,16 +102,16 @@ export class CouponFormComponent implements OnInit, OnDestroy {
 
     this.couponForm = this.fb.group({
       // Regex courtesy of https://stackoverflow.com/questions/388996/regex-for-javascript-to-allow-only-alphanumeric
-      [DiscountCouponQueryFields.COUPON_CODE]: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+$/i)]],
-      [DiscountCouponQueryFields.DISCOUNT_PERCENTAGE]: ['', [Validators.required, Validators.max(100), Validators.min(1)]],
-      [DiscountCouponQueryFields.EXPIRATION_DATE]: [moment.now(), [Validators.required]],
+      [DiscountCouponKeys.COUPON_CODE]: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+$/i)]],
+      [DiscountCouponKeys.DISCOUNT_PERCENTAGE]: ['', [Validators.required, Validators.max(100), Validators.min(1)]],
+      [DiscountCouponKeys.EXPIRATION_DATE]: [moment.now(), [Validators.required]],
       expirationHour: [0, [Validators.min(0), Validators.max(23)]], // Datepicker doesn't have time of day by default
       expirationMin: [0, [Validators.min(0), Validators.max(59)]], // Datepicker doesn't have time of day by default
-      [DiscountCouponQueryFields.MAX_USES]: ['', [Validators.required, Validators.min(1)]],
-      [DiscountCouponQueryFields.USER_SPECIFIC]: [false, [Validators.required]],
-      [DiscountCouponQueryFields.PRODUCT_SPECIFIC]: [false, [Validators.required]],
-      [DiscountCouponQueryFields.MAX_USES_PER_USER]: [null], // Validators set after form is created
-      [DiscountCouponQueryFields.APPROVED_PRODUCT_IDS]: [[]]
+      [DiscountCouponKeys.MAX_USES]: ['', [Validators.required, Validators.min(1)]],
+      [DiscountCouponKeys.USER_SPECIFIC]: [false, [Validators.required]],
+      [DiscountCouponKeys.PRODUCT_SPECIFIC]: [false, [Validators.required]],
+      [DiscountCouponKeys.MAX_USES_PER_USER]: [null], // Validators set after form is created
+      [DiscountCouponKeys.APPROVED_PRODUCT_IDS]: [[]]
     });
 
     this.isNewCoupon = true;
@@ -124,22 +124,22 @@ export class CouponFormComponent implements OnInit, OnDestroy {
   // Configure max uses
   private setMaxUsesPerUserValidators() {
     // Only apply if userSpecific is selected
-    if (this.userSpecific.value) {
-      const maxValue = this.maxUses.value ? this.maxUses.value : null;
-      this.maxUsesPerUser.setValidators([Validators.required, Validators.min(1), Validators.max(maxValue)]);
-      this.maxUsesPerUser.updateValueAndValidity();
+    if (this[DiscountCouponKeys.USER_SPECIFIC].value) {
+      const maxValue = this[DiscountCouponKeys.MAX_USES].value ? this[DiscountCouponKeys.MAX_USES].value : null;
+      this[DiscountCouponKeys.MAX_USES_PER_USER].setValidators([Validators.required, Validators.min(1), Validators.max(maxValue)]);
+      this[DiscountCouponKeys.MAX_USES_PER_USER].updateValueAndValidity();
     }
   }
 
   private clearMaxUsesPerUserValidators() {
-    this.maxUsesPerUser.setValidators(null);
-    this.maxUsesPerUser.updateValueAndValidity();
+    this[DiscountCouponKeys.MAX_USES_PER_USER].setValidators(null);
+    this[DiscountCouponKeys.MAX_USES_PER_USER].updateValueAndValidity();
   }
 
 
   // Update maxUsesPerUser whenever maxUses is updated
   private bindMaxUsesPerUserToOverallMaxUses() {
-    this.maxUses.valueChanges.subscribe(value => {
+    this[DiscountCouponKeys.MAX_USES].valueChanges.subscribe(value => {
       this.setMaxUsesPerUserValidators();
     });
   }
@@ -162,28 +162,30 @@ export class CouponFormComponent implements OnInit, OnDestroy {
     this.isNewCoupon = false;
 
     const patchFormData: Partial<DiscountCouponParent> = {
-      couponCode: this.existingCoupon.couponCode,
-      discountPercentage: this.existingCoupon.discountPercentage * 100,
-      expirationDate: this.existingCoupon.expirationDate,
-      maxUses: this.existingCoupon.maxUses,
-      userSpecific: this.existingCoupon.userSpecific,
-      productSpecific: this.existingCoupon.productSpecific,
-      maxUsesPerUser: this.existingCoupon.maxUsesPerUser ? this.existingCoupon.maxUsesPerUser : 0,
-      approvedProductIds: this.existingCoupon.approvedProductIds ? this.existingCoupon.approvedProductIds : []
+      [DiscountCouponKeys.COUPON_CODE]: this.existingCoupon[DiscountCouponKeys.COUPON_CODE],
+      [DiscountCouponKeys.DISCOUNT_PERCENTAGE]: this.existingCoupon[DiscountCouponKeys.DISCOUNT_PERCENTAGE] * 100,
+      [DiscountCouponKeys.EXPIRATION_DATE]: this.existingCoupon[DiscountCouponKeys.EXPIRATION_DATE],
+      [DiscountCouponKeys.MAX_USES]: this.existingCoupon[DiscountCouponKeys.MAX_USES],
+      [DiscountCouponKeys.USER_SPECIFIC]: this.existingCoupon[DiscountCouponKeys.USER_SPECIFIC],
+      [DiscountCouponKeys.PRODUCT_SPECIFIC]: this.existingCoupon[DiscountCouponKeys.PRODUCT_SPECIFIC],
+      // tslint:disable-next-line:max-line-length
+      [DiscountCouponKeys.MAX_USES_PER_USER]: this.existingCoupon[DiscountCouponKeys.MAX_USES_PER_USER] ? this.existingCoupon[DiscountCouponKeys.MAX_USES_PER_USER] : 0,
+      // tslint:disable-next-line:max-line-length
+      [DiscountCouponKeys.APPROVED_PRODUCT_IDS]: this.existingCoupon[DiscountCouponKeys.APPROVED_PRODUCT_IDS] ? this.existingCoupon[DiscountCouponKeys.APPROVED_PRODUCT_IDS] : []
     };
 
     // Convert the datestring to segments to fill form fields properly
-    const dateString = this.existingCoupon[DiscountCouponQueryFields.EXPIRATION_DATE];
+    const dateString = this.existingCoupon[DiscountCouponKeys.EXPIRATION_DATE];
     const patchFormDataWithDatePickerFormats = {
       ...patchFormData,
-      expirationDate: moment(dateString),
+      [DiscountCouponKeys.EXPIRATION_DATE]: moment(dateString),
       expirationHour: moment(dateString).hours(),
       expirationMin: moment(dateString).minutes()
     };
 
 
     this.couponForm.patchValue(patchFormDataWithDatePickerFormats);
-    this.couponCode.disable(); // Prevent code from being edited
+    this[DiscountCouponKeys.COUPON_CODE].disable(); // Prevent code from being edited
 
     // Set base validator upon initialization if a value exists
     this.setMaxUsesPerUserValidators();
@@ -199,19 +201,21 @@ export class CouponFormComponent implements OnInit, OnDestroy {
     .pipe(take(1))
     .subscribe(publicUser => {
       const coupon: DiscountCouponParent = {
-        couponCode: (this.couponCode.value as string).trim(),
-        discountPercentage: this.discountPercentage.value / 100,
-        expirationDate: this.calculateExpirationDate(),
-        maxUses: this.maxUses.value,
-        userSpecific: this.userSpecific.value,
-        productSpecific: this.productSpecific.value,
-        maxUsesPerUser: this.userSpecific.value ? this.maxUsesPerUser.value : null,
-        approvedProductIds: this.productSpecific.value ? this.approvedProductIds.value : null,
-        useCount: this.existingCoupon ? this.existingCoupon.useCount : 0,
-        createdDate: this.existingCoupon ? this.existingCoupon.createdDate : moment.now(),
+        [DiscountCouponKeys.COUPON_CODE]: (this[DiscountCouponKeys.COUPON_CODE].value as string).trim(),
+        [DiscountCouponKeys.DISCOUNT_PERCENTAGE]: this[DiscountCouponKeys.DISCOUNT_PERCENTAGE].value / 100,
+        [DiscountCouponKeys.EXPIRATION_DATE]: this.calculateExpirationDate(),
+        [DiscountCouponKeys.MAX_USES]: this[DiscountCouponKeys.MAX_USES].value,
+        [DiscountCouponKeys.USER_SPECIFIC]: this[DiscountCouponKeys.USER_SPECIFIC].value,
+        [DiscountCouponKeys.PRODUCT_SPECIFIC]: this[DiscountCouponKeys.PRODUCT_SPECIFIC].value,
+        // tslint:disable-next-line:max-line-length
+        [DiscountCouponKeys.MAX_USES_PER_USER]: this[DiscountCouponKeys.USER_SPECIFIC].value ? this[DiscountCouponKeys.MAX_USES_PER_USER].value : null,
+        // tslint:disable-next-line:max-line-length
+        [DiscountCouponKeys.APPROVED_PRODUCT_IDS]: this[DiscountCouponKeys.PRODUCT_SPECIFIC].value ? this[DiscountCouponKeys.APPROVED_PRODUCT_IDS].value : null,
+        [DiscountCouponKeys.USE_COUNT]: this.existingCoupon ? this.existingCoupon[DiscountCouponKeys.USE_COUNT] : 0,
+        [DiscountCouponKeys.CREATED_DATE]: this.existingCoupon ? this.existingCoupon[DiscountCouponKeys.CREATED_DATE] : moment.now(),
         modifiedDate: moment.now(),
         creatorId: this.existingCoupon ? this.existingCoupon.creatorId : publicUser.id,
-        active: this.existingCoupon ? this.existingCoupon.active : false,
+        [DiscountCouponKeys.ACTIVE]: this.existingCoupon ? this.existingCoupon[DiscountCouponKeys.ACTIVE] : false,
       };
 
       this.store$.dispatch(new CouponStoreActions.UpdateCouponRequested({coupon}));
@@ -220,15 +224,14 @@ export class CouponFormComponent implements OnInit, OnDestroy {
       this.saveCouponSubscription = this.store$.select(CouponStoreSelectors.selectIsSaving)
         .pipe(
           withLatestFrom(
-            this.store$.select(CouponStoreSelectors.selectCouponSaved),
             this.store$.select(CouponStoreSelectors.selectSaveError)
           )
         )
-        .subscribe(([isSaving, couponUpdated, saveError]) => {
-          if (!isSaving && couponUpdated) {
+        .subscribe(([isSaving, saveError]) => {
+          if (!isSaving && !saveError) {
             console.log('Coupon saved', coupon);
             this.dialogRef.close();
-            this.router.navigate([AdminAppRoutes.COUPONS_COUPON_DETAILS, coupon.couponCode]);
+            this.router.navigate([AdminAppRoutes.COUPONS_COUPON_DETAILS, coupon[DiscountCouponKeys.COUPON_CODE]]);
           }
           if (saveError) {
             console.log('Error saving coupon');
@@ -238,7 +241,8 @@ export class CouponFormComponent implements OnInit, OnDestroy {
   }
 
   private calculateExpirationDate(): number {
-    const dateNoTime = moment(this.expirationDate.value).format('YYYY-MM-DD'); // Purge time from date value so that it adds properly
+    // tslint:disable-next-line:max-line-length
+    const dateNoTime = moment(this[DiscountCouponKeys.EXPIRATION_DATE].value).format('YYYY-MM-DD'); // Purge time from date value so that it adds properly
     const expDateInMs: number = moment(dateNoTime, 'YYYY-MM-DD').valueOf(); // Convert purged value back to ms
 
     let expirationHourInMs = 0;
@@ -267,15 +271,15 @@ export class CouponFormComponent implements OnInit, OnDestroy {
 
 
 
-  get couponCode() { return this.couponForm.get(DiscountCouponQueryFields.COUPON_CODE); }
-  get discountPercentage() { return this.couponForm.get(DiscountCouponQueryFields.DISCOUNT_PERCENTAGE); }
-  get expirationDate() { return this.couponForm.get(DiscountCouponQueryFields.EXPIRATION_DATE); }
+  get [DiscountCouponKeys.COUPON_CODE]() { return this.couponForm.get(DiscountCouponKeys.COUPON_CODE); }
+  get [DiscountCouponKeys.DISCOUNT_PERCENTAGE]() { return this.couponForm.get(DiscountCouponKeys.DISCOUNT_PERCENTAGE); }
+  get [DiscountCouponKeys.EXPIRATION_DATE]() { return this.couponForm.get(DiscountCouponKeys.EXPIRATION_DATE); }
   get expirationHour() { return this.couponForm.get('expirationHour'); }
   get expirationMin() { return this.couponForm.get('expirationMin'); }
-  get maxUses() { return this.couponForm.get(DiscountCouponQueryFields.MAX_USES); }
-  get userSpecific() { return this.couponForm.get(DiscountCouponQueryFields.USER_SPECIFIC); }
-  get productSpecific() { return this.couponForm.get(DiscountCouponQueryFields.PRODUCT_SPECIFIC); }
-  get maxUsesPerUser() { return this.couponForm.get(DiscountCouponQueryFields.MAX_USES_PER_USER); }
-  get approvedProductIds() { return this.couponForm.get(DiscountCouponQueryFields.APPROVED_PRODUCT_IDS); }
+  get [DiscountCouponKeys.MAX_USES]() { return this.couponForm.get(DiscountCouponKeys.MAX_USES); }
+  get [DiscountCouponKeys.USER_SPECIFIC]() { return this.couponForm.get(DiscountCouponKeys.USER_SPECIFIC); }
+  get [DiscountCouponKeys.PRODUCT_SPECIFIC]() { return this.couponForm.get(DiscountCouponKeys.PRODUCT_SPECIFIC); }
+  get [DiscountCouponKeys.MAX_USES_PER_USER]() { return this.couponForm.get(DiscountCouponKeys.MAX_USES_PER_USER); }
+  get [DiscountCouponKeys.APPROVED_PRODUCT_IDS]() { return this.couponForm.get(DiscountCouponKeys.APPROVED_PRODUCT_IDS); }
 
 }

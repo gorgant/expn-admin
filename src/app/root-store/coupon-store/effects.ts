@@ -57,24 +57,6 @@ export class CouponStoreEffects {
     )
   );
 
-  // @Effect()
-  // addCouponEffect$: Observable<Action> = this.actions$.pipe(
-  //   ofType<couponFeatureActions.AddCouponRequested>(
-  //     couponFeatureActions.ActionTypes.ADD_COUPON_REQUESTED
-  //   ),
-  //   mergeMap(action => this.couponService.createCoupon(action.payload.coupon).pipe(
-  //     map(coupon => {
-  //       if (!coupon) {
-  //         throw new Error('Error adding coupon');
-  //       }
-  //       return new couponFeatureActions.AddCouponComplete({coupon});
-  //     }),
-  //     catchError(error => {
-  //       return of(new couponFeatureActions.SaveFailed({ error }));
-  //     })
-  //   )),
-  // );
-
   @Effect()
   deleteCouponEffect$: Observable<Action> = this.actions$.pipe(
     ofType<couponFeatureActions.DeleteCouponRequested>(
@@ -89,7 +71,7 @@ export class CouponStoreEffects {
             return new couponFeatureActions.DeleteCouponComplete({couponId});
           }),
           catchError(error => {
-            return of(new couponFeatureActions.LoadFailed({ error }));
+            return of(new couponFeatureActions.DeleteFailed({ error }));
           })
         )
     ),

@@ -7,7 +7,6 @@ import { PubSub } from '@google-cloud/pubsub';
 import { adminProjectId } from '../config/environments-config';
 import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.model';
 import { EmailCategories } from '../../../shared-models/email/email-vars.model';
-import { catchErrors } from '../config/global-helpers';
 
 const pubSub = new PubSub();
 
@@ -23,7 +22,7 @@ const triggerContactFormConfirmationEmail = async(contactForm: ContactForm) => {
     contactForm
   }
   const topicPublishRes = await topic.publishJSON(pubsubMsg)
-    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); return err;});
+    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); throw new functions.https.HttpsError('internal', err);});;
   console.log(`Publish to topic "${topicName}" on project "${projectId}" succeeded:`, topicPublishRes);
 }
 
@@ -32,19 +31,19 @@ const executeActions = async (contactForm: ContactForm) => {
 
   // Store contact form
   const contactFormFbRes = await db.collection(AdminCollectionPaths.CONTACT_FORMS).doc(contactForm.id).set(contactForm)
-     .catch(err => {console.log(`Failed to store contact form in admin database`, err); return err;});
+     .catch(err => {console.log(`Failed to store contact form in admin database`, err); throw new functions.https.HttpsError('internal', err);});;
+     
   console.log('Contact form stored in admin database:', contactFormFbRes);
    
   // Also update subcriber with contact form data
   const subContactFormFbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(contactForm.email)
     .collection(AdminCollectionPaths.CONTACT_FORMS).doc(contactForm.id)
     .set(contactForm)
-    .catch(err => {console.log(`Failed to update subscriber contact form in admin database`, err); return err;});
+    .catch(err => {console.log(`Failed to update subscriber contact form in admin database`, err); throw new functions.https.HttpsError('internal', err);});;
   console.log('Subscriber updated with contact form:', subContactFormFbRes); 
  
   // Trigger contact form confirmation email
-  await triggerContactFormConfirmationEmail(contactForm)
-    .catch(err => {console.log(`Error publishing contact form topic to admin: ${err}`); return err});
+  await triggerContactFormConfirmationEmail(contactForm);
 }
 
 
@@ -56,7 +55,7 @@ export const storeContactForm = functions.pubsub.topic(AdminTopicNames.SAVE_CONT
   console.log('Store contact form request received with this data:', contactForm);
   console.log('Context from pubsub:', context);
   
-  return catchErrors(executeActions(contactForm));
+  return executeActions(contactForm);
 });
 
 

@@ -4,11 +4,12 @@ import { MatDialogConfig, MatDialog } from '@angular/material';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { RootStoreState, ProductStoreActions } from 'src/app/root-store';
+import { RootStoreState, ProductStoreActions, ProductStoreSelectors } from 'src/app/root-store';
 import { Product } from 'shared-models/products/product.model';
 import { AdminImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-product-card',
@@ -19,6 +20,7 @@ export class ProductCardComponent implements OnInit {
 
   @Input() product: Product;
   imagePaths = AdminImagePaths;
+  isTogglingActive$: Observable<boolean>;
 
   constructor(
     private router: Router,
@@ -35,6 +37,7 @@ export class ProductCardComponent implements OnInit {
 
   onToggleProductActive() {
     console.log('Activate product toggled');
+    this.isTogglingActive$ = this.store$.select(ProductStoreSelectors.selectIsTogglingActive);
     this.store$.dispatch(new ProductStoreActions.ToggleActiveRequested({product: this.product}));
   }
 

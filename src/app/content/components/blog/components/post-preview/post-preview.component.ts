@@ -64,11 +64,12 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
 
   // Triggered after params are fetched
   private getPost() {
-    this.error$ = this.store$.select(PostStoreSelectors.selectPostError);
+    this.error$ = this.store$.select(PostStoreSelectors.selectLoadError);
+    this.isLoading$ = this.store$.select(PostStoreSelectors.selectIsLoading);
     this.post$ = this.store$.select(PostStoreSelectors.selectPostById(this.postId))
     .pipe(
       withLatestFrom(
-        this.store$.select(PostStoreSelectors.selectPostsLoaded)
+        this.store$.select(PostStoreSelectors.selectLoaded)
       ),
       map(([post, postsLoaded]) => {
         // Check if items are loaded, if not fetch from server
@@ -81,13 +82,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.error$ = this.store$.select(
-      PostStoreSelectors.selectPostError
-    );
 
-    this.isLoading$ = this.store$.select(
-      PostStoreSelectors.selectPostIsLoading
-    );
   }
 
   // If post data available, patch values into form
@@ -172,7 +167,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
     console.log('Initializing hero data with this post', post);
     this.heroData = {
       pageTitle: post.title,
-      pageSubtitle: null,
+      pageHeroSubtitle: null,
       imageProps: post.imageProps,
       actionMessage: 'Read More',
       isPost: true
