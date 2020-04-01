@@ -10,11 +10,11 @@
       <div class="schedule-picker" fxLayout="column" fxLayoutAlign="center center">
         <div class="date-picker">
           <mat-form-field>
-              <input formControlName="publishDate" matInput [min]="minDate" [matDatepicker]="picker" placeholder="Choose a Date">
+              <input formControlName="publishedDate" matInput [min]="minDate" [matDatepicker]="picker" placeholder="Choose a Date">
               <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker [touchUi]="useTouchUi" #picker></mat-datepicker>
-            <mat-error *ngFor="let validation of SCHEDULE_POST_FORM_VALIDATION_MESSAGES.publishDate">
-              <mat-error *ngIf="publishDate.hasError(validation.type) && publishDate.invalid && (publishDate.dirty || publishDate.touched)">{{ validation.message }}</mat-error>
+            <mat-error *ngFor="let validation of schedulePostFormValidationMessages.publishedDate">
+              <mat-error *ngIf="publishedDate.hasError(validation.type) && publishedDate.invalid && (publishedDate.dirty || publishedDate.touched)">{{ validation.message }}</mat-error>
             </mat-error>
           </mat-form-field>
         </div>
@@ -22,14 +22,14 @@
           <mat-form-field class="hour-picker">
             <input formControlName="publishHour" matInput type="phone" placeholder="Hour" min="0" max="23">
             <mat-hint>0 - 23</mat-hint>
-            <mat-error *ngFor="let validation of SCHEDULE_POST_FORM_VALIDATION_MESSAGES.publishHour">
+            <mat-error *ngFor="let validation of schedulePostFormValidationMessages.publishHour">
               <mat-error *ngIf="publishHour.hasError(validation.type) && publishHour.invalid && (publishHour.dirty || publishHour.touched)">{{ validation.message }}</mat-error>
             </mat-error>
           </mat-form-field>
           <mat-form-field class="min-picker">
             <input formControlName="publishMin" matInput type="phone" placeholder="Min" min="0" max="59">
             <mat-hint>0 - 59</mat-hint>
-            <mat-error *ngFor="let validation of SCHEDULE_POST_FORM_VALIDATION_MESSAGES.publishMin">
+            <mat-error *ngFor="let validation of schedulePostFormValidationMessages.publishMin">
               <mat-error *ngIf="publishMin.hasError(validation.type) && publishMin.invalid && (publishMin.dirty || publishMin.touched)">{{ validation.message }}</mat-error>
             </mat-error>
           </mat-form-field>

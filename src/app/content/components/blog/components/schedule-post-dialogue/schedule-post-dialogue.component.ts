@@ -18,7 +18,7 @@ import { UiService } from 'src/app/core/services/ui.service';
 export class SchedulePostDialogueComponent implements OnInit, OnDestroy {
 
   scheduleForm: FormGroup;
-  SCHEDULE_POST_FORM_VALIDATION_MESSAGES = SCHEDULE_POST_FORM_VALIDATION_MESSAGES;
+  schedulePostFormValidationMessages = SCHEDULE_POST_FORM_VALIDATION_MESSAGES;
   minDate = new Date(moment.now());
   useTouchUi: boolean;
 
