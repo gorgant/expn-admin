@@ -1,6 +1,16 @@
 <div class="page-container" fxLayout="column" fxLayoutAlign="center center">
   <button class="create-product-button" color="primary" mat-raised-button (click)="onCreateProduct()">Create Product</button>
-  <div *ngIf="!(deletionProcessing$ | async)" class="products-container" fxLayout="column" fxLayoutGap="40px">
-    <app-product-card *ngFor="let product of products$ | async" [product]="product"></app-product-card>
-  </div>
+  <mat-tab-group mat-stretch-tabs>
+    <mat-tab label="Services" >
+      <div class="products-container" fxLayoutGap="32px">
+        <app-product-card *ngFor="let product of products$ | async | serviceProductPipe" [product]="product"></app-product-card>
+      </div>
+    </mat-tab>
+    <mat-tab label="Web Courses">
+      <div class="products-container" fxLayoutGap="32px">
+        <app-product-card *ngFor="let product of products$ | async | webcourseProductPipe " [product]="product"></app-product-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>
+

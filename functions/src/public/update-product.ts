@@ -13,6 +13,7 @@ const updateProd = async (product: Product): Promise<FirebaseFirestore.WriteResu
     fbRes = await db.collection(SharedCollectionPaths.PRODUCTS).doc(product.id).delete()
       .catch(err => {console.log(`Failed to delete product data from public database`, err); throw new functions.https.HttpsError('internal', err);});
     console.log('Product deleted from public database', fbRes);
+    return fbRes;
   }
 
   // If product is active on admin, add to public

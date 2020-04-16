@@ -23,6 +23,8 @@ export enum PublicAppRoutes {
   HOME = '',
   ABOUT_ME = '/about',
   PRODUCTS = '/products',
+  SERVICES = '/products/services',
+  WEBCOURSES = '/products/webcourses',
   CHECKOUT = '/products/checkout',
   PURCHASE_CONFIRMATION = '/products/purchase-confirmation',
   BLOG = '/blog',

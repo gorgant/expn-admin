@@ -107,7 +107,7 @@
         </mat-error>
       </mat-form-field>
       <div class="form-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
-        <button class="submit-button" [disabled]="productForm.invalid || !productInitialized" mat-raised-button color="accent" type="button" (click)="onSave()">Save Product</button>
+        <button class="submit-button" [disabled]="!productInitialized" mat-raised-button color="accent" type="button" (click)="onSave()">Save Product</button>
         <button *ngIf="isNewProduct" class="discard-button" [disabled]="!productInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Product</button>
         <button *ngIf="!isNewProduct" class="discard-button" [disabled]="!productInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Edits</button>
       </div>

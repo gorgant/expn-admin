@@ -217,26 +217,32 @@ const updateFBPost = async (imageData: ResizeImageDataObject): Promise<FirebaseF
     imagesUpdated: now()
   };
 
+  let collectionPath = '';
+
   // Set approapriate image size data in Firestore then signal to database that images have been uploaded
   switch (imageData.imageType) {
     case ImageType.BLOG_HERO:
       imageUpdate.imageSizes = blogHeroSizes;
+      collectionPath = SharedCollectionPaths.POSTS;
       break;
     case ImageType.BLOG_INLINE:
       imageUpdate.imageSizes = blogInlineImages;
+      collectionPath = SharedCollectionPaths.POSTS;
       break;
     case ImageType.PRODUCT_CARD:
       imageUpdate.imageSizes = productCardSizes;
+      collectionPath = SharedCollectionPaths.PRODUCTS;
       break;
     case ImageType.PRODUCT_HERO:
       imageUpdate.imageSizes = productHeroSizes;
+      collectionPath = SharedCollectionPaths.PRODUCTS;
       break;
     default:
       console.log('No image type detected, image size not set') 
       break;
   }
 
-  return adminFirestore.collection(SharedCollectionPaths.POSTS).doc(imageData.itemId).update(imageUpdate)
+  return adminFirestore.collection(collectionPath).doc(imageData.itemId).update(imageUpdate)
     .catch(err => {console.log(`Error updating image:`, err); throw new functions.https.HttpsError('internal', err);});
     
   

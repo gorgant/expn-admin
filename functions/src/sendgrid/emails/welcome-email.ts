@@ -76,7 +76,8 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
       firstName: toFirstName, // Will populate first name greeting if name exists
       blogUrl: EmailWebsiteLinks.BLOG_URL,
       remoteCoachUrl: EmailWebsiteLinks.REMOTE_COACH_URL,
-      replyEmailAddress: fromEmail
+      replyEmailAddress: fromEmail,
+      webcoursesUrl: EmailWebsiteLinks.WEBCOURSES_URL
     },
     trackingSettings: {
       subscriptionTracking: {

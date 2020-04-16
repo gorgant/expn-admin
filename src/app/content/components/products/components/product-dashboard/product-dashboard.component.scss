@@ -1,7 +1,11 @@
 @import '../../../../../variables';
 
+:host {
+  width: 100%;
+  max-width: 1000px;
+}
+
 .page-container {
-  max-width: 900px;
   margin-top: 64px;
   margin-bottom: 32px;
   font-size: 16px;
@@ -10,6 +14,14 @@
 
 .create-product-button {
   margin-bottom: 32px;
+}
+
+.products-container {
+  margin: 16px;
+}
+
+mat-tab-group {
+  width: 100%;
 }
 
 @media screen and (max-width: $mobile-cutoff-width) {

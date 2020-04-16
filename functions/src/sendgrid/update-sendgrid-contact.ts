@@ -12,6 +12,7 @@ import { adminFirestore } from '../config/db-config';
 import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
 import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.model';
 import { PubSub } from '@google-cloud/pubsub';
+import { SubscriptionSource } from '../../../shared-models/subscribers/subscription-source.model';
 
 const pubSub = new PubSub();
 const db = adminFirestore;
@@ -205,7 +206,8 @@ const createOrUpdateSendgridContact = async (subscriber: EmailSubscriber): Promi
   // Many more fields available, check api docs if needed (https://sendgrid.com/docs/API_Reference/api_v3.html)
   const requestBody = { 
     list_ids: [ 
-      newsletterListId 
+      newsletterListId ,
+      subscriber.subscriptionSources.includes(SubscriptionSource.WAIT_LIST_EXECUTIVE_PRESENCE) ? EmailContactListIds.EXPLEARNING_EXECUTIVE_PRESENCE_WAIT_LIST : '',
     ],
     contacts: [ 
       { 
@@ -294,9 +296,15 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
   const notOptedInYet = newSubscriberData && !newSubscriberData.optInConfirmed;
   const optInRequested = oldSubscriberData && newSubscriberData && !oldSubscriberData.optInConfirmed && newSubscriberData.optInConfirmed; // Opt in chagned from false to true
   const subscriberAlreadyOptedIn = oldSubscriberData && oldSubscriberData.optInConfirmed;
-  const otherValidSendgridUpdate = oldSubscriberData && // Detect name change
+  // Detect name change or contact list update
+  const otherValidSendgridUpdate = 
+    oldSubscriberData && 
     newSubscriberData && 
-    (newSubscriberData.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData.publicUserData.billingDetails as BillingDetails).firstName;
+    (
+      (newSubscriberData.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData.publicUserData.billingDetails as BillingDetails).firstName || // Detect name change
+      newSubscriberData.subscriptionSources.length !== oldSubscriberData.subscriptionSources.length // Detect contact list update
+    );
+  
   const subscriberMissingSGContactId = newSubscriberData && !newSubscriberData.sendgridContactId;
 
   // If this is a new opt in, send welcome email
@@ -333,8 +341,16 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
 
   // If subscriber is opted in but the update is not a name update, don't transmit updates to Sendgrid
   if (subscriberAlreadyOptedIn && !otherValidSendgridUpdate) {
-    console.log('No change to first name detected, exiting function');
+    console.log('No other valid sendgrid updates detected, exiting function');
     return;
+  }
+
+  if (newSubscriberData && oldSubscriberData && (newSubscriberData.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData.publicUserData.billingDetails as BillingDetails).firstName) {
+    console.log('Subscriber name update detected');
+  }
+
+  if (newSubscriberData && oldSubscriberData && newSubscriberData.subscriptionSources.length !== oldSubscriberData.subscriptionSources.length) {
+    console.log('Subscriber contact list update detected');
   }
 
   // Create or update Sendgrid Contact

@@ -38,7 +38,7 @@ const executeActions = async (susbscriberData: EmailSubscriber) => {
     .catch(err => {console.log(`Error fetching subscriber doc from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
 
 
-  const isContactForm: boolean = newSubscriberData.lastSubSource === SubscriptionSource.CONTACT_FORM;
+  const isContactFormNoSub: boolean = newSubscriberData.lastSubSource === SubscriptionSource.CONTACT_FORM_NO_SUB;
   const isExistingSubscriber: boolean = subDoc.exists;
   let subscriberHasOptedIn: boolean = false;
   if (isExistingSubscriber) {
@@ -68,10 +68,10 @@ const executeActions = async (susbscriberData: EmailSubscriber) => {
   await subDocRef.set(subscriberUpdate, {merge: true})
     .catch(err => {console.log(`Error storing subscriber data in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
     
-  // Send opt in email if NOT a contact form request and if subscriber has NOT opted in
-  if (!isContactForm && !subscriberHasOptedIn) {
+  // Send opt in email if NOT a no-sub contact form and if subscriber has NOT opted in
+  if (!isContactFormNoSub && !subscriberHasOptedIn) {
     
-    console.log('Subscriber has not opted in yet and this is not a contact form, sending opt in confirmation email');
+    console.log('Subscriber has not opted in yet and this is not a no-sub contact form, sending opt in confirmation email');
     // Trigger opt in email
     await triggerOptInEmail(newSubscriberData);
   }
@@ -91,6 +91,3 @@ export const storeEmailSub = functions.pubsub.topic(AdminTopicNames.SAVE_EMAIL_S
   return executeActions(subscriberData);
 
 });
-
-
-

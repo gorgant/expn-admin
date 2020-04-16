@@ -28,12 +28,16 @@ const blogUrl = `https://${appUrl}${blogSlugWithSlashPrefix}`;
 const productListSlugWithSlashPrefix = PublicAppRoutes.PRODUCTS;
 const remoteCoachUrl = `https://${appUrl}${productListSlugWithSlashPrefix}/${remoteCoachProductId}/${remoteCoachProductSlug}`;
 const confirmationSlugWithSlahPrefeix = PublicAppRoutes.SUB_CONFIRMATION;
-const optInConfirmationUrlNoParams = `https://${appUrl}${confirmationSlugWithSlahPrefeix}`
+const optInConfirmationUrlNoParams = `https://${appUrl}${confirmationSlugWithSlahPrefeix}`;
+const webCoursesSlugWithSlashPrefix = PublicAppRoutes.WEBCOURSES;
+const webcoursesUrl = `https://${appUrl}${webCoursesSlugWithSlashPrefix}`;
+
 
 export const EmailWebsiteLinks = {
   BLOG_URL: blogUrl,
   REMOTE_COACH_URL: remoteCoachUrl,
-  OPT_IN_CONFIRMATION_URL_NO_PARAMS: optInConfirmationUrlNoParams
+  OPT_IN_CONFIRMATION_URL_NO_PARAMS: optInConfirmationUrlNoParams,
+  WEBCOURSES_URL: webcoursesUrl
 };
 
 export const getProductUrlById = (productId: string): string => {
