@@ -32,6 +32,6 @@ export const initialState: State = featureAdapter.getInitialState(
     saveError: null,
     deleteError: null,
     publicUpdateError: null,
-    postsLoaded: false,
+    postsLoaded: false
   }
 );

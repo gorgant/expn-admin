@@ -94,7 +94,7 @@ export const StripePublishableKeys = {
 
 export enum ProductionSsrDataLoadChecks {
   EXPLEARNING_BLOG_MIN = 100,
-  EXPLEARNING_PODCAST_MIN = 50,
+  EXPLEARNING_PODCAST_MIN = 30,
   MARY_DAPHNE_BLOG_MIN = 6,
   MARY_DAPHNE_PODCAST_MIN = 0
 }

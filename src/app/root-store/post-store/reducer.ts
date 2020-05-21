@@ -35,13 +35,13 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.posts, {
           ...state,
           isLoading: false,
-          postsLoaded: true,
           loadError: null,
+          postsLoaded: true
         }
       );
     }
 
-    case ActionTypes.UPDATE_POST_COMPLETE:
+    case ActionTypes.UPDATE_POST_REQUESTED:
       return {
         ...state,
         isSaving: true,
@@ -49,7 +49,24 @@ export function featureReducer(state = initialState, action: Actions): State {
       };
 
     case ActionTypes.UPDATE_POST_COMPLETE:
-      return featureAdapter.updateOne(
+      return featureAdapter.upsertOne(
+        action.payload.post,
+        {
+          ...state,
+          isSaving: false,
+          saveError: null
+        }
+      );
+
+    case ActionTypes.ROLLBACK_POST_REQUESTED:
+      return {
+        ...state,
+        isSaving: true,
+        saveError: null
+      };
+
+    case ActionTypes.ROLLBACK_POST_COMPLETE:
+      return featureAdapter.addOne(
         action.payload.post,
         {
           ...state,

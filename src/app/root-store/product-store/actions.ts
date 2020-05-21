@@ -9,6 +9,8 @@ export enum ActionTypes {
   ALL_PRODUCTS_LOADED = '[Products] All Products Loaded',
   UPDATE_PRODUCT_REQUESTED = '[Products] Update Product Requested',
   UPDATE_PRODUCT_COMPLETE = '[Products] Update Product Complete',
+  ROLLBACK_PRODUCT_REQUESTED = '[Products] Rollback Product Requested',
+  ROLLBACK_PRODUCT_COMPLETE = '[Products] Rollback Product Complete',
   DELETE_PRODUCT_REQUESTED = '[Products] Delete Product Requested',
   DELETE_PRODUCT_COMPLETE = '[Products] Delete Product Complete',
   TOGGLE_ACTIVE_REQUESTED = '[Products] Toggle Product Active Requested',
@@ -47,7 +49,19 @@ export class UpdateProductRequested implements Action {
 export class UpdateProductComplete implements Action {
   readonly type = ActionTypes.UPDATE_PRODUCT_COMPLETE;
 
-  constructor(public payload: { product: Update<Product> }) {}
+  constructor(public payload: { product: Product }) {}
+}
+
+export class RollbackProductRequested implements Action {
+  readonly type = ActionTypes.ROLLBACK_PRODUCT_REQUESTED;
+
+  constructor(public payload: { product: Product }) {}
+}
+
+export class RollbackProductComplete implements Action {
+  readonly type = ActionTypes.ROLLBACK_PRODUCT_COMPLETE;
+
+  constructor(public payload: { product: Product }) {}
 }
 
 export class DeleteProductRequested implements Action {
@@ -99,6 +113,8 @@ export type Actions =
   AllProductsLoaded |
   UpdateProductRequested |
   UpdateProductComplete |
+  RollbackProductRequested |
+  RollbackProductComplete |
   DeleteProductRequested |
   DeleteProductComplete |
   ToggleActiveRequested |

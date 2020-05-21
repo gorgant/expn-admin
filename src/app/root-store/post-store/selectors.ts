@@ -9,8 +9,8 @@ const getIsDeleting = (state: State): boolean => state.isDeleting;
 const getIsTogglingPublished = (state: State): boolean => state.isTogglingPublished;
 const getIsTogglingFeatured = (state: State): boolean => state.isTogglingFeatured;
 const getLoadError = (state: State): any => state.loadError;
-const getSaveError = (state: State): boolean => state.saveError;
-const getDeleteError = (state: State): boolean => state.deleteError;
+const getSaveError = (state: State): any => state.saveError;
+const getDeleteError = (state: State): any => state.deleteError;
 const getPostsLoaded = (state: State): boolean => state.postsLoaded;
 
 export const selectPostState: MemoizedSelector<object, State>
@@ -45,9 +45,6 @@ export const selectDeleteError: MemoizedSelector<object, any> = createSelector(
 export const selectIsLoading: MemoizedSelector<object, boolean>
 = createSelector(selectPostState, getIsLoading);
 
-export const selectLoaded: MemoizedSelector<object, boolean>
-= createSelector(selectPostState, getPostsLoaded);
-
 export const selectIsSaving: MemoizedSelector<object, boolean>
 = createSelector(selectPostState, getIsSaving);
 
@@ -59,3 +56,7 @@ export const selectIsTogglingPublished: MemoizedSelector<object, boolean>
 
 export const selectIsTogglingFeatured: MemoizedSelector<object, boolean>
 = createSelector(selectPostState, getIsTogglingFeatured);
+
+export const selectPostsLoaded: MemoizedSelector<object, boolean>
+= createSelector(selectPostState, getPostsLoaded);
+

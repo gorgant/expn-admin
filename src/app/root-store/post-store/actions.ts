@@ -9,6 +9,8 @@ export enum ActionTypes {
   ALL_POSTS_LOADED = '[Posts] All Posts Loaded',
   UPDATE_POST_REQUESTED = '[Posts] Update Post Requested',
   UPDATE_POST_COMPLETE = '[Posts] Update Post Complete',
+  ROLLBACK_POST_REQUESTED = '[Posts] Rollback Post Requested',
+  ROLLBACK_POST_COMPLETE = '[Posts] Rollback Post Complete',
   DELETE_POST_REQUESTED = '[Posts] Delete Post Requested',
   DELETE_POST_COMPLETE = '[Posts] Delete Post Complete',
   TOGGLE_PUBLISHED_REQUESTED = '[Posts] Toggle Post Published Requested',
@@ -55,7 +57,19 @@ export class UpdatePostRequested implements Action {
 export class UpdatePostComplete implements Action {
   readonly type = ActionTypes.UPDATE_POST_COMPLETE;
 
-  constructor(public payload: { post: Update<Post> }) {}
+  constructor(public payload: { post: Post }) {}
+}
+
+export class RollbackPostRequested implements Action {
+  readonly type = ActionTypes.ROLLBACK_POST_REQUESTED;
+
+  constructor(public payload: { post: Post }) {}
+}
+
+export class RollbackPostComplete implements Action {
+  readonly type = ActionTypes.ROLLBACK_POST_COMPLETE;
+
+  constructor(public payload: { post: Post }) {}
 }
 
 export class DeletePostRequested implements Action {
@@ -142,6 +156,8 @@ export type Actions =
   AllPostsLoaded |
   UpdatePostRequested |
   UpdatePostComplete |
+  RollbackPostRequested |
+  RollbackPostComplete |
   DeletePostRequested |
   DeletePostComplete |
   TogglePublishedRequested |

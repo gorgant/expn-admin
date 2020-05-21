@@ -8,6 +8,7 @@ import { PostService } from 'src/app/core/services/post.service';
 import { Update } from '@ngrx/entity';
 import { RootStoreState } from '..';
 import { Post } from 'shared-models/posts/post.model';
+import { UpdateStr } from '@ngrx/entity/src/models';
 
 @Injectable()
 export class PostStoreEffects {
@@ -90,11 +91,27 @@ export class PostStoreEffects {
             if (!post) {
               throw new Error('Error updating post');
             }
-            const postUpdate: Update<Post> = {
-              id: post.id,
-              changes: post
-            };
-            return new postFeatureActions.UpdatePostComplete({ post: postUpdate });
+            return new postFeatureActions.UpdatePostComplete({ post });
+          }),
+          catchError(error => {
+            return of(new postFeatureActions.SaveFailed({ error }));
+          })
+        )
+    ),
+  );
+
+  @Effect()
+  rollbackPostEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<postFeatureActions.RollbackPostRequested>(
+      postFeatureActions.ActionTypes.ROLLBACK_POST_REQUESTED
+    ),
+    switchMap(action => this.postService.rollbackPost(action.payload.post)
+      .pipe(
+          map(post => {
+            if (!post) {
+              throw new Error('Error rolling back post');
+            }
+            return new postFeatureActions.RollbackPostComplete({ post });
           }),
           catchError(error => {
             return of(new postFeatureActions.SaveFailed({ error }));

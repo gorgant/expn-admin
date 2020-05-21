@@ -26,7 +26,7 @@ export function featureReducer(state = initialState, action: Actions): State {
       return {
         ...state,
         isLoading: true,
-        loadError: null
+        loadError: null,
       };
     }
 
@@ -35,8 +35,8 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.coupons, {
           ...state,
           isLoading: false,
-          couponsLoaded: true,
           loadError: null,
+          couponsLoaded: true,
         }
       );
     }
@@ -63,7 +63,7 @@ export function featureReducer(state = initialState, action: Actions): State {
       return {
         ...state,
         isDeleting: true,
-        deleteError: null
+        deleteError: null,
       };
 
     case ActionTypes.DELETE_COUPON_COMPLETE:

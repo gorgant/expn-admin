@@ -86,7 +86,7 @@ export class CouponFormComponent implements OnInit, OnDestroy {
     this.products$ = this.store$.select(ProductStoreSelectors.selectAllProducts)
       .pipe(
         withLatestFrom(
-          this.store$.select(ProductStoreSelectors.selectLoaded)
+          this.store$.select(ProductStoreSelectors.selectProductsLoaded)
         ),
         map(([products, productsLoaded]) => {
           // Check if items are loaded, if not fetch from server
@@ -232,9 +232,11 @@ export class CouponFormComponent implements OnInit, OnDestroy {
             console.log('Coupon saved', coupon);
             this.dialogRef.close();
             this.router.navigate([AdminAppRoutes.COUPONS_COUPON_DETAILS, coupon[DiscountCouponKeys.COUPON_CODE]]);
+            this.saveCouponSubscription.unsubscribe();
           }
           if (saveError) {
             console.log('Error saving coupon');
+            this.saveCouponSubscription.unsubscribe();
           }
         });
     });

@@ -90,11 +90,27 @@ export class ProductStoreEffects {
             if (!product) {
               throw new Error('Error updating product');
             }
-            const productUpdate: Update<Product> = {
-              id: product.id,
-              changes: product
-            };
-            return new productFeatureActions.UpdateProductComplete({ product: productUpdate });
+            return new productFeatureActions.UpdateProductComplete({ product });
+          }),
+          catchError(error => {
+            return of(new productFeatureActions.SaveFailed({ error }));
+          })
+        )
+    ),
+  );
+
+  @Effect()
+  rollbackProductEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<productFeatureActions.RollbackProductRequested>(
+      productFeatureActions.ActionTypes.ROLLBACK_PRODUCT_REQUESTED
+    ),
+    switchMap(action => this.productService.rollbackProduct(action.payload.product)
+      .pipe(
+          map(product => {
+            if (!product) {
+              throw new Error('Error rolling back product');
+            }
+            return new productFeatureActions.RollbackProductComplete({ product });
           }),
           catchError(error => {
             return of(new productFeatureActions.SaveFailed({ error }));

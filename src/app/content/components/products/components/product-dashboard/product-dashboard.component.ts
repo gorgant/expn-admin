@@ -35,7 +35,7 @@ export class ProductDashboardComponent implements OnInit {
     this.products$ = this.store$.select(ProductStoreSelectors.selectAllProducts)
     .pipe(
       withLatestFrom(
-        this.store$.select(ProductStoreSelectors.selectLoaded),
+        this.store$.select(ProductStoreSelectors.selectProductsLoaded),
         this.store$.select(ProductStoreSelectors.selectIsDeleting), // Prevents error loading deleted data
       ),
       map(([products, productsLoaded, deletionProcessing]) => {

@@ -81,6 +81,23 @@ export class PostService {
     );
   }
 
+  rollbackPost(post: Post): Observable<Post> {
+    const fbResponse = from(this.getPostDoc(post.id).set(post)); // No merge here, to avoid lingering new fields from discarded changes
+
+    return fbResponse.pipe(
+      take(1),
+      map(empty => {
+        console.log('Post rolled back', post);
+        return post;
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error updating post', error);
+        return throwError(error);
+      })
+    );
+  }
+
   deletePost(postId: string): Observable<string> {
 
     // Be sure to delete images before deleting the item doc

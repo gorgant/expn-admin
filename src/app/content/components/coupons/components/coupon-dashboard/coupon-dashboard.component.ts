@@ -68,7 +68,7 @@ export class CouponDashboardComponent implements OnInit, OnDestroy {
     this.coupons$ = this.store$.select(CouponStoreSelectors.selectAllCoupons)
       .pipe(
         withLatestFrom(
-          this.store$.select(CouponStoreSelectors.selectLoaded)
+          this.store$.select(CouponStoreSelectors.selectCouponsLoaded)
         ),
         map(([coupons, couponsLoaded]) => {
           // Check if items are loaded, if not fetch from server

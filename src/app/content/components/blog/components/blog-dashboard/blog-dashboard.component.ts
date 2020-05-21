@@ -34,7 +34,7 @@ export class BlogDashboardComponent implements OnInit {
     this.posts$ = this.store$.select(PostStoreSelectors.selectAllPosts)
     .pipe(
       withLatestFrom(
-        this.store$.select(PostStoreSelectors.selectLoaded),
+        this.store$.select(PostStoreSelectors.selectPostsLoaded),
         this.store$.select(PostStoreSelectors.selectIsDeleting), // Prevents error loading deleted data
       ),
       map(([posts, postsLoaded, deletionProcessing]) => {

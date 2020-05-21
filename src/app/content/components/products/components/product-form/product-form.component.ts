@@ -113,9 +113,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
                 ...this.originalProduct,
                 imageFilePathList: product.imageFilePathList ? product.imageFilePathList : null
               };
-              console.log('Original item to revert to', this.originalProduct);
-              console.log('Original item with current image list', originalItemWithCurrentImageList);
-              this.store$.dispatch(new ProductStoreActions.UpdateProductRequested({product: originalItemWithCurrentImageList}));
+              console.log('Reverting to original item with current image list', originalItemWithCurrentImageList);
+              this.store$.dispatch(new ProductStoreActions.RollbackProductRequested({product: originalItemWithCurrentImageList}));
               this.reactToSaveOutcome(product);
             });
         }
@@ -247,7 +246,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     return this.store$.select(ProductStoreSelectors.selectProductById(productId))
     .pipe(
       withLatestFrom(
-        this.store$.select(ProductStoreSelectors.selectLoaded)
+        this.store$.select(ProductStoreSelectors.selectProductsLoaded)
       ),
       map(([product, productsLoaded]) => {
         // Check if items are loaded, if not fetch from server
@@ -491,10 +490,12 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           if (this.manualSave || this.productDiscarded) {
             this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
           }
+          this.saveProductSubscription.unsubscribe();
         }
         if (saveError) {
           console.log('Error saving coupon');
           this.productDiscarded = false;
+          this.saveProductSubscription.unsubscribe();
         }
       });
   }
@@ -513,10 +514,12 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           if (this.productDiscarded) {
             this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
           }
+          this.deleteProductSubscription.unsubscribe();
         }
         if (deleteError) {
           console.log('Error saving coupon');
           this.productDiscarded = false;
+          this.deleteProductSubscription.unsubscribe();
         }
       });
   }

@@ -76,7 +76,22 @@ export class ProductService {
         return throwError(error);
       })
     );
+  }
 
+  rollbackProduct(product: Product): Observable<Product> {
+    const fbResponse = from(this.getProductDoc(product.id).set(product)); // No merge, avoid lingering new fields from discarded changes
+    return fbResponse.pipe(
+      take(1),
+      map(empty => {
+        console.log('Product rolled back', product);
+        return product;
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error updating product', error);
+        return throwError(error);
+      })
+    );
   }
 
   deleteProduct(productId: string): Observable<string> {
@@ -129,7 +144,6 @@ export class ProductService {
         console.log('Server call succeded', res);
         return updatedProduct;
       }),
-      // // TODO: this error message gets duplicated, decide whether to show here or on public service (preferably where it originates?)
       catchError(error => {
         this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
         console.log('Error updating product on public server', error);

@@ -5,7 +5,7 @@ const getError = (state: State): any => state.error;
 const getEmailSendProcessing = (state: State): boolean => state.emailSendProcessing;
 
 export const selectEmailState: MemoizedSelector<object, State>
-= createFeatureSelector<State>('products');
+= createFeatureSelector<State>('email');
 
 export const selectProductError: MemoizedSelector<object, any> = createSelector(
   selectEmailState,

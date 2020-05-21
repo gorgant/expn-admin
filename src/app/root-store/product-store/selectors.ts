@@ -12,7 +12,6 @@ const getSaveError = (state: State): boolean => state.saveError;
 const getDeleteError = (state: State): boolean => state.deleteError;
 const getProductsLoaded = (state: State): boolean => state.productsLoaded;
 
-
 export const selectProductState: MemoizedSelector<object, State>
 = createFeatureSelector<State>('products');
 
@@ -45,9 +44,6 @@ export const selectDeleteError: MemoizedSelector<object, any> = createSelector(
 export const selectIsLoading: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getIsLoading);
 
-export const selectLoaded: MemoizedSelector<object, boolean>
-= createSelector(selectProductState, getProductsLoaded);
-
 export const selectIsSaving: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getIsSaving);
 
@@ -56,3 +52,6 @@ export const selectIsDeleting: MemoizedSelector<object, boolean>
 
 export const selectIsTogglingActive: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getIsTogglingActive);
+
+export const selectProductsLoaded: MemoizedSelector<object, boolean>
+= createSelector(selectProductState, getProductsLoaded);

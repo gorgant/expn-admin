@@ -35,22 +35,38 @@ export function featureReducer(state = initialState, action: Actions): State {
         action.payload.products, {
           ...state,
           isLoading: false,
-          productsLoaded: true,
           loadError: null,
+          productsLoaded: true
         }
       );
     }
 
-    case ActionTypes.UPDATE_PRODUCT_REQUESTED: {
+    case ActionTypes.UPDATE_PRODUCT_REQUESTED:
       return {
         ...state,
         isSaving: true,
         saveError: null
       };
-    }
 
     case ActionTypes.UPDATE_PRODUCT_COMPLETE:
-      return featureAdapter.updateOne(
+      return featureAdapter.upsertOne(
+        action.payload.product,
+        {
+          ...state,
+          isSaving: false,
+          saveError: null
+        }
+      );
+
+    case ActionTypes.ROLLBACK_PRODUCT_REQUESTED:
+      return {
+        ...state,
+        isSaving: true,
+        saveError: null
+      };
+
+    case ActionTypes.ROLLBACK_PRODUCT_COMPLETE:
+      return featureAdapter.addOne(
         action.payload.product,
         {
           ...state,

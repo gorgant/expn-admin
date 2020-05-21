@@ -1,4 +1,4 @@
-@import '../../../../../variables';
+@import "../../../../../variables";
 
 :host {
   width: 100%;
@@ -56,14 +56,29 @@ app-page-hero {
     padding-top:56.25%; //sets aspect ratio to 16:9
   }
   
-  iframe {
+  .youtube-iframe {
     // Center iframe in box
-    position:absolute;
+    position: absolute;
     top:0;
     left:0;
     // Fill box
     width: 100%;
     height: 100%;
+  }
+
+  .podcast-container {
+    margin-top: 16px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .podcast-body {
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .soundcloud-iframe {
+    width: 100%;
   }
   
   .text-container {
@@ -85,17 +100,20 @@ app-page-hero {
   }
   
   h2 {
-    color: $accent;
+    color: $primary;
+    font-weight: $font-weight-light;
     font-size: 1.5em;
   }
 
   h3 {
-    color: $accent;
+    color: $primary;
+    font-weight: $font-weight-light;
     font-size: 1.3em;
   }
 
   h4 {
-    color: $accent;
+    color: $primary;
+    font-weight: $font-weight-light;
     font-size: 1.1em;
   }
   
@@ -196,3 +214,4 @@ app-page-hero {
     
   }
 }
+

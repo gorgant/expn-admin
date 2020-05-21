@@ -66,7 +66,7 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
       .pipe(
         take(1),
         withLatestFrom(
-          this.store$.select(ProductStoreSelectors.selectLoaded)
+          this.store$.select(ProductStoreSelectors.selectProductsLoaded)
         ),
         map(([products, productsLoaded]) => {
           // Check if items are loaded, if not fetch from server

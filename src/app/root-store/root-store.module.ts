@@ -16,6 +16,7 @@ import { SubscriberStoreModule } from './subscriber-store';
 import { ContactFormStoreModule } from './contact-form-store';
 import { EmailStoreModule } from './email-store';
 import { CouponStoreModule } from './coupon-store';
+import { PodcastStoreModule } from './podcast-store';
 
 @NgModule({
   declarations: [],
@@ -30,6 +31,7 @@ import { CouponStoreModule } from './coupon-store';
     ContactFormStoreModule,
     CouponStoreModule,
     EmailStoreModule,
+    PodcastStoreModule,
     StoreModule.forRoot({}, {metaReducers}),
     EffectsModule.forRoot([]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],

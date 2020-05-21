@@ -10,5 +10,6 @@ export * from './subscriber-store';
 export * from './contact-form-store';
 export * from './email-store';
 export * from './coupon-store';
+export * from './podcast-store';
 
 export { RootStoreState, RootStoreModule };

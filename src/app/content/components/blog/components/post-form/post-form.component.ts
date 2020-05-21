@@ -130,9 +130,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
                   ...this.originalPost,
                   imageFilePathList: post.imageFilePathList ? post.imageFilePathList : null
                 };
-                console.log('Original item to revert to', this.originalPost);
-                console.log('Original item with current image list', originalItemWithCurrentImageList);
-                this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post: originalItemWithCurrentImageList}));
+                console.log('Reverting to original item with current image list', originalItemWithCurrentImageList);
+                this.store$.dispatch(new PostStoreActions.RollbackPostRequested({post: originalItemWithCurrentImageList}));
                 this.reactToSaveOutcome(post);
               });
           }
@@ -213,10 +212,9 @@ export class PostFormComponent implements OnInit, OnDestroy {
         .subscribe(post => {
           if (post) {
             const data: Partial<Post> = {
-              [PostKeys.BLOG_DOMAIN]: post[PostKeys.BLOG_DOMAIN],
               [PostKeys.TITLE]: post[PostKeys.TITLE],
-              [PostKeys.VIDEO_URL]: post[PostKeys.VIDEO_URL],
-              [PostKeys.PODCAST_EPISODE_URL]: post[PostKeys.PODCAST_EPISODE_URL],
+              [PostKeys.VIDEO_URL]: post[PostKeys.VIDEO_URL] ? post[PostKeys.VIDEO_URL] : '',
+              [PostKeys.PODCAST_EPISODE_URL]: post[PostKeys.PODCAST_EPISODE_URL] ? post[PostKeys.PODCAST_EPISODE_URL] : '',
               [PostKeys.DESCRIPTION]: post[PostKeys.DESCRIPTION],
               [PostKeys.KEYWORDS]: post[PostKeys.KEYWORDS],
               [PostKeys.CONTENT]: post[PostKeys.CONTENT],
@@ -240,7 +238,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
     return this.store$.select(PostStoreSelectors.selectPostById(postId))
     .pipe(
       withLatestFrom(
-        this.store$.select(PostStoreSelectors.selectLoaded)
+        this.store$.select(PostStoreSelectors.selectPostsLoaded)
       ),
       map(([post, postsLoaded]) => {
         // Check if items are loaded, if not fetch from server
@@ -435,7 +433,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
           published: false,
           publishedDate: this.originalPost ? this.originalPost.publishedDate : null,
           imageProps: this.currentImageProps ? this.currentImageProps : null,
-          featured: this.originalPost ? this.originalPost.featured : false
+          featured: this.originalPost ? (this.originalPost.featured ? this.originalPost.featured : false) : false
         };
 
         // If post isn't ready to publish, remove scheduled publish time
@@ -459,6 +457,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
         )
       )
       .subscribe(([isSaving, saveError]) => {
+        console.log('React to save outcome subscription firing');
         if (!isSaving && !saveError) {
           console.log('Post saved', post);
           this.imagesModifiedSinceLastSave = false; // Reset image change detection
@@ -466,10 +465,12 @@ export class PostFormComponent implements OnInit, OnDestroy {
           if (this.manualSave || this.postDiscarded) {
             this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
           }
+          this.savePostSubscription.unsubscribe();
         }
         if (saveError) {
           console.log('Error saving coupon');
           this.postDiscarded = false;
+          this.savePostSubscription.unsubscribe();
         }
       });
   }
@@ -488,10 +489,12 @@ export class PostFormComponent implements OnInit, OnDestroy {
           if (this.postDiscarded) {
             this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
           }
+          this.deletePostSubscription.unsubscribe();
         }
         if (deleteError) {
           console.log('Error saving coupon');
           this.postDiscarded = false;
+          this.deletePostSubscription.unsubscribe();
         }
       });
   }
