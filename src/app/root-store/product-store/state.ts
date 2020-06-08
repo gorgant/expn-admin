@@ -6,7 +6,7 @@ export const featureAdapter: EntityAdapter<Product>
     {
       selectId: (product: Product) => product.id,
 
-      // Sort by list order
+      // Sort by list order (ascending)
       sortComparer: (a: Product, b: Product): number => {
         const listOrderA = a.listOrder;
         const listOrderB = b.listOrder;

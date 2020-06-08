@@ -12,10 +12,10 @@ export class WebcourseProductPipe implements PipeTransform {
       return [];
     }
 
-    // Return webcourses sorted by list order
+    // Return webcourses sorted by list order (ascending)
     return products.filter(product =>
       product.productCategory === ProductCategories.WEBCOURSE
-    ).sort((a, b) =>  b.listOrder - a.listOrder);
+    ).sort((a, b) =>  a.listOrder - b.listOrder);
 
 
   }

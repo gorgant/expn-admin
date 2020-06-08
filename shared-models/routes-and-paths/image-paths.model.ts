@@ -15,7 +15,6 @@ export enum PublicImagePaths {
   MD_CHECKOUT_AVATAR = 'assets/images/avatar/mary_daphne_explearning_headshot_280x180@300.jpg',
   MD_CHECKOUT_SIGNATURE = 'assets/images/avatar/md_explearning_signature_thumb@300.png',
   LINK_SHARE_IMAGE = 'assets/images/background/link_share_image@1500.jpg',
-  WEBCOURSE_EXECUTIVE_PRESENCE = 'assets/images/background/webcourse_executive_presence@1500.jpg'
 }
 
 export enum PublicTestamonialImagePaths {

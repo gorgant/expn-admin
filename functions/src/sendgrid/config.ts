@@ -3,7 +3,6 @@ import { adminFirestore } from '../config/db-config';
 import * as sendGridMail from '@sendgrid/mail';
 import { remoteCoachProductId, publicAppUrl, remoteCoachProductSlug } from '../config/environments-config';
 import { PublicAppRoutes } from '../../../shared-models/routes-and-paths/app-routes.model';
-import { ProductReferenceList } from '../../../shared-models/products/product-id-list.model';
 
 // Iniitialize Cloud Firestore Database
 export const db = adminFirestore;
@@ -38,10 +37,4 @@ export const EmailWebsiteLinks = {
   REMOTE_COACH_URL: remoteCoachUrl,
   OPT_IN_CONFIRMATION_URL_NO_PARAMS: optInConfirmationUrlNoParams,
   WEBCOURSES_URL: webcoursesUrl
-};
-
-export const getProductUrlById = (productId: string): string => {
-  const productSlug = ProductReferenceList[productId].productUrlSlug;
-  const url = `https://${appUrl}${productListSlugWithSlashPrefix}/${productId}/${productSlug}`;
-  return url;
 };

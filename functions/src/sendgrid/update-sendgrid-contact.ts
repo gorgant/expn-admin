@@ -205,9 +205,11 @@ const createOrUpdateSendgridContact = async (subscriber: EmailSubscriber): Promi
 
   // Many more fields available, check api docs if needed (https://sendgrid.com/docs/API_Reference/api_v3.html)
   const requestBody = { 
+    // Check for wait list IDs
     list_ids: [ 
-      newsletterListId ,
+      newsletterListId,
       subscriber.subscriptionSources.includes(SubscriptionSource.WAIT_LIST_EXECUTIVE_PRESENCE) ? EmailContactListIds.EXPLEARNING_EXECUTIVE_PRESENCE_WAIT_LIST : '',
+      subscriber.subscriptionSources.includes(SubscriptionSource.WAIT_LIST_REMOTE_WORK) ? EmailContactListIds.EXPLEARNING_REMOTE_WORK_WAIT_LIST : '',
     ],
     contacts: [ 
       { 
