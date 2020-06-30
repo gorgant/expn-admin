@@ -18,7 +18,7 @@ export class SubscriberStoreEffects {
     ofType<subscriberFeatureActions.SingleSubscriberRequested>(
       subscriberFeatureActions.ActionTypes.SINGLE_SUBSCRIBER_REQUESTED
     ),
-    mergeMap(action =>
+    switchMap(action =>
       this.subscriberService.fetchSingleSubscriber(action.payload.subscriberId)
         .pipe(
           map(subscriber => {

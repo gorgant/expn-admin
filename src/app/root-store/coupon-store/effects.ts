@@ -3,7 +3,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Observable, of } from 'rxjs';
 import { Action } from '@ngrx/store';
 import * as couponFeatureActions from './actions';
-import { switchMap, map, catchError, mergeMap } from 'rxjs/operators';
+import { switchMap, map, catchError, mergeMap, concatMap } from 'rxjs/operators';
 import { Update } from '@ngrx/entity';
 import { DiscountCouponParent } from 'shared-models/billing/discount-coupon.model';
 import { CouponService } from 'src/app/core/services/coupon.service';
@@ -20,7 +20,7 @@ export class CouponStoreEffects {
     ofType<couponFeatureActions.SingleCouponRequested>(
       couponFeatureActions.ActionTypes.SINGLE_COUPON_REQUESTED
     ),
-    mergeMap(action =>
+    switchMap(action =>
       this.couponService.fetchSingleCoupon(action.payload.couponId)
         .pipe(
           map(coupon => {
@@ -62,7 +62,7 @@ export class CouponStoreEffects {
     ofType<couponFeatureActions.DeleteCouponRequested>(
       couponFeatureActions.ActionTypes.DELETE_COUPON_REQUESTED
     ),
-    switchMap(action => this.couponService.deleteCoupon(action.payload.couponId)
+    concatMap(action => this.couponService.deleteCoupon(action.payload.couponId)
       .pipe(
           map(couponId => {
             if (!couponId) {
@@ -82,7 +82,7 @@ export class CouponStoreEffects {
     ofType<couponFeatureActions.UpdateCouponRequested>(
       couponFeatureActions.ActionTypes.UPDATE_COUPON_REQUESTED
     ),
-    switchMap(action => this.couponService.updateCoupon(action.payload.coupon)
+    concatMap(action => this.couponService.updateCoupon(action.payload.coupon)
       .pipe(
           map(coupon => {
             if (!coupon) {

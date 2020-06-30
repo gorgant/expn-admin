@@ -3,7 +3,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Observable, of } from 'rxjs';
 import { Action, Store } from '@ngrx/store';
 import * as productFeatureActions from './actions';
-import { switchMap, map, catchError, mergeMap, tap } from 'rxjs/operators';
+import { switchMap, map, catchError, mergeMap, tap, concatMap } from 'rxjs/operators';
 import { ProductService } from 'src/app/core/services/product.service';
 import { Update } from '@ngrx/entity';
 import { Product } from 'shared-models/products/product.model';
@@ -22,7 +22,7 @@ export class ProductStoreEffects {
     ofType<productFeatureActions.SingleProductRequested>(
       productFeatureActions.ActionTypes.SINGLE_PRODUCT_REQUESTED
     ),
-    mergeMap(action =>
+    switchMap(action =>
       this.productService.fetchSingleProduct(action.payload.productId)
         .pipe(
           map(product => {
@@ -64,7 +64,7 @@ export class ProductStoreEffects {
     ofType<productFeatureActions.DeleteProductRequested>(
       productFeatureActions.ActionTypes.DELETE_PRODUCT_REQUESTED
     ),
-    switchMap(action => this.productService.deleteProduct(action.payload.productId)
+    concatMap(action => this.productService.deleteProduct(action.payload.productId)
       .pipe(
           map(productId => {
             if (!productId) {
@@ -84,7 +84,7 @@ export class ProductStoreEffects {
     ofType<productFeatureActions.UpdateProductRequested>(
       productFeatureActions.ActionTypes.UPDATE_PRODUCT_REQUESTED
     ),
-    switchMap(action => this.productService.updateProduct(action.payload.product)
+    concatMap(action => this.productService.updateProduct(action.payload.product)
       .pipe(
           map(product => {
             if (!product) {
@@ -104,7 +104,7 @@ export class ProductStoreEffects {
     ofType<productFeatureActions.RollbackProductRequested>(
       productFeatureActions.ActionTypes.ROLLBACK_PRODUCT_REQUESTED
     ),
-    switchMap(action => this.productService.rollbackProduct(action.payload.product)
+    concatMap(action => this.productService.rollbackProduct(action.payload.product)
       .pipe(
           map(product => {
             if (!product) {
@@ -124,7 +124,7 @@ export class ProductStoreEffects {
     ofType<productFeatureActions.ToggleActiveRequested>(
       productFeatureActions.ActionTypes.TOGGLE_ACTIVE_REQUESTED
     ),
-    switchMap(action => this.productService.toggleProductActive(action.payload.product)
+    concatMap(action => this.productService.toggleProductActive(action.payload.product)
       .pipe(
           // Update product locally once server update confirmed
           tap(product => {

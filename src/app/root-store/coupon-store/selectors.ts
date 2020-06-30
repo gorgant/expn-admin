@@ -2,6 +2,7 @@ import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromCoupons from './reducer';
 import { DiscountCouponParent } from 'shared-models/billing/discount-coupon.model';
+import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
 
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getIsSaving = (state: State): boolean => state.isSaving;
@@ -12,7 +13,7 @@ const getDeleteError = (state: State): any => state.deleteError;
 const getCouponsLoaded = (state: State): boolean => state.couponsLoaded;
 
 export const selectCouponState: MemoizedSelector<object, State>
-= createFeatureSelector<State>('coupons');
+= createFeatureSelector<State>(AdminFeatureNames.COUPON);
 
 export const selectAllCoupons: (state: object) => DiscountCouponParent[] = createSelector(
   selectCouponState,

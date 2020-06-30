@@ -2,6 +2,7 @@ import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromContactForms from './reducer';
 import { ContactForm } from 'shared-models/user/contact-form.model';
+import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
 
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getContactFormsLoaded = (state: State): boolean => state.contactFormsLoaded;
@@ -10,7 +11,7 @@ const getSubscriberContactFormsLoaded = (state: State): boolean => state.subscri
 const getError = (state: State): any => state.error;
 
 export const selectContactFormState: MemoizedSelector<object, State>
-= createFeatureSelector<State>('contactForms');
+= createFeatureSelector<State>(AdminFeatureNames.CONTACT_FORMS);
 
 export const selectAllContactForms: (state: object) => ContactForm[] = createSelector(
   selectContactFormState,

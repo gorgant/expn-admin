@@ -4,12 +4,13 @@ import { StoreModule } from '@ngrx/store';
 import { featureReducer } from './reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { PostStoreEffects } from './effects';
+import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
-    StoreModule.forFeature('posts', featureReducer),
+    StoreModule.forFeature(AdminFeatureNames.POSTS, featureReducer),
     EffectsModule.forFeature([PostStoreEffects])
   ],
   providers: [PostStoreEffects]

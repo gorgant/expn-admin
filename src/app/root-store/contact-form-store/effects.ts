@@ -18,7 +18,7 @@ export class ContactFormStoreEffects {
     ofType<contactFormFeatureActions.SingleContactFormRequested>(
       contactFormFeatureActions.ActionTypes.SINGLE_CONTACT_FORM_REQUESTED
     ),
-    mergeMap(action =>
+    switchMap(action =>
       this.contactFormService.fetchSingleContactForm(action.payload.contactFormId)
         .pipe(
           map(contactForm => {

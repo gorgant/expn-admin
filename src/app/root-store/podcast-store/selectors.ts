@@ -2,13 +2,14 @@ import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromEpisodes from './reducer';
 import { PodcastEpisode } from 'shared-models/podcast/podcast-episode.model';
+import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
 
 const getError = (state: State): any => state.error;
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getEpisodesLoaded = (state: State): boolean => state.episodesLoaded;
 
 export const selectEpisodeState: MemoizedSelector<object, State>
-= createFeatureSelector<State>('podcast');
+= createFeatureSelector<State>(AdminFeatureNames.PODCASTS);
 
 export const selectAllEpisodes: (state: object) => PodcastEpisode[] = createSelector(
   selectEpisodeState,

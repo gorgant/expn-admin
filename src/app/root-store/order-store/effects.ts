@@ -18,7 +18,7 @@ export class OrderStoreEffects {
     ofType<orderFeatureActions.SingleOrderRequested>(
       orderFeatureActions.ActionTypes.SINGLE_ORDER_REQUESTED
     ),
-    mergeMap(action =>
+    switchMap(action =>
       this.orderService.fetchSingleOrder(action.payload.orderId)
         .pipe(
           map(order => {

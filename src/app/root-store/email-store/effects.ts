@@ -3,7 +3,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Observable, of } from 'rxjs';
 import { Action, Store } from '@ngrx/store';
 import * as emailFeatureActions from './actions';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { switchMap, map, catchError, concatMap } from 'rxjs/operators';
 import { RootStoreState } from '..';
 import { EmailService } from 'src/app/core/services/email.service';
 
@@ -19,7 +19,7 @@ export class EmailStoreEffects {
   @Effect()
   sendTestEmailEffect$: Observable<Action> = this.actions$.pipe(
     ofType<emailFeatureActions.SendTestEmailRequested>(emailFeatureActions.ActionTypes.SEND_TEST_EMAIL_REQUESTED),
-    switchMap(action =>
+    concatMap(action =>
       this.emailService.sendSendgridTest(action.payload.emailContent)
         .pipe(
           map(result => {

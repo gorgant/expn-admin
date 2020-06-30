@@ -2,6 +2,7 @@ import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromProducts from './reducer';
 import { Product } from 'shared-models/products/product.model';
+import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
 
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getIsSaving = (state: State): boolean => state.isSaving;
@@ -13,7 +14,7 @@ const getDeleteError = (state: State): boolean => state.deleteError;
 const getProductsLoaded = (state: State): boolean => state.productsLoaded;
 
 export const selectProductState: MemoizedSelector<object, State>
-= createFeatureSelector<State>('products');
+= createFeatureSelector<State>(AdminFeatureNames.PRODUCTS);
 
 export const selectAllProducts: (state: object) => Product[] = createSelector(
   selectProductState,

@@ -4,6 +4,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { EmailStoreEffects } from './effects';
 import { featureReducer } from './reducer';
+import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
 
 
 
@@ -11,7 +12,7 @@ import { featureReducer } from './reducer';
   declarations: [],
   imports: [
     CommonModule,
-    StoreModule.forFeature('email', featureReducer),
+    StoreModule.forFeature(AdminFeatureNames.EMAIL, featureReducer),
     EffectsModule.forFeature([EmailStoreEffects])
   ]
 })

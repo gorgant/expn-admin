@@ -2,6 +2,7 @@ import { State } from './state';
 import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromPosts from './reducer';
 import { Post } from 'shared-models/posts/post.model';
+import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
 
 const getIsLoading = (state: State): boolean => state.isLoading;
 const getIsSaving = (state: State): boolean => state.isSaving;
@@ -14,7 +15,7 @@ const getDeleteError = (state: State): any => state.deleteError;
 const getPostsLoaded = (state: State): boolean => state.postsLoaded;
 
 export const selectPostState: MemoizedSelector<object, State>
-= createFeatureSelector<State>('posts');
+= createFeatureSelector<State>(AdminFeatureNames.POSTS);
 
 export const selectAllPosts: (state: object) => Post[] = createSelector(
   selectPostState,

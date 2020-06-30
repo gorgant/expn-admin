@@ -3,12 +3,9 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Observable, of } from 'rxjs';
 import { Action, Store } from '@ngrx/store';
 import * as postFeatureActions from './actions';
-import { switchMap, map, catchError, mergeMap, tap } from 'rxjs/operators';
+import { switchMap, map, catchError, mergeMap, tap, concatMap, exhaustMap } from 'rxjs/operators';
 import { PostService } from 'src/app/core/services/post.service';
-import { Update } from '@ngrx/entity';
 import { RootStoreState } from '..';
-import { Post } from 'shared-models/posts/post.model';
-import { UpdateStr } from '@ngrx/entity/src/models';
 
 @Injectable()
 export class PostStoreEffects {
@@ -23,7 +20,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.SinglePostRequested>(
       postFeatureActions.ActionTypes.SINGLE_POST_REQUESTED
     ),
-    mergeMap(action =>
+    switchMap(action =>
       this.postService.fetchSinglePost(action.payload.postId)
         .pipe(
           map(post => {
@@ -65,7 +62,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.DeletePostRequested>(
       postFeatureActions.ActionTypes.DELETE_POST_REQUESTED
     ),
-    switchMap(action => this.postService.deletePost(action.payload.postId)
+    concatMap(action => this.postService.deletePost(action.payload.postId)
       .pipe(
           map(postId => {
             if (!postId) {
@@ -85,7 +82,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.UpdatePostRequested>(
       postFeatureActions.ActionTypes.UPDATE_POST_REQUESTED
     ),
-    switchMap(action => this.postService.updatePost(action.payload.post)
+    concatMap(action => this.postService.updatePost(action.payload.post)
       .pipe(
           map(post => {
             if (!post) {
@@ -105,7 +102,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.RollbackPostRequested>(
       postFeatureActions.ActionTypes.ROLLBACK_POST_REQUESTED
     ),
-    switchMap(action => this.postService.rollbackPost(action.payload.post)
+    concatMap(action => this.postService.rollbackPost(action.payload.post)
       .pipe(
           map(post => {
             if (!post) {
@@ -125,7 +122,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.TogglePublishedRequested>(
       postFeatureActions.ActionTypes.TOGGLE_PUBLISHED_REQUESTED
     ),
-    switchMap(action => this.postService.togglePublishPost(action.payload.post)
+    concatMap(action => this.postService.togglePublishPost(action.payload.post)
       .pipe(
           tap(post => {
             if (!post) {
@@ -146,7 +143,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.ToggleFeaturedRequested>(
       postFeatureActions.ActionTypes.TOGGLE_FEATURED_REQUESTED
     ),
-    switchMap(action => this.postService.togglePostFeatured(action.payload.post)
+    concatMap(action => this.postService.togglePostFeatured(action.payload.post)
       .pipe(
           tap(post => {
             if (!post) {
@@ -167,7 +164,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.RefreshPublicBlogIndexRequested>(
       postFeatureActions.ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_REQUESTED
     ),
-    switchMap(action => this.postService.refreshBlogIndex()
+    exhaustMap(action => this.postService.refreshBlogIndex()
       .pipe(
           map(response => {
             if (!response) {
@@ -187,7 +184,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.RefreshPublicBlogCacheRequested>(
       postFeatureActions.ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_REQUESTED
     ),
-    switchMap(action => this.postService.refreshBlogCache()
+    exhaustMap(action => this.postService.refreshBlogCache()
       .pipe(
           map(response => {
             if (!response) {
@@ -207,7 +204,7 @@ export class PostStoreEffects {
     ofType<postFeatureActions.RefreshPublicFeaturedPostsCacheRequested>(
       postFeatureActions.ActionTypes.REFRESH_PUBLIC_FEATURED_POSTS_CACHE_REQUESTED
     ),
-    switchMap(action => this.postService.refreshFeaturedPostsCache()
+    exhaustMap(action => this.postService.refreshFeaturedPostsCache()
       .pipe(
           map(response => {
             if (!response) {

@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { Action, Store } from '@ngrx/store';
 import * as authFeatureActions from './actions';
 import * as userFeatureActions from '../user-store/actions';
-import { switchMap, map, catchError, tap } from 'rxjs/operators';
+import { switchMap, map, catchError, tap, concatMap } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { RootStoreState } from '..';
 import { AuthenticateUserType } from 'shared-models/auth/authenticate-user-type.model';
@@ -72,7 +72,7 @@ export class AuthStoreEffects {
     ofType<authFeatureActions.UpdateEmailRequested>(
       authFeatureActions.ActionTypes.UPDATE_EMAIL_REQUESTED
     ),
-    switchMap(action =>
+    concatMap(action =>
       this.authService.updateEmail(
         action.payload.user,
         action.payload.password,
@@ -103,7 +103,7 @@ export class AuthStoreEffects {
     ofType<authFeatureActions.UpdatePasswordRequested>(
       authFeatureActions.ActionTypes.UPDATE_PASSWORD_REQUESTED
     ),
-    switchMap(action =>
+    concatMap(action =>
       this.authService.updatePassword(
         action.payload.user,
         action.payload.oldPassword,
@@ -128,7 +128,7 @@ export class AuthStoreEffects {
     ofType<authFeatureActions.ResetPasswordRequested>(
       authFeatureActions.ActionTypes.RESET_PASSWORD_REQUESTED
     ),
-    switchMap(action =>
+    concatMap(action =>
       this.authService.sendResetPasswordEmail(
         action.payload.email
         )

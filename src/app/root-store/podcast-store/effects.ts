@@ -18,7 +18,7 @@ export class PodcastStoreEffects {
     ofType<episodeFeatureActions.SingleEpisodeRequested>(
       episodeFeatureActions.ActionTypes.SINGLE_EPISODE_REQUESTED
     ),
-    mergeMap(action =>
+    switchMap(action =>
       this.episodeService.fetchSinglePodcastEpisode(action.payload.podcastId, action.payload.episodeId)
         .pipe(
           map(episode => {
