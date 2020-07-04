@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable, Subscription, of, Subject, from } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
-import { take, withLatestFrom, map, takeWhile } from 'rxjs/operators';
+import { take, withLatestFrom, map, takeWhile, debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload-adapter';
 
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Store } from '@ngrx/store';
-import { RootStoreState, UserStoreSelectors, PostStoreActions, PostStoreSelectors } from 'src/app/root-store';
+import { RootStoreState, PostStoreActions, PostStoreSelectors, UserStoreSelectors } from 'src/app/root-store';
 import { MatDialogConfig, MatDialog } from '@angular/material';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { now } from 'moment';
@@ -18,9 +18,10 @@ import { Post, PostKeys } from 'shared-models/posts/post.model';
 import { ImageProps } from 'shared-models/images/image-props.model';
 import { POST_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
 import { BlogDomains } from 'shared-models/posts/blog-domains.model';
-import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes, PublicAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 import { ImageType } from 'shared-models/images/image-type.model';
+import { EditorSessionService } from 'src/app/core/services/editor-session.service';
 
 @Component({
   selector: 'app-post-form',
@@ -28,6 +29,8 @@ import { ImageType } from 'shared-models/images/image-type.model';
   styleUrls: ['./post-form.component.scss']
 })
 export class PostFormComponent implements OnInit, OnDestroy {
+
+  appRoutes = PublicAppRoutes;
 
   adminUser$: Observable<AdminUser>;
   private post$: Observable<Post>;
@@ -41,25 +44,23 @@ export class PostFormComponent implements OnInit, OnDestroy {
   descriptionMaxLength = 320;
   keywordsMaxLength = 100;
   isNewPost: boolean;
+  loadingExistingPost: boolean;
 
   blogDomains: string[] = Object.values(BlogDomains);
-
 
   private postId: string;
   private tempPostTitle: string;
   private originalPost: Post;
   postInitialized: boolean;
+  postTouched: boolean;
   private postDiscarded: boolean;
   private heroImageAdded: boolean; // Helps determine if post is blank
-  private imagesModifiedSinceLastSave: boolean;
   private manualSave: boolean;
 
-  private initPostTimeout: NodeJS.Timer;
-  // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
-  private autoSaveTicker: NodeJS.Timer;
-  private autoSavePostSubscription: Subscription;
   private savePostSubscription: Subscription;
+  isSavingPost$: Observable<boolean>;
   private deletePostSubscription: Subscription;
+  isDeletingPost$: Observable<boolean>;
   private imageProcessingSubscription: Subscription;
 
   public Editor = ClassicEditor;
@@ -74,22 +75,44 @@ export class PostFormComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private route: ActivatedRoute,
     private imageService: ImageService,
+    private editorSessionService: EditorSessionService
   ) { }
 
   ngOnInit() {
-
     this.configureNewPost();
-
     this.loadExistingPostData(); // Only loads if exists
-
     this.adminUser$ = this.store$.select(UserStoreSelectors.selectUser);
+    this.monitorFormChanges();
+  }
 
+  private createEditorSession(docId: string) {
+    this.editorSessionService.createEditorSession(docId);
+  }
+
+  private updateEditorSession() {
+    this.editorSessionService.updateEditorSession();
+  }
+
+  // Keeps track of user changes and triggers auto save
+  private monitorFormChanges() {
+    this.postForm.valueChanges
+      .pipe(
+        skipWhile(() => this.loadingExistingPost), // Prevents this from firing when patching in existing data
+        debounceTime(1000)
+      )
+      .subscribe(valueChange => {
+        console.log('Logging form value change', valueChange);
+        if (!this.postInitialized) {
+          this.initializePost();
+        }
+        this.postForm.markAsTouched(); // Edits in the text editor don't automatically cause form to be touched until clicking out
+        this.savePost();
+      });
   }
 
   onSave() {
     this.manualSave = true;
     this.savePost();
-    this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
   }
 
   onDiscardEdits() {
@@ -117,6 +140,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
             this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId: this.postId}));
             this.reactToDeletOutcome();
           } else {
+          // If existing item, revert to original version (but user current image list)
             if (this.savePostSubscription) {
               this.savePostSubscription.unsubscribe();
             }
@@ -146,9 +170,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
     eventData.plugins.get('FileRepository').createUploadAdapter = (loader) => {
       console.log('Plugin fired, will provide this post ID', this.postId);
 
-      // Mark post initialized
       if (!this.postInitialized) {
-        this.initializePost();
+        this.initializePost(); // Initialize post so that it exists once image is uploaded
       } else {
         this.savePost();
       }
@@ -181,7 +204,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
         .then(imageProps => {
           this.heroImageAdded = true;
           this.currentImageProps = imageProps;
-          this.imagesModifiedSinceLastSave = true; // Used for auto-save change detection only after image uploaded
           return imageProps;
         })
       );
@@ -199,7 +221,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
     const idParamName = 'id';
     const idParam = this.route.snapshot.params[idParamName];
     if (idParam) {
-      this.postInitialized = true;
+      this.loadingExistingPost = true; // Pauses the monitorChanges observable
+      this.postInitialized = true; // Prevents post from being initialized (which would overwrite this data)
       this.postId = idParam;
       console.log('Post detected with id', idParam);
       this.post$ = this.getPost(this.postId);
@@ -219,6 +242,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
               [PostKeys.KEYWORDS]: post[PostKeys.KEYWORDS],
               [PostKeys.CONTENT]: post[PostKeys.CONTENT],
             };
+            // Patch in form values
             console.log('Patching post data into form', data);
             this.postForm.patchValue(data);
             this.heroImageProps$ = of(post.imageProps);
@@ -228,6 +252,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
             }
             this.isNewPost = false;
             this.originalPost = post;
+            this.createEditorSession(post.id); // Trigger the start of this editing session
+            this.loadingExistingPost = false; // unpauses the monitorChanges observable
           }
       });
     }
@@ -246,7 +272,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
           console.log('No post in store, fetching from server', postId);
           this.store$.dispatch(new PostStoreActions.SinglePostRequested({postId}));
         }
-        console.log('Single post status', this.postLoaded);
         this.postLoaded = true; // Prevents loading from firing more than needed
         return post;
       })
@@ -254,6 +279,10 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private configureNewPost() {
+    this.isNewPost = true;
+    this.postId = `${this.utilsService.generateRandomCharacterNoCaps(8)}`; // Use custom ID creator to avoid caps in URLs
+    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
+
     this.postForm = this.fb.group({
       [PostKeys.BLOG_DOMAIN]: [BlogDomains.EXPLEARNING, Validators.required],
       [PostKeys.TITLE]: ['', Validators.required],
@@ -265,41 +294,20 @@ export class PostFormComponent implements OnInit, OnDestroy {
     });
 
     this.imageUploadProcessing$ = this.imageService.getImageProcessing(); // Monitor image processing
-    this.setContentFormStatus();
-    this.isNewPost = true;
-    this.postId = `${this.utilsService.generateRandomCharacterNoCaps(8)}`; // Use custom ID creator to avoid caps in URLs
-    this.tempPostTitle = `Untitled Post ${this.postId.substr(0, 4)}`;
-
-    // Auto-init post if it hasn't already been initialized and it has content
-    this.initPostTimeout = setTimeout(() => {
-      if (!this.postInitialized) {
-        this.initializePost();
-      }
-      this.createAutoSaveTicker();
-    }, 5000);
+    this.lockFormWhileImageProcessing();
   }
 
-
-
-  private setContentFormStatus(): void {
+  // Prevents editing of content while image upload is processing
+  private lockFormWhileImageProcessing(): void {
     this.imageProcessingSubscription = this.imageUploadProcessing$
-      .subscribe(imageProcessing => {
-        switch (imageProcessing) {
-          case true:
-            return this[PostKeys.CONTENT].disable();
-          case false:
-            return this[PostKeys.CONTENT].enable();
-          default:
-            return this[PostKeys.CONTENT].enable();
-        }
-      });
+      .subscribe(imageProcessing => imageProcessing ? this[PostKeys.CONTENT].disable() : this[PostKeys.CONTENT].enable());
   }
 
+  // Won't fire if this is not a new post
   private initializePost(): void {
     this.adminUser$
       .pipe(take(1))
       .subscribe(adminUser => {
-        console.log('Post initialized');
         const post: Post = {
           [PostKeys.BLOG_DOMAIN]: this[PostKeys.BLOG_DOMAIN].value,
           author: adminUser.email,
@@ -318,87 +326,9 @@ export class PostFormComponent implements OnInit, OnDestroy {
         };
         this.store$.dispatch(new PostStoreActions.UpdatePostRequested({post}));
         this.postInitialized = true;
+        console.log('Post initialized');
+        this.createEditorSession(this.postId);
       });
-  }
-
-  private createAutoSaveTicker() {
-    console.log('Creating autosave ticker');
-    // Set interval at 10 seconds
-    const step = 10000;
-
-    this.autoSavePostSubscription = this.getPost(this.postId)
-      .subscribe(post => {
-        if (this.autoSaveTicker) {
-          // Clear old interval
-          this.killAutoSaveTicker();
-          console.log('clearing old interval');
-        }
-        if (post) {
-          // Refresh interval every 10 seconds
-          this.autoSaveTicker = setInterval(() => {
-            this.autoSave(post);
-          }, step);
-        }
-      });
-
-  }
-
-  private autoSave(post: Post) {
-    // Cancel autosave if no changes to content
-    if (!this.changesDetected(post)) {
-      console.log('No changes to content, no auto save');
-      return;
-    }
-    this.savePost();
-    console.log('Auto saving');
-  }
-
-  private changesDetected(post: Post): boolean {
-    // // Enable for debugging
-    // tslint:disable-next-line:max-line-length
-    // console.log(`Server [PostKeys.BLOG_DOMAIN]: ${post[PostKeys.BLOG_DOMAIN]} vs local [PostKeys.BLOG_DOMAIN]: ${this[PostKeys.BLOG_DOMAIN].value}`);
-    // console.log(`Server post [PostKeys.TITLE]: ${post[PostKeys.TITLE]} vs local post [PostKeys.TITLE]: ${this[PostKeys.TITLE].value}`);
-    // tslint:disable-next-line:max-line-length
-    // console.log(`Server post [PostKeys.VIDEO_URL]: ${post[PostKeys.VIDEO_URL]} vs local post [PostKeys.VIDEO_URL]: ${this[PostKeys.VIDEO_URL].value}`);
-    // tslint:disable-next-line:max-line-length
-    // console.log(`Server post [PostKeys.PODCAST_EPISODE_URL]: ${post[PostKeys.PODCAST_EPISODE_URL]} vs local post [PostKeys.PODCAST_EPISODE_URL]: ${this[PostKeys.PODCAST_EPISODE_URL].value}`);
-    // tslint:disable-next-line:max-line-length
-    // console.log(`Server post [PostKeys.DESCRIPTION]: ${post[PostKeys.DESCRIPTION]} vs local post [PostKeys.DESCRIPTION]: ${this[PostKeys.DESCRIPTION].value}`);
-    // tslint:disable-next-line:max-line-length
-    // console.log(`Server post [PostKeys.KEYWORDS]: ${post[PostKeys.KEYWORDS]} vs local post [PostKeys.KEYWORDS]: ${this[PostKeys.KEYWORDS].value}`);
-    // tslint:disable-next-line:max-line-length
-    // console.log(`Server post [PostKeys.CONTENT]: ${post[PostKeys.CONTENT]} vs local post [PostKeys.CONTENT]: ${this[PostKeys.CONTENT].value}`);
-    // console.log(`Images modified since last save: ${this.imagesModifiedSinceLastSave}`);
-    if (
-      post[PostKeys.BLOG_DOMAIN] === this[PostKeys.BLOG_DOMAIN].value &&
-      (post[PostKeys.TITLE] === (this[PostKeys.TITLE].value as string).trim() || post[PostKeys.TITLE] === this.tempPostTitle) &&
-      post[PostKeys.VIDEO_URL] === this[PostKeys.VIDEO_URL].value &&
-      post[PostKeys.PODCAST_EPISODE_URL] === this[PostKeys.PODCAST_EPISODE_URL].value &&
-      post[PostKeys.DESCRIPTION] === this[PostKeys.DESCRIPTION].value &&
-      post[PostKeys.KEYWORDS] === this[PostKeys.KEYWORDS].value &&
-      post[PostKeys.CONTENT] === this[PostKeys.CONTENT].value &&
-      !this.imagesModifiedSinceLastSave
-    ) {
-      return false;
-    }
-    return true;
-  }
-
-  private postIsBlank(): boolean {
-    if (
-      this.heroImageAdded ||
-      this[PostKeys.TITLE].value ||
-      this[PostKeys.VIDEO_URL].value ||
-      this[PostKeys.PODCAST_EPISODE_URL].value ||
-      this[PostKeys.DESCRIPTION].value ||
-      this[PostKeys.KEYWORDS].value ||
-      this[PostKeys.CONTENT].value ||
-      this.imagesModifiedSinceLastSave
-    ) {
-      return false;
-    }
-    console.log('Post is blank');
-    return true;
   }
 
   private readyToPublish(): boolean {
@@ -414,6 +344,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private savePost(): void {
+    this.updateEditorSession();
     this.adminUser$
       .pipe(take(1))
       .subscribe(publicUser => {
@@ -454,13 +385,15 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .pipe(
         withLatestFrom(
           this.store$.select(PostStoreSelectors.selectSaveError)
-        )
+        ),
+        tap(([isSaving, saveError]) => {
+          this.isSavingPost$ = of(isSaving);
+        })
       )
       .subscribe(([isSaving, saveError]) => {
         console.log('React to save outcome subscription firing');
         if (!isSaving && !saveError) {
           console.log('Post saved', post);
-          this.imagesModifiedSinceLastSave = false; // Reset image change detection
           // Navigate to dashboard if save is complete and is a manual save
           if (this.manualSave || this.postDiscarded) {
             this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
@@ -480,7 +413,10 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .pipe(
         withLatestFrom(
           this.store$.select(PostStoreSelectors.selectDeleteError)
-        )
+        ),
+        tap(([isDeleting, deleteError]) => {
+          this.isDeletingPost$ = of(isDeleting);
+        })
       )
       .subscribe(([isDeleting, deleteError]) => {
         if (!isDeleting && !deleteError) {
@@ -492,19 +428,11 @@ export class PostFormComponent implements OnInit, OnDestroy {
           this.deletePostSubscription.unsubscribe();
         }
         if (deleteError) {
-          console.log('Error saving coupon');
+          console.log('Error deleting post');
           this.postDiscarded = false;
           this.deletePostSubscription.unsubscribe();
         }
       });
-  }
-
-  private killAutoSaveTicker(): void {
-    clearInterval(this.autoSaveTicker);
-  }
-
-  private killInitPostTimeout(): void {
-    clearTimeout(this.initPostTimeout);
   }
 
   get [PostKeys.BLOG_DOMAIN]() { return this.postForm.get(PostKeys.BLOG_DOMAIN); }
@@ -516,29 +444,22 @@ export class PostFormComponent implements OnInit, OnDestroy {
   get [PostKeys.CONTENT]() { return this.postForm.get(PostKeys.CONTENT); }
 
   ngOnDestroy(): void {
-    if (this.postInitialized && !this.postDiscarded && !this.manualSave && !this.postIsBlank()) {
+
+    this.editorSessionService.destroyComponentActions(); // Signals unsubscribe in service from all relevant subscriptions
+
+    // Save post when user navigates away without saving manually
+    if (
+        this.postInitialized &&
+        !this.postDiscarded &&
+        !this.manualSave &&
+        this.postForm.touched &&
+        !this.editorSessionService.autoDisconnectDetected
+      ) {
       this.savePost();
-    }
-
-    if (this.postInitialized && this.postIsBlank() && !this.postDiscarded) {
-      console.log('Deleting blank post');
-      this.store$.dispatch(new PostStoreActions.DeletePostRequested({postId: this.postId}));
-    }
-
-    if (this.autoSavePostSubscription) {
-      this.autoSavePostSubscription.unsubscribe();
     }
 
     if (this.imageProcessingSubscription) {
       this.imageProcessingSubscription.unsubscribe();
-    }
-
-    if (this.autoSaveTicker) {
-      this.killAutoSaveTicker();
-    }
-
-    if (this.initPostTimeout) {
-      this.killInitPostTimeout();
     }
 
     if (this.savePostSubscription) {

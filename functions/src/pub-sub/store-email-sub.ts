@@ -24,8 +24,8 @@ const triggerOptInEmail = async(subscriber: EmailSubscriber) => {
     subscriber
   }
   const topicPublishRes = await topic.publishJSON(pubsubMsg)
-    .catch(err => {console.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); throw new functions.https.HttpsError('internal', err);});;
-  console.log(`Publish to topic "${topicName}" on project "${projectId}" succeeded:`, topicPublishRes);
+    .catch(err => {functions.logger.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); throw new functions.https.HttpsError('internal', err);});;
+  functions.logger.log(`Publish to topic "${topicName}" on project "${projectId}" succeeded:`, topicPublishRes);
 }
 
 const executeActions = async (susbscriberData: EmailSubscriber) => {
@@ -35,7 +35,7 @@ const executeActions = async (susbscriberData: EmailSubscriber) => {
   const db = adminFirestore;
   const subDocRef: FirebaseFirestore.DocumentReference = db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subId);
   const subDoc: FirebaseFirestore.DocumentSnapshot = await subDocRef.get()
-    .catch(err => {console.log(`Error fetching subscriber doc from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error fetching subscriber doc from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
 
 
   const isContactFormNoSub: boolean = newSubscriberData.lastSubSource === SubscriptionSource.CONTACT_FORM_NO_SUB;
@@ -62,16 +62,16 @@ const executeActions = async (susbscriberData: EmailSubscriber) => {
     [EmailSubscriberKeys.MODIFIED_DATE]: now()
   }
 
-  console.log('Updating or creating subscriber with this data', subscriberUpdate);
+  functions.logger.log('Updating or creating subscriber with this data', subscriberUpdate);
 
   // Udpate subscriber with combined data
   await subDocRef.set(subscriberUpdate, {merge: true})
-    .catch(err => {console.log(`Error storing subscriber data in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error storing subscriber data in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
     
   // Send opt in email if NOT a no-sub contact form and if subscriber has NOT opted in
   if (!isContactFormNoSub && !subscriberHasOptedIn) {
     
-    console.log('Subscriber has not opted in yet and this is not a no-sub contact form, sending opt in confirmation email');
+    functions.logger.log('Subscriber has not opted in yet and this is not a no-sub contact form, sending opt in confirmation email');
     // Trigger opt in email
     await triggerOptInEmail(newSubscriberData);
   }
@@ -85,8 +85,8 @@ const executeActions = async (susbscriberData: EmailSubscriber) => {
 export const storeEmailSub = functions.pubsub.topic(AdminTopicNames.SAVE_EMAIL_SUB_TOPIC).onPublish( async (message, context) => {
 
   const subscriberData = message.json as EmailSubscriber;
-  console.log('Store email sub request received with this data:', subscriberData);
-  console.log('Context from pubsub', context);
+  functions.logger.log('Store email sub request received with this data:', subscriberData);
+  functions.logger.log('Context from pubsub', context);
 
   return executeActions(subscriberData);
 

@@ -10,7 +10,7 @@ import * as functions from 'firebase-functions';
 
 export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber) => {
   
-  console.log('Sending Sub Opt In Confirmation Email to this subscriber', subscriber.id);
+  functions.logger.log('Sending Sub Opt In Confirmation Email to this subscriber', subscriber.id);
   
   const sgMail = getSgMail();
   const fromEmail: string = EmailSenderAddresses.EXPLEARNING_NEWSLETTER;
@@ -58,7 +58,7 @@ export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber)
     categories
   };
   await sgMail.send(msg)
-    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
 
-  console.log('Email sent', msg);
+  functions.logger.log('Email sent', msg);
 }

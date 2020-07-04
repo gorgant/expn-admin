@@ -18,8 +18,8 @@ const publishPostOnAdmin = async (post: Post) => {
   };
 
   const fbRes = await adminDb.collection(SharedCollectionPaths.POSTS).doc(updatedPost.id).set(updatedPost)
-    .catch(err => {console.log(`Error updating post on admin`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Post published');
+    .catch(err => {functions.logger.log(`Error updating post on admin`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Post published');
 
   return fbRes && updatedPost;
 }
@@ -30,7 +30,7 @@ const publishExpiredPosts = async () => {
   const postCollectionSnapshot: FirebaseFirestore.QuerySnapshot = await adminDb.collection(SharedCollectionPaths.POSTS)
     .where('published', '==', false)
     .get()
-    .catch(err => {console.log(`Error fetching post collection:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error fetching post collection:`, err); throw new functions.https.HttpsError('internal', err);});
 
   // Scan for and publish outstanding publish requests
   for (const doc of postCollectionSnapshot.docs) {
@@ -40,7 +40,7 @@ const publishExpiredPosts = async () => {
 
     // Confirm that publish time is prior to current time
     if (scheduledPublishTime && scheduledPublishTime < now()) {
-      console.log(`expired publish request detected`, post);
+      functions.logger.log(`expired publish request detected`, post);
 
       // First update post on admin
       const updatedAdminPost: Post = await publishPostOnAdmin(post);
@@ -55,15 +55,15 @@ const publishExpiredPosts = async () => {
 
 // A cron job triggers this function
 export const autoPublishBlogPosts = functions.https.onRequest( async (req, res ) => {
-  console.log('Auto-publish blog posts request received with these headers', req.headers);
+  functions.logger.log('Auto-publish blog posts request received with these headers', req.headers);
 
   if (req.headers['user-agent'] !== 'Google-Cloud-Scheduler') {
-    console.log('Invalid request, ending operation');
+    functions.logger.log('Invalid request, ending operation');
     return;
   }
 
   await publishExpiredPosts();
 
-  console.log('All expired posts published', res);
-  return res.status(200).send('All expired posts published');
+  functions.logger.log('All expired posts published', res);
+  res.status(200).send('All expired posts published');
 })

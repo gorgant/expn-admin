@@ -7,7 +7,8 @@ export enum AdminCollectionPaths {
   DISCOUNT_COUPONS = 'discountCoupons',
   DISCOUNT_COUPON_USER_IDS = 'discountCouponUserIds',
   DISCOUNT_COUPON_USER_EMAILS = 'discountCouponUserEmails',
-  DISCOUNT_COUPON_PRODUCTS = 'discountCouponProducts'
+  DISCOUNT_COUPON_PRODUCTS = 'discountCouponProducts',
+  EDITOR_SESSIONS = 'editorSessions'
 }
 
 export enum PublicCollectionPaths {

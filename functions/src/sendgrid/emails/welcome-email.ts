@@ -24,14 +24,14 @@ const markIntroEmailSent = async (subscriber: EmailSubscriber) => {
   }
 
   const fbRes = await db.collection(AdminCollectionPaths.SUBSCRIBERS).doc(subscriber.id).update(introEmailSent)
-    .catch(err => {console.log(`Failed to update subscriber data in admin database`, err); return err;});
+    .catch(err => {functions.logger.log(`Failed to update subscriber data in admin database`, err); return err;});
 
-  console.log('Marked intro email sent', fbRes);
+  functions.logger.log('Marked intro email sent', fbRes);
   return fbRes;
 }
 
 export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
-  console.log('Sending Welcome Email to this subscriber', subscriber.id);
+  functions.logger.log('Sending Welcome Email to this subscriber', subscriber.id);
 
   const sgMail = getSgMail();
   const fromEmail: string = EmailSenderAddresses.EXPLEARNING_NEWSLETTER;
@@ -90,13 +90,13 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
     categories
   };
   const sendgridResponse = await sgMail.send(msg)
-    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
   
   // If email is successful, mark intro email sent
   if (sendgridResponse) {
     await markIntroEmailSent(subscriber);
   }
 
-  console.log('Email sent', msg);
+  functions.logger.log('Email sent', msg);
   return sendgridResponse;
 }

@@ -8,7 +8,7 @@ import { assertUID } from '../config/global-helpers';
 
 
 export const refreshPublicFeaturedPostsCache = functions.https.onCall(async (data: any, context) => {
-  console.log('Received request to refresh public home cache with this data', data);
+  functions.logger.log('Received request to refresh public home cache with this data', data);
 
   assertUID(context);
 

@@ -7,28 +7,28 @@ import { catchErrors } from '../config/global-helpers';
 
 const isSandbox = (events: EmailEvent[], req: functions.Request, res: functions.Response): Promise<boolean> => {
   
-  console.log('Opening exitIfSandbox function');
+  functions.logger.log('Opening exitIfSandbox function');
 
   const sandboxCheck = new Promise<boolean> ((resolve, reject) => {
 
     if (!events) {
-      console.log('No events present');
+      functions.logger.log('No events present');
       resolve(false);
       return;
     }
 
     events.forEach(event => {
       if (!event.category) {
-        console.log('No event category present');
+        functions.logger.log('No event category present');
         resolve(false);
         return;
       }
 
-      console.log('Scanning this event category list', event.category)
+      functions.logger.log('Scanning this event category list', event.category)
 
       // Since category can be a single string, first check for that
       if (typeof event.category === 'string' && event.category === EmailCategories.TEST_SEND) {
-        console.log(`Sandbox mode based on this event category: ${event.category}, canceling function, received this data`, req.body);
+        functions.logger.log(`Sandbox mode based on this event category: ${event.category}, canceling function, received this data`, req.body);
         res.sendStatus(200);
         resolve(true);
         return;
@@ -37,7 +37,7 @@ const isSandbox = (events: EmailEvent[], req: functions.Request, res: functions.
       // Otherwise must be array, so loop through that
       (event.category as string[]).forEach(category => {
         if (category === EmailCategories.TEST_SEND) {
-          console.log(`Sandbox mode based on this event category: ${category}, canceling function, received this data`, req.body);
+          functions.logger.log(`Sandbox mode based on this event category: ${category}, canceling function, received this data`, req.body);
           resolve(true);
           return;
         }
@@ -69,10 +69,10 @@ export const sgEmailWebhookEndpoint = functions.https.onRequest(
       res.sendStatus(200);
       return;
     }
-    console.log('No sandbox found');
+    functions.logger.log('No sandbox found');
     
     try {
-      console.log('Sending webhook data to handler', events);
+      functions.logger.log('Sending webhook data to handler', events);
       catchErrors(updateEmailRecord(events))
         .catch(error => error);
       res.sendStatus(200);

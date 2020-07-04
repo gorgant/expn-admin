@@ -9,7 +9,7 @@ import * as functions from 'firebase-functions';
 
 export const sendContactFormConfirmationEmail = async (contactForm: ContactForm) => {
 
-  console.log('Sending Contact Form Confirmation Email to this subscriber', contactForm.email);
+  functions.logger.log('Sending Contact Form Confirmation Email to this subscriber', contactForm.email);
 
   const sgMail = getSgMail();
   const fromEmail = EmailSenderAddresses.EXPLEARNING_DEFAULT;
@@ -60,7 +60,7 @@ export const sendContactFormConfirmationEmail = async (contactForm: ContactForm)
     categories
   };
   await sgMail.send(msg)
-    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
 
-  console.log('Email sent', msg);
+  functions.logger.log('Email sent', msg);
 }

@@ -12,14 +12,14 @@ const getProductEmailTemplateIdFromProductId = (order: Order): string => {
     const template = ProductEmailTemplates[order.productId].templateId;
     return template;
   } catch(error) {
-    console.log(`Error fetching email template from product id ${order.productId}`, error);
+    functions.logger.log(`Error fetching email template from product id ${order.productId}`, error);
     return error;
   }
 }
 
 export const sendPurchaseConfirmationEmail = async (order: Order) => {
 
-  console.log('Sending Purchase Confirmation Email to this subscriber', order.email);
+  functions.logger.log('Sending Purchase Confirmation Email to this subscriber', order.email);
 
   const sgMail = getSgMail();
   const fromEmail = EmailSenderAddresses.EXPLEARNING_ORDERS;
@@ -73,7 +73,7 @@ export const sendPurchaseConfirmationEmail = async (order: Order) => {
     }
   };
   await sgMail.send(msg)
-    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
 
-  console.log('Email sent', msg);
+  functions.logger.log('Email sent', msg);
 }

@@ -7,8 +7,8 @@ import { assertUID } from '../config/global-helpers';
 const updateGeoLists = async (geographicData: GeographicData) => {
   const db = publicFirestore;
   const fbRes = await db.collection(SharedCollectionPaths.PUBLIC_RESOURCES).doc(SharedCollectionPaths.GEOGRAPHIC_DATA).set(geographicData)
-    .catch(err => {console.log(`Failed to update geographic data in public database`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Geographic data updated in public database:', fbRes);
+    .catch(err => {functions.logger.log(`Failed to update geographic data in public database`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Geographic data updated in public database:', fbRes);
   return fbRes;
 }
 
@@ -16,7 +16,7 @@ const updateGeoLists = async (geographicData: GeographicData) => {
 
 export const updateGeographicData = functions.https.onCall(async (data: GeographicData, context) => {
 
-  console.log('Received request to update geographic data on public database with this data', data);
+  functions.logger.log('Received request to update geographic data on public database with this data', data);
   assertUID(context);
   
   return updateGeoLists(data);

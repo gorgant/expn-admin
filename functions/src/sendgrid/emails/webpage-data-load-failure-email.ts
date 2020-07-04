@@ -9,7 +9,7 @@ import * as functions from 'firebase-functions';
 
 export const sendWebpageDataLoadFailureEmail = async (webpageLoadFailureData: WebpageLoadFailureData ) => {
   
-  console.log('Sending Webpage Data Load Failure Email to admin');
+  functions.logger.log('Sending Webpage Data Load Failure Email to admin');
   
   const sgMail = getSgMail();
   const fromEmail: string = EmailSenderAddresses.EXPLEARNING_ADMIN;
@@ -61,7 +61,7 @@ export const sendWebpageDataLoadFailureEmail = async (webpageLoadFailureData: We
     categories
   };
   await sgMail.send(msg)
-    .catch(err => {console.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error sending email: ${msg} because:`, err); throw new functions.https.HttpsError('internal', err);});
 
-  console.log('Email sent', msg);
+  functions.logger.log('Email sent', msg);
 }

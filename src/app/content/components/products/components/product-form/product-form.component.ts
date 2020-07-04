@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@ang
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig, MatSelectChange } from '@angular/material';
 import { Subscription, Observable, of } from 'rxjs';
-import { take, withLatestFrom, map, takeWhile } from 'rxjs/operators';
+import { take, withLatestFrom, map, takeWhile, skipWhile, debounceTime, tap } from 'rxjs/operators';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { ImageService } from 'src/app/core/services/image.service';
 import { Store } from '@ngrx/store';
@@ -12,13 +12,14 @@ import { UtilsService } from 'src/app/core/services/utils.service';
 import { Product, ProductKeys, ProductCategory, ProductCategoryList } from 'shared-models/products/product.model';
 import { ImageProps } from 'shared-models/images/image-props.model';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
-import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
+import { AdminAppRoutes, PublicAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 import { ImageType } from 'shared-models/images/image-type.model';
 import { ProductCardData, ProductCardKeys } from 'shared-models/products/product-card-data.model';
 import { PageHeroData, PageHeroKeys } from 'shared-models/forms-and-components/page-hero-data.model';
 import { BuyNowBoxData, BuyNowBoxKeys } from 'shared-models/products/buy-now-box-data.model';
 import { CheckoutData, CheckoutKeys } from 'shared-models/products/checkout-data.model';
+import { EditorSessionService } from 'src/app/core/services/editor-session.service';
 
 @Component({
   selector: 'app-product-form',
@@ -26,6 +27,8 @@ import { CheckoutData, CheckoutKeys } from 'shared-models/products/checkout-data
   styleUrls: ['./product-form.component.scss']
 })
 export class ProductFormComponent implements OnInit, OnDestroy {
+
+  appRoutes = PublicAppRoutes;
 
   product$: Observable<Product>;
   private productLoaded: boolean;
@@ -38,6 +41,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   productValidationMessages = PRODUCT_FORM_VALIDATION_MESSAGES;
   isNewProduct: boolean;
   productCategories: ProductCategory[] = ProductCategoryList;
+  loadingExistingProduct: boolean;
 
   private productId: string;
   private tempProductTitle: string;
@@ -49,11 +53,10 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private imagesModifiedSinceLastSave: boolean;
   private manualSave: boolean;
 
-  private initProductTimeout: NodeJS.Timer; // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
-  private autoSaveTicker: NodeJS.Timer; // Add "types": ["node"] to tsconfig.app.json to remove TS error from NodeJS.Timer function
-  private autoSaveSubscription: Subscription;
   private saveProductSubscription: Subscription;
+  isSavingProduct$: Observable<boolean>;
   private deleteProductSubscription: Subscription;
+  isDeletingProduct$: Observable<boolean>;
 
   constructor(
     private store$: Store<RootStoreState.State>,
@@ -62,12 +65,39 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: MatDialog,
     private route: ActivatedRoute,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private editorSessionService: EditorSessionService
   ) { }
 
   ngOnInit() {
     this.configureNewProduct();
     this.loadExistingProductData();
+    this.monitorFormChanges();
+  }
+
+  private createEditorSession(docId: string) {
+    this.editorSessionService.createEditorSession(docId);
+  }
+
+  private updateEditorSession() {
+    this.editorSessionService.updateEditorSession();
+  }
+
+  // Keeps track of user changes and triggers auto save
+  private monitorFormChanges() {
+    this.productForm.valueChanges
+      .pipe(
+        skipWhile(() => this.loadingExistingProduct), // Prevents this from firing when patching in existing data
+        debounceTime(1000)
+      )
+      .subscribe(valueChange => {
+        console.log('Logging form value change', valueChange);
+        if (!this.productInitialized) {
+          this.initializeProduct();
+        }
+        this.productForm.markAsTouched(); // Edits in the text editor don't automatically cause form to be touched until clicking out
+        this.saveProduct();
+      });
   }
 
   onSave() {
@@ -179,7 +209,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           default:
             break;
         }
-        this.imagesModifiedSinceLastSave = true; // Used for auto-save change detection only after image uploaded
         return imageProps;
       });
 
@@ -197,6 +226,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     const idParamName = 'id';
     const idParam = this.route.snapshot.params[idParamName];
     if (idParam) {
+      this.loadingExistingProduct = true; // Pauses the monitorChanges observable
       this.productInitialized = true;
       this.productId = idParam;
       console.log('Product detected with id', this.productId);
@@ -232,12 +262,27 @@ export class ProductFormComponent implements OnInit, OnDestroy {
             }
 
             // Patch in form values
+            console.log('Patching post data into form', productFormObject);
             this.productForm.patchValue(productFormObject);
             this.setProductImages(product);
             this.isNewProduct = false;
             this.originalProduct = product;
+            this.createEditorSession(product.id); // Trigger the start of this editing session
+            this.loadingExistingProduct = false; // unpauses the monitorChanges observable
           }
       });
+    }
+  }
+
+  private setProductImages(product: Product): void {
+    this.cardImageProps$ = of(product.cardImageProps);
+    if (product.cardImageProps) {
+      this.cardImageAdded = true;
+    }
+
+    this.heroImageProps$ = of(product.heroImageProps);
+    if (product.heroImageProps) {
+      this.heroImageAdded = true;
     }
   }
 
@@ -254,23 +299,10 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           console.log('No product in store, fetching from server', productId);
           this.store$.dispatch(new ProductStoreActions.SingleProductRequested({productId}));
         }
-        console.log('Single product status', this.productLoaded);
         this.productLoaded = true; // Prevents loading from firing more than needed
         return product;
       })
     );
-  }
-
-  private setProductImages(product: Product): void {
-    this.cardImageProps$ = of(product.cardImageProps);
-    if (product.cardImageProps) {
-      this.cardImageAdded = true;
-    }
-
-    this.heroImageProps$ = of(product.heroImageProps);
-    if (product.heroImageProps) {
-      this.heroImageAdded = true;
-    }
   }
 
   private configureNewProduct() {
@@ -294,16 +326,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       [CheckoutKeys.CHECKOUT_HEADER]: ['', [Validators.required]],
       [CheckoutKeys.CHECKOUT_DESCRIPTION]: ['', [Validators.required]],
     });
-
-    // Auto-init product if it hasn't already been initialized and it has content
-    this.initProductTimeout = setTimeout(() => {
-      if (!this.productInitialized) {
-        this.initializeProduct();
-      }
-      this.createAutoSaveTicker();
-    }, 5000);
   }
 
+  // Won't fire if this is not a new post
   private initializeProduct(): void {
 
     const productName = (this[ProductKeys.NAME].value as string).trim();
@@ -342,78 +367,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new ProductStoreActions.UpdateProductRequested({product}));
     this.productInitialized = true;
     console.log('Product initialized');
-  }
-
-  private createAutoSaveTicker() {
-    // Set interval at 10 seconds
-    const step = 10000;
-
-    this.autoSaveSubscription = this.getProduct(this.productId)
-      .subscribe(product => {
-        if (this.autoSaveTicker) {
-          // Clear old interval
-          this.killAutoSaveTicker();
-          console.log('clearing old interval');
-        }
-        if (product) {
-          // Refresh interval every 10 seconds
-          console.log('Creating autosave ticker');
-          this.autoSaveTicker = setInterval(() => {
-            this.autoSave(product);
-          }, step);
-        }
-      });
-
-  }
-
-  private autoSave(product: Product) {
-    // Cancel autosave if no changes to content
-    if (!this.changesDetected(product)) {
-      console.log('No changes to content, no auto save');
-      return;
-    }
-    console.log('Initiating auto save');
-    this.saveProduct();
-  }
-
-  private changesDetected(product: Product): boolean {
-    if (
-      // tslint:disable-next-line:max-line-length
-      (product[ProductKeys.NAME] === (this[ProductKeys.NAME].value as string).trim() || product[ProductKeys.NAME] === this.tempProductTitle) &&
-      product[ProductKeys.PRICE] === this[ProductKeys.PRICE].value &&
-      product[ProductKeys.LIST_ORDER] === this[ProductKeys.LIST_ORDER].value &&
-      product[ProductKeys.TAGLINE] === this[ProductKeys.TAGLINE].value &&
-      product[ProductKeys.PRODUCT_CATEGORY] === this[ProductKeys.PRODUCT_CATEGORY].value &&
-      this.sortedArraysEqual(product.productCardData[ProductCardKeys.HIGHLIGHTS], this[ProductCardKeys.HIGHLIGHTS].value) &&
-      product.heroData[PageHeroKeys.PAGE_HERO_SUBTITLE] === this[PageHeroKeys.PAGE_HERO_SUBTITLE].value &&
-      product.buyNowData[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE] === this[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE].value &&
-      product.checkoutData[CheckoutKeys.CHECKOUT_HEADER] === this[CheckoutKeys.CHECKOUT_HEADER].value &&
-      product.checkoutData[CheckoutKeys.CHECKOUT_DESCRIPTION] === this[CheckoutKeys.CHECKOUT_DESCRIPTION].value &&
-      !this.imagesModifiedSinceLastSave
-    ) {
-      return false;
-    }
-    return true;
-  }
-
-  private productIsBlank(): boolean {
-    if (
-      this.cardImageAdded ||
-      this.heroImageAdded ||
-      this[ProductKeys.NAME].value ||
-      this[ProductKeys.PRICE].value ||
-      this[ProductKeys.LIST_ORDER].value ||
-      this[ProductKeys.PRODUCT_CATEGORY].value ||
-      !this.highlightsArrayIsBlank ||
-      this[ProductKeys.TAGLINE].value ||
-      this[CheckoutKeys.CHECKOUT_HEADER].value ||
-      this[CheckoutKeys.CHECKOUT_DESCRIPTION].value ||
-      this.imagesModifiedSinceLastSave
-    ) {
-      return false;
-    }
-    console.log('Product is blank');
-    return true;
+    this.createEditorSession(this.productId);
   }
 
   private readyToActivate(): boolean {
@@ -431,9 +385,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private saveProduct() {
 
-    if (this.saveProductSubscription) {
-      this.saveProductSubscription.unsubscribe();
-    }
+    // if (this.saveProductSubscription) {
+    //   this.saveProductSubscription.unsubscribe();
+    // }
 
     const productName = (this[ProductKeys.NAME].value as string).trim();
 
@@ -480,12 +434,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       .pipe(
         withLatestFrom(
           this.store$.select(ProductStoreSelectors.selectSaveError)
-        )
+        ),
+        tap(([isSaving, saveError]) => {
+          this.isSavingProduct$ = of(isSaving);
+        })
       )
       .subscribe(([isSaving, saveError]) => {
+        console.log('React to save outcome subscription firing');
         if (!isSaving && !saveError) {
           console.log('Product saved', product);
-          this.imagesModifiedSinceLastSave = false; // Reset image change detection
           // Navigate to dashboard if save is complete and is a manual save
           if (this.manualSave || this.productDiscarded) {
             this.router.navigate([AdminAppRoutes.PRODUCT_DASHBOARD]);
@@ -505,7 +462,10 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       .pipe(
         withLatestFrom(
           this.store$.select(ProductStoreSelectors.selectDeleteError)
-        )
+        ),
+        tap(([isDeleting, deleteError]) => {
+          this.isDeletingProduct$ = of(isDeleting);
+        })
       )
       .subscribe(([isDeleting, deleteError]) => {
         if (!isDeleting && !deleteError) {
@@ -517,48 +477,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           this.deleteProductSubscription.unsubscribe();
         }
         if (deleteError) {
-          console.log('Error saving coupon');
+          console.log('Error deleting post');
           this.productDiscarded = false;
           this.deleteProductSubscription.unsubscribe();
         }
       });
   }
 
-  // Courtesy of: https://stackoverflow.com/a/4025958/6572208
-  private sortedArraysEqual(arr1: string[], arr2: []) {
-    if (arr1.length !== arr2.length) {
-        return false;
-    }
-    for (let i = arr1.length; i--;) {
-        if (arr1[i] !== arr2[i]) {
-            return false;
-        }
-    }
-    return true;
-  }
-
-  private highlightsArrayIsBlank(): boolean {
-    let isBlank = true;
-    this.highlightsArray.map(highlight => {
-      if (highlight) {
-        console.log('Highlight value detected');
-        isBlank = false;
-      }
-    });
-    return isBlank;
-  }
-
   private createHighlight(): FormControl {
     return this.fb.control('', Validators.required);
-  }
-
-
-  private killAutoSaveTicker(): void {
-    clearInterval(this.autoSaveTicker);
-  }
-
-  private killInitProductTimeout(): void {
-    clearTimeout(this.initProductTimeout);
   }
 
   get [ProductKeys.NAME]() { return this.productForm.get(ProductKeys.NAME); }
@@ -578,27 +505,18 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   get [CheckoutKeys.CHECKOUT_DESCRIPTION]() { return this.productForm.get(CheckoutKeys.CHECKOUT_DESCRIPTION); }
 
   ngOnDestroy(): void {
-    // Auto save product if navigating away
-    if (this.productInitialized && !this.productDiscarded && !this.manualSave && !this.productIsBlank()) {
+
+    this.editorSessionService.destroyComponentActions(); // Signals unsubscribe in service from all relevant subscriptions
+
+    // Save post when user navigates away without saving manually
+    if (
+        this.productInitialized &&
+        !this.productDiscarded &&
+        !this.manualSave &&
+        this.productForm.touched &&
+        !this.editorSessionService.autoDisconnectDetected
+      ) {
       this.saveProduct();
-    }
-
-    // Delete product if blank
-    if (this.productInitialized && this.productIsBlank() && !this.productDiscarded) {
-      console.log('Deleting blank product');
-      this.store$.dispatch(new ProductStoreActions.DeleteProductRequested({productId: this.productId}));
-    }
-
-    if (this.autoSaveSubscription) {
-      this.autoSaveSubscription.unsubscribe();
-    }
-
-    if (this.autoSaveTicker) {
-      this.killAutoSaveTicker();
-    }
-
-    if (this.initProductTimeout) {
-      this.killInitProductTimeout();
     }
 
     if (this.saveProductSubscription) {

@@ -96,10 +96,10 @@ const createResizeImageDataObject = async (metadata: ImageMetadata): Promise<Res
   const contentType = metadata.contentType; // File content type, used for upload of new file.
   const existingMetadata = await bucket.file(filePath).getMetadata()   // Extracts existing metadata
     .then(([md, res]) => md.metadata)
-    .catch(err => {console.log(`Error retrieving metadata for file of this type ${imageType} at this bucket ${bucket} and this filepath ${filePath}:`, err); return err});
-  console.log('System metadata for image', existingMetadata);
+    .catch(err => {functions.logger.log(`Error retrieving metadata for file of this type ${imageType} at this bucket ${bucket} and this filepath ${filePath}:`, err); return err});
+  functions.logger.log('System metadata for image', existingMetadata);
   const itemId = metadata.customMetadata.itemId;
-  console.log('Item id for image', itemId);
+  functions.logger.log('Item id for image', itemId);
   
   const bucketDir = dirname(filePath);
 
@@ -128,7 +128,7 @@ const objectIsValidCheck = (imageData: ResizeImageDataObject): boolean => {
 
   // Exit if this is triggered on a file that is not an image.
   if (!imageData.contentType || !imageData.contentType.includes('image')) {
-    console.log('Object is not an image.');
+    functions.logger.log('Object is not an image.');
     return false;
   }
 
@@ -138,33 +138,33 @@ const objectIsValidCheck = (imageData: ResizeImageDataObject): boolean => {
 const resizeImgs = async (imageData: ResizeImageDataObject) => {
   // 1. Ensure thumbnail dir exists
   await fs.ensureDir(imageData.workingDir)
-    .catch(err => {console.log(`Error ensuring thumbnail dir exists:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error ensuring thumbnail dir exists:`, err); throw new functions.https.HttpsError('internal', err);});
     
 
   // 2. Download Source File
   await imageData.bucket.file(imageData.filePath).download({
     destination: imageData.tmpFilePath
   })
-    .catch(err => {console.log(`Error retrieving file of this type ${imageData} at ${imageData.filePath}:`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Image downloaded locally to', imageData.tmpFilePath);
+    .catch(err => {functions.logger.log(`Error retrieving file of this type ${imageData} at ${imageData.filePath}:`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Image downloaded locally to', imageData.tmpFilePath);
 
   // 3. Resize the images and define an array of upload promises
   let sizes: number[] = [];
   switch (imageData.imageType) {
     case ImageType.BLOG_HERO :
-      console.log('Blog hero detected, setting blog hero sizes');
+      functions.logger.log('Blog hero detected, setting blog hero sizes');
       sizes = blogHeroSizes;
       break;
     case ImageType.BLOG_INLINE:
-      console.log('Blog inline detected, setting blog inline sizes');
+      functions.logger.log('Blog inline detected, setting blog inline sizes');
       sizes = blogInlineImages;
       break;
     case ImageType.PRODUCT_CARD:
-      console.log('Product card detected, setting product card sizes');
+      functions.logger.log('Product card detected, setting product card sizes');
       sizes = productCardSizes;
       break;
     case ImageType.PRODUCT_HERO:
-      console.log('Product hero detected, setting product hero sizes');
+      functions.logger.log('Product hero detected, setting product hero sizes');
       sizes = productHeroSizes;
       break;
     default: sizes = [500];
@@ -185,9 +185,9 @@ const resizeImgs = async (imageData: ResizeImageDataObject) => {
     await sharp(imageData.tmpFilePath)
       .resize(size, null) // Null for height, autoscale to width
       .toFile(thumbPath)
-      .catch(err => {console.log(`Error resizing source image:`, err); throw new functions.https.HttpsError('internal', err);});
+      .catch(err => {functions.logger.log(`Error resizing source image:`, err); throw new functions.https.HttpsError('internal', err);});
 
-    console.log('Thumbnail to be saved at', destination)
+    functions.logger.log('Thumbnail to be saved at', destination)
     
     // Upload to GCS
     return imageData.bucket.upload(thumbPath, {
@@ -195,17 +195,17 @@ const resizeImgs = async (imageData: ResizeImageDataObject) => {
       contentType: imageData.contentType,
       metadata: {metadata: metadata},
     })
-      .catch(err => {console.log(`Error uploading image data:`, err); throw new functions.https.HttpsError('internal', err);});
+      .catch(err => {functions.logger.log(`Error uploading image data:`, err); throw new functions.https.HttpsError('internal', err);});
   });
 
   // 4.1 Run the multi-resize operations
   await Promise.all(createMultiSizes)
-  console.log('All thumbnails uploaded to storage');
+  functions.logger.log('All thumbnails uploaded to storage');
 
   // 4.2 Delete original image
   const signalImageDeleted = imageData.bucket.file(imageData.filePath).delete()
-    .catch(err => {console.log(`Error deleting original image:`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Original file deleted', imageData.filePath);
+    .catch(err => {functions.logger.log(`Error deleting original image:`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Original file deleted', imageData.filePath);
 
   return signalImageDeleted;
 
@@ -238,12 +238,12 @@ const updateFBPost = async (imageData: ResizeImageDataObject): Promise<FirebaseF
       collectionPath = SharedCollectionPaths.PRODUCTS;
       break;
     default:
-      console.log('No image type detected, image size not set') 
+      functions.logger.log('No image type detected, image size not set') 
       break;
   }
 
   return adminFirestore.collection(collectionPath).doc(imageData.itemId).update(imageUpdate)
-    .catch(err => {console.log(`Error updating image:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error updating image:`, err); throw new functions.https.HttpsError('internal', err);});
     
   
 }
@@ -263,7 +263,7 @@ const executeActions = async (imageData: ResizeImageDataObject) => {
 /////// DEPLOYABLE FUNCTIONS ///////
 
 export const resizeImages = functions.https.onCall(async (metadata: ImageMetadata, context) => {
-  console.log('Received this image metadata', metadata);
+  functions.logger.log('Received this image metadata', metadata);
 
   assertUID(context);
 

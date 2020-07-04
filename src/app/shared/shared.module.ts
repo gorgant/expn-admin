@@ -13,6 +13,8 @@ import { ProductIdToNamePipe } from './pipes/product-id-to-name.pipe';
 import { PageHeroComponent } from './components/page-hero/page-hero.component';
 import { ServiceProductPipe } from './pipes/service-product.pipe';
 import { WebcourseProductPipe } from './pipes/webcourse-product.pipe';
+// tslint:disable-next-line:max-line-length
+import { ActiveEditorSessionsDialogueComponent } from './components/active-editor-sessions-dialogue/active-editor-sessions-dialogue.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,8 @@ import { WebcourseProductPipe } from './pipes/webcourse-product.pipe';
     ProductIdToNamePipe,
     ServiceProductPipe,
     WebcourseProductPipe,
-    PageHeroComponent
+    PageHeroComponent,
+    ActiveEditorSessionsDialogueComponent
   ],
   imports: [
     CommonModule,
@@ -49,7 +52,8 @@ import { WebcourseProductPipe } from './pipes/webcourse-product.pipe';
     WebcourseProductPipe,
   ],
   entryComponents: [
-    DeleteConfirmDialogueComponent
+    DeleteConfirmDialogueComponent,
+    ActiveEditorSessionsDialogueComponent
   ]
 })
 export class SharedModule { }

@@ -14,19 +14,19 @@ let eventKey: EmailEventType | string;
 // Update email record with clicks
 const handleClickEvent = async (emailRecordDocRef: FirebaseFirestore.DocumentReference): Promise<Partial<EmailRecordWithClicks>> => {
   const emailRecordDoc = await emailRecordDocRef.get()
-    .catch(err => {console.log(`Failed to fetch email record doc from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Failed to fetch email record doc from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
   const emailRecordData: EmailRecordWithClicks = emailRecordDoc.data() as EmailRecord;
   const emailRecordClickUpdates: Partial<EmailRecordWithClicks> = {};
-  console.log('Click type detected, fetched this email record data', emailRecordData);
+  functions.logger.log('Click type detected, fetched this email record data', emailRecordData);
 
   // If click data exists, add a click count and modify key
   if (emailRecordData.clickCount) {
-    console.log(`Click exists with ${emailRecordData.clickCount} click(s), adding new click data`,)
+    functions.logger.log(`Click exists with ${emailRecordData.clickCount} click(s), adding new click data`,)
     const updatedClickCount = emailRecordData.clickCount + 1;
     emailRecordClickUpdates.clickCount = updatedClickCount;
     eventKey = `click_${updatedClickCount}`;
   } else {
-    console.log('No click exists, setting click to 1');
+    functions.logger.log('No click exists, setting click to 1');
     emailRecordClickUpdates.clickCount = 1;
   }
 
@@ -36,7 +36,7 @@ const handleClickEvent = async (emailRecordDocRef: FirebaseFirestore.DocumentRef
 
 // If group unsubscribe, add that to subscriber data
 const handleGroupUnsubscribe = async (rawEventData: EmailEvent, subDocRef: FirebaseFirestore.DocumentReference) => {
-  console.log('Group unsubscribe detected');
+  functions.logger.log('Group unsubscribe detected');
   
   const groupUnsubscribeObject: UnsubscribeRecord = {
     unsubscribeDate: now(),
@@ -49,17 +49,17 @@ const handleGroupUnsubscribe = async (rawEventData: EmailEvent, subDocRef: Fireb
     }
   };
 
-  console.log('Updating subscriber with group unsubscribe', subscriberUpdates);
+  functions.logger.log('Updating subscriber with group unsubscribe', subscriberUpdates);
   await subDocRef.set(subscriberUpdates, {merge: true}) // Set {merge: true} in case the subscriber doesn't exist yet
-    .catch(err => {console.log(`Failed to update subscriber in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Failed to update subscriber in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
 }
 
 // If group resubscribe, remove that from subscriber data
 const handleGroupResubscribe = async (rawEventData: EmailEvent, subDocRef: FirebaseFirestore.DocumentReference) => {
   const subscriberDoc = await subDocRef.get()
-    .catch(err => {console.log(`Failed to fetch subscriber doc from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Failed to fetch subscriber doc from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
   const subscriberData: EmailSubscriber = subscriberDoc.data() as EmailSubscriber;
-  console.log('Group resubscribe type detected, fetched this email record data', subscriberData);
+  functions.logger.log('Group resubscribe type detected, fetched this email record data', subscriberData);
   const unsubGroupId: number = rawEventData.asm_group_id as number;
 
   const updatedSubscriber = {
@@ -73,14 +73,14 @@ const handleGroupResubscribe = async (rawEventData: EmailEvent, subDocRef: Fireb
     delete updatedSubscriber.globalUnsubscribe;
   }
 
-  console.log('Updating subscriber with group resubscribe', updatedSubscriber);
+  functions.logger.log('Updating subscriber with group resubscribe', updatedSubscriber);
   await subDocRef.set(updatedSubscriber) // No merge here because purposefully removing the gropuUnsubscribe value (if merge it wouldn't get removed)
-    .catch(err => {console.log(`Failed to update subscriber in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Failed to update subscriber in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
 }
 
 // If global unsubscribe, add that to subscriber data and remove optIn designation
 const handleGlobalUnsubscribe = async (subDocRef: FirebaseFirestore.DocumentReference) => {
-  console.log('Global unsubscribe detected');
+  functions.logger.log('Global unsubscribe detected');
   
   const globalUnsubscribeObject: UnsubscribeRecord = {
     unsubscribeDate: now(),
@@ -90,9 +90,9 @@ const handleGlobalUnsubscribe = async (subDocRef: FirebaseFirestore.DocumentRefe
     optInConfirmed: false
   };
   
-  console.log('Updating subscriber with global unsubscribe', subscriberUpdates);
+  functions.logger.log('Updating subscriber with global unsubscribe', subscriberUpdates);
   await subDocRef.set(subscriberUpdates, {merge: true})
-    .catch(err => {console.log(`Failed to update subscriber in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Failed to update subscriber in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
 }
 
 const executeActions = async (emailEvents: EmailEvent[]) => {
@@ -128,19 +128,19 @@ const executeActions = async (emailEvents: EmailEvent[]) => {
     }
     
     // Add the event to the updated email record
-    console.log('Updating record using this event key', eventKey);
+    functions.logger.log('Updating record using this event key', eventKey);
     emailRecordUpdates[eventKey as EmailEventType] = rawEventData;
 
     // Update the email record in database
-    console.log('Updating email record with this event object', emailRecordUpdates);
+    functions.logger.log('Updating email record with this event object', emailRecordUpdates);
     
     return emailRecordDocRef.set(emailRecordUpdates, {merge: true})
-      .catch(err => {console.log(`Error updating email record with this event object ${emailRecordUpdates}:`, err); throw new functions.https.HttpsError('internal', err);});
+      .catch(err => {functions.logger.log(`Error updating email record with this event object ${emailRecordUpdates}:`, err); throw new functions.https.HttpsError('internal', err);});
 ;
   });
 
   const res = await Promise.all(logEvents);
-  console.log('All events logged in email record', res);
+  functions.logger.log('All events logged in email record', res);
 
   return res;
 }

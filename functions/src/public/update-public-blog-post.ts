@@ -11,16 +11,16 @@ const publicDb: FirebaseFirestore.Firestore = publicFirestore;
 
 const publishPost = async (post: Post) => {
   const fbRes = await publicDb.collection(SharedCollectionPaths.POSTS).doc(post.id).set(post)
-    .catch(err => {console.log(`Failed to publish post on public database:`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Post published on public database:', fbRes);
+    .catch(err => {functions.logger.log(`Failed to publish post on public database:`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Post published on public database:', fbRes);
 
   return fbRes;
 }
 
 const deletePost = async (post: Post) => {
   const fbRes = await publicDb.collection(SharedCollectionPaths.POSTS).doc(post.id).delete()
-    .catch(err => {console.log(`Failed to delete post on public database:`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Post deleted on public database:', fbRes);
+    .catch(err => {functions.logger.log(`Failed to delete post on public database:`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Post deleted on public database:', fbRes);
   return fbRes;
 }
 
@@ -35,16 +35,16 @@ const publishPostRef = async (post: Post) => {
   }
 
   const fbRes = await publicDb.collection(PublicCollectionPaths.BLOG_INDEX).doc(post.id).set(postRef)
-    .catch(err => {console.log(`Failed to publish blog index post ref on public database:`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Blog index post ref published on public database:', fbRes);
+    .catch(err => {functions.logger.log(`Failed to publish blog index post ref on public database:`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Blog index post ref published on public database:', fbRes);
 
   return fbRes;
 }
 
 const deleteBlogIndexPostRef = async (post: Post) => {
   const fbRes = await publicDb.collection(PublicCollectionPaths.BLOG_INDEX).doc(post.id).delete()
-    .catch(err => {console.log(`Failed to delete blog index post ref on public database:`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Blog index post ref deleted on public database:', fbRes);
+    .catch(err => {functions.logger.log(`Failed to delete blog index post ref on public database:`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Blog index post ref deleted on public database:', fbRes);
   return fbRes;
 }
 
@@ -67,9 +67,9 @@ export const updatePostOnPublic = async (post: Post) => {
     postFbRes = await deletePost(post);
     postRefFbRes = await deleteBlogIndexPostRef(post);
     blogCacheUpdateRes = await submitCacheUpdateRequest(blogUrlObject);
-    console.log('Blog cache update transmitted');
+    functions.logger.log('Blog cache update transmitted');
     featuredPostsCacheUpdateRes = await submitCacheUpdateRequest(homeUrlObject);
-    console.log('Home cache update transmitted');
+    functions.logger.log('Home cache update transmitted');
     return postFbRes && postRefFbRes && blogCacheUpdateRes;
   }
 
@@ -81,15 +81,15 @@ export const updatePostOnPublic = async (post: Post) => {
 
   // Update post page cache
   postCacheUpdateRes = await submitCacheUpdateRequest(postUrlObject);
-  console.log('Post cache update transmitted');
+  functions.logger.log('Post cache update transmitted');
 
   // Update blog page cache (to include new post page)
   blogCacheUpdateRes = await submitCacheUpdateRequest(blogUrlObject);
-  console.log('Blog cache update transmitted');
+  functions.logger.log('Blog cache update transmitted');
 
   // Update featured posts cache (i.e., home page cache)
   featuredPostsCacheUpdateRes = await submitCacheUpdateRequest(homeUrlObject);
-  console.log('Home cache update transmitted');
+  functions.logger.log('Home cache update transmitted');
 
   return postFbRes && postRefFbRes && postCacheUpdateRes && blogCacheUpdateRes && featuredPostsCacheUpdateRes;
 }
@@ -98,11 +98,11 @@ export const updatePostOnPublic = async (post: Post) => {
 
 export const updatePublicBlogPost = functions.https.onCall(async (data: Post, context) => {
 
-  console.log('Received request to update blog post on public database with this data', data);
+  functions.logger.log('Received request to update blog post on public database with this data', data);
   assertUID(context);
 
   const post: Post = data;
-  console.log('Updating public post with this data', post);
+  functions.logger.log('Updating public post with this data', post);
   
   return updatePostOnPublic(post);
 });

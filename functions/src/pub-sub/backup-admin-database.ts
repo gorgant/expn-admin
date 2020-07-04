@@ -35,7 +35,7 @@ const processBackup = async () => {
   const bucket = setBucketsBasedOnEnvironment();
   // Check for api updates: https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases/exportDocuments
   const url = `https://firestore.googleapis.com/v1beta1/projects/${projectId}/databases/(default):exportDocuments`;
-  console.log(`Deploying backup data to this bucket: ${bucket.name} and this url ${url}`);
+  functions.logger.log(`Deploying backup data to this bucket: ${bucket.name} and this url ${url}`);
 
   // Must add import/export IAM to default service account
   const admin = await auth.getClient({
@@ -43,7 +43,7 @@ const processBackup = async () => {
         'https://www.googleapis.com/auth/datastore',
     ]
   })
-    .catch(err => {console.log(`Error getting auth client:`, err); throw new functions.https.HttpsError('internal', err);});;
+    .catch(err => {functions.logger.log(`Error getting auth client:`, err); throw new functions.https.HttpsError('internal', err);});;
 
   return admin.request({
     url,
@@ -52,7 +52,7 @@ const processBackup = async () => {
       outputUriPrefix: `gs://${bucket.name}/database-backup/${now()}`
     }
   })
-    .catch(err => {console.log(`Error submitting backup POST request:`, err); throw new functions.https.HttpsError('internal', err);});;
+    .catch(err => {functions.logger.log(`Error submitting backup POST request:`, err); throw new functions.https.HttpsError('internal', err);});;
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////

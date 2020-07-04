@@ -16,6 +16,7 @@ export enum AdminFunctionNames {
   REFRESH_PUBLIC_BLOG_INDEX = 'refreshPublicBlogIndex',
   REFRESH_PUBLIC_BLOG_CACHE = 'refreshPublicBlogCache',
   REFRESH_PUBLIC_FEATURED_POSTS_CACHE = 'refreshPublicFeaturedPostsCache',
+  PURGE_INACTIVE_EDITOR_SESSIONS = 'purgeInactiveEditorSessions'
 }
 
 export enum AdminTopicNames {

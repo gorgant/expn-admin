@@ -74,9 +74,11 @@
         (keydown.enter)="textareaEnterPressed($event)"
         ></ckeditor>
       <div class="form-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
-        <button class="submit-button" [disabled]="!postInitialized" mat-raised-button color="accent" type="button" (click)="onSave()">Save Post</button>
-        <button *ngIf="isNewPost" class="discard-button" [disabled]="!postInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Post</button>
-        <button *ngIf="!isNewPost" class="discard-button" [disabled]="!postInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Edits</button>
+        <mat-progress-spinner *ngIf="(isSavingPost$ | async) || (isDeletingPost$ | async)" diameter=40 color="accent" mode="indeterminate"></mat-progress-spinner>
+        <button *ngIf="!(isSavingPost$ | async)" class="submit-button" [disabled]="!postInitialized || postForm.untouched" mat-raised-button color="accent" type="button" (click)="onSave()">Save Post</button>
+        <button *ngIf="isNewPost && postInitialized && !(isDeletingPost$ | async)" class="discard-button" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Post</button>
+        <button *ngIf="(isNewPost && !postInitialized) || (!isNewPost && postForm.untouched)" class="discard-button" mat-raised-button color="warn" type="button" [routerLink]="appRoutes.BLOG">Cancel</button>
+        <button *ngIf="!isNewPost && postForm.touched && !(isSavingPost$ | async)" class="discard-button" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Edits</button>
       </div>
     </form>
   </div>

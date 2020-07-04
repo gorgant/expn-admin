@@ -19,8 +19,8 @@ const addUserToDb = async (authUser: admin.auth.UserRecord) => {
   }
 
   await adminFirestore.collection(AdminCollectionPaths.ADMIN_USERS).doc(authUser.uid).set(publicUser)
-    .catch(err => {console.log(`Failed to create admin user in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
-  console.log('Admin user created', publicUser);
+    .catch(err => {functions.logger.log(`Failed to create admin user in admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+  functions.logger.log('Admin user created', publicUser);
 }
 
 /////// DEPLOYABLE FUNCTIONS ///////

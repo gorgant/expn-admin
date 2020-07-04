@@ -11,13 +11,13 @@ const publicBlogIndexCollection = publicDb.collection(PublicCollectionPaths.BLOG
 const deleteBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null> => {
 
   const blogIndexCollectionSnapshot: FirebaseFirestore.QuerySnapshot = await publicBlogIndexCollection.get()
-    .catch(err => {console.log(`Error fetching public blog index collection:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error fetching public blog index collection:`, err); throw new functions.https.HttpsError('internal', err);});
     
   const blogIndexArray = blogIndexCollectionSnapshot.docs;
   
   // Exit function if array is empty
   if (blogIndexArray.length < 1) {
-    console.log('No post index items found, aborting delete');
+    functions.logger.log('No post index items found, aborting delete');
     return null;
   }
 
@@ -25,7 +25,7 @@ const deleteBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null
   const maxBatchSize = 450; // Firebase limit is 500
   let batchSize = 0;
 
-  console.log(`Initiating batch delete of post indexes, found ${blogIndexArray.length} index refs in the array`);
+  functions.logger.log(`Initiating batch delete of post indexes, found ${blogIndexArray.length} index refs in the array`);
 
   // Loop through array until the max batch size is reached
   for (let i = 0; i < maxBatchSize; i++) {
@@ -38,13 +38,13 @@ const deleteBlogIndex = async (): Promise<FirebaseFirestore.WriteResult[] | null
   }
 
   const batchDelete = await batch.commit()
-    .catch(err => {console.log(`Error with batch delete:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error with batch delete:`, err); throw new functions.https.HttpsError('internal', err);});
 
-  console.log(`Batch deleted ${batchSize} index refs, should equal batch delete response length: ${batchDelete.length}`);
+  functions.logger.log(`Batch deleted ${batchSize} index refs, should equal batch delete response length: ${batchDelete.length}`);
 
   // If more items than max batch size, re-run operation until that's not the case
   if (batchSize >= maxBatchSize) {
-    console.log('Batch size exceeded limit, running function again');
+    functions.logger.log('Batch size exceeded limit, running function again');
     return deleteBlogIndex();
   }
 
@@ -75,10 +75,10 @@ const batchSetBlogIndex = async(blogIndexArray: BlogIndexPostRef[]) => {
   }
 
   const batchCreate = await batch.commit()
-    .catch(err => {console.log(`Error with batch creation:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error with batch creation:`, err); throw new functions.https.HttpsError('internal', err);});
     
 
-  console.log(`Batch created ${batchCreate.length} items`);
+  functions.logger.log(`Batch created ${batchCreate.length} items`);
   itemsProcessedCount += batchSize; // Update global variable to keep track of remaining episodes to cache
   loopCount++; // Prevents infinite looping in case of error
 }
@@ -89,13 +89,13 @@ const createBlogIndex = async () => {
   loopCount = 0; // Initialize at zero (prevents global variable remenant from last function execution)
 
   const publicPostCollectionSnapshot: FirebaseFirestore.QuerySnapshot = await publicPostCollection.get()
-    .catch(err => {console.log(`Error fetching public post collection:`, err); throw new functions.https.HttpsError('internal', err);});
+    .catch(err => {functions.logger.log(`Error fetching public post collection:`, err); throw new functions.https.HttpsError('internal', err);});
 
   const postArray = publicPostCollectionSnapshot.docs;
   
   // Exit function if array is empty
   if (postArray.length < 1) {
-    console.log('No post items found, aborting creation');
+    functions.logger.log('No post items found, aborting creation');
     return;
   }
 
@@ -117,7 +117,7 @@ const createBlogIndex = async () => {
   while (itemsProcessedCount < totalItemCount && loopCount < 10) {
     await batchSetBlogIndex(blogIndexArray);
     if (itemsProcessedCount < totalItemCount) {
-      console.log(`Repeating batch process: ${itemsProcessedCount} out of ${totalItemCount} items cached`);
+      functions.logger.log(`Repeating batch process: ${itemsProcessedCount} out of ${totalItemCount} items cached`);
     }
   }
 }
@@ -129,7 +129,7 @@ const createBlogIndex = async () => {
 //   const adminDb = adminFirestore;
 //   const adminPostCollection = adminDb.collection(SharedCollectionPaths.POSTS);
 //   const adminPostCollectionSnapshot: FirebaseFirestore.QuerySnapshot = await adminPostCollection.get()
-//     .catch(err => {console.log(`Error fetching admin post collection:`, err); throw new functions.https.HttpsError('internal', err);});
+//     .catch(err => {functions.logger.log(`Error fetching admin post collection:`, err); throw new functions.https.HttpsError('internal', err);});
 //   const batch = adminDb.batch();
 
 //   adminPostCollectionSnapshot.docs.forEach( async (doc) => {
@@ -138,9 +138,9 @@ const createBlogIndex = async () => {
 //   });
 
 //   const batchUpdate = await batch.commit()
-//     .catch(err => {console.log(`Error with batch update:`, err); throw new functions.https.HttpsError('internal', err);});
+//     .catch(err => {functions.logger.log(`Error with batch update:`, err); throw new functions.https.HttpsError('internal', err);});
 
-//   console.log(`Batch updated ${batchUpdate.length} blog domains`);
+//   functions.logger.log(`Batch updated ${batchUpdate.length} blog domains`);
 
 //   return batchUpdate;
 // }
@@ -157,7 +157,7 @@ const executeActions = async () => {
 
 
 export const refreshPublicBlogIndex = functions.https.onCall(async (data: any, context) => {
-  console.log('Received request to refresh public blog index with this data', data);
+  functions.logger.log('Received request to refresh public blog index with this data', data);
 
   assertUID(context);
   

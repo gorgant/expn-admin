@@ -107,9 +107,11 @@
         </mat-error>
       </mat-form-field>
       <div class="form-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
-        <button class="submit-button" [disabled]="!productInitialized" mat-raised-button color="accent" type="button" (click)="onSave()">Save Product</button>
-        <button *ngIf="isNewProduct" class="discard-button" [disabled]="!productInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Product</button>
-        <button *ngIf="!isNewProduct" class="discard-button" [disabled]="!productInitialized" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Edits</button>
+        <mat-progress-spinner *ngIf="(isSavingProduct$ | async) || (isDeletingProduct$ | async)" diameter=40 color="accent" mode="indeterminate"></mat-progress-spinner>
+        <button *ngIf="!(isSavingProduct$ | async)" class="submit-button" [disabled]="!productInitialized || productForm.untouched" mat-raised-button color="accent" type="button" (click)="onSave()">Save Product</button>
+        <button *ngIf="isNewProduct && productInitialized && !(isDeletingProduct$ | async)" class="discard-button" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Product</button>
+        <button *ngIf="(isNewProduct && !productInitialized) || (!isNewProduct && productForm.untouched)" class="discard-button" mat-raised-button color="warn" type="button" [routerLink]="appRoutes.PRODUCTS">Cancel</button>
+        <button *ngIf="!isNewProduct && productForm.touched && !(isSavingProduct$ | async)" class="discard-button" mat-raised-button color="warn" type="button" (click)="onDiscardEdits()">Discard Edits</button>
       </div>
     </form>
   </div>
