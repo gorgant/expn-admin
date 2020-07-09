@@ -17,7 +17,7 @@ export class HeaderComponent implements OnInit {
 
   userAuth$: Observable<boolean>;
 
-  @ViewChild('matButton', { static: false }) matButton;
+  @ViewChild('matButton') matButton;
   activeUrl$: Observable<string>;
   appRoutes = AdminAppRoutes;
 
