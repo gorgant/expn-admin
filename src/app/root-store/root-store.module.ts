@@ -10,7 +10,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { metaReducers } from './meta-reducers';
 import { environment } from 'src/environments/environment';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-store';
+import { StoreRouterConnectingModule, RouterStateSerializer, DefaultRouterStateSerializer } from '@ngrx/router-store';
 import { CustomSerializer } from '../core/utils/router-state-serializer';
 import { SubscriberStoreModule } from './subscriber-store';
 import { ContactFormStoreModule } from './contact-form-store';
@@ -36,7 +36,7 @@ import { PodcastStoreModule } from './podcast-store';
     EffectsModule.forRoot([]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     StoreRouterConnectingModule.forRoot(
-      {
+      { serializer: DefaultRouterStateSerializer,
         stateKey: 'router',
         // navigationActionTiming: NavigationActionTiming.PostActivation // navigation isn't dispatched until all guards/resolvers are run
       }
