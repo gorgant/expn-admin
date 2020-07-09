@@ -18,7 +18,6 @@ export class UiService {
   constructor(
     private snackbar: MatSnackBar,
     private afs: AngularFirestore,
-    private uiService: UiService,
     private breakpointObserver: BreakpointObserver,
   ) {
     this.monitorScreenSize();
@@ -52,7 +51,7 @@ export class UiService {
           return geographicData;
         }),
         catchError(error => {
-          this.uiService.showSnackBar(error, 5000);
+          this.showSnackBar(error, 5000);
           return throwError(error);
         })
       );

@@ -4,7 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { UiService } from 'src/app/core/services/ui.service';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import { from, Observable, Subject, throwError } from 'rxjs';
+import { from, Observable, Subject, throwError, combineLatest, of } from 'rxjs';
 import { now } from 'moment';
 import { AuthData } from 'shared-models/auth/auth-data.model';
 import { AdminUser } from 'shared-models/user/admin-user.model';
@@ -40,7 +40,7 @@ export class AuthService {
   // Currently, registration is not available (done with admin console)
   registerUser(authData: AuthData): Observable<AdminUser> {
 
-    const authResponse = from(this.afAuth.auth.createUserWithEmailAndPassword(
+    const authResponse = from(this.afAuth.createUserWithEmailAndPassword(
       authData.email,
       authData.password
     ));
@@ -69,7 +69,7 @@ export class AuthService {
   // Currently, Google Login is not available (done with admin console)
   loginWithGoogle(): Observable<AdminUser> {
 
-    const authResponse = from(this.afAuth.auth.signInWithPopup(
+    const authResponse = from(this.afAuth.signInWithPopup(
       new firebase.auth.GoogleAuthProvider()
     ));
 
@@ -100,7 +100,7 @@ export class AuthService {
 
   loginWithEmail(authData: AuthData): Observable<Partial<AdminUser>> {
 
-    const authResponse = from(this.afAuth.auth.signInWithEmailAndPassword(
+    const authResponse = from(this.afAuth.signInWithEmailAndPassword(
       authData.email,
       authData.password
     ));
@@ -126,7 +126,7 @@ export class AuthService {
 
   logout(): void {
     this.preLogoutActions();
-    this.afAuth.auth.signOut();
+    this.afAuth.signOut();
     // Post logout actions carried out by auth listener once logout detected
   }
 
@@ -134,70 +134,58 @@ export class AuthService {
 
     const credentials = this.getUserCredentials(publicUser.email, password);
 
-    const authResponse = from(this.afAuth.auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credentials));
-
-    return authResponse.pipe(
-      take(1),
-      switchMap(userCreds => {
-        const updateResponse = from(this.afAuth.auth.currentUser.updateEmail(newEmail));
-        return updateResponse.pipe(
-          take(1),
-          map(empty => {
-            const newUserData: AdminUser = {
-              ...publicUser,
-              email: newEmail
-            };
-            this.uiService.showSnackBar(`Email successfully updated: ${newEmail}`, 5000);
-            return {userData: newUserData, userId: publicUser.id};
-          }),
-          catchError(error => {
-            this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-            console.log('Error updating email', error);
-            return throwError(error);
-          })
-        );
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error reauthenticating user', error);
-        return throwError(error);
-      })
-    );
+    return from(this.afAuth.currentUser)
+      .pipe(
+        take(1),
+        switchMap(user => {
+          return combineLatest(of(user), from(user.reauthenticateAndRetrieveDataWithCredential(credentials)));
+        }),
+        switchMap(([user, userCreds]) => {
+          return user.updateEmail(newEmail);
+        }),
+        map(empt => {
+          const newUserData: AdminUser = {
+            ...publicUser,
+            email: newEmail
+          };
+          this.uiService.showSnackBar(`Email successfully updated: ${newEmail}`, 5000);
+          return {userData: newUserData, userId: publicUser.id};
+        }),
+        catchError(error => {
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+          console.log('Error updating email', error);
+          return throwError(error);
+        })
+      );
   }
 
   updatePassword(publicUser: AdminUser, oldPassword: string, newPassword: string): Observable<string> {
     const credentials = this.getUserCredentials(publicUser.email, oldPassword);
 
-    const authResponse = from(this.afAuth.auth.currentUser.reauthenticateAndRetrieveDataWithCredential(credentials));
-
-    return authResponse.pipe(
-      take(1),
-      switchMap(userCreds => {
-        const updateResponse = from(this.afAuth.auth.currentUser.updatePassword(newPassword));
-        return updateResponse.pipe(
-          take(1),
-          map(empty => {
-            this.uiService.showSnackBar(`Password successfully updated`, 5000);
-            return 'success';
-          }),
-          catchError(error => {
-            this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-            console.log('Error updating password', error);
-            return throwError(error);
-          })
-        );
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error reauthenticating user', error);
-        return throwError(error);
-      })
-    );
+    return from(this.afAuth.currentUser)
+      .pipe(
+        take(1),
+        switchMap(user => {
+          return combineLatest(of(user), from(user.reauthenticateAndRetrieveDataWithCredential(credentials)));
+        }),
+        switchMap(([user, userCreds]) => {
+          return user.updatePassword(newPassword);
+        }),
+        map(empt => {
+          this.uiService.showSnackBar(`Password successfully updated`, 5000);
+          return 'success';
+        }),
+        catchError(error => {
+          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+          console.log('Error updating password', error);
+          return throwError(error);
+        })
+      );
   }
 
   sendResetPasswordEmail(email: string): Observable<string> {
 
-    const authResponse = from(this.afAuth.auth.sendPasswordResetEmail(email));
+    const authResponse = from(this.afAuth.sendPasswordResetEmail(email));
 
     return authResponse.pipe(
       take(1),

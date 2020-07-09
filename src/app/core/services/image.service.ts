@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject, throwError } from 'rxjs';
 import { UploadMetadata } from '@angular/fire/storage/interfaces';
 import { environment } from 'src/environments/environment';
 import { ProductionCloudStorage, SandboxCloudStorage } from 'shared-models/environments/env-vars.model';
@@ -14,6 +14,8 @@ import { AdminFunctionNames } from 'shared-models/routes-and-paths/fb-function-n
 import { ImageDirectoryData } from 'shared-models/images/image-directory-data.model';
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 import { SanitizedFileName } from 'shared-models/images/sanitized-file-name.model';
+import { AngularFireFunctions } from '@angular/fire/functions';
+import { take, tap, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -27,9 +29,13 @@ export class ImageService {
   private productsStorageRef: firebase.storage.Reference;
 
   private db = firebase.firestore(); // Firebase database
-  private fns = firebase.functions(); // Firebase functions
+  // TODO: Check for firebase updates because firebase functions SDK isn't working at present
+  // private fns = firebase.functions(); // Firebase function
 
-  constructor() {
+
+  constructor(
+    private fnsFire: AngularFireFunctions // Using this temporarily while functions SDK is down
+  ) {
     this.setStorageBasedOnEnvironment();
   }
 
@@ -206,7 +212,7 @@ export class ImageService {
       }, async () => {
 
         // Trigger cloud function to resize images
-        await this.resizeImagesOnServer(metadata);
+        await this.resizeImagesOnServer(metadata).toPromise();
         console.log('Triggering cloud function image reiszing', metadata);
 
         // Wait for image resizing to complete, then fetch the sizes
@@ -225,16 +231,33 @@ export class ImageService {
 
   }
 
-  private async resizeImagesOnServer(metadata: ImageMetadata) {
+  // private async resizeImagesOnServer(metadata: ImageMetadata) {
 
-    const resizeImagesHttpCall = this.fns.httpsCallable(AdminFunctionNames.RESIZE_IMAGES);
+  //   const resizeImagesHttpCall = this.fns.httpsCallable(AdminFunctionNames.RESIZE_IMAGES);
 
-    const response = await resizeImagesHttpCall(metadata)
-      .catch(error =>  console.log('Error updating item data on server', error));
+  //   const response = await resizeImagesHttpCall(metadata)
+  //     .catch(error =>  console.log('Error updating item data on server', error));
 
-    console.log('Resized image url set on item', response);
+  //   console.log('Resized image url set on item', response);
 
-    return response;
+  //   return response;
+  // }
+
+  private resizeImagesOnServer(metadata: ImageMetadata) {
+
+    const resizeImagesHttpCall = this.fnsFire.httpsCallable(AdminFunctionNames.RESIZE_IMAGES);
+
+    return resizeImagesHttpCall(metadata)
+      .pipe(
+        take(1),
+        tap(res => {
+          console.log('Resized image url set on item', res);
+        }),
+        catchError(error => {
+          console.log('Error updating item data on server', error);
+          return throwError(error);
+        })
+      );
   }
 
   // Listen for item update and then fetch image sizes when available
