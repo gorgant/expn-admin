@@ -3,7 +3,7 @@ import { getSgMail, EmailWebsiteLinks } from "../config";
 import { EmailSenderAddresses, EmailSenderNames, EmailTemplateIds, EmailCategories, AdminEmailAddresses } from "../../../../shared-models/email/email-vars.model";
 import { currentEnvironmentType } from "../../config/environments-config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
-import { MailData } from "@sendgrid/helpers/classes/mail";
+import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 import * as functions from 'firebase-functions';
 
 
@@ -39,7 +39,7 @@ export const sendContactFormConfirmationEmail = async (contactForm: ContactForm)
       break;
   }
 
-  const msg: MailData = {
+  const msg: MailDataRequired = {
     to: {
       email: toEmail,
       name: toFirstName

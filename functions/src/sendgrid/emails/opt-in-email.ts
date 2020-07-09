@@ -4,7 +4,7 @@ import { EmailSenderAddresses, EmailSenderNames, EmailTemplateIds, EmailCategori
 import { BillingDetails } from "../../../../shared-models/billing/billing-details.model";
 import { currentEnvironmentType } from "../../config/environments-config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
-import { MailData } from "@sendgrid/helpers/classes/mail";
+import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 import * as functions from 'firebase-functions';
 
 
@@ -40,7 +40,7 @@ export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber)
       break;
   }
 
-  const msg: MailData = {
+  const msg: MailDataRequired = {
     to: {
       email: toEmail,
       name: toFirstName

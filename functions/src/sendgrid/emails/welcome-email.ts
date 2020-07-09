@@ -10,7 +10,7 @@ import { currentEnvironmentType } from "../../config/environments-config";
 
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
 
-import { MailData } from "@sendgrid/helpers/classes/mail";
+import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 import { adminFirestore } from "../../config/db-config";
 import { AdminCollectionPaths } from "../../../../shared-models/routes-and-paths/fb-collection-paths";
 import * as functions from 'firebase-functions';
@@ -61,7 +61,7 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
       break;
   }
 
-  const msg: MailData = {
+  const msg: MailDataRequired = {
     to: {
       email: toEmail,
       name: toFirstName

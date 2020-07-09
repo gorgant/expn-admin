@@ -3,7 +3,7 @@ import { ProductEmailTemplates, EmailSenderAddresses, EmailSenderNames, EmailCat
 import { getSgMail } from "../config";
 import { getProductUrlById, currentEnvironmentType } from "../../config/environments-config";
 import { EnvironmentTypes } from "../../../../shared-models/environments/env-vars.model";
-import { MailData } from "@sendgrid/helpers/classes/mail";
+import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 import * as functions from 'firebase-functions';
 
 const getProductEmailTemplateIdFromProductId = (order: Order): string => {
@@ -50,7 +50,7 @@ export const sendPurchaseConfirmationEmail = async (order: Order) => {
       break;
   }
 
-  const msg: MailData = {
+  const msg: MailDataRequired = {
     to: {
       email: toEmail,
       name: toFirstName
