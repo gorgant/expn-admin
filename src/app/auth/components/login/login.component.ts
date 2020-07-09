@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { RootStoreState, AuthStoreSelectors, UserStoreSelectors, AuthStoreActions } from 'src/app/root-store';
-import { MatDialog, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { ResetPasswordDialogueComponent } from '../reset-password-dialogue/reset-password-dialogue.component';
 import { LOGIN_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';

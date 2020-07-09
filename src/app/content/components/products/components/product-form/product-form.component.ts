@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatDialog, MatDialogConfig, MatSelectChange } from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatSelectChange } from '@angular/material/select';
 import { Subscription, Observable, of } from 'rxjs';
 import { take, withLatestFrom, map, takeWhile, skipWhile, debounceTime, tap } from 'rxjs/operators';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';

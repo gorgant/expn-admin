@@ -13,7 +13,8 @@ import {
   ProductStoreActions
 } from 'src/app/root-store';
 import { Router } from '@angular/router';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSlideToggleChange } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
 import { take, withLatestFrom, map } from 'rxjs/operators';
 import * as moment from 'moment';

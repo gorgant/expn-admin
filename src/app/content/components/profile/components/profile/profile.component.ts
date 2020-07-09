@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { MatDialogConfig, MatDialog } from '@angular/material';
+import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { RootStoreState, UserStoreSelectors } from 'src/app/root-store';
 import { EditEmailDialogueComponent } from '../edit-email-dialogue/edit-email-dialogue.component';

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { EditEmailDialogueComponent } from '../../../profile/components/edit-email-dialogue/edit-email-dialogue.component';
 import { Post, PostKeys } from 'shared-models/posts/post.model';
 import { Store } from '@ngrx/store';

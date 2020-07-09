@@ -1,5 +1,5 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { MatSidenav } from '@angular/material';
+import { MatSidenav } from '@angular/material/sidenav';
 import { UiService } from './core/services/ui.service';
 import { AuthService } from './core/services/auth.service';
 import { Store } from '@ngrx/store';

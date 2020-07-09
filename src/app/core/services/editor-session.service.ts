@@ -7,7 +7,7 @@ import { UserStoreActions, UserStoreSelectors, RootStoreState } from 'src/app/ro
 import { withLatestFrom, takeUntil, take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { Subject, interval } from 'rxjs';
-import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material';
+import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 // tslint:disable-next-line:max-line-length
 import { ActiveEditorSessionsDialogueComponent } from 'src/app/shared/components/active-editor-sessions-dialogue/active-editor-sessions-dialogue.component';

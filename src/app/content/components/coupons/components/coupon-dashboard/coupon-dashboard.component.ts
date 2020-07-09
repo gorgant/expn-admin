@@ -1,7 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { DiscountCouponParent, DiscountCouponKeys } from 'shared-models/billing/discount-coupon.model';
-import { MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog } from '@angular/material';
+import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Store } from '@ngrx/store';
 import { RootStoreState, CouponStoreSelectors, CouponStoreActions } from 'src/app/root-store';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject, Observable, throwError } from 'rxjs';
-import { MatSnackBarConfig, MatSnackBar } from '@angular/material';
+import { MatSnackBarConfig, MatSnackBar } from '@angular/material/snack-bar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { GeographicData } from 'shared-models/forms-and-components/geography/geographic-data.model';

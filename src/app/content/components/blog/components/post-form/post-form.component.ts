@@ -8,7 +8,7 @@ import { InlineImageUploadAdapter } from 'src/app/core/utils/inline-image-upload
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreActions, PostStoreSelectors, UserStoreSelectors } from 'src/app/root-store';
-import { MatDialogConfig, MatDialog } from '@angular/material';
+import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { now } from 'moment';
 import { ImageService } from 'src/app/core/services/image.service';
