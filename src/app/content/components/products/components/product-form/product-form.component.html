@@ -66,6 +66,15 @@
           <mat-option *ngFor="let category of productCategories" [value]="category.id" (selectionChange)="updateProductCategory($event)">{{ category.name }} </mat-option>
         </mat-select>
       </mat-form-field>
+      <mat-form-field [fxHide]="productCategory.value !== productCategoryValues.WEBCOURSE" class="skillshareUrl">
+        <input matInput formControlName="skillshareUrl" type="text" placeholder="Skillshare Url (optional)">
+        <mat-error *ngFor="let validation of productValidationMessages.skillshareUrl">
+          <mat-error *ngIf="skillshareUrl.hasError(validation.type) && skillshareUrl.invalid && (skillshareUrl.dirty || skillshareUrl.touched)">{{ validation.message }}</mat-error>
+        </mat-error>
+      </mat-form-field>
+      <mat-checkbox [fxHide]="productCategory.value !== productCategoryValues.WEBCOURSE" formControlName="skillshareActive" matInput [checked]="skillshareActive.value">
+        Use Skillshare Link
+      </mat-checkbox>
       <div class="highlights-array-container" fxLayout="column" fxLayoutAlign="center center">
         <button class="add-highlight-button" mat-raised-button color="primary" type="button" (click)="onAddHighlight()">
           <mat-icon>add</mat-icon> Add Highlight
@@ -106,6 +115,9 @@
           <mat-error *ngIf="checkoutDescription.hasError(validation.type) && checkoutDescription.invalid && (checkoutDescription.dirty || checkoutDescription.touched)">{{ validation.message }}</mat-error>
         </mat-error>
       </mat-form-field>
+      <mat-checkbox formControlName="waitlistActive" matInput [checked]="waitlistActive.value">
+        Wait List Active
+      </mat-checkbox>
       <div class="form-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
         <mat-progress-spinner *ngIf="(isSavingProduct$ | async) || (isDeletingProduct$ | async)" diameter=40 color="accent" mode="indeterminate"></mat-progress-spinner>
         <button *ngIf="!(isSavingProduct$ | async)" class="submit-button" [disabled]="!productInitialized || productForm.untouched" mat-raised-button color="accent" type="button" (click)="onSave()">Save Product</button>

@@ -65,6 +65,9 @@ export const PRODUCT_FORM_VALIDATION_MESSAGES = {
   [ProductKeys.PRODUCT_CATEGORY]: [
     { type: 'required', message: 'Tagline is required.'},
   ],
+  [ProductKeys.SKILLSHARE_URL]: [
+    { type: 'pattern', message: 'Invalid url.' }
+  ],
   [ProductCardKeys.HIGHLIGHTS]: [
     { type: 'required', message: 'Highlight cannot be blank.'},
   ],

@@ -9,7 +9,10 @@ export enum ProductKeys {
   PRICE = 'price',
   LIST_ORDER = 'listOrder',
   TAGLINE = 'tagline',
-  PRODUCT_CATEGORY = 'productCategory'
+  PRODUCT_CATEGORY = 'productCategory',
+  SKILLSHARE_URL = 'skillshareUrl',
+  SKILLSHARE_ACTIVE = 'skillshareActive',
+  WAITLIST_ACTIVE = 'waitlistActive'
 }
 
 export interface Product {
@@ -23,6 +26,9 @@ export interface Product {
   buyNowData: BuyNowBoxData;
   checkoutData: CheckoutData;
   [ProductKeys.PRODUCT_CATEGORY]: ProductCategories;
+  [ProductKeys.SKILLSHARE_URL]: string;
+  [ProductKeys.SKILLSHARE_ACTIVE]: string;
+  [ProductKeys.WAITLIST_ACTIVE]: boolean;
   cardImageProps?: ImageProps;
   heroImageProps?: ImageProps;
   active?: boolean;

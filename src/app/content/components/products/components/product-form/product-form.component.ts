@@ -10,7 +10,7 @@ import { ImageService } from 'src/app/core/services/image.service';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ProductStoreActions, ProductStoreSelectors } from 'src/app/root-store';
 import { UtilsService } from 'src/app/core/services/utils.service';
-import { Product, ProductKeys, ProductCategory, ProductCategoryList } from 'shared-models/products/product.model';
+import { Product, ProductKeys, ProductCategory, ProductCategoryList, ProductCategories } from 'shared-models/products/product.model';
 import { ImageProps } from 'shared-models/images/image-props.model';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
 import { AdminAppRoutes, PublicAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
@@ -41,6 +41,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   minHighlightsLength = 3;
   productValidationMessages = PRODUCT_FORM_VALIDATION_MESSAGES;
   isNewProduct: boolean;
+  productCategoryValues = ProductCategories;
   productCategories: ProductCategory[] = ProductCategoryList;
   loadingExistingProduct: boolean;
 
@@ -51,7 +52,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private productDiscarded: boolean;
   private cardImageAdded: boolean;
   private heroImageAdded: boolean;
-  private imagesModifiedSinceLastSave: boolean;
   private manualSave: boolean;
 
   private saveProductSubscription: Subscription;
@@ -246,6 +246,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
               [ProductKeys.LIST_ORDER]: product[ProductKeys.LIST_ORDER],
               [ProductKeys.TAGLINE]: product[ProductKeys.TAGLINE],
               [ProductKeys.PRODUCT_CATEGORY]: product[ProductKeys.PRODUCT_CATEGORY],
+              [ProductKeys.SKILLSHARE_URL]: product[ProductKeys.SKILLSHARE_URL] || '',
+              [ProductKeys.SKILLSHARE_ACTIVE]: product[ProductKeys.SKILLSHARE_ACTIVE] || false,
+              [ProductKeys.WAITLIST_ACTIVE]: product[ProductKeys.WAITLIST_ACTIVE] || false,
               [ProductCardKeys.HIGHLIGHTS]: product.productCardData[ProductCardKeys.HIGHLIGHTS],
               [PageHeroKeys.PAGE_HERO_SUBTITLE]: product.heroData[PageHeroKeys.PAGE_HERO_SUBTITLE],
               [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: product.buyNowData[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE],
@@ -317,6 +320,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       [ProductKeys.LIST_ORDER]: ['', [Validators.required]],
       [ProductKeys.TAGLINE]: ['', [Validators.required]],
       [ProductKeys.PRODUCT_CATEGORY]: ['', [Validators.required]],
+      [ProductKeys.SKILLSHARE_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/skl\.sh\/)\S*$/)]],
+      [ProductKeys.SKILLSHARE_ACTIVE]: [false],
+      [ProductKeys.WAITLIST_ACTIVE]: [true],
       [ProductCardKeys.HIGHLIGHTS]: this.fb.array([
         this.createHighlight(),
         this.createHighlight(),
@@ -360,6 +366,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       [ProductKeys.LIST_ORDER]: this[ProductKeys.LIST_ORDER].value,
       [ProductKeys.TAGLINE]: this[ProductKeys.TAGLINE].value,
       [ProductKeys.PRODUCT_CATEGORY]: this[ProductKeys.PRODUCT_CATEGORY].value,
+      [ProductKeys.SKILLSHARE_URL]: this[ProductKeys.SKILLSHARE_URL].value,
+      [ProductKeys.SKILLSHARE_ACTIVE]: this[ProductKeys.SKILLSHARE_ACTIVE].value,
+      [ProductKeys.WAITLIST_ACTIVE]: this[ProductKeys.WAITLIST_ACTIVE].value,
       productCardData,
       heroData,
       buyNowData,
@@ -385,10 +394,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   private saveProduct() {
-
-    // if (this.saveProductSubscription) {
-    //   this.saveProductSubscription.unsubscribe();
-    // }
+    this.updateEditorSession();
 
     const productName = (this[ProductKeys.NAME].value as string).trim();
 
@@ -401,9 +407,11 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       [PageHeroKeys.PAGE_HERO_SUBTITLE]: this[PageHeroKeys.PAGE_HERO_SUBTITLE].value,
     };
 
+    // Set button text based on product link
     const buyNowData: BuyNowBoxData = {
       title: productName,
       [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: this[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE].value,
+      buttonText: this[ProductKeys.SKILLSHARE_ACTIVE].value ? `Get Started (2-Month Free Trial)` : `Get Started - $${this[ProductKeys.PRICE].value}`
     };
 
     const checkoutData: CheckoutData = {
@@ -418,6 +426,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       [ProductKeys.LIST_ORDER]: this[ProductKeys.LIST_ORDER].value,
       [ProductKeys.TAGLINE]: this[ProductKeys.TAGLINE].value,
       [ProductKeys.PRODUCT_CATEGORY]: this[ProductKeys.PRODUCT_CATEGORY].value,
+      [ProductKeys.SKILLSHARE_URL]: this[ProductKeys.SKILLSHARE_URL].value,
+      [ProductKeys.SKILLSHARE_ACTIVE]: this[ProductKeys.SKILLSHARE_ACTIVE].value,
+      [ProductKeys.WAITLIST_ACTIVE]: this[ProductKeys.WAITLIST_ACTIVE].value,
       productCardData,
       heroData,
       buyNowData,
@@ -494,6 +505,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   get [ProductKeys.LIST_ORDER]() { return this.productForm.get(ProductKeys.LIST_ORDER); }
   get [ProductKeys.TAGLINE]() { return this.productForm.get(ProductKeys.TAGLINE); }
   get [ProductKeys.PRODUCT_CATEGORY]() { return this.productForm.get(ProductKeys.PRODUCT_CATEGORY); }
+  get [ProductKeys.SKILLSHARE_URL]() { return this.productForm.get(ProductKeys.SKILLSHARE_URL); }
+  get [ProductKeys.SKILLSHARE_ACTIVE]() { return this.productForm.get(ProductKeys.SKILLSHARE_ACTIVE); }
+  get [ProductKeys.WAITLIST_ACTIVE]() { return this.productForm.get(ProductKeys.WAITLIST_ACTIVE); }
   get [ProductCardKeys.HIGHLIGHTS]() { return this.productForm.get(ProductCardKeys.HIGHLIGHTS) as FormArray; }
   get highlightsArray(): string[] {
     return this[ProductCardKeys.HIGHLIGHTS].controls.map(control => {
