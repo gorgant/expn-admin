@@ -20,10 +20,12 @@ export interface State extends EntityState<Product> {
   isSaving: boolean;
   isDeleting: boolean;
   isTogglingActive: boolean;
+  isCloningProduct: boolean;
   loadError: any;
   saveError: any;
   deleteError: any;
   publicUpdateError: any;
+  altEnvOpError: any;
   productsLoaded: boolean;
 }
 
@@ -33,10 +35,12 @@ export const initialState: State = featureAdapter.getInitialState(
     isSaving: false,
     isDeleting: false,
     isTogglingActive: false,
+    isCloningProduct: false,
     loadError: null,
     saveError: null,
     deleteError: null,
     publicUpdateError: null,
+    altEnvOpError: null,
     productsLoaded: null
   }
 );

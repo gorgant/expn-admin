@@ -104,6 +104,18 @@ export function featureReducer(state = initialState, action: Actions): State {
         isTogglingActive: false
       };
 
+    case ActionTypes.CLONE_PRODUCT_REQUESTED:
+      return {
+        ...state,
+        isCloningProduct: true,
+      };
+
+    case ActionTypes.CLONE_PRODUCT_COMPLETE:
+      return {
+        ...state,
+        isCloningProduct: false,
+      };
+
     case ActionTypes.LOAD_FAILED: {
       return {
         ...state,
@@ -133,6 +145,14 @@ export function featureReducer(state = initialState, action: Actions): State {
         ...state,
         isTogglingActive: false,
         publicUpdateError: action.payload.error
+      };
+    }
+
+    case ActionTypes.ALT_ENV_OP_FAILED: {
+      return {
+        ...state,
+        isCloningProduct: false,
+        altEnvOpError: action.payload.error
       };
     }
 

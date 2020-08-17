@@ -8,9 +8,11 @@ const getIsLoading = (state: State): boolean => state.isLoading;
 const getIsSaving = (state: State): boolean => state.isSaving;
 const getIsDeleting = (state: State): boolean => state.isDeleting;
 const getIsTogglingActive = (state: State): boolean => state.isTogglingActive;
+const getIsCloningProduct = (state: State): boolean => state.isCloningProduct;
 const getLoadError = (state: State): any => state.loadError;
 const getSaveError = (state: State): boolean => state.saveError;
 const getDeleteError = (state: State): boolean => state.deleteError;
+const getAltEnvOpError = (state: State): boolean => state.altEnvOpError;
 const getProductsLoaded = (state: State): boolean => state.productsLoaded;
 
 export const selectProductState: MemoizedSelector<object, State>
@@ -42,6 +44,11 @@ export const selectDeleteError: MemoizedSelector<object, any> = createSelector(
   getDeleteError
 );
 
+export const selectAltEnvOpError: MemoizedSelector<object, any> = createSelector(
+  selectProductState,
+  getAltEnvOpError
+);
+
 export const selectIsLoading: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getIsLoading);
 
@@ -53,6 +60,9 @@ export const selectIsDeleting: MemoizedSelector<object, boolean>
 
 export const selectIsTogglingActive: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getIsTogglingActive);
+
+export const selectIsCloningProduct: MemoizedSelector<object, boolean>
+= createSelector(selectProductState, getIsCloningProduct);
 
 export const selectProductsLoaded: MemoizedSelector<object, boolean>
 = createSelector(selectProductState, getProductsLoaded);

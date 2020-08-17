@@ -47,26 +47,26 @@ export const ProductEmailTemplates: ProductEmailTemplateList = {
     templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
     productId: ProductIdList.EXPLEARNING_REMOTE_COACH
   },
-  [ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH]: {
-    templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
-    productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH
-  },
-  [ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT]: {
-    templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
-    productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH
-  },
+  // [ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH]: {
+  //   templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
+  //   productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH
+  // },
+  // [ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT]: {
+  //   templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
+  //   productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH
+  // },
   [ProductIdList.MARY_DAPHNE_REMOTE_COACH]: {
     templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
     productId: ProductIdList.MARY_DAPHNE_REMOTE_COACH
   },
-  [ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH]: {
-    templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
-    productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH
-  },
-  [ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT]: {
-    templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
-    productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH
-  }
+  // [ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH]: {
+  //   templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
+  //   productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH
+  // },
+  // [ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT]: {
+  //   templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
+  //   productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH
+  // }
 };
 
 export enum EmailSenderAddresses {

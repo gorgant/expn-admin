@@ -9,7 +9,6 @@ import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreActions, PostStoreSelectors, UserStoreSelectors } from 'src/app/root-store';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
-import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { now } from 'moment';
 import { ImageService } from 'src/app/core/services/image.service';
 import { UtilsService } from 'src/app/core/services/utils.service';
@@ -19,9 +18,11 @@ import { ImageProps } from 'shared-models/images/image-props.model';
 import { POST_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
 import { BlogDomains } from 'shared-models/posts/blog-domains.model';
 import { AdminAppRoutes, PublicAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
-import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 import { ImageType } from 'shared-models/images/image-type.model';
 import { EditorSessionService } from 'src/app/core/services/editor-session.service';
+import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { ActionConfData } from 'shared-models/forms-and-components/action-conf-data.model';
+import { ActionConfirmDialogueComponent } from 'src/app/shared/components/action-confirm-dialogue/action-confirm-dialogue.component';
 
 @Component({
   selector: 'app-post-form',
@@ -86,7 +87,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private createEditorSession(docId: string) {
-    this.editorSessionService.createEditorSession(docId);
+    this.editorSessionService.createEditorSession(docId, SharedCollectionPaths.POSTS);
   }
 
   private updateEditorSession() {
@@ -118,14 +119,14 @@ export class PostFormComponent implements OnInit, OnDestroy {
   onDiscardEdits() {
     const dialogConfig = new MatDialogConfig();
 
-    const deleteConfData: DeleteConfData = {
+    const deleteConfData: ActionConfData = {
       title: 'Discard Edits',
       body: 'Are you sure you want to discard your edits?'
     };
 
     dialogConfig.data = deleteConfData;
 
-    const dialogRef = this.dialog.open(DeleteConfirmDialogueComponent, dialogConfig);
+    const dialogRef = this.dialog.open(ActionConfirmDialogueComponent, dialogConfig);
 
     dialogRef.afterClosed()
       .pipe(take(1))

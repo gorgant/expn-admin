@@ -4,7 +4,6 @@ import { MaterialModule } from '../material.module';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { DeleteConfirmDialogueComponent } from './components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { PublishedPostPipe } from './pipes/published-post.pipe';
 import { UnpublishedPostPipe } from './pipes/unpublished-post.pipe';
 import { HttpClientModule } from '@angular/common/http';
@@ -15,10 +14,10 @@ import { ServiceProductPipe } from './pipes/service-product.pipe';
 import { WebcourseProductPipe } from './pipes/webcourse-product.pipe';
 // tslint:disable-next-line:max-line-length
 import { ActiveEditorSessionsDialogueComponent } from './components/active-editor-sessions-dialogue/active-editor-sessions-dialogue.component';
+import { ActionConfirmDialogueComponent } from './components/action-confirm-dialogue/action-confirm-dialogue.component';
 
 @NgModule({
   declarations: [
-    DeleteConfirmDialogueComponent,
     PublishedPostPipe,
     UnpublishedPostPipe,
     MatElevationDirective,
@@ -26,7 +25,8 @@ import { ActiveEditorSessionsDialogueComponent } from './components/active-edito
     ServiceProductPipe,
     WebcourseProductPipe,
     PageHeroComponent,
-    ActiveEditorSessionsDialogueComponent
+    ActiveEditorSessionsDialogueComponent,
+    ActionConfirmDialogueComponent
   ],
   imports: [
     CommonModule,
@@ -52,7 +52,6 @@ import { ActiveEditorSessionsDialogueComponent } from './components/active-edito
     WebcourseProductPipe,
   ],
   entryComponents: [
-    DeleteConfirmDialogueComponent,
     ActiveEditorSessionsDialogueComponent
   ]
 })

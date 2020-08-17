@@ -4,27 +4,21 @@ export enum ProductIdList {
   EXPLEARNING_REMOTE_COACH = '907jvhn4',
   EXPLEARNING_EXECUTIVE_PRESENCE = 'ko8wpx0c',
   EXPLEARNING_REMOTE_WORK = 'v7h7td9h',
-  EXPLEARNING_SANDBOX_REMOTE_COACH = 'oq0moyim',
-  EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT = 'fpfh8wi9',
-  EXPLEARNING_SANDBOX_WEB_COURSE = 'wq7jg75d',
-  EXPLEARNING_SANDBOX_REMOTE_WORK = 'oekbxuwf',
+  EXPLEARNING_ONLINE_INTERVIEWS = 'oemqpck1',
+  EXPLEARNING_GROUP_INTERVIEWS = 'bug3hcqp',
   MARY_DAPHNE_REMOTE_COACH = '5fff82ic',
   MARY_DAPHNE_EXECUTIVE_PRESENCE = 'oos6fw69',
   MARY_DAPHNE_REMOTE_WORK = 'qo17xor5',
-  MARY_DAPHNE_SANDBOX_REMOTE_COACH = 'z37kqtvl',
-  MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT = 'ml2ke0ak',
-  MARY_DAPHNE_SANDBOX_WEB_COURSE = 'z3iiar4t',
-  MARY_DAPHNE_SANDBOX_REMOTE_WORK = 'g1rjuj81'
+  MARY_DAPHNE_ONLINE_INTERVIEWS = 'fapjp8i0',
+  MARY_DAPHNE_GROUP_INTERVIEWS = 'gfjrmdhq'
 }
 
 export enum ProductUrlSlugList {
   REMOTE_COACH = 'remote-coach',
   EXECUTIVE_PRESENCE = 'executive-presence:-unlock-the-leader-within',
-  REMOTE_WORK = 'remote-work-mastery:-work-from-home-or-anywhere',
-  SANDBOX_REMOTE_COACH = 'sandbox-remote-coach',
-  SANDBOX_ANOTHER_COOL_PRODUCT = 'sandbox-another-cool-product',
-  SANDBOX_WEB_COURSE = 'sandbox-executive-presence:-unlock-the-leader-within',
-  SANDBOX_REMOTE_WORK = 'sandbox-remote-work-mastery:-work-from-home-or-anywhere'
+  REMOTE_WORK = 'remote-work-for-professionals-and-managers:-work-from-home-or-anywhere',
+  ONLINE_INTERVIEWS = 'acing-online-interviews-on-zoom,-skype,-and-video-calls',
+  GROUP_INTERVIEWS = 'group-interviews:-how-to-stand-out-in-a-crowd-and-influence-people'
 }
 
 // The Product/Template pair
@@ -56,25 +50,15 @@ export const ProductReferenceList: ProductReferenceList = {
     productUrlSlug: ProductUrlSlugList.REMOTE_WORK,
     mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_REMOTE_WORK
   },
-  [ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH]: {
-    productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_REMOTE_COACH,
-    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH
+  [ProductIdList.EXPLEARNING_ONLINE_INTERVIEWS]: {
+    productId: ProductIdList.EXPLEARNING_ONLINE_INTERVIEWS,
+    productUrlSlug: ProductUrlSlugList.ONLINE_INTERVIEWS,
+    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_ONLINE_INTERVIEWS
   },
-  [ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT]: {
-    productId: ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_ANOTHER_COOL_PRODUCT,
-    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT
-  },
-  [ProductIdList.EXPLEARNING_SANDBOX_WEB_COURSE]: {
-    productId: ProductIdList.EXPLEARNING_SANDBOX_WEB_COURSE,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_WEB_COURSE,
-    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_SANDBOX_WEB_COURSE
-  },
-  [ProductIdList.EXPLEARNING_SANDBOX_REMOTE_WORK]: {
-    productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_WORK,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_REMOTE_WORK,
-    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_WORK
+  [ProductIdList.EXPLEARNING_GROUP_INTERVIEWS]: {
+    productId: ProductIdList.EXPLEARNING_GROUP_INTERVIEWS,
+    productUrlSlug: ProductUrlSlugList.GROUP_INTERVIEWS,
+    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_GROUP_INTERVIEWS
   },
   [ProductIdList.MARY_DAPHNE_REMOTE_COACH]: {
     productId: ProductIdList.MARY_DAPHNE_REMOTE_COACH,
@@ -91,25 +75,15 @@ export const ProductReferenceList: ProductReferenceList = {
     productUrlSlug: ProductUrlSlugList.REMOTE_WORK,
     mdOrExpSisterProduct: ProductIdList.EXPLEARNING_REMOTE_WORK
   },
-  [ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH]: {
-    productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_COACH,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_REMOTE_COACH,
-    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_COACH,
+  [ProductIdList.MARY_DAPHNE_ONLINE_INTERVIEWS]: {
+    productId: ProductIdList.MARY_DAPHNE_ONLINE_INTERVIEWS,
+    productUrlSlug: ProductUrlSlugList.ONLINE_INTERVIEWS,
+    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_ONLINE_INTERVIEWS
   },
-  [ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT]: {
-    productId: ProductIdList.MARY_DAPHNE_SANDBOX_ANOTHER_COOL_PRODUCT,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_ANOTHER_COOL_PRODUCT,
-    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_SANDBOX_ANOTHER_COOL_PRODUCT
-  },
-  [ProductIdList.MARY_DAPHNE_SANDBOX_WEB_COURSE]: {
-    productId: ProductIdList.MARY_DAPHNE_SANDBOX_WEB_COURSE,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_WEB_COURSE,
-    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_SANDBOX_WEB_COURSE
-  },
-  [ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_WORK]: {
-    productId: ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_WORK,
-    productUrlSlug: ProductUrlSlugList.SANDBOX_REMOTE_WORK,
-    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_WORK
+  [ProductIdList.MARY_DAPHNE_GROUP_INTERVIEWS]: {
+    productId: ProductIdList.MARY_DAPHNE_GROUP_INTERVIEWS,
+    productUrlSlug: ProductUrlSlugList.GROUP_INTERVIEWS,
+    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_GROUP_INTERVIEWS
   },
 };
 
@@ -123,14 +97,6 @@ export const SubSourceProductIdReferences: SubSourceProductIdReferenceList = {
     subSource: SubscriptionSource.WAIT_LIST_REMOTE_WORK,
     productId: ProductIdList.EXPLEARNING_REMOTE_WORK
   },
-  [ProductIdList.EXPLEARNING_SANDBOX_WEB_COURSE]: {
-    subSource: SubscriptionSource.WAIT_LIST_EXECUTIVE_PRESENCE,
-    productId: ProductIdList.EXPLEARNING_SANDBOX_WEB_COURSE
-  },
-  [ProductIdList.EXPLEARNING_SANDBOX_REMOTE_WORK]: {
-    subSource: SubscriptionSource.WAIT_LIST_REMOTE_WORK,
-    productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_WORK
-  },
   [ProductIdList.MARY_DAPHNE_EXECUTIVE_PRESENCE]: {
     subSource: SubscriptionSource.WAIT_LIST_EXECUTIVE_PRESENCE,
     productId: ProductIdList.MARY_DAPHNE_EXECUTIVE_PRESENCE
@@ -139,12 +105,4 @@ export const SubSourceProductIdReferences: SubSourceProductIdReferenceList = {
     subSource: SubscriptionSource.WAIT_LIST_REMOTE_WORK,
     productId: ProductIdList.MARY_DAPHNE_REMOTE_WORK
   },
-  [ProductIdList.MARY_DAPHNE_SANDBOX_WEB_COURSE]: {
-    subSource: SubscriptionSource.WAIT_LIST_EXECUTIVE_PRESENCE,
-    productId: ProductIdList.EXPLEARNING_SANDBOX_WEB_COURSE
-  },
-  [ProductIdList.MARY_DAPHNE_SANDBOX_REMOTE_WORK]: {
-    subSource: SubscriptionSource.WAIT_LIST_REMOTE_WORK,
-    productId: ProductIdList.EXPLEARNING_SANDBOX_REMOTE_WORK
-  }
 };

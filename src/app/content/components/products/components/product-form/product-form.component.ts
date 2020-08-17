@@ -5,7 +5,6 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { Subscription, Observable, of } from 'rxjs';
 import { take, withLatestFrom, map, takeWhile, skipWhile, debounceTime, tap } from 'rxjs/operators';
-import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { ImageService } from 'src/app/core/services/image.service';
 import { Store } from '@ngrx/store';
 import { RootStoreState, ProductStoreActions, ProductStoreSelectors } from 'src/app/root-store';
@@ -14,13 +13,15 @@ import { Product, ProductKeys, ProductCategory, ProductCategoryList, ProductCate
 import { ImageProps } from 'shared-models/images/image-props.model';
 import { PRODUCT_FORM_VALIDATION_MESSAGES } from 'shared-models/forms-and-components/admin-validation-messages.model';
 import { AdminAppRoutes, PublicAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
-import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 import { ImageType } from 'shared-models/images/image-type.model';
 import { ProductCardData, ProductCardKeys } from 'shared-models/products/product-card-data.model';
 import { PageHeroData, PageHeroKeys } from 'shared-models/forms-and-components/page-hero-data.model';
 import { BuyNowBoxData, BuyNowBoxKeys } from 'shared-models/products/buy-now-box-data.model';
 import { CheckoutData, CheckoutKeys } from 'shared-models/products/checkout-data.model';
 import { EditorSessionService } from 'src/app/core/services/editor-session.service';
+import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { ActionConfData } from 'shared-models/forms-and-components/action-conf-data.model';
+import { ActionConfirmDialogueComponent } from 'src/app/shared/components/action-confirm-dialogue/action-confirm-dialogue.component';
 
 @Component({
   selector: 'app-product-form',
@@ -77,7 +78,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   private createEditorSession(docId: string) {
-    this.editorSessionService.createEditorSession(docId);
+    this.editorSessionService.createEditorSession(docId, SharedCollectionPaths.PRODUCTS);
   }
 
   private updateEditorSession() {
@@ -109,14 +110,14 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   onDiscardEdits() {
     const dialogConfig = new MatDialogConfig();
 
-    const deleteConfData: DeleteConfData = {
+    const deleteConfData: ActionConfData = {
       title: 'Discard Edits',
       body: 'Are you sure you want to discard your edits?'
     };
 
     dialogConfig.data = deleteConfData;
 
-    const dialogRef = this.dialog.open(DeleteConfirmDialogueComponent, dialogConfig);
+    const dialogRef = this.dialog.open(ActionConfirmDialogueComponent, dialogConfig);
 
     dialogRef.afterClosed()
     .pipe(take(1))

@@ -51,3 +51,53 @@ const getExplearningPublicApp = () => {
   return app;
 };
 export const explearningPublicApp = getExplearningPublicApp();
+
+const getAltEnvironmentExplearningAdminApp = () => {
+
+  let app: admin.app.App;
+
+  switch (currentEnvironmentType) {
+    case EnvironmentTypes.PRODUCTION:
+      app = admin.initializeApp(
+        SANDBOX_APPS.explearningAdminApp,
+        'altExplearningAdminApp'
+      );
+      break;
+    case EnvironmentTypes.SANDBOX:
+      app = admin.initializeApp(
+        PRODUCTION_APPS.explearningAdminApp,
+        'altExplearningAdminApp'
+      );
+      break;
+    default:
+      throw new functions.https.HttpsError('failed-precondition', `No environment type detected when creating alt admin app`);
+  }
+  return app;
+}
+
+export const altEnvironmentExplearningAdminApp = getAltEnvironmentExplearningAdminApp();
+
+const getAltEnvironmentExplearningPublicApp = () => {
+
+  let app: admin.app.App;
+
+  switch (currentEnvironmentType) {
+    case EnvironmentTypes.PRODUCTION:
+      app = admin.initializeApp(
+        SANDBOX_APPS.explearningPublicApp,
+        'altExplearningPublicApp'
+      );
+      break;
+    case EnvironmentTypes.SANDBOX:
+      app = admin.initializeApp(
+        PRODUCTION_APPS.explearningPublicApp,
+        'altExplearningPublicApp'
+      );
+      break;
+    default:
+      throw new functions.https.HttpsError('failed-precondition', `No environment type detected when creating alt public app`);
+  }
+  return app;
+}
+
+export const altEnvironmentExplearningPublicApp = getAltEnvironmentExplearningPublicApp();

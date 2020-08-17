@@ -36,3 +36,5 @@ export { refreshPublicBlogCache } from './public/refresh-public-blog-cache';
 export { refreshPublicFeaturedPostsCache } from './public/refresh-public-featured-posts-cache';
 
 export { purgeInactiveEditorSessions } from './cron-jobs/purge-inactive-editor-sessions';
+
+export { cloneProductOnAltAdmin } from './alt-environment/clone-product-on-alt-admin';

@@ -1,4 +1,4 @@
-export interface DeleteConfData {
+export interface ActionConfData {
   title: string;
   body: string;
 }

@@ -1,17 +1,17 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { DeleteConfirmDialogueComponent } from 'src/app/shared/components/delete-confirm-dialogue/delete-confirm-dialogue.component';
 import { take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { RootStoreState, PostStoreActions, PostStoreSelectors } from 'src/app/root-store';
 import { Post } from 'shared-models/posts/post.model';
 import { AdminImagePaths } from 'shared-models/routes-and-paths/image-paths.model';
 import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
-import { DeleteConfData } from 'shared-models/forms-and-components/delete-conf-data.model';
 import { SchedulePostDialogueComponent } from '../schedule-post-dialogue/schedule-post-dialogue.component';
 import { UiService } from 'src/app/core/services/ui.service';
 import { Observable } from 'rxjs';
+import { ActionConfirmDialogueComponent } from 'src/app/shared/components/action-confirm-dialogue/action-confirm-dialogue.component';
+import { ActionConfData } from 'shared-models/forms-and-components/action-conf-data.model';
 
 @Component({
   selector: 'app-post-card',
@@ -80,14 +80,14 @@ export class PostCardComponent implements OnInit {
   onDelete() {
     const dialogConfig = new MatDialogConfig();
 
-    const deleteConfData: DeleteConfData = {
+    const deleteConfData: ActionConfData = {
       title: 'Delete Post',
       body: 'Are you sure you want to permanently delete this post?'
     };
 
     dialogConfig.data = deleteConfData;
 
-    const dialogRef = this.dialog.open(DeleteConfirmDialogueComponent, dialogConfig);
+    const dialogRef = this.dialog.open(ActionConfirmDialogueComponent, dialogConfig);
 
     dialogRef.afterClosed()
     .pipe(take(1))

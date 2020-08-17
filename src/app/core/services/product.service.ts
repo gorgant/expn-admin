@@ -10,6 +10,7 @@ import { PublicService } from './public.service';
 import { Product } from 'shared-models/products/product.model';
 import { ImageType } from 'shared-models/images/image-type.model';
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { AltEnvService } from './alt-env.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,7 @@ export class ProductService {
     private uiService: UiService,
     private imageService: ImageService,
     private publicService: PublicService,
+    private altEnvService: AltEnvService,
   ) { }
 
   fetchAllProducts(): Observable<Product[]> {
@@ -147,6 +149,22 @@ export class ProductService {
       catchError(error => {
         this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
         console.log('Error updating product on public server', error);
+        return throwError(error.message ? error.message : error);
+      })
+    );
+  }
+
+  cloneProductonAltAdmin(product: Product): Observable<Product> {
+    const serverRes = this.altEnvService.cloneProductOnAltAdmin(product);
+
+    return serverRes.pipe(
+      map(res => {
+        console.log('Server call succeded', res);
+        return product;
+      }),
+      catchError(error => {
+        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        console.log('Error cloning product on alt admin', error);
         return throwError(error.message ? error.message : error);
       })
     );

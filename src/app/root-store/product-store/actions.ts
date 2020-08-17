@@ -15,10 +15,13 @@ export enum ActionTypes {
   DELETE_PRODUCT_COMPLETE = '[Products] Delete Product Complete',
   TOGGLE_ACTIVE_REQUESTED = '[Products] Toggle Product Active Requested',
   TOGGLE_ACTIVE_COMPLETE = '[Products] Toggle Product Active Complete',
+  CLONE_PRODUCT_REQUESTED = '[Products] Clone Product Requested',
+  CLONE_PRODUCT_COMPLETE = '[Products] Clone Product Complete',
   LOAD_FAILED = '[Products] Load Failed',
   SAVE_FAILED = '[Products] Save Failed',
   DELETE_FAILED = '[Products] Delete Failed',
-  PUBLIC_UPDATE_FAILED = '[Products] Public Update Failed'
+  PUBLIC_UPDATE_FAILED = '[Products] Public Update Failed',
+  ALT_ENV_OP_FAILED = '[Products] Alt Env Op Failed'
 }
 
 export class SingleProductRequested implements Action {
@@ -86,6 +89,16 @@ export class ToggleActiveComplete implements Action {
   readonly type = ActionTypes.TOGGLE_ACTIVE_COMPLETE;
 }
 
+export class CloneProductRequested implements Action {
+  readonly type = ActionTypes.CLONE_PRODUCT_REQUESTED;
+
+  constructor(public payload: { product: Product }) {}
+}
+
+export class CloneProductComplete implements Action {
+  readonly type = ActionTypes.CLONE_PRODUCT_COMPLETE;
+}
+
 export class LoadFailed implements Action {
   readonly type = ActionTypes.LOAD_FAILED;
   constructor(public payload: { error: string }) {}
@@ -106,6 +119,11 @@ export class PublicUpdateFailed implements Action {
   constructor(public payload: { error: string }) {}
 }
 
+export class AltEnvOpFailed implements Action {
+  readonly type = ActionTypes.ALT_ENV_OP_FAILED;
+  constructor(public payload: { error: string }) {}
+}
+
 export type Actions =
   SingleProductRequested |
   SingleProductLoaded |
@@ -119,8 +137,11 @@ export type Actions =
   DeleteProductComplete |
   ToggleActiveRequested |
   ToggleActiveComplete |
+  CloneProductRequested |
+  CloneProductComplete |
   LoadFailed |
   SaveFailed |
   DeleteFailed |
-  PublicUpdateFailed
+  PublicUpdateFailed |
+  AltEnvOpFailed
   ;

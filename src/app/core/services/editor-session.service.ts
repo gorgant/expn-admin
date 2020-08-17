@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UtilsService } from './utils.service';
 import { EditorSession, EditorSessionVars } from 'shared-models/editor-sessions/editor-session.model';
-import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { SharedCollectionPaths, AdminCollectionPaths, PublicCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 import { now } from 'moment';
 import { UserStoreActions, UserStoreSelectors, RootStoreState } from 'src/app/root-store';
 import { withLatestFrom, takeUntil, take } from 'rxjs/operators';
@@ -34,11 +34,11 @@ export class EditorSessionService {
     private userService: UserService
   ) { }
 
-  createEditorSession(docId: string) {
+  createEditorSession(docId: string, docCollectionPath: SharedCollectionPaths | AdminCollectionPaths | PublicCollectionPaths) {
     const newEditorSession: EditorSession = {
       id: this.utilsService.generateRandomCharacterNoCaps(10),
       docId,
-      docCollectionPath: SharedCollectionPaths.POSTS,
+      docCollectionPath,
       active: true,
       activatedTimestamp: now(),
       lastModifiedTimestamp: now()
@@ -91,9 +91,21 @@ export class EditorSessionService {
           if (this.activeSessionDialogueRef) {
             this.activeSessionDialogueRef.close();
           }
-          this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
+          const redirectRoute = this.getRedirectRoute();
+          this.router.navigate([redirectRoute]);
         }
       });
+  }
+
+  private getRedirectRoute(): AdminAppRoutes {
+    switch (this.localEditorSession.docCollectionPath) {
+      case SharedCollectionPaths.POSTS:
+        return AdminAppRoutes.BLOG_DASHBOARD;
+      case SharedCollectionPaths.PRODUCTS:
+        return AdminAppRoutes.PRODUCT_DASHBOARD;
+      default:
+        return AdminAppRoutes.HOME;
+    }
   }
 
   // Present user with an option to close other active sessions if they exist
@@ -163,7 +175,8 @@ export class EditorSessionService {
         console.log('monitoring local timeout, time since last update', timeSinceLastUpdate);
         if (timeSinceLastUpdate > localInactiveTimeLimit) {
           this.autoDisconnect = true;
-          this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
+          const redirectRoute = this.getRedirectRoute();
+          this.router.navigate([redirectRoute]);
         }
       });
   }

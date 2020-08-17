@@ -140,4 +140,24 @@ export class ProductStoreEffects {
         )
     ),
   );
+
+  @Effect()
+  cloneProductEffect$: Observable<Action> = this.actions$.pipe(
+    ofType<productFeatureActions.CloneProductRequested>(
+      productFeatureActions.ActionTypes.CLONE_PRODUCT_REQUESTED
+    ),
+    concatMap(action => this.productService.cloneProductonAltAdmin(action.payload.product)
+      .pipe(
+          map(product => {
+            if (!product) {
+              throw new Error('Error cloning product');
+            }
+            return new productFeatureActions.ToggleActiveComplete();
+          }),
+          catchError(error => {
+            return of(new productFeatureActions.PublicUpdateFailed({ error }));
+          })
+        )
+    ),
+  );
 }

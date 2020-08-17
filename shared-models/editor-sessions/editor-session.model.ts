@@ -1,3 +1,5 @@
+import { SharedCollectionPaths, AdminCollectionPaths, PublicCollectionPaths } from '../routes-and-paths/fb-collection-paths';
+
 export enum EditorSessionKeys {
   DOC_ID = 'docId',
   DOC_COLLECTION_PATH = 'docCollectionPath',
@@ -7,7 +9,7 @@ export enum EditorSessionKeys {
 export interface EditorSession {
   id: string;
   [EditorSessionKeys.DOC_ID]: string;
-  [EditorSessionKeys.DOC_COLLECTION_PATH]: string;
+  [EditorSessionKeys.DOC_COLLECTION_PATH]: SharedCollectionPaths | AdminCollectionPaths | PublicCollectionPaths;
   [EditorSessionKeys.ACTIVE]: boolean;
   activatedTimestamp: number;
   lastModifiedTimestamp: number;

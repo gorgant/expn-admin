@@ -1,8 +1,9 @@
 import * as functions from 'firebase-functions';
 import { adminFirestore } from '../config/db-config';
 import * as sendGridMail from '@sendgrid/mail';
-import { remoteCoachProductId, publicAppUrl, remoteCoachProductSlug } from '../config/environments-config';
+import { publicAppUrl } from '../config/environments-config';
 import { PublicAppRoutes } from '../../../shared-models/routes-and-paths/app-routes.model';
+import { ProductIdList } from '../../../shared-models/products/product-id-list.model';
 
 // Iniitialize Cloud Firestore Database
 export const db = adminFirestore;
@@ -25,6 +26,8 @@ const appUrl = publicAppUrl;
 const blogSlugWithSlashPrefix = PublicAppRoutes.BLOG;
 const blogUrl = `https://${appUrl}${blogSlugWithSlashPrefix}`;
 const productListSlugWithSlashPrefix = PublicAppRoutes.PRODUCTS;
+const remoteCoachProductId = ProductIdList.EXPLEARNING_REMOTE_COACH;
+const remoteCoachProductSlug = ProductIdList.EXPLEARNING_REMOTE_COACH;
 const remoteCoachUrl = `https://${appUrl}${productListSlugWithSlashPrefix}/${remoteCoachProductId}/${remoteCoachProductSlug}`;
 const confirmationSlugWithSlahPrefeix = PublicAppRoutes.SUB_CONFIRMATION;
 const optInConfirmationUrlNoParams = `https://${appUrl}${confirmationSlugWithSlahPrefeix}`;
