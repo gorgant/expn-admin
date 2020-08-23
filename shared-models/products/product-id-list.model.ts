@@ -6,11 +6,13 @@ export enum ProductIdList {
   EXPLEARNING_REMOTE_WORK = 'v7h7td9h',
   EXPLEARNING_ONLINE_INTERVIEWS = 'oemqpck1',
   EXPLEARNING_GROUP_INTERVIEWS = 'bug3hcqp',
+  EXPLEARNING_ONLINE_TEAMWORK = 'kzu1v20b',
   MARY_DAPHNE_REMOTE_COACH = '5fff82ic',
   MARY_DAPHNE_EXECUTIVE_PRESENCE = 'oos6fw69',
   MARY_DAPHNE_REMOTE_WORK = 'qo17xor5',
   MARY_DAPHNE_ONLINE_INTERVIEWS = 'fapjp8i0',
-  MARY_DAPHNE_GROUP_INTERVIEWS = 'gfjrmdhq'
+  MARY_DAPHNE_GROUP_INTERVIEWS = 'gfjrmdhq',
+  MARY_DAPHNE_ONLINE_TEAMWORK = '60j6rl1n'
 }
 
 export enum ProductUrlSlugList {
@@ -18,7 +20,8 @@ export enum ProductUrlSlugList {
   EXECUTIVE_PRESENCE = 'executive-presence:-unlock-the-leader-within',
   REMOTE_WORK = 'remote-work-for-professionals-and-managers:-work-from-home-or-anywhere',
   ONLINE_INTERVIEWS = 'acing-online-interviews-on-zoom,-skype,-and-video-calls',
-  GROUP_INTERVIEWS = 'group-interviews:-how-to-stand-out-in-a-crowd-and-influence-people'
+  GROUP_INTERVIEWS = 'group-interviews:-how-to-stand-out-in-a-crowd-and-influence-people',
+  ONLINE_TEAMWORK = 'master-online-teamwork,-remote-collaboration,-and-managing-remote-teams'
 }
 
 // The Product/Template pair
@@ -60,6 +63,11 @@ export const ProductReferenceList: ProductReferenceList = {
     productUrlSlug: ProductUrlSlugList.GROUP_INTERVIEWS,
     mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_GROUP_INTERVIEWS
   },
+  [ProductIdList.EXPLEARNING_ONLINE_TEAMWORK]: {
+    productId: ProductIdList.EXPLEARNING_ONLINE_TEAMWORK,
+    productUrlSlug: ProductUrlSlugList.ONLINE_TEAMWORK,
+    mdOrExpSisterProduct: ProductIdList.MARY_DAPHNE_ONLINE_TEAMWORK
+  },
   [ProductIdList.MARY_DAPHNE_REMOTE_COACH]: {
     productId: ProductIdList.MARY_DAPHNE_REMOTE_COACH,
     productUrlSlug: ProductUrlSlugList.REMOTE_COACH,
@@ -84,6 +92,11 @@ export const ProductReferenceList: ProductReferenceList = {
     productId: ProductIdList.MARY_DAPHNE_GROUP_INTERVIEWS,
     productUrlSlug: ProductUrlSlugList.GROUP_INTERVIEWS,
     mdOrExpSisterProduct: ProductIdList.EXPLEARNING_GROUP_INTERVIEWS
+  },
+  [ProductIdList.MARY_DAPHNE_ONLINE_TEAMWORK]: {
+    productId: ProductIdList.MARY_DAPHNE_ONLINE_TEAMWORK,
+    productUrlSlug: ProductUrlSlugList.ONLINE_TEAMWORK,
+    mdOrExpSisterProduct: ProductIdList.EXPLEARNING_ONLINE_TEAMWORK
   },
 };
 

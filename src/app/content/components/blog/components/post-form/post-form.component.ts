@@ -195,8 +195,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
     // Initialize post if not yet done
     if (!this.postInitialized) {
       this.initializePost();
-    } else {
-      this.savePost();
     }
 
     // Upload file and get image props
@@ -345,7 +343,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private savePost(): void {
-    this.updateEditorSession();
     this.adminUser$
       .pipe(take(1))
       .subscribe(publicUser => {
@@ -398,6 +395,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
           // Navigate to dashboard if save is complete and is a manual save
           if (this.manualSave || this.postDiscarded) {
             this.router.navigate([AdminAppRoutes.BLOG_DASHBOARD]);
+          } else {
+            this.updateEditorSession(); // update editor session if no navigation
           }
           this.savePostSubscription.unsubscribe();
         }
