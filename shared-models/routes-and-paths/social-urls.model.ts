@@ -1,5 +1,5 @@
 export enum SocialUrls {
-  EXPLEARNING_YOUTUBE = 'https://www.youtube.com/c/explearning-communications',
+  EXPLEARNING_YOUTUBE = 'https://www.youtube.com/channel/UCMnAKOzuvMSuBSoPUL3dXlw',
   EXPLEARNING_INSTAGRAM = 'https://www.instagram.com/explearning',
   EXPLEARNING_TWITTER = 'https://twitter.com/ExplearningCo',
   EXPLEARNING_FACEBOOK = 'https://www.facebook.com/myexplearning',

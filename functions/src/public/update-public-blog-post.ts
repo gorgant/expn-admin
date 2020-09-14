@@ -83,7 +83,7 @@ export const updatePostOnPublic = async (post: Post) => {
   postCacheUpdateRes = await submitCacheUpdateRequest(postUrlObject);
   functions.logger.log('Post cache update transmitted');
 
-  // Update blog page cache (to include new post page)
+  // Update blog page cache (to include new post item)
   blogCacheUpdateRes = await submitCacheUpdateRequest(blogUrlObject);
   functions.logger.log('Blog cache update transmitted');
 

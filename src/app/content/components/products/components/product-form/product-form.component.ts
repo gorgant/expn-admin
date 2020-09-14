@@ -240,19 +240,19 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         .subscribe(product => {
           if (product) {
             const productFormObject = {
-              [ProductKeys.NAME]: product[ProductKeys.NAME] || '',
-              [ProductKeys.PRICE]: product[ProductKeys.PRICE] || '',
-              [ProductKeys.LIST_ORDER]: product[ProductKeys.LIST_ORDER] || '',
-              [ProductKeys.TAGLINE]: product[ProductKeys.TAGLINE] || '',
-              [ProductKeys.PRODUCT_CATEGORY]: product[ProductKeys.PRODUCT_CATEGORY] || '',
-              [ProductKeys.SKILLSHARE_URL]: product[ProductKeys.SKILLSHARE_URL] || '',
-              [ProductKeys.SKILLSHARE_ACTIVE]: product[ProductKeys.SKILLSHARE_ACTIVE] || false,
-              [ProductKeys.WAITLIST_ACTIVE]: product[ProductKeys.WAITLIST_ACTIVE] || false,
+              [ProductKeys.NAME]: product[ProductKeys.NAME] ?? '',
+              [ProductKeys.PRICE]: product[ProductKeys.PRICE] ?? '',
+              [ProductKeys.LIST_ORDER]: product[ProductKeys.LIST_ORDER] ?? '',
+              [ProductKeys.TAGLINE]: product[ProductKeys.TAGLINE] ?? '',
+              [ProductKeys.PRODUCT_CATEGORY]: product[ProductKeys.PRODUCT_CATEGORY] ?? '',
+              [ProductKeys.SKILLSHARE_URL]: product[ProductKeys.SKILLSHARE_URL] ?? '',
+              [ProductKeys.SKILLSHARE_ACTIVE]: product[ProductKeys.SKILLSHARE_ACTIVE] ?? true,
+              [ProductKeys.WAITLIST_ACTIVE]: product[ProductKeys.WAITLIST_ACTIVE] ?? false,
               [ProductCardKeys.HIGHLIGHTS]: product.productCardData[ProductCardKeys.HIGHLIGHTS],
-              [PageHeroKeys.PAGE_HERO_SUBTITLE]: product.heroData[PageHeroKeys.PAGE_HERO_SUBTITLE] || '',
-              [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: product.buyNowData[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE] || '',
-              [CheckoutKeys.CHECKOUT_HEADER]: product.checkoutData[CheckoutKeys.CHECKOUT_HEADER] || '',
-              [CheckoutKeys.CHECKOUT_DESCRIPTION]: product.checkoutData[CheckoutKeys.CHECKOUT_DESCRIPTION] || '',
+              [PageHeroKeys.PAGE_HERO_SUBTITLE]: product.heroData[PageHeroKeys.PAGE_HERO_SUBTITLE] ?? '',
+              [BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE]: product.buyNowData[BuyNowBoxKeys.BUY_NOW_BOX_SUBTITLE] ?? '',
+              [CheckoutKeys.CHECKOUT_HEADER]: product.checkoutData[CheckoutKeys.CHECKOUT_HEADER] ?? '',
+              [CheckoutKeys.CHECKOUT_DESCRIPTION]: product.checkoutData[CheckoutKeys.CHECKOUT_DESCRIPTION] ?? '',
             };
 
             // Add additional highlight form controls if more than min amount

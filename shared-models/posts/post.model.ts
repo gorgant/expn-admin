@@ -5,6 +5,7 @@ export enum PostKeys {
   BLOG_DOMAIN = 'blogDomain',
   CONTENT = 'content',
   DESCRIPTION = 'description',
+  FEATURED = 'featured',
   KEYWORDS = 'keywords',
   PODCAST_EPISODE_URL = 'podcastEpisodeUrl',
   PUBLISHED_DATE = 'publishedDate',
@@ -18,7 +19,7 @@ export interface BlogIndexPostRef {
   publishedDate: number;
   imageProps: ImageProps;
   id: string;
-  featured: boolean;
+  [PostKeys.FEATURED]: boolean;
 }
 
 export interface Post extends BlogIndexPostRef {

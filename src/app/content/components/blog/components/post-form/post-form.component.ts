@@ -348,7 +348,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .subscribe(publicUser => {
         const post: Post = {
           [PostKeys.BLOG_DOMAIN]: this[PostKeys.BLOG_DOMAIN].value,
-          author: publicUser.displayName || publicUser.email,
+          author: publicUser.displayName ?? publicUser.email,
           authorId: publicUser.id,
           [PostKeys.VIDEO_URL]: this[PostKeys.VIDEO_URL].value,
           [PostKeys.PODCAST_EPISODE_URL]: this[PostKeys.PODCAST_EPISODE_URL].value,

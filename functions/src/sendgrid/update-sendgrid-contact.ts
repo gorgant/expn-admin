@@ -295,17 +295,14 @@ const triggerWelcomeEmail = async(subscriber: EmailSubscriber) => {
 const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubscriberData: EmailSubscriber | null) => {
 
   const deleteRequest = !newSubscriberData; // If no new subscriber data, document has been deleted
-  const notOptedInYet = newSubscriberData && !newSubscriberData.optInConfirmed;
-  const optInRequested = oldSubscriberData && newSubscriberData && !oldSubscriberData.optInConfirmed && newSubscriberData.optInConfirmed; // Opt in chagned from false to true
+  const notOptedInYet = !newSubscriberData?.optInConfirmed;
+  const optInRequested = !oldSubscriberData?.optInConfirmed && newSubscriberData?.optInConfirmed; // Opt in chagned from false to true
   const subscriberAlreadyOptedIn = oldSubscriberData && oldSubscriberData.optInConfirmed;
   // Detect name change or contact list update
   const otherValidSendgridUpdate = 
-    oldSubscriberData && 
-    newSubscriberData && 
-    (
-      (newSubscriberData.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData.publicUserData.billingDetails as BillingDetails).firstName || // Detect name change
-      newSubscriberData.subscriptionSources.length !== oldSubscriberData.subscriptionSources.length // Detect contact list update
-    );
+    (newSubscriberData?.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData?.publicUserData.billingDetails as BillingDetails).firstName || // Detect name change
+     newSubscriberData?.subscriptionSources.length !== oldSubscriberData?.subscriptionSources.length // Detect contact list update
+    ;
   
   const subscriberMissingSGContactId = newSubscriberData && !newSubscriberData.sendgridContactId;
 
@@ -347,11 +344,11 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
     return;
   }
 
-  if (newSubscriberData && oldSubscriberData && (newSubscriberData.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData.publicUserData.billingDetails as BillingDetails).firstName) {
+  if ((newSubscriberData?.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData?.publicUserData.billingDetails as BillingDetails).firstName) {
     functions.logger.log('Subscriber name update detected');
   }
 
-  if (newSubscriberData && oldSubscriberData && newSubscriberData.subscriptionSources.length !== oldSubscriberData.subscriptionSources.length) {
+  if (newSubscriberData?.subscriptionSources.length !== oldSubscriberData?.subscriptionSources.length) {
     functions.logger.log('Subscriber contact list update detected');
   }
 
