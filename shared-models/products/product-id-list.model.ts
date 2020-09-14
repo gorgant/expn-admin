@@ -21,7 +21,7 @@ export enum ProductUrlSlugList {
   REMOTE_WORK = 'remote-work-for-professionals-and-managers:-work-from-home-or-anywhere',
   ONLINE_INTERVIEWS = 'acing-online-interviews-on-zoom,-skype,-and-video-calls',
   GROUP_INTERVIEWS = 'group-interviews:-how-to-stand-out-in-a-crowd-and-influence-people',
-  ONLINE_TEAMWORK = 'master-online-teamwork,-remote-collaboration,-and-managing-remote-teams'
+  ONLINE_TEAMWORK = 'online-teamwork:-manage-remote-teams-&-master-remote-collaboration'
 }
 
 // The Product/Template pair
