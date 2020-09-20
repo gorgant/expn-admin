@@ -13,7 +13,8 @@ import { DOCUMENT } from '@angular/common';
 import { UiService } from 'src/app/core/services/ui.service';
 import { environment } from 'src/environments/environment';
 import { PodcastEpisode } from 'shared-models/podcast/podcast-episode.model';
-import { PodcastPaths } from 'shared-models/podcast/podcast-paths.model';
+import { YouTubeChannelIds } from 'shared-models/routes-and-paths/social-urls.model';
+import { PODCAST_PATHS } from 'shared-models/podcast/podcast-vars.model';
 
 @Component({
   selector: 'app-post-preview',
@@ -42,6 +43,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   private productionEnvironment: boolean = environment.production;
   private origin: string;
   sanitizedSubscribeButtonContent: SafeHtml;
+  youTubeChannelId = YouTubeChannelIds.SYW;
 
   constructor(
     private store$: Store<RootStoreState.State>,
@@ -117,13 +119,13 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   private setYouTubeIframeOriginBasedOnEnvironment(): string {
     switch (this.productionEnvironment) {
       case true:
-        this.origin = `https://${PRODUCTION_APPS.explearningPublicApp.websiteDomain}`;
+        this.origin = `https://${PRODUCTION_APPS.sywPublicApp.websiteDomain}`;
         break;
       case false:
-        this.origin = `https://${SANDBOX_APPS.explearningPublicApp.websiteDomain}`;
+        this.origin = `https://${SANDBOX_APPS.sywPublicApp.websiteDomain}`;
         break;
       default:
-        this.origin = `https://${SANDBOX_APPS.explearningPublicApp.websiteDomain}`;
+        this.origin = `https://${SANDBOX_APPS.sywPublicApp.websiteDomain}`;
         break;
     }
     return this.origin;
@@ -135,9 +137,10 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
 
     // See video parameters here: https://developers.google.com/youtube/player_parameters
     const videoParameters = {
-      rel: 0,
-      origin: `${this.setYouTubeIframeOriginBasedOnEnvironment()}`,
       fs: 1,
+      origin: `${this.setYouTubeIframeOriginBasedOnEnvironment()}`,
+      rel: 0,
+      enablejsapi: 1
     };
 
     // Courtesy of https://stackoverflow.com/a/12040639/6572208
@@ -228,7 +231,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   }
 
   private getPodcastEpisode(podcastEpisodeUrl: string): Observable<PodcastEpisode> {
-    const podcastId = PodcastPaths.EXPLEARNING_RSS_FEED.split('users:')[1].split('/')[0]; // May change if RSS feed link changes
+    const podcastId = PODCAST_PATHS.syw.rssFeedPath.split('users:')[1].split('/')[0]; // May change if RSS feed link changes
     const episodeId = this.uiService.createOrReverseFirebaseSafeUrl(podcastEpisodeUrl);
 
     const podcastEpisode$ = this.store$.select(PodcastStoreSelectors.selectEpisodeById(episodeId))
@@ -257,7 +260,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
       actionMessage: 'Read More',
       isPost: true
     };
-  }
+}
 
   private handlePostError() {
     this.errorSubscription = this.error$.subscribe(error => {

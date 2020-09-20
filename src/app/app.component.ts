@@ -5,6 +5,7 @@ import { AuthService } from './core/services/auth.service';
 import { Store } from '@ngrx/store';
 import { RootStoreState, UserStoreSelectors, AuthStoreSelectors, AuthStoreActions, UserStoreActions } from './root-store';
 import { withLatestFrom } from 'rxjs/operators';
+import { ShorthandBusinessNames } from 'shared-models/forms-and-components/legal-vars.model';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,7 @@ import { withLatestFrom } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'Admin - Explearning';
+  title = `Admin - ${ShorthandBusinessNames.EXPLEARNING}`;
   appVersion = '2.0.0';
 
   @ViewChild('sidenav', { static: true }) sidenav: MatSidenav;

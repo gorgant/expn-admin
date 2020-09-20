@@ -1,8 +1,75 @@
 // Import material theming functions
 @import '~@angular/material/theming';
 
-$theme-primary: mat-palette($mat-deep-purple);
-$theme-accent:  mat-palette($mat-red, A200);
+// Copied from theme.scss
+$explearning-primary: (
+  50 : #e4f2fe,
+    100 : #bce0fb,
+    200 : #90cbf9,
+    300 : #64b6f7,
+    400 : #42a6f5,
+    500 : #2196f3,
+    600 : #1d8ef1,
+    700 : #1883ef,
+    800 : #1479ed,
+    900 : #0b68ea,
+    A100 : #ffffff,
+    A200 : #e1ecff,
+    A400 : #aeccff,
+    A700 : #95bcff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$explearning-accent: (
+    50 : #e7e9fe,
+    100 : #c2c9fd,
+    200 : #99a5fc,
+    300 : #7080fb,
+    400 : #5265fa,
+    500 : #334af9,
+    600 : #2e43f8,
+    700 : #273af7,
+    800 : #2032f6,
+    900 : #1422f5,
+    A100 : #ffffff,
+    A200 : #f1f1ff,
+    A400 : #bec1ff,
+    A700 : #a4a8ff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #ffffff,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$theme-primary: mat-palette($explearning-primary);
+$theme-accent:  mat-palette($explearning-accent);
 $theme-warn:    mat-palette($mat-red);
 
 // Create your Sass color vars (will be available in all the project)
@@ -17,6 +84,10 @@ $font-weight-bold: 700;
 $font-weight-black: 900;
 
 $logo-font-family: HarlowSolid;
+$logo-font-default-size: 40px;
+$logo-font-mobile-size: 35px;
+// Color from here: https://blog.union.io/code/2017/08/10/img-svg-fill/ && https://codepen.io/sosuke/pen/Pjoqqp
+$svg-color-filter: brightness(0) saturate(100%) invert(43%) sepia(97%) saturate(1340%) hue-rotate(184deg) brightness(98%) contrast(95%);
 
 $max-screen-width: 2500px;
 $min-screen-width: 320px;

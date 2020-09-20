@@ -1,16 +1,20 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { catchError, takeUntil, map, take, tap } from 'rxjs/operators';
 import { throwError, Observable, of } from 'rxjs';
-import { PodcastEpisode } from 'shared-models/podcast/podcast-episode.model';
+import { PodcastEpisode, PodcastEpisodeKeys } from 'shared-models/podcast/podcast-episode.model';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { PodcastVars } from 'shared-models/podcast/podcast-vars.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PodcastService {
+
+  private podcastEpisodeQueryField = PodcastEpisodeKeys.PUB_DATE;
+  private podcastEpisodeQueryLimit = PodcastVars.PODCAST_QUERY_LIMIT;
 
   constructor(
     private afs: AngularFirestore,
@@ -43,7 +47,7 @@ export class PodcastService {
       .pipe(
         takeUntil(this.authService.unsubTrigger$),
         map(episodes => {
-          console.log('Fetched all episodes');
+          console.log(`Fetched all ${episodes.length} episodes`, episodes);
           return episodes;
         }),
         catchError(error => {
@@ -81,7 +85,9 @@ export class PodcastService {
 
   private getEpisodesCollection(podcastId: string): AngularFirestoreCollection<PodcastEpisode> {
     return this.getPodcastContainerDoc(podcastId).collection<PodcastEpisode>(
-      SharedCollectionPaths.PODCAST_FEED_EPISODES, ref => ref.where('blogPostUrlHandle', '>', '0') // This query confirms field exists
+      SharedCollectionPaths.PODCAST_FEED_EPISODES, ref => ref
+        .orderBy(this.podcastEpisodeQueryField, 'desc') // Ensures most recent podcasts come first
+        .limit(this.podcastEpisodeQueryLimit) // Limit results to most recent for faster page load
     );
   }
 

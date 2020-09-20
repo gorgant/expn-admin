@@ -1,12 +1,13 @@
+const firestore = require('@google-cloud/firestore');
+import { Bucket } from '@google-cloud/storage';
 import * as functions from 'firebase-functions';
-import { auth } from 'google-auth-library';
+import { now } from 'moment';
+import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '../../../shared-models/environments/env-vars.model';
 import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-function-names';
 import { adminProjectId, currentEnvironmentType } from '../config/environments-config';
-import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '../../../shared-models/environments/env-vars.model';
-import { Bucket } from '@google-cloud/storage';
-import { now } from 'moment';
 import { explearningAdminStorage } from '../config/storage-config';
 
+const client = new firestore.v1.FirestoreAdminClient();
 const adminStorage = explearningAdminStorage;
 
 let backupBucket: Bucket;
@@ -28,32 +29,36 @@ const setBucketsBasedOnEnvironment = (): Bucket => {
   return backupBucket;
 }
 
-// Courtesy of: https://medium.com/@nedavniat/how-to-perform-and-schedule-firestore-backups-with-google-cloud-platform-and-nodejs-be44bbcd64ae
+// Courtesy of https://cloud.google.com/firestore/docs/solutions/schedule-export#firebase-console
+export const processBackup = async () => {
 
-const processBackup = async () => {
-  const projectId = adminProjectId;
   const bucket = setBucketsBasedOnEnvironment();
-  // Check for api updates: https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases/exportDocuments
-  const url = `https://firestore.googleapis.com/v1beta1/projects/${projectId}/databases/(default):exportDocuments`;
-  functions.logger.log(`Deploying backup data to this bucket: ${bucket.name} and this url ${url}`);
+  const projectId = adminProjectId;
 
-  // Must add import/export IAM to default service account
-  const admin = await auth.getClient({
-    scopes: [                               // scopes required to make a request
-        'https://www.googleapis.com/auth/datastore',
-    ]
-  })
-    .catch(err => {functions.logger.log(`Error getting auth client:`, err); throw new functions.https.HttpsError('internal', err);});;
+  functions.logger.log(`Deploying backup data to this bucket: ${bucket.name} and this projectID ${projectId}`);
 
-  return admin.request({
-    url,
-    method: 'POST',
-    data: {
-      outputUriPrefix: `gs://${bucket.name}/database-backup/${now()}`
-    }
-  })
-    .catch(err => {functions.logger.log(`Error submitting backup POST request:`, err); throw new functions.https.HttpsError('internal', err);});;
-}
+  const databaseName = client.databasePath(
+    projectId,
+    '(default)'
+  );
+
+  const sendExportRequest = await client.exportDocuments({
+      name: databaseName,
+      outputUriPrefix: `gs://${bucket.name}/database-backup/${now()}`, // Add gs prefix manually here bc CF bucket config above requires without
+      // Leave collectionIds empty to export all collections
+      // or define a list of collection IDs:
+      // collectionIds: ['users', 'posts']
+      collectionIds: [],
+    })
+    .catch((err: any) => {functions.logger.log(`Error submitting backup request:`, err); throw new functions.https.HttpsError('internal', err);});
+  
+  const response = sendExportRequest[0];
+  
+  functions.logger.log(`Operation Complete: ${response['name']}`);
+
+  return response;
+};
+
 
 /////// DEPLOYABLE FUNCTIONS ///////
 

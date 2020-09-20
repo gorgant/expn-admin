@@ -1,0 +1,5 @@
+export enum PostVars {
+  DESCRIPTION_MAX_LENGTH = 320,
+  KEYWORDS_MAX_LENGTH = 500,
+  POST_QUERY_LIMIT = 40
+}

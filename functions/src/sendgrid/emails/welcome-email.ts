@@ -14,6 +14,8 @@ import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 import { adminFirestore } from "../../config/db-config";
 import { AdminCollectionPaths } from "../../../../shared-models/routes-and-paths/fb-collection-paths";
 import * as functions from 'firebase-functions';
+import { DownloadableUrls } from '../../../../shared-models/routes-and-paths/promo-urls.model';
+import { SocialUrls } from '../../../../shared-models/routes-and-paths/social-urls.model';
 
 const db = adminFirestore;
 
@@ -40,7 +42,7 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
   let toEmail: string;
   let bccEmail: string;
   const templateId: string = EmailTemplateIds.EXPLEARNING_WELCOME_EMAIL;
-  const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.EXPLEARNING_COMMUNICATIONS_STRATEGIES;
+  const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.EXPLEARNING_PRIMARY_NEWSLETTER;
   let categories: string[];
   
   switch (currentEnvironmentType) {
@@ -77,7 +79,9 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
       blogUrl: EmailWebsiteLinks.BLOG_URL,
       remoteCoachUrl: EmailWebsiteLinks.REMOTE_COACH_URL,
       replyEmailAddress: fromEmail,
-      webcoursesUrl: EmailWebsiteLinks.WEBCOURSES_URL
+      webcoursesUrl: EmailWebsiteLinks.WEBCOURSES_URL,
+      downloadableUrl: DownloadableUrls.EXPLEARNING_DOWNLOADABLE,
+      youTubeChannelUrl: SocialUrls.EXPLEARNING_YOUTUBE
     },
     trackingSettings: {
       subscriptionTracking: {

@@ -10,10 +10,10 @@ export enum PublicImagePaths {
   REMOTE_COACH = 'assets/images/background/remote_coach@1500.jpg',
   PODCAST = 'assets/images/background/podcast@1500.jpg',
   CONTACT = 'assets/images/background/contact@1500.jpg',
-  POST_HERO = 'assets/images/background/post_hero_background_explearning_logo.jpg',
-  MD_AVATAR = 'assets/images/avatar/mary_daphne_explearning_avatar.png',
-  MD_CHECKOUT_AVATAR = 'assets/images/avatar/mary_daphne_explearning_headshot_280x180@300.jpg',
-  MD_CHECKOUT_SIGNATURE = 'assets/images/avatar/md_explearning_signature_thumb@300.png',
+  POST_HERO = 'assets/images/background/post_hero_fallback_image.jpg',
+  FOUNDER_AVATAR = 'assets/images/avatar/founder_avatar.png',
+  CHECKOUT_AVATAR = 'assets/images/avatar/checkout_avatar.jpg',
+  FOUNDER_SIGNATURE = 'assets/images/avatar/founder_signature.png',
   LINK_SHARE_IMAGE = 'assets/images/background/link_share_image@1500.jpg',
 }
 

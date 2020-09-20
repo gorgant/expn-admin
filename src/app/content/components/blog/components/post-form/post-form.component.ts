@@ -23,6 +23,7 @@ import { EditorSessionService } from 'src/app/core/services/editor-session.servi
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 import { ActionConfData } from 'shared-models/forms-and-components/action-conf-data.model';
 import { ActionConfirmDialogueComponent } from 'src/app/shared/components/action-confirm-dialogue/action-confirm-dialogue.component';
+import { PostVars } from 'shared-models/posts/post-vars.model';
 
 @Component({
   selector: 'app-post-form',
@@ -42,8 +43,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
   postForm: FormGroup;
   postFormKeys = PostKeys;
   postValidationMessages = POST_FORM_VALIDATION_MESSAGES;
-  descriptionMaxLength = 320;
-  keywordsMaxLength = 100;
+  descriptionMaxLength = PostVars.DESCRIPTION_MAX_LENGTH;
+  keywordsMaxLength = PostVars.KEYWORDS_MAX_LENGTH;
   isNewPost: boolean;
   loadingExistingPost: boolean;
 

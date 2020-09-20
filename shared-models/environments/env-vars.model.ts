@@ -27,7 +27,19 @@ export const PRODUCTION_APPS = {
     projectId: 'marydaphne-admin',
     storageBucket: 'marydaphne-admin.appspot.com',
     websiteDomain: 'admin.marydaphne.com'
-  }
+  },
+  sywPublicApp: {
+    databaseURL: 'https://syw-public.firebaseio.com',
+    projectId: 'syw-public',
+    storageBucket: 'syw-public.appspot.com',
+    websiteDomain: 'stakeyourwealth.com'
+  },
+  sywAdminApp: {
+    databaseURL: 'https://syw-admin.firebaseio.com',
+    projectId: 'syw-admin',
+    storageBucket: 'syw-admin.appspot.com',
+    websiteDomain: 'admin.stakeyourwealth.com'
+  },
 };
 
 export const SANDBOX_APPS = {
@@ -54,7 +66,19 @@ export const SANDBOX_APPS = {
     projectId: 'marydaphne-sandbox-admin',
     storageBucket: 'marydaphne-sandbox-admin.appspot.com',
     websiteDomain: 'marydaphne-sandbox-admin.firebaseapp.com'
-  }
+  },
+  sywPublicApp: {
+    databaseURL: 'https://syw-sandbox-public.firebaseio.com',
+    projectId: 'syw-sandbox-public',
+    storageBucket: 'syw-sandbox-public.appspot.com',
+    websiteDomain: 'syw-sandbox-public.firebaseapp.com'
+  },
+  sywAdminApp: {
+    databaseURL: 'https://syw-sandbox-admin.firebaseio.com',
+    projectId: 'syw-sandbox-admin',
+    storageBucket: 'syw-sandbox-admin.appspot.com',
+    websiteDomain: 'syw-sandbox-admin.firebaseapp.com'
+  },
 };
 
 export enum ProductionCloudStorage {
@@ -70,6 +94,12 @@ export enum ProductionCloudStorage {
   MARY_DAPHNE_ADMIN_PRODUCTS_STORAGE_FB = 'gs://marydaphne-admin-products',
   MARY_DAPHNE_ADMIN_BACKUP_STORAGE_AF_CF = 'marydaphne-admin-backup',
   MARY_DAPHNE_ADMIN_BACKUP_STORAGE_FB = 'gs://marydaphne-admin-backup',
+  SYW_ADMIN_BLOG_STORAGE_AF_CF = 'syw-admin-blog',
+  SYW_ADMIN_BLOG_STORAGE_FB = 'gs://syw-admin-blog',
+  SYW_ADMIN_PRODUCTS_STORAGE_AF_CF = 'syw-admin-products',
+  SYW_ADMIN_PRODUCTS_STORAGE_FB = 'gs://syw-admin-products',
+  SYW_ADMIN_BACKUP_STORAGE_AF_CF = 'syw-admin-backup',
+  SYW_ADMIN_BACKUP_STORAGE_FB = 'gs://syw-admin-backup',
 }
 
 export enum SandboxCloudStorage {
@@ -85,23 +115,38 @@ export enum SandboxCloudStorage {
   MARY_DAPHNE_ADMIN_PRODUCTS_STORAGE_FB = 'gs://marydaphne-sandbox-admin-products',
   MARY_DAPHNE_ADMIN_BACKUP_STORAGE_AF_CF = 'marydaphne-sandbox-admin-backup',
   MARY_DAPHNE_ADMIN_BACKUP_STORAGE_FB = 'gs://marydaphne-sandbox-admin-backup',
+  SYW_ADMIN_BLOG_STORAGE_AF_CF = 'syw-sandbox-admin-blog',
+  SYW_ADMIN_BLOG_STORAGE_FB = 'gs://syw-sandbox-admin-blog',
+  SYW_ADMIN_PRODUCTS_STORAGE_AF_CF = 'syw-sandbox-admin-products',
+  SYW_ADMIN_PRODUCTS_STORAGE_FB = 'gs://syw-sandbox-admin-products',
+  SYW_ADMIN_BACKUP_STORAGE_AF_CF = 'syw-sandbox-admin-backup',
+  SYW_ADMIN_BACKUP_STORAGE_FB = 'gs://syw-sandbox-admin-backup',
 }
 
-export const StripePublishableKeys = {
-  production: 'pk_live_2ybMSK15jNXw8mpoJ1MmIrfW00PvuSsi2F',
-  sandbox: 'pk_test_qiAhFPd39eG3eqgEtWM9Yx0v00p7PxdzcH'
-};
+// Currently all apps use the Explearning keys
+export enum StripePublishableKeys {
+  EXPLEARNING_PROD = 'pk_live_2ybMSK15jNXw8mpoJ1MmIrfW00PvuSsi2F',
+  EXPLEARNING_SANDBOX = 'pk_test_qiAhFPd39eG3eqgEtWM9Yx0v00p7PxdzcH',
+  MARY_DAPHNE_PROD = 'pk_live_2ybMSK15jNXw8mpoJ1MmIrfW00PvuSsi2F',
+  MARY_DAPHNE_SANDBOX = 'pk_test_qiAhFPd39eG3eqgEtWM9Yx0v00p7PxdzcH',
+  SYW_PROD = 'pk_live_2ybMSK15jNXw8mpoJ1MmIrfW00PvuSsi2F',
+  SYW_SANDBOX = 'pk_test_qiAhFPd39eG3eqgEtWM9Yx0v00p7PxdzcH'
+}
 
 export enum ProductionSsrDataLoadChecks {
   EXPLEARNING_BLOG_MIN = 49,
   EXPLEARNING_PODCAST_MIN = 29,
   MARY_DAPHNE_BLOG_MIN = 14,
-  MARY_DAPHNE_PODCAST_MIN = 0
+  MARY_DAPHNE_PODCAST_MIN = 0,
+  SYW_BLOG_MIN = 4,
+  SYW_PODCAST_MIN = 4
 }
 
 export enum SandboxSsrDataLoadChecks {
   EXPLEARNING_BLOG_MIN = 2,
   EXPLEARNING_PODCAST_MIN = 2,
   MARY_DAPHNE_BLOG_MIN = 1,
-  MARY_DAPHNE_PODCAST_MIN = 0
+  MARY_DAPHNE_PODCAST_MIN = 0,
+  SYW_BLOG_MIN = 1,
+  SYW_PODCAST_MIN = 1
 }

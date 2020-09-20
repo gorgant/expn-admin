@@ -11,6 +11,7 @@
   },
   "main": "lib/functions/src/index.js",
   "dependencies": {
+    "@google-cloud/firestore": "^4.2.0",
     "@google-cloud/pubsub": "^2.1.0",
     "@google-cloud/storage": "^5.1.1",
     "@sendgrid/helpers": "^7.2.0",

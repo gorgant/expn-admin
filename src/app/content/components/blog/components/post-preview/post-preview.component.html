@@ -7,7 +7,7 @@
       <div class="subscribe-button-container" fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="center center"  fxLayoutAlign.gt-sm="end center" fxLayoutGap="16px">
         <div class="subscribe-caption" fxHide fxShow.gt-sm>Subscribe on YouTube for the latest videos --></div>
         <div class="subscribe-caption" fxHide.gt-sm>(subscribe below for the latest videos)</div>
-        <div class="g-ytsubscribe subscribe-button" data-channelid="UCMnAKOzuvMSuBSoPUL3dXlw" data-layout="full" data-count="default"></div>
+        <div class="g-ytsubscribe subscribe-button" [attr.data-channelid]="youTubeChannelId" data-layout="full" data-count="default"></div>
       </div>
     </div>
     <div *ngIf="podcastEpisodeHtml" class="podcast-container" fxLayout="column" fxLayoutAlign="center center">
