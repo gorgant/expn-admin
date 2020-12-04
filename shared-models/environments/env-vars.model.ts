@@ -134,12 +134,12 @@ export enum StripePublishableKeys {
 }
 
 export enum ProductionSsrDataLoadChecks {
-  EXPLEARNING_BLOG_MIN = 49,
-  EXPLEARNING_PODCAST_MIN = 29,
+  EXPLEARNING_BLOG_MIN = 39,
+  EXPLEARNING_PODCAST_MIN = 39,
   MARY_DAPHNE_BLOG_MIN = 14,
   MARY_DAPHNE_PODCAST_MIN = 0,
-  SYW_BLOG_MIN = 4,
-  SYW_PODCAST_MIN = 4
+  SYW_BLOG_MIN = 20,
+  SYW_PODCAST_MIN = 20
 }
 
 export enum SandboxSsrDataLoadChecks {
@@ -147,6 +147,6 @@ export enum SandboxSsrDataLoadChecks {
   EXPLEARNING_PODCAST_MIN = 2,
   MARY_DAPHNE_BLOG_MIN = 1,
   MARY_DAPHNE_PODCAST_MIN = 0,
-  SYW_BLOG_MIN = 1,
-  SYW_PODCAST_MIN = 1
+  SYW_BLOG_MIN = 2,
+  SYW_PODCAST_MIN = 2
 }
