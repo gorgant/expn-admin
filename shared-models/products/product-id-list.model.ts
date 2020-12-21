@@ -18,7 +18,13 @@ export enum ProductIdList {
   SYW_REMOTE_WORK = 'dgp28sgc',
   SYW_ONLINE_INTERVIEWS = 'cwdazfbw',
   SYW_GROUP_INTERVIEWS = 'm0w4qx1n',
-  SYW_ONLINE_TEAMWORK = 'jjfmkxlk'
+  SYW_ONLINE_TEAMWORK = 'jjfmkxlk',
+  ADVE_REMOTE_COACH = '7us06f84',
+  ADVE_EXECUTIVE_PRESENCE = 'o4u9lkpk',
+  ADVE_REMOTE_WORK = 'brhfsfff',
+  ADVE_ONLINE_INTERVIEWS = '68sieci0',
+  ADVE_GROUP_INTERVIEWS = 'ebgyik3s',
+  ADVE_ONLINE_TEAMWORK = 'hh7m8i1qS',
 }
 
 export enum ProductUrlSlugList {
@@ -131,6 +137,36 @@ export const ProductReferenceList: ProductReferenceList = {
   },
   [ProductIdList.SYW_ONLINE_TEAMWORK]: {
     productId: ProductIdList.SYW_ONLINE_TEAMWORK,
+    productUrlSlug: ProductUrlSlugList.ONLINE_TEAMWORK,
+    masterProductRef: ProductIdList.EXPLEARNING_ONLINE_TEAMWORK
+  },
+  [ProductIdList.ADVE_REMOTE_COACH]: {
+    productId: ProductIdList.ADVE_REMOTE_COACH,
+    productUrlSlug: ProductUrlSlugList.REMOTE_COACH,
+    masterProductRef: ProductIdList.EXPLEARNING_REMOTE_COACH
+  },
+  [ProductIdList.ADVE_EXECUTIVE_PRESENCE]: {
+    productId: ProductIdList.ADVE_EXECUTIVE_PRESENCE,
+    productUrlSlug: ProductUrlSlugList.EXECUTIVE_PRESENCE,
+    masterProductRef: ProductIdList.EXPLEARNING_EXECUTIVE_PRESENCE
+  },
+  [ProductIdList.ADVE_REMOTE_WORK]: {
+    productId: ProductIdList.ADVE_REMOTE_WORK,
+    productUrlSlug: ProductUrlSlugList.REMOTE_WORK,
+    masterProductRef: ProductIdList.EXPLEARNING_REMOTE_WORK
+  },
+  [ProductIdList.ADVE_ONLINE_INTERVIEWS]: {
+    productId: ProductIdList.ADVE_ONLINE_INTERVIEWS,
+    productUrlSlug: ProductUrlSlugList.ONLINE_INTERVIEWS,
+    masterProductRef: ProductIdList.EXPLEARNING_ONLINE_INTERVIEWS
+  },
+  [ProductIdList.ADVE_GROUP_INTERVIEWS]: {
+    productId: ProductIdList.ADVE_GROUP_INTERVIEWS,
+    productUrlSlug: ProductUrlSlugList.GROUP_INTERVIEWS,
+    masterProductRef: ProductIdList.EXPLEARNING_GROUP_INTERVIEWS
+  },
+  [ProductIdList.ADVE_ONLINE_TEAMWORK]: {
+    productId: ProductIdList.ADVE_ONLINE_TEAMWORK,
     productUrlSlug: ProductUrlSlugList.ONLINE_TEAMWORK,
     masterProductRef: ProductIdList.EXPLEARNING_ONLINE_TEAMWORK
   },

@@ -4,12 +4,12 @@ import { PublicImagePaths } from '../../shared-models/routes-and-paths/image-pat
 
 export const metaTagDefaults = {
   explearningPublic: {
-    metaTagDefaultTitle: 'Explearning - Supercharge Your Social Skills',
+    metaTagDefaultTitle: 'Explearning - Build Stronger Social Connections',
     // tslint:disable-next-line:max-line-length
-    metaTagDefaultDescription: 'A richer life begins with better communication. Equip yourself for personal and professional success by improving your speaking skills and communication skills using our research-backed techniques. We teach you public speaking techniques, interview strategies, negotiation tactics, and much more.',
+    metaTagDefaultDescription: 'A richer life begins with stronger social connections. Our job is to supercharge your social interactions with your friends, colleagues, and clients using our research-backed techniques.',
     metaTagAuthor: LegalBusinessNames.EXPLEARNING,
     // tslint:disable-next-line:max-line-length
-    metaTagDefaultKeywords: 'social skills, make friends, build trust, be authentic, what is effective communication, what is communication skills, effective communication techniques, public speaking techniques, interview strategies, mary daphne root',
+    metaTagDefaultKeywords: 'social connections, social skills, mental fortitude, be more confident, make friends, build trust, be authentic, effective communication',
     metaTagSiteName: ShorthandBusinessNames.EXPLEARNING,
     metaTagFbAppId: '2401296806861214',
     metaTagTwitterHandle: '@ExplearningCo',
@@ -47,55 +47,70 @@ export const metaTagDefaults = {
     metaTagCachedHtml: 'cachedHtml',
     metaTagIsBot: 'isBot'
   },
+  advePublic: {
+    metaTagDefaultTitle: 'Advanced English - Speak English Fluently and Confidently',
+    // tslint:disable-next-line:max-line-length
+    metaTagDefaultDescription: 'Learn to speak English fluently and confidently. At Advanced English, we teach English fluency by immersing our students in real-world English conversations and scenarios. Alongside the language, we teach American English culture and norms.',
+    metaTagAuthor: LegalBusinessNames.ADVE,
+    // tslint:disable-next-line: max-line-length
+    metaTagDefaultKeywords: 'speak fluent english, english fluency, speak confident english, speak english fluently, speak english confidently, advanced english',
+    metaTagSiteName: ShorthandBusinessNames.ADVE,
+    metaTagFbAppId: '1273297499707553',
+    metaTagTwitterHandle: '@Advanc3dEnglish',
+    metaTagTwitterCardType: 'summary_large_image',
+    metaTagDefaultImage: PublicImagePaths.LINK_SHARE_IMAGE,
+    metaTagCachedHtml: 'cachedHtml',
+    metaTagIsBot: 'isBot'
+  },
 };
 
 export const metaTagsContentPages = {
   explearningPublic: {
     aboutMetaTitle: `About Us - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     // tslint:disable-next-line: max-line-length
-    aboutMetaDescription: `Speaking skills and effective communication are at the core of who we are. My goal is to equip you for personal and professional success by improving your speaking skills and communication skills using our research-backed techniques. With an Ed.M from Columbia University, I've been teaching and coaching communications for over ten years.`,
-    aboutBodyVideoUrl: `https://youtu.be/X949bB9fqMA`,
+    aboutMetaDescription: `Stronger social connections are at the core of who we are. Our job is to supercharge your social interactions with your friends, colleagues, and clients using our research-backed techniques.`,
+    aboutBodyVideoUrl: `https://youtu.be/_onRdMrhzmw`,
     blogMetaTitle: `Blog - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     // tslint:disable-next-line: max-line-length
-    blogMetaDescription: `On ${metaTagDefaults.explearningPublic.metaTagSiteName}'s blog you have access to our complete library of free lessons on speaking skills and effective communication. From public speaking techniques to interview strategies and negotiation tactics, our goal is to make you the best communicator you can be.`,
+    blogMetaDescription: `On ${metaTagDefaults.explearningPublic.metaTagSiteName}'s blog you have access to our complete library of free lessons on building stronger social connections. From confident communication, to building rapport, to asserting yourself in public, our goal is to supercharge your social interactions with your friends, colleagues, and clients.`,
     blogPageTitle: `${metaTagDefaults.explearningPublic.metaTagSiteName} Blog`,
-    blogPagHeroSubtitle: `Access our complete library of free lessons on speaking skills and effective communication`,
+    blogPagHeroSubtitle: `Access our complete library of free lessons on building stronger social connections`,
     blogActionMessage: `View Collection`,
     contactMetaTitle: `Contact Us - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     // tslint:disable-next-line: max-line-length
-    contactMetaDescription: `Get in touch with the ${metaTagDefaults.explearningPublic.metaTagSiteName} team using this contact form. We welcome questions, suggestions, and any thoughtful input. Let us know if there is anything else we can do to help you improve your speaking and communication skills!`,
+    contactMetaDescription: `Get in touch with the ${metaTagDefaults.explearningPublic.metaTagSiteName} team using this contact form. We welcome questions, suggestions, and any thoughtful input. Let us know if there is anything else we can do to help you strengthen your social connections!`,
     contactPageTitle: 'Contact Us',
     contactPageHeroSubtitle: 'Questions, suggestions, and thoughtful input are welcome',
     contactActionMessage: 'Get in Touch',
     homeCapTitleOne: 'Confidence',
-    homeCapBodyOne: 'Learn effective communication skills for interviews, public speaking, salary negotiations, and more',
+    homeCapBodyOne: 'Cultivate your mental fortitude for stronger social connections with the people who matter most',
     homeCapIconOnePath: PublicIconPaths.FIST_ICON,
     homeCapTitleTwo: 'Authenticity',
-    homeCapBodyTwo: 'Develop authentic speaking skills and project your true self to win the trust of your peers and clients',
+    homeCapBodyTwo: 'Project your unique and authentic self to win the trust of your friends, colleagues, and clients',
     homeCapIconTwoPath: PublicIconPaths.SHIELD_ICON,
     homeCapTitleThree: 'Poise',
-    homeCapBodyThree: 'Demonstrate professionalism and competence through better body language and demeanor',
+    homeCapBodyThree: 'Assert yourself in public and communicate with clarity and grace in any social context',
     homeCapIconThreePath: PublicIconPaths.LOTUS_FLOWER_ICON,
-    homePageTitle: 'A Richer Life Begins with Better Communication',
+    homePageTitle: 'A Richer Life Begins with Stronger Social Connections',
     homeActionMessage: 'Learn More',
     privacyPolicyMetaTitle: `Privacy Policy - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     termsAndConditionsMetaTitle: `Terms and Conditions - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     podcastMetaTitle: `Podcast - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     // tslint:disable-next-line: max-line-length
-    podcastMetaDescription: `Get our lastest communications strategies in audio form from our weekly ${metaTagDefaults.sywPublic.metaTagSiteName} podcast. Available on all the major directories, including Soundlcoud, iTunes, Google Podcast, Spotify, and more.`,
+    podcastMetaDescription: `Get our lastest social skills strategies in audio form from our weekly ${metaTagDefaults.sywPublic.metaTagSiteName} podcast. Available on all the major directories, including Soundlcoud, iTunes, Google Podcast, Spotify, and more.`,
     podcastPageTitle: 'Podcast',
-    podcastPageHeroSubtitle: 'Get our lastest communications strategies in audio form',
+    podcastPageHeroSubtitle: 'Get our lastest social skills strategies in audio form',
     podcastActionMessage: 'View Episodes',
     productListMetaTitle: `Products - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     // tslint:disable-next-line: max-line-length
-    productListMetaDescription: `${metaTagDefaults.explearningPublic.metaTagSiteName} offers a variety of products to help you improve your speaking skills and communication skills. From professional communications coaching to high quality web courses, our goal is to make you the best communicator you can be.`,
+    productListMetaDescription: `${metaTagDefaults.explearningPublic.metaTagSiteName} offers a variety of products to help you improve your social skills and professional interactions. From communications coaching to detailed web courses, our goal is to make you the best communicator you can be.`,
     purchaseConfirmationMetaTitle: `Purchase Confirmation - ${metaTagDefaults.maryDaphnePublic.metaTagSiteName}`,
     serviceListMetaTitle: `Services - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     // tslint:disable-next-line: max-line-length
-    serviceListMetaDescription: `${metaTagDefaults.explearningPublic.metaTagSiteName} offers a variety of services to help you improve your speaking skills and communication skills. From professional communications coaching to high quality web courses, our goal is to make you the best communicator you can be.`,
+    serviceListMetaDescription: `${metaTagDefaults.explearningPublic.metaTagSiteName} offers a variety of services to help you improve your social skills and professional interactions. From communications coaching to detailed web courses, our goal is to make you the best communicator you can be.`,
     webcourseListMetaTitle: `Web Courses - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
     // tslint:disable-next-line: max-line-length
-    webcourseListMetaDescription: `${metaTagDefaults.explearningPublic.metaTagSiteName} offers interactive, in-depth web courses that are designed to take your communication skills and social skills to a new level.`,
+    webcourseListMetaDescription: `${metaTagDefaults.explearningPublic.metaTagSiteName} offers interactive, in-depth web courses that are designed to take your social skills and professional communications to a new level.`,
     downloadPromoTitle: `Afraid of Small Talk?`,
     downloadPromoDescription: `Sign up to get our five foolproof strategies for mastering small talk.`,
     downloadPromoDeclineButton: `Nah, I'm already a small talk pro.`,
@@ -203,5 +218,59 @@ export const metaTagsContentPages = {
     subscribeBoxTitle: `Don't miss out`,
     subscribeBoxDescription: `Sign up to get our 3-Step Guide to building wealth.`,
     waitListBoxDescription: `Sign up for early bird prices on this webcourse along with our latest wealth building strategies.`,
+  },
+  advePublic: {
+    aboutMetaTitle: `About Us - ${metaTagDefaults.advePublic.metaTagSiteName}`,
+    // tslint:disable-next-line: max-line-length
+    aboutMetaDescription: `Our mission at Advanced English is to teach you to speak English fluently and confidently. At Advanced English, we teach English fluency by immersing our students in real-world English conversations and scenarios. Alongside the language, we teach American English culture and norms.`,
+    aboutBodyVideoUrl: `https://youtu.be/4YWtm8T8gj8`,
+    blogMetaTitle: `Blog - ${metaTagDefaults.advePublic.metaTagSiteName}`,
+    // tslint:disable-next-line: max-line-length
+    blogMetaDescription: `On ${metaTagDefaults.advePublic.metaTagSiteName}'s blog you have access to our complete library of free lessons on advanced english. Our goal with our content is for you to learn to speak English fluently and confidently.`,
+    blogPageTitle: `${metaTagDefaults.advePublic.metaTagSiteName} Blog`,
+    blogPagHeroSubtitle: `Access to our complete library of free lessons on speaking English fluently and confidently`,
+    blogActionMessage: `View Collection`,
+    contactMetaTitle: `Contact Us - ${metaTagDefaults.explearningPublic.metaTagSiteName}`,
+    // tslint:disable-next-line: max-line-length
+    contactMetaDescription: `Get in touch with the ${metaTagDefaults.explearningPublic.metaTagSiteName} team using this contact form. We welcome questions, suggestions, and any thoughtful input. Let us know if there is anything else we can do to help you on your English learning journey!`,
+    contactPageTitle: 'Contact Us',
+    contactPageHeroSubtitle: 'Questions, suggestions, and thoughtful input are welcome',
+    contactActionMessage: 'Get in Touch',
+    homeCapTitleOne: 'Fluency',
+    homeCapBodyOne: `Communicate like a native English speaker in any professional or social context`,
+    homeCapIconOnePath: PublicIconPaths.SHIELD_ICON,
+    homeCapTitleTwo: 'Confidence',
+    homeCapBodyTwo: `Feel confident in your English interactions by understanding American English culture and norms`,
+    homeCapIconTwoPath: PublicIconPaths.FIST_ICON,
+    homeCapTitleThree: 'Clarity',
+    homeCapBodyThree: `Learn to speak in clear, concise English to ensure your voice is heard and understood`,
+    homeCapIconThreePath: PublicIconPaths.LOTUS_FLOWER_ICON,
+    homePageTitle: 'Learn to speak English fluently and confidently',
+    homeActionMessage: 'Learn More',
+    privacyPolicyMetaTitle: `Privacy Policy - ${metaTagDefaults.advePublic.metaTagSiteName}`,
+    termsAndConditionsMetaTitle: `Terms and Conditions - ${metaTagDefaults.advePublic.metaTagSiteName}`,
+    // tslint:disable-next-line: max-line-length
+    podcastMetaTitle: `Podcast - ${metaTagDefaults.advePublic.metaTagSiteName}`,
+    // tslint:disable-next-line: max-line-length
+    podcastMetaDescription: `Get our lastest advanced English strategies in audio form from our weekly ${metaTagDefaults.advePublic.metaTagSiteName} podcast. Available on all the major directories, including Soundlcoud, iTunes, Google Podcast, Spotify, and more.`,
+    podcastPageTitle: 'Podcast',
+    podcastPageHeroSubtitle: 'Get our lastest wealth building strategies in audio form',
+    podcastActionMessage: 'View Episodes',
+    productListMetaTitle: `Products - ${metaTagDefaults.advePublic.metaTagSiteName}`,
+    // tslint:disable-next-line: max-line-length
+    productListMetaDescription: `${metaTagDefaults.advePublic.metaTagSiteName} offers a variety of products to help you improve your advanced English fluency. From conversational English, to business English, to native-sounding English, our goal is to equip you to speak English with fluency and confidence.`,
+    purchaseConfirmationMetaTitle: `Purchase Confirmation - ${metaTagDefaults.maryDaphnePublic.metaTagSiteName}`,
+    serviceListMetaTitle: `Services - ${metaTagDefaults.advePublic.metaTagSiteName}`,
+    // tslint:disable-next-line: max-line-length
+    serviceListMetaDescription: `${metaTagDefaults.advePublic.metaTagSiteName} offers a variety of products to help you improve your advanced English fluency. From conversational English, to business English, to native-sounding English, our goal is to equip you to speak English with fluency and confidence.`,
+    webcourseListMetaTitle: `Web Courses - ${metaTagDefaults.advePublic.metaTagSiteName}`,
+    // tslint:disable-next-line: max-line-length
+    webcourseListMetaDescription: `${metaTagDefaults.advePublic.metaTagSiteName} offers a variety of products to help you improve your advanced English fluency. From conversational English, to business English, to native-sounding English, our goal is to equip you to speak English with fluency and confidence.`,
+    downloadPromoTitle: `Want to Speak English Fluently?`,
+    downloadPromoDescription: `Get started with our free Small Talk Guide.`,
+    downloadPromoDeclineButton: `Nah, I'm already a small-talk pro.`,
+    subscribeBoxTitle: `Don't miss out`,
+    subscribeBoxDescription: `Sign up to get our free Small Talk Guide.`,
+    waitListBoxDescription: `Sign up for early bird prices on this webcourse along with our latest Advanced English strategies.`,
   },
 };

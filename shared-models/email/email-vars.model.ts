@@ -23,6 +23,9 @@ export enum EmailTemplateIds {
   SYW_WELCOME_EMAIL = 'd-99c64a8b00364a6cb1af1fb9e0b16eac',
   SYW_OPT_IN_CONFIRMATION = 'd-776824ed40bf44efa371843d0073ec25',
   SYW_CONTACT_FORM_CONFIRMATION = 'd-e058fdbaa080487285a8391258a6ef08',
+  ADVE_WELCOME_EMAIL = 'd-539dc1e2c38a4c14a16ba52a167bccb9',
+  ADVE_OPT_IN_CONFIRMATION = 'd-278d02a459384530b9e71cb338e0046d',
+  ADVE_CONTACT_FORM_CONFIRMATION = 'd-30ecd808839443f1a3b941c8e4a43d82',
 }
 
 export enum EmailContactListIds {
@@ -35,6 +38,9 @@ export enum EmailContactListIds {
   SYW_PRIMARY_NEWSLETTER = '422a87c7-66ce-469e-b614-81bab3b2c05c',
   SYW_EXECUTIVE_PRESENCE_WAIT_LIST = 'TBD',
   SYW_REMOTE_WORK_WAIT_LIST = 'TBD',
+  ADVE_PRIMARY_NEWSLETTER = '4cd8cb6e-8ac4-433a-877d-829cf99be715',
+  ADVE_EXECUTIVE_PRESENCE_WAIT_LIST = 'TBD',
+  ADVE_REMOTE_WORK_WAIT_LIST = 'TBD',
 }
 
 export enum EmailUnsubscribeGroupIds {
@@ -45,6 +51,7 @@ export enum EmailUnsubscribeGroupIds {
   MARY_DAPHNE_EXECUTIVE_PRESENCE_WAIT_LIST = 13699,
   MARY_DAPHNE_REMOTE_WORK_WAIT_LIST = 13700,
   SYW_PRIMARY_NEWSLETTER = 22515,
+  ADVE_PRIMARY_NEWSLETTER = 17226,
 }
 
 // Set the key to the Product ID Searchable by product ID
@@ -61,6 +68,10 @@ export const ProductEmailTemplates: ProductEmailTemplateList = {
   [ProductIdList.SYW_REMOTE_COACH]: {
     templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
     productId: ProductIdList.SYW_REMOTE_COACH
+  },
+  [ProductIdList.ADVE_REMOTE_COACH]: {
+    templateId: EmailTemplateIds.EXPLEARNING_REMOTE_COACH_PURCHASE_CONFIRMATION,
+    productId: ProductIdList.ADVE_REMOTE_COACH
   },
 
 };
@@ -80,7 +91,12 @@ export enum EmailSenderAddresses {
   SYW_NEWSLETTER = 'newsletter@stakeyourwealth.com',
   SYW_ORDERS = 'orders@stakeyourwealth.com',
   SYW_ADMIN = 'admin@stakeyourwealth.com',
-  SYW_SUPPORT = 'support@stakeyourwealth.com'
+  SYW_SUPPORT = 'support@stakeyourwealth.com',
+  ADVE_DEFAULT = 'hello@advancedenglish.co',
+  ADVE_NEWSLETTER = 'newsletter@advancedenglish.co',
+  ADVE_ORDERS = 'orders@advancedenglish.co',
+  ADVE_ADMIN = 'admin@advancedenglish.co',
+  ADVE_SUPPORT = 'support@advancedenglish.co'
 }
 
 export enum EmailSenderNames {
@@ -92,7 +108,10 @@ export enum EmailSenderNames {
   MARY_DAPHNE_ADMIN = 'Mary Daphne ADMIN',
   SYW_DEFAULT = 'Stake Your Wealth',
   SYW_NEWSLETTER = 'Stake Your Wealth',
-  SYW_ADMIN = 'Stake Your Wealth ADMIN'
+  SYW_ADMIN = 'Stake Your Wealth ADMIN',
+  ADVE_DEFAULT = 'Advanced English',
+  ADVE_NEWSLETTER = 'Advanced English',
+  ADVE_ADMIN = 'Advanced English ADMIN'
 }
 
 export const AdminEmailAddresses = {
@@ -104,5 +123,8 @@ export const AdminEmailAddresses = {
   MARY_DAPHNE_DEFAULT: 'hello@marydaphne.com',
   SYW_GREG_ONLY: 'greg@stakeyourwealth.com',
   SYW_GREG_AND_MD: ['greg@stakeyourwealth.com, md@stakeyourwealth.com'],
-  SYW_DEFAULT: 'hello@stakeyourwealth.com'
+  SYW_DEFAULT: 'hello@stakeyourwealth.com',
+  ADVE_GREG_ONLY: 'greg@advancedenglish.co',
+  ADVE_GREG_AND_MD: ['greg@advancedenglish.co, md@advancedenglish.co'],
+  ADVE_DEFAULT: 'hello@advancedenglish.co',
 };

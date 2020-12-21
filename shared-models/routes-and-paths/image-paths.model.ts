@@ -12,6 +12,7 @@ export enum PublicImagePaths {
   CONTACT = 'assets/images/background/contact@1500.jpg',
   POST_HERO = 'assets/images/background/post_hero_fallback_image.jpg',
   FOUNDER_AVATAR = 'assets/images/avatar/founder_avatar.png',
+  FOUNDER_AVATAR_2 = 'assets/images/avatar/founder_avatar_2.png',
   CHECKOUT_AVATAR = 'assets/images/avatar/checkout_avatar.jpg',
   FOUNDER_SIGNATURE = 'assets/images/avatar/founder_signature.png',
   LINK_SHARE_IMAGE = 'assets/images/background/link_share_image@1500.jpg',
