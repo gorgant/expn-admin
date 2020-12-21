@@ -24,7 +24,7 @@ export enum ProductIdList {
   ADVE_REMOTE_WORK = 'brhfsfff',
   ADVE_ONLINE_INTERVIEWS = '68sieci0',
   ADVE_GROUP_INTERVIEWS = 'ebgyik3s',
-  ADVE_ONLINE_TEAMWORK = 'hh7m8i1qS',
+  ADVE_ONLINE_TEAMWORK = 'hh7m8i1q',
 }
 
 export enum ProductUrlSlugList {
