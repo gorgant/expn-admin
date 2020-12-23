@@ -70,7 +70,7 @@ export class AuthService {
   loginWithGoogle(): Observable<AdminUser> {
 
     const authResponse = from(this.afAuth.signInWithPopup(
-      new firebase.auth.GoogleAuthProvider()
+      new firebase.default.auth.GoogleAuthProvider()
     ));
 
     return authResponse.pipe(
@@ -207,15 +207,15 @@ export class AuthService {
     return this.ngUnsubscribe$;
   }
 
-  private getUserCredentials(email: string, password: string): firebase.auth.AuthCredential {
-    const credentials = firebase.auth.EmailAuthProvider.credential(
+  private getUserCredentials(email: string, password: string): firebase.default.auth.AuthCredential {
+    const credentials = firebase.default.auth.EmailAuthProvider.credential(
       email,
       password
     );
     return credentials;
   }
 
-  private authSuccessActions(user: firebase.User): void {
+  private authSuccessActions(user: firebase.default.User): void {
     this.authStatus.next(user.uid);
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
     if (returnUrl && returnUrl !== '/') {

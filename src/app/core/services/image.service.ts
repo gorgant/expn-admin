@@ -25,12 +25,12 @@ export class ImageService {
   private imageProcessing$ = new BehaviorSubject<boolean>(false);
 
   private currentEnvironmentType: boolean = environment.production;
-  private blogStorageRef: firebase.storage.Reference;
-  private productsStorageRef: firebase.storage.Reference;
+  private blogStorageRef: firebase.default.storage.Reference;
+  private productsStorageRef: firebase.default.storage.Reference;
 
-  private db = firebase.firestore(); // Firebase database
+  private db = firebase.default.firestore(); // Firebase database
   // TODO: Check for firebase updates because firebase functions SDK isn't working at present
-  // private fns = firebase.functions(); // Firebase function
+  // private fns = firebase.default.functions(); // Firebase function
 
 
   constructor(
@@ -43,17 +43,17 @@ export class ImageService {
     switch (this.currentEnvironmentType) {
       case true:
         console.log('Setting storage to production');
-        this.blogStorageRef = firebase.app().storage(ProductionCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.app().storage(ProductionCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.default.app().storage(ProductionCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.default.app().storage(ProductionCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
       case false:
         console.log('Setting storage to sandbox');
-        this.blogStorageRef = firebase.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
       default:
-        this.blogStorageRef = firebase.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
     }
   }
@@ -194,10 +194,10 @@ export class ImageService {
       uploadTask.on('state_changed', (snapshot) => {
 
         switch (snapshot.state) {
-          case firebase.storage.TaskState.PAUSED: // or 'paused'
+          case firebase.default.storage.TaskState.PAUSED: // or 'paused'
             console.log('Upload is paused');
             break;
-          case firebase.storage.TaskState.RUNNING: // or 'running'
+          case firebase.default.storage.TaskState.RUNNING: // or 'running'
             console.log('Upload is running');
             break;
         }
@@ -435,8 +435,8 @@ export class ImageService {
 
   // The following are helper function used in both core functions
 
-  private getItemRef(itemId: string, imageType: ImageType): firebase.firestore.DocumentReference {
-    let docRef: firebase.firestore.DocumentReference;
+  private getItemRef(itemId: string, imageType: ImageType): firebase.default.firestore.DocumentReference {
+    let docRef: firebase.default.firestore.DocumentReference;
 
     switch (imageType) {
       case ImageType.BLOG_HERO:
@@ -457,7 +457,7 @@ export class ImageService {
     return docRef;
   }
 
-  private getItemFileRef(path: string, imageType: ImageType): firebase.storage.Reference {
+  private getItemFileRef(path: string, imageType: ImageType): firebase.default.storage.Reference {
     switch (imageType) {
       case ImageType.BLOG_HERO:
         return this.blogStorageRef.child(path);
