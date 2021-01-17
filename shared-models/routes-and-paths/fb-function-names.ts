@@ -40,7 +40,8 @@ export enum PublicFunctionNames {
   UPDATE_PODCAST_FEED_CACHE = 'updatePodcastFeedCache',
   UNIVERSAL_SSR = 'universalSsr',
   MARK_SUB_OPTED_IN = 'markSubOptedIn',
-  VALIDATE_DISCOUNT_COUPON = 'validateDiscountCoupon'
+  VALIDATE_DISCOUNT_COUPON = 'validateDiscountCoupon',
+  TRIGGER_WEBPAGE_LOAD_FAILURE_EMAIL = 'triggerWebpageLoadFailureEmail'
 }
 
 export enum PublicTopicNames {

@@ -2,7 +2,7 @@
 @import '~@angular/material/theming';
 
 // Copied from theme.scss
-$explearning-primary: (
+$expn-primary: (
   50 : #e4f2fe,
     100 : #bce0fb,
     200 : #90cbf9,
@@ -35,7 +35,7 @@ $explearning-primary: (
     )
 );
 
-$explearning-accent: (
+$expn-accent: (
     50 : #e7e9fe,
     100 : #c2c9fd,
     200 : #99a5fc,
@@ -68,8 +68,8 @@ $explearning-accent: (
     )
 );
 
-$theme-primary: mat-palette($explearning-primary);
-$theme-accent:  mat-palette($explearning-accent);
+$theme-primary: mat-palette($expn-primary);
+$theme-accent:  mat-palette($expn-accent);
 $theme-warn:    mat-palette($mat-red);
 
 // Create your Sass color vars (will be available in all the project)

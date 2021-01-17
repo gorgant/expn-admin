@@ -43,17 +43,17 @@ export class ImageService {
     switch (this.currentEnvironmentType) {
       case true:
         console.log('Setting storage to production');
-        this.blogStorageRef = firebase.default.app().storage(ProductionCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.default.app().storage(ProductionCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.default.app().storage(ProductionCloudStorage.EXPN_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.default.app().storage(ProductionCloudStorage.EXPN_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
       case false:
         console.log('Setting storage to sandbox');
-        this.blogStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPN_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPN_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
       default:
-        this.blogStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_BLOG_STORAGE_FB).ref();
-        this.productsStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPLEARNING_ADMIN_PRODUCTS_STORAGE_FB).ref();
+        this.blogStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPN_ADMIN_BLOG_STORAGE_FB).ref();
+        this.productsStorageRef = firebase.default.app().storage(SandboxCloudStorage.EXPN_ADMIN_PRODUCTS_STORAGE_FB).ref();
         break;
     }
   }

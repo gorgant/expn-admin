@@ -1,6 +1,6 @@
-import { explearningAdminApp, explearningPublicApp, altEnvironmentExplearningAdminApp } from "./app-config";
+import { expnAdminApp, expnPublicApp, altEnvironmentExpnAdminApp } from "./app-config";
 
-export const adminFirestore = explearningAdminApp.firestore();
-export const publicFirestore = explearningPublicApp.firestore();
-export const altEnvAdminFirestore = altEnvironmentExplearningAdminApp.firestore();
-export const altEnvPublicFirestore = altEnvironmentExplearningAdminApp.firestore();
+export const adminFirestore = expnAdminApp.firestore();
+export const publicFirestore = expnPublicApp.firestore();
+export const altEnvAdminFirestore = altEnvironmentExpnAdminApp.firestore();
+export const altEnvPublicFirestore = altEnvironmentExpnAdminApp.firestore();

@@ -12,12 +12,12 @@ export const sendContactFormConfirmationEmail = async (contactForm: ContactForm)
   functions.logger.log('Sending Contact Form Confirmation Email to this subscriber', contactForm.email);
 
   const sgMail = getSgMail();
-  const fromEmail = EmailSenderAddresses.EXPLEARNING_DEFAULT;
-  const fromName = EmailSenderNames.EXPLEARNING_DEFAULT;
+  const fromEmail = EmailSenderAddresses.EXPN_DEFAULT;
+  const fromName = EmailSenderNames.EXPN_DEFAULT;
   const toFirstName = (contactForm.firstName);
   let toEmail: string;
   let bccEmail: string;
-  const templateId = EmailTemplateIds.EXPLEARNING_CONTACT_FORM_CONFIRMATION;
+  const templateId = EmailTemplateIds.EXPN_CONTACT_FORM_CONFIRMATION;
   let categories: string[];
 
   // Prevents test emails from going to the actual address used
@@ -25,15 +25,15 @@ export const sendContactFormConfirmationEmail = async (contactForm: ContactForm)
     case EnvironmentTypes.PRODUCTION:
       toEmail = contactForm.email;
       categories = [EmailCategories.CONTACT_FORM_CONFIRMATION];
-      bccEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      bccEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.CONTACT_FORM_CONFIRMATION, EmailCategories.TEST_SEND];
       bccEmail = '';
       break;
     default:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.CONTACT_FORM_CONFIRMATION, EmailCategories.TEST_SEND];
       bccEmail = '';
       break;

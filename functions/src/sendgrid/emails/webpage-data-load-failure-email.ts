@@ -12,8 +12,8 @@ export const sendWebpageDataLoadFailureEmail = async (webpageLoadFailureData: We
   functions.logger.log('Sending Webpage Data Load Failure Email to admin');
   
   const sgMail = getSgMail();
-  const fromEmail: string = EmailSenderAddresses.EXPLEARNING_ADMIN;
-  const fromName: string = EmailSenderNames.EXPLEARNING_ADMIN;
+  const fromEmail: string = EmailSenderAddresses.EXPN_ADMIN;
+  const fromName: string = EmailSenderNames.EXPN_ADMIN;
   const toFirstName: string = 'Administrator';
   let toEmail: string;
   const subject: string = '[Automated Error Service] Webpage Data Load Failure';
@@ -33,15 +33,15 @@ export const sendWebpageDataLoadFailureEmail = async (webpageLoadFailureData: We
   
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.WEBPAGE_DATA_LOAD_FAILURE];
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.WEBPAGE_DATA_LOAD_FAILURE, EmailCategories.TEST_SEND];
       break;
     default:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.WEBPAGE_DATA_LOAD_FAILURE, EmailCategories.TEST_SEND];
       break;
   }

@@ -12,7 +12,7 @@ export class FooterComponent implements OnInit {
   @Input() appVersion: string;
   showAppVersion = false;
 
-  legalBusinessName = LegalBusinessNames.EXPLEARNING;
+  legalBusinessName = LegalBusinessNames.EXPN;
 
   currentDate: number;
 

@@ -13,12 +13,12 @@ export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber)
   functions.logger.log('Sending Sub Opt In Confirmation Email to this subscriber', subscriber.id);
   
   const sgMail = getSgMail();
-  const fromEmail: string = EmailSenderAddresses.EXPLEARNING_NEWSLETTER;
-  const fromName: string = EmailSenderNames.EXPLEARNING_NEWSLETTER;
+  const fromEmail: string = EmailSenderAddresses.EXPN_NEWSLETTER;
+  const fromName: string = EmailSenderNames.EXPN_NEWSLETTER;
   const toFirstName: string = (subscriber.publicUserData.billingDetails as BillingDetails).firstName;
   let toEmail: string;
   let bccEmail: string;
-  const templateId: string = EmailTemplateIds.EXPLEARNING_OPT_IN_CONFIRMATION;
+  const templateId: string = EmailTemplateIds.EXPN_OPT_IN_CONFIRMATION;
   let categories: string[];
   const optInConfirmationUrl = `${EmailWebsiteLinks.OPT_IN_CONFIRMATION_URL_NO_PARAMS}/${subscriber.publicUserData.id}/${subscriber.id}`;
   
@@ -26,15 +26,15 @@ export const sendSubOptInConfirmationEmail = async (subscriber: EmailSubscriber)
     case EnvironmentTypes.PRODUCTION:
       toEmail = subscriber.id;
       categories = [EmailCategories.OPT_IN_CONFIRMATION, EmailCategories.MARKETING_NEWSLETTER];
-      bccEmail = AdminEmailAddresses.EXPLEARNING_DEFAULT;
+      bccEmail = AdminEmailAddresses.EXPN_DEFAULT;
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.OPT_IN_CONFIRMATION, EmailCategories.MARKETING_NEWSLETTER, EmailCategories.TEST_SEND];
       bccEmail = '';
       break;
     default:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.OPT_IN_CONFIRMATION, EmailCategories.MARKETING_NEWSLETTER, EmailCategories.TEST_SEND];
       bccEmail = '';
       break;

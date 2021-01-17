@@ -13,7 +13,7 @@ import { ShorthandBusinessNames } from 'shared-models/forms-and-components/legal
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = `Admin - ${ShorthandBusinessNames.EXPLEARNING}`;
+  title = `Admin - ${ShorthandBusinessNames.EXPN}`;
   appVersion = '2.0.4';
 
   @ViewChild('sidenav', { static: true }) sidenav: MatSidenav;

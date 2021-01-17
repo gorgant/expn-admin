@@ -5,20 +5,20 @@ import * as functions from 'firebase-functions';
 
 
 // Access to public app requires admin service account to be added to public IAM
-const getExplearningAdminApp = () => {
+const getExpnAdminApp = () => {
   let app: admin.app.App;
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       app = admin.initializeApp(
-        PRODUCTION_APPS.explearningAdminApp,
-        'explearningAdminApp'
+        PRODUCTION_APPS.expnAdminApp,
+        'expnAdminApp'
       );
       break;
     case EnvironmentTypes.SANDBOX:
       app = admin.initializeApp(
-        SANDBOX_APPS.explearningAdminApp,
-        'explearningAdminApp'
+        SANDBOX_APPS.expnAdminApp,
+        'expnAdminApp'
       );
       break;
     default:
@@ -26,23 +26,23 @@ const getExplearningAdminApp = () => {
   }
   return app;
 };
-export const explearningAdminApp = getExplearningAdminApp();
+export const expnAdminApp = getExpnAdminApp();
 
 // Access to public app requires admin service account to be added to public IAM
-const getExplearningPublicApp = () => {
+const getExpnPublicApp = () => {
   let app: admin.app.App;
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       app = admin.initializeApp(
-        PRODUCTION_APPS.explearningPublicApp,
-        'explearningPublicApp'
+        PRODUCTION_APPS.expnPublicApp,
+        'expnPublicApp'
       );
       break;
     case EnvironmentTypes.SANDBOX:
       app = admin.initializeApp(
-        SANDBOX_APPS.explearningPublicApp,
-        'explearningPublicApp'
+        SANDBOX_APPS.expnPublicApp,
+        'expnPublicApp'
       );
       break;
     default:
@@ -50,23 +50,23 @@ const getExplearningPublicApp = () => {
   }
   return app;
 };
-export const explearningPublicApp = getExplearningPublicApp();
+export const expnPublicApp = getExpnPublicApp();
 
-const getAltEnvironmentExplearningAdminApp = () => {
+const getAltEnvironmentExpnAdminApp = () => {
 
   let app: admin.app.App;
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       app = admin.initializeApp(
-        SANDBOX_APPS.explearningAdminApp,
-        'altExplearningAdminApp'
+        SANDBOX_APPS.expnAdminApp,
+        'altExpnAdminApp'
       );
       break;
     case EnvironmentTypes.SANDBOX:
       app = admin.initializeApp(
-        PRODUCTION_APPS.explearningAdminApp,
-        'altExplearningAdminApp'
+        PRODUCTION_APPS.expnAdminApp,
+        'altExpnAdminApp'
       );
       break;
     default:
@@ -75,23 +75,23 @@ const getAltEnvironmentExplearningAdminApp = () => {
   return app;
 }
 
-export const altEnvironmentExplearningAdminApp = getAltEnvironmentExplearningAdminApp();
+export const altEnvironmentExpnAdminApp = getAltEnvironmentExpnAdminApp();
 
-const getAltEnvironmentExplearningPublicApp = () => {
+const getAltEnvironmentExpnPublicApp = () => {
 
   let app: admin.app.App;
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       app = admin.initializeApp(
-        SANDBOX_APPS.explearningPublicApp,
-        'altExplearningPublicApp'
+        SANDBOX_APPS.expnPublicApp,
+        'altExpnPublicApp'
       );
       break;
     case EnvironmentTypes.SANDBOX:
       app = admin.initializeApp(
-        PRODUCTION_APPS.explearningPublicApp,
-        'altExplearningPublicApp'
+        PRODUCTION_APPS.expnPublicApp,
+        'altExpnPublicApp'
       );
       break;
     default:
@@ -100,4 +100,4 @@ const getAltEnvironmentExplearningPublicApp = () => {
   return app;
 }
 
-export const altEnvironmentExplearningPublicApp = getAltEnvironmentExplearningPublicApp();
+export const altEnvironmentExpnPublicApp = getAltEnvironmentExpnPublicApp();

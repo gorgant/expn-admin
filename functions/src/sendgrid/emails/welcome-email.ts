@@ -36,28 +36,28 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
   functions.logger.log('Sending Welcome Email to this subscriber', subscriber.id);
 
   const sgMail = getSgMail();
-  const fromEmail: string = EmailSenderAddresses.EXPLEARNING_NEWSLETTER;
-  const fromName: string = EmailSenderNames.EXPLEARNING_NEWSLETTER;
+  const fromEmail: string = EmailSenderAddresses.EXPN_NEWSLETTER;
+  const fromName: string = EmailSenderNames.EXPN_NEWSLETTER;
   const toFirstName: string = (subscriber.publicUserData.billingDetails as BillingDetails).firstName;
   let toEmail: string;
   let bccEmail: string;
-  const templateId: string = EmailTemplateIds.EXPLEARNING_WELCOME_EMAIL;
-  const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.EXPLEARNING_PRIMARY_NEWSLETTER;
+  const templateId: string = EmailTemplateIds.EXPN_WELCOME_EMAIL;
+  const unsubscribeGroupId: number = EmailUnsubscribeGroupIds.EXPN_PRIMARY_NEWSLETTER;
   let categories: string[];
   
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       toEmail = subscriber.id;
       categories = [EmailCategories.WELCOME_EMAIL, EmailCategories.MARKETING_NEWSLETTER];
-      bccEmail = AdminEmailAddresses.EXPLEARNING_DEFAULT;
+      bccEmail = AdminEmailAddresses.EXPN_DEFAULT;
       break;
     case EnvironmentTypes.SANDBOX:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.WELCOME_EMAIL, EmailCategories.MARKETING_NEWSLETTER, EmailCategories.TEST_SEND];
       bccEmail = '';
       break;
     default:
-      toEmail = AdminEmailAddresses.EXPLEARNING_GREG_ONLY;
+      toEmail = AdminEmailAddresses.EXPN_GREG_ONLY;
       categories = [EmailCategories.WELCOME_EMAIL, EmailCategories.MARKETING_NEWSLETTER, EmailCategories.TEST_SEND];
       bccEmail = '';
       break;
@@ -80,8 +80,8 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
       remoteCoachUrl: EmailWebsiteLinks.REMOTE_COACH_URL,
       replyEmailAddress: fromEmail,
       webcoursesUrl: EmailWebsiteLinks.WEBCOURSES_URL,
-      downloadableUrl: DownloadableUrls.EXPLEARNING_DOWNLOADABLE,
-      youTubeChannelUrl: SocialUrls.EXPLEARNING_YOUTUBE
+      downloadableUrl: DownloadableUrls.EXPN_DOWNLOADABLE,
+      youTubeChannelUrl: SocialUrls.EXPN_YOUTUBE
     },
     trackingSettings: {
       subscriptionTracking: {

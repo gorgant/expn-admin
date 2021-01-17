@@ -10,10 +10,10 @@ const getAdminProjectId = (): string => {
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      projectId = PRODUCTION_APPS.explearningAdminApp.projectId
+      projectId = PRODUCTION_APPS.expnAdminApp.projectId
       break;
     case EnvironmentTypes.SANDBOX:
-      projectId = SANDBOX_APPS.explearningAdminApp.projectId
+      projectId = SANDBOX_APPS.expnAdminApp.projectId
       break;
     default:
       throw new functions.https.HttpsError('failed-precondition', `No environment type detected when getting admin project ID`);
@@ -27,10 +27,10 @@ const getPublicProjectId = (): string => {
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      projectId = PRODUCTION_APPS.explearningPublicApp.projectId;
+      projectId = PRODUCTION_APPS.expnPublicApp.projectId;
       break;
     case EnvironmentTypes.SANDBOX:
-      projectId = SANDBOX_APPS.explearningPublicApp.projectId;
+      projectId = SANDBOX_APPS.expnPublicApp.projectId;
       break;
     default:
       throw new functions.https.HttpsError('failed-precondition', `No environment type detected when getting public project ID`);
@@ -45,10 +45,10 @@ const getPublicAppUrl = (): string => {
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
-      appUrl = PRODUCTION_APPS.explearningPublicApp.websiteDomain;
+      appUrl = PRODUCTION_APPS.expnPublicApp.websiteDomain;
       break;
     case EnvironmentTypes.SANDBOX:
-      appUrl = SANDBOX_APPS.explearningPublicApp.websiteDomain;
+      appUrl = SANDBOX_APPS.expnPublicApp.websiteDomain;
       break;
     default:
       throw new functions.https.HttpsError('failed-precondition', `No environment type detected when getting public project ID`);

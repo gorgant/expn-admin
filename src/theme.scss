@@ -3,7 +3,7 @@
 
 
 // Generated from: http://mcg.mbitson.com
-$explearning-primary: (
+$expn-primary: (
   50 : #e4f2fe,
     100 : #bce0fb,
     200 : #90cbf9,
@@ -36,7 +36,7 @@ $explearning-primary: (
     )
 );
 
-$explearning-accent: (
+$expn-accent: (
     50 : #e7e9fe,
     100 : #c2c9fd,
     200 : #99a5fc,
@@ -69,9 +69,9 @@ $explearning-accent: (
     )
 );
 
-$explearning-palette-primary: mat-palette($explearning-primary);
-$explearning-palette-accent:  mat-palette($explearning-accent);
+$expn-palette-primary: mat-palette($expn-primary);
+$expn-palette-accent:  mat-palette($expn-accent);
 
-$explearning-theme: mat-light-theme($explearning-palette-primary, $explearning-palette-accent);
+$expn-theme: mat-light-theme($expn-palette-primary, $expn-palette-accent);
 
-@include angular-material-theme($explearning-theme);
+@include angular-material-theme($expn-theme);

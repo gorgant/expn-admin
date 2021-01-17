@@ -5,18 +5,18 @@ import * as functions from 'firebase-functions';
 
 
 // Access to public app requires admin service account to be added to public IAM
-const getExplearningAdminStorage = (): Storage => {
+const getExpnAdminStorage = (): Storage => {
   let storageConstructor: Storage;
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       storageConstructor = new Storage({
-        projectId: PRODUCTION_APPS.explearningAdminApp.projectId
+        projectId: PRODUCTION_APPS.expnAdminApp.projectId
       });
       break;
     case EnvironmentTypes.SANDBOX:
       storageConstructor = new Storage({
-        projectId: SANDBOX_APPS.explearningAdminApp.projectId
+        projectId: SANDBOX_APPS.expnAdminApp.projectId
       });
       break;
     default:
@@ -24,21 +24,21 @@ const getExplearningAdminStorage = (): Storage => {
   }
   return storageConstructor;
 };
-export const explearningAdminStorage = getExplearningAdminStorage();
+export const expnAdminStorage = getExpnAdminStorage();
 
 // Access to public app requires admin service account to be added to public IAM
-const getExplearningPublicStorage = (): Storage => {
+const getExpnPublicStorage = (): Storage => {
   let storageConstructor: Storage;
 
   switch (currentEnvironmentType) {
     case EnvironmentTypes.PRODUCTION:
       storageConstructor = new Storage({
-        projectId: PRODUCTION_APPS.explearningPublicApp.projectId
+        projectId: PRODUCTION_APPS.expnPublicApp.projectId
       });
       break;
     case EnvironmentTypes.SANDBOX:
       storageConstructor = new Storage({
-        projectId: SANDBOX_APPS.explearningPublicApp.projectId
+        projectId: SANDBOX_APPS.expnPublicApp.projectId
       });
       break;
     default:
@@ -46,4 +46,4 @@ const getExplearningPublicStorage = (): Storage => {
   }
   return storageConstructor;
 };
-export const explearningPublicStorage = getExplearningPublicStorage();
+export const expnPublicStorage = getExpnPublicStorage();

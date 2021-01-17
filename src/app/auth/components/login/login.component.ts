@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   userAuth$: Observable<boolean>;
   userLoaded$: Observable<boolean>;
-  shorthandBusinessName = ShorthandBusinessNames.EXPLEARNING;
+  shorthandBusinessName = ShorthandBusinessNames.EXPN;
 
   constructor(
     private fb: FormBuilder,

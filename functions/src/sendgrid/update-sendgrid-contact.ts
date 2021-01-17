@@ -13,12 +13,13 @@ import { AdminTopicNames } from '../../../shared-models/routes-and-paths/fb-func
 import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.model';
 import { PubSub } from '@google-cloud/pubsub';
 import { SubscriptionSource } from '../../../shared-models/subscribers/subscription-source.model';
+import { now } from 'moment';
 
 const pubSub = new PubSub();
 const db = adminFirestore;
 const sendgridApiKey = sendgridSecret;
 const contactsApiUrl = 'https://api.sendgrid.com/v3/marketing/contacts';
-const newsletterListId = EmailContactListIds.EXPLEARNING_PRIMARY_NEWSLETTER;
+const newsletterListId = EmailContactListIds.EXPN_PRIMARY_NEWSLETTER;
 const wildcardParamKey = 'subscriberId'; // Can use any value here, will represent the doc ID
 
 const submitRequest = async (requestOptions: request.Options): Promise<{}> => {
@@ -197,20 +198,21 @@ const deleteSendgridContact = async (subscriber: EmailSubscriber): Promise<Sendg
 
 }
 
-const createOrUpdateSendgridContact = async (subscriber: EmailSubscriber): Promise <SendgridStandardJobResponse> => {
+const createOrUpdateSendgridContact = async (subscriber: EmailSubscriber, optInRequested: boolean): Promise <SendgridStandardJobResponse> => {
 
   const firstName = (subscriber.publicUserData.billingDetails as BillingDetails).firstName;
   const email = subscriber.id;
   const requestUrl = contactsApiUrl;
 
+  const listIds = [
+    newsletterListId,
+    subscriber.subscriptionSources.includes(SubscriptionSource.WAIT_LIST_EXECUTIVE_PRESENCE) ? EmailContactListIds.EXPN_EXECUTIVE_PRESENCE_WAIT_LIST : '',
+  ].filter(Boolean); // Filter(Booelan) purges empty strings, such as when there is no wait list, courtesy of https://stackoverflow.com/a/19888749/6572208
+
   // Many more fields available, check api docs if needed (https://sendgrid.com/docs/API_Reference/api_v3.html)
   const requestBody = { 
     // Check for wait list IDs
-    list_ids: [ 
-      newsletterListId,
-      subscriber.subscriptionSources.includes(SubscriptionSource.WAIT_LIST_EXECUTIVE_PRESENCE) ? EmailContactListIds.EXPLEARNING_EXECUTIVE_PRESENCE_WAIT_LIST : '',
-      subscriber.subscriptionSources.includes(SubscriptionSource.WAIT_LIST_REMOTE_WORK) ? EmailContactListIds.EXPLEARNING_REMOTE_WORK_WAIT_LIST : '',
-    ],
+    list_ids: listIds,
     contacts: [ 
       { 
         email,
@@ -300,11 +302,12 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
   const subscriberAlreadyOptedIn = oldSubscriberData && oldSubscriberData.optInConfirmed;
   // Detect name change or contact list update
   const otherValidSendgridUpdate = 
-    (newSubscriberData?.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData?.publicUserData.billingDetails as BillingDetails).firstName || // Detect name change
+    (newSubscriberData?.publicUserData.billingDetails as BillingDetails)?.firstName !== (oldSubscriberData?.publicUserData.billingDetails as BillingDetails)?.firstName || // Detect name change
      newSubscriberData?.subscriptionSources.length !== oldSubscriberData?.subscriptionSources.length // Detect contact list update
     ;
   
-  const subscriberMissingSGContactId = newSubscriberData && !newSubscriberData.sendgridContactId;
+  const subscriberMissingSGContactId = !newSubscriberData?.sendgridContactId;
+  const optInOccurredSecondsAgo = (newSubscriberData?.optInTimestamp as number) > now() - 10000; // Check if opt in happend in last ten seconds
 
   // If this is a new opt in, send welcome email
   if (optInRequested) {
@@ -312,22 +315,24 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
     await triggerWelcomeEmail(newSubscriberData as EmailSubscriber);
   }
 
-  // Exit function if subscriber not opted in (we only update SG with opted-in subscribers)
-  if(notOptedInYet) {
+  // Exit function if subscriber not delete request and not opted in (we only update SG with opted-in subscribers)
+  if(!deleteRequest && notOptedInYet) {
     functions.logger.log('Subscriber not yet opted in, exiting function');
     return;
   }
 
   // ALL SENDGRID RELATED FUNCTIONS MUST GO BELOW THIS
+
   
   // Exit function if in sandbox to prevent bad data getting to sendGrid
   if (currentEnvironmentType === EnvironmentTypes.SANDBOX) {
+    // functions.logger.log('Sandbox detected, OVERRIDING EXIT FOR TESTING PURPOSES');
     functions.logger.log('Sandbox detected, exit function with no updates to SengGrid');
     return;
   }
 
   // If existing subscriber doesn't have a Sengrid contact id, attempt to add it (often fails because contact isn't searchable right after upload)
-  if (subscriberAlreadyOptedIn && subscriberMissingSGContactId) {
+  if (!deleteRequest && subscriberAlreadyOptedIn && subscriberMissingSGContactId && !optInOccurredSecondsAgo) {
     await addSendgridContactIdToSubscriber(newSubscriberData as EmailSubscriber);
   }
 
@@ -344,7 +349,7 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
     return;
   }
 
-  if ((newSubscriberData?.publicUserData.billingDetails as BillingDetails).firstName !== (oldSubscriberData?.publicUserData.billingDetails as BillingDetails).firstName) {
+  if ((newSubscriberData?.publicUserData.billingDetails as BillingDetails)?.firstName !== (oldSubscriberData?.publicUserData.billingDetails as BillingDetails)?.firstName) {
     functions.logger.log('Subscriber name update detected');
   }
 
@@ -353,7 +358,7 @@ const executeActions = async (newSubscriberData: EmailSubscriber | null, oldSubs
   }
 
   // Create or update Sendgrid Contact
-  await createOrUpdateSendgridContact(newSubscriberData as EmailSubscriber);
+  await createOrUpdateSendgridContact(newSubscriberData as EmailSubscriber, optInRequested as boolean);
 
 }
 
