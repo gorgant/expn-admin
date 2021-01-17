@@ -14,7 +14,7 @@ import { ShorthandBusinessNames } from 'shared-models/forms-and-components/legal
 })
 export class AppComponent implements OnInit {
   title = `Admin - ${ShorthandBusinessNames.EXPN}`;
-  appVersion = '2.0.4';
+  appVersion = '2.0.5';
 
   @ViewChild('sidenav', { static: true }) sidenav: MatSidenav;
 
