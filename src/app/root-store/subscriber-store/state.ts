@@ -1,5 +1,6 @@
 import { EntityAdapter, createEntityAdapter, EntityState } from '@ngrx/entity';
 import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
+import { SubCountData } from 'shared-models/subscribers/sub-count-data.model';
 
 export const featureAdapter: EntityAdapter<EmailSubscriber>
   = createEntityAdapter<EmailSubscriber>(
@@ -16,15 +17,27 @@ export const featureAdapter: EntityAdapter<EmailSubscriber>
   );
 
 export interface State extends EntityState<EmailSubscriber> {
-  isLoading?: boolean;
-  error?: any;
-  subscribersLoaded?: boolean;
+  isLoading: boolean;
+  isExportingSubscribers: boolean;
+  isProcessingSubscriberCount: boolean;
+  loadError: any;
+  exportSubscribersError: any;
+  subscriberCountError: any;
+  subscribersLoaded: boolean;
+  downloadUrl: string;
+  subCountData: SubCountData;
 }
 
 export const initialState: State = featureAdapter.getInitialState(
   {
     isLoading: false,
-    error: null,
+    isExportingSubscribers: false,
+    isProcessingSubscriberCount: false,
+    loadError: null,
+    exportSubscribersError: null,
+    subscriberCountError: null,
     subscribersLoaded: false,
+    downloadUrl: null,
+    subCountData: null,
   }
 );

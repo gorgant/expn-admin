@@ -174,3 +174,19 @@ export const COUPON_FORM_VALIDATION_MESSAGES = {
     { type: 'max', message: 'Value cannot exceed overall max use limit above.'},
   ],
 };
+
+export const DATE_RANGE_VALIDATION_MESSAGES = {
+  startDate: [
+    { type: 'required', message: 'This field is required.'},
+    { type: 'matStartDateInvalid', message: 'Invalid start date.'}
+  ],
+  endDate: [
+    { type: 'required', message: 'This field is required.'},
+    { type: 'matStartDateInvalid', message: 'Invalid end date.'}
+  ],
+  queryLimit: [
+    { type: 'required', message: 'This field is required.'},
+    { type: 'min', message: 'Value must be 0 or greater.'},
+    { type: 'max', message: 'Value must be below 100,000.'}
+  ]
+}

@@ -3,9 +3,13 @@ import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, throwError } from 'rxjs';
-import { takeUntil, map, catchError } from 'rxjs/operators';
+import { takeUntil, map, catchError, take, tap } from 'rxjs/operators';
 import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
 import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { ExportSubscribersParams } from 'shared-models/subscribers/export-subscriber-params.model';
+import { AdminFunctionNames } from 'shared-models/routes-and-paths/fb-function-names';
+import { AngularFireFunctions } from '@angular/fire/functions';
+import { SubCountData } from 'shared-models/subscribers/sub-count-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +19,8 @@ export class SubscriberService {
   constructor(
     private authService: AuthService,
     private uiService: UiService,
-    private afs: AngularFirestore
+    private afs: AngularFirestore,
+    private fns: AngularFireFunctions,
   ) { }
 
   fetchAllSubscribers(): Observable<EmailSubscriber[]> {
@@ -50,6 +55,48 @@ export class SubscriberService {
           return throwError(error);
         })
       );
+  }
+
+  exportSubscribers(exportParams: ExportSubscribersParams): Observable<string> {
+    const exportSubscribersHttpCall: (exportParams: ExportSubscribersParams) => Observable<string> = this.fns.httpsCallable(
+      AdminFunctionNames.EXPORT_SUBSCRIBERS
+    );
+
+    const exportSubscriberRes = exportSubscribersHttpCall(exportParams)
+      .pipe(
+        take(1),
+        tap(downloadUrl => {
+          console.log('Export subscribers processed, returning this URL', downloadUrl);
+          // throw new Error('Fake subscriber export error');
+        }),
+        catchError(error => {
+          console.log('Error exporting subscribers', error);
+          return throwError(error);
+        })
+      );
+    return exportSubscriberRes;
+  }
+
+  fetchSubscriberCount(): Observable<SubCountData> {
+    const fetchSubscriberCountHttpCall: (data: string) => Observable<SubCountData> = this.fns.httpsCallable(
+      AdminFunctionNames.GET_SUBSCRIBER_COUNT
+    );
+
+    const dummyData = 'Sub count requested'
+
+    const fetchSubscriberCountRes = fetchSubscriberCountHttpCall(dummyData)
+      .pipe(
+        take(1),
+        tap(subCountData => {
+          console.log('Fetch subscriber count processed, returning this data', subCountData);
+          // throw new Error('Fake subscriber export error');
+        }),
+        catchError(error => {
+          console.log('Error fetching subscriber count', error);
+          return throwError(error);
+        })
+      );
+    return fetchSubscriberCountRes;
   }
 
   private getSubscribersCollection(): AngularFirestoreCollection<EmailSubscriber> {

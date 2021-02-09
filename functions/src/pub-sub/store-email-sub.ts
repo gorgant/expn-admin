@@ -24,7 +24,7 @@ const triggerOptInEmail = async(subscriber: EmailSubscriber) => {
     subscriber
   }
   const topicPublishRes = await topic.publishJSON(pubsubMsg)
-    .catch(err => {functions.logger.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); throw new functions.https.HttpsError('internal', err);});;
+    .catch(err => {functions.logger.log(`Failed to publish to topic "${topicName}" on project "${projectId}":`, err); throw new functions.https.HttpsError('internal', err);});
   functions.logger.log(`Publish to topic "${topicName}" on project "${projectId}" succeeded:`, topicPublishRes);
 }
 

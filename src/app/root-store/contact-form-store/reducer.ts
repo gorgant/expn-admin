@@ -31,7 +31,7 @@ export function featureReducer(state = initialState, action: Actions): State {
     }
 
     case ActionTypes.ALL_CONTACT_FORMS_LOADED: {
-      return featureAdapter.addAll(
+      return featureAdapter.setAll(
         action.payload.contactForms, {
           ...state,
           isLoading: false,

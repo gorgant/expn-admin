@@ -8,7 +8,8 @@ export enum EmailCategories {
   PURCHASE_CONFIRMATION = 'purchase-confirmation',
   TEST_SEND = 'test-send',
   MARKETING_NEWSLETTER = 'marketing-newsletter',
-  WEBPAGE_DATA_LOAD_FAILURE = 'webpage-data-load-failure'
+  WEBPAGE_DATA_LOAD_FAILURE = 'webpage-data-load-failure',
+  SUBSCRIBER_COUNT_MISMATCH = 'subscriber-count-mismatch'
 }
 
 // Ids sourced from Sendgrid template system

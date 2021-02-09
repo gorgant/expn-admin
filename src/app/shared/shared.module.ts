@@ -15,6 +15,7 @@ import { WebcourseProductPipe } from './pipes/webcourse-product.pipe';
 // tslint:disable-next-line:max-line-length
 import { ActiveEditorSessionsDialogueComponent } from './components/active-editor-sessions-dialogue/active-editor-sessions-dialogue.component';
 import { ActionConfirmDialogueComponent } from './components/action-confirm-dialogue/action-confirm-dialogue.component';
+import { DateRangePickerComponent } from './components/date-range-picker/date-range-picker.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { ActionConfirmDialogueComponent } from './components/action-confirm-dial
     WebcourseProductPipe,
     PageHeroComponent,
     ActiveEditorSessionsDialogueComponent,
-    ActionConfirmDialogueComponent
+    ActionConfirmDialogueComponent,
+    DateRangePickerComponent
   ],
   imports: [
     CommonModule,
@@ -50,9 +52,7 @@ import { ActionConfirmDialogueComponent } from './components/action-confirm-dial
     PageHeroComponent,
     ServiceProductPipe,
     WebcourseProductPipe,
-  ],
-  entryComponents: [
-    ActiveEditorSessionsDialogueComponent
+    DateRangePickerComponent
   ]
 })
 export class SharedModule { }

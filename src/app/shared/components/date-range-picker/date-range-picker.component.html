@@ -1,0 +1,35 @@
+
+
+<h2 class="section-header" mat-dialog-title>Select Export Options</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="fill" fxLayoutAlign="center center">
+    <mat-label>Enter a date range</mat-label>
+    <mat-date-range-input [formGroup]="dateRangeForm" [rangePicker]="picker" [max]="maxDate">
+      <input matStartDate formControlName="startDate" placeholder="Start date" (dateInput)="onDateSelect($event)" (dateChange)="onDateSelect($event)">
+      <input matEndDate formControlName="endDate" placeholder="End date" (dateInput)="onDateSelect($event)" (dateChange)="onDateSelect($event)">
+    </mat-date-range-input>
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+    <mat-error *ngFor="let validation of dateRangeValidationMessages.startDate">
+      <mat-error *ngIf="startDate.hasError(validation.type) && startDate.invalid && (startDate.dirty || startDate.touched)">{{ validation.message }}</mat-error>
+    </mat-error>
+    <mat-error *ngFor="let validation of dateRangeValidationMessages.endDate">
+      <mat-error *ngIf="endDate.hasError(validation.type) && endDate.invalid && (endDate.dirty || endDate.touched)">{{ validation.message }}</mat-error>
+    </mat-error>
+  
+    <!-- <mat-error *ngIf="startDate.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+    <mat-error *ngIf="endDate.hasError('matEndDateInvalid')">Invalid end date</mat-error> -->
+  </mat-form-field>
+  <form [formGroup]="dateRangeForm">
+    <mat-form-field fxLayoutAlign="center center">
+      <input matInput formControlName="queryLimit" type="number" placeholder="Query Limit">
+      <mat-error *ngFor="let validation of dateRangeValidationMessages.queryLimit">
+        <mat-error *ngIf="queryLimit.hasError(validation.type) && queryLimit.invalid && (queryLimit.dirty || queryLimit.touched)">{{ validation.message }}</mat-error>
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayoutAlign="center center" fxLayout="column" fxLayoutGap="16px" fxLayout.gt-sm="row">
+  <button mat-raised-button (click)="onConfirmExport()" color="primary" [disabled]="dateRangeForm.invalid">Begin Export</button>
+  <button mat-raised-button [mat-dialog-close]="false" cdkFocusInitial="false" color="warn">Cancel Export</button>
+</mat-dialog-actions>

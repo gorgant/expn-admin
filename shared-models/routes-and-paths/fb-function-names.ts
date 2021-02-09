@@ -17,7 +17,9 @@ export enum AdminFunctionNames {
   REFRESH_PUBLIC_BLOG_CACHE = 'refreshPublicBlogCache',
   REFRESH_PUBLIC_FEATURED_POSTS_CACHE = 'refreshPublicFeaturedPostsCache',
   PURGE_INACTIVE_EDITOR_SESSIONS = 'purgeInactiveEditorSessions',
-  CLONE_PRODUCT_ON_ALT_ADMIN = 'cloneProductOnAltAdmin'
+  CLONE_PRODUCT_ON_ALT_ADMIN = 'cloneProductOnAltAdmin',
+  EXPORT_SUBSCRIBERS = 'exportSubscribers',
+  GET_SUBSCRIBER_COUNT = 'getSubscriberCount'
 }
 
 export enum AdminTopicNames {

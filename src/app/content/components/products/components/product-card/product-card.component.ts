@@ -85,9 +85,6 @@ export class ProductCardComponent implements OnInit {
 
     const wrappedProduct = clonedProductData as Product;
 
-
-    // TODO: test this function
-
     const dialogConfig = new MatDialogConfig();
 
     const cloneConfData: ActionConfData = {

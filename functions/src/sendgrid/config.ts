@@ -41,3 +41,5 @@ export const EmailWebsiteLinks = {
   OPT_IN_CONFIRMATION_URL_NO_PARAMS: optInConfirmationUrlNoParams,
   WEBCOURSES_URL: webcoursesUrl
 };
+
+export const sendgridContactsApiUrl = 'https://api.sendgrid.com/v3/marketing/contacts';

@@ -31,7 +31,7 @@ export function featureReducer(state = initialState, action: Actions): State {
     }
 
     case ActionTypes.ALL_EPISODES_LOADED: {
-      return featureAdapter.addAll(
+      return featureAdapter.setAll(
         action.payload.episodes, {
           ...state,
           isLoading: false,

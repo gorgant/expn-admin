@@ -38,3 +38,11 @@ export { refreshPublicFeaturedPostsCache } from './public/refresh-public-feature
 export { purgeInactiveEditorSessions } from './cron-jobs/purge-inactive-editor-sessions';
 
 export { cloneProductOnAltAdmin } from './alt-environment/clone-product-on-alt-admin';
+
+export { exportSubscribers } from './local/export-subscribers';
+
+export { purgeSubReports } from './cron-jobs/purge-sub-reports';
+
+export { getSubscriberCount } from './local/get-subscriber-count';
+
+export { verifySubscriberCountMatch } from './cron-jobs/verify-subscriber-count-match';

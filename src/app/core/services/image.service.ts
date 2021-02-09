@@ -16,6 +16,7 @@ import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collect
 import { SanitizedFileName } from 'shared-models/images/sanitized-file-name.model';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { take, tap, catchError } from 'rxjs/operators';
+import { AdminCsDirectoryPaths } from 'shared-models/routes-and-paths/cs-directory-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -491,27 +492,27 @@ export class ImageService {
     let imageDirectory: string;
     switch (imageType) {
       case ImageType.BLOG_HERO:
-        imagePath = `${SharedCollectionPaths.POSTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `${SharedCollectionPaths.POSTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${AdminCsDirectoryPaths.POST_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${AdminCsDirectoryPaths.POST_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
       case ImageType.BLOG_INLINE:
-        imagePath = `${SharedCollectionPaths.POSTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `${SharedCollectionPaths.POSTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${AdminCsDirectoryPaths.POST_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${AdminCsDirectoryPaths.POST_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
       case ImageType.PRODUCT_CARD:
-        imagePath = `${SharedCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imagePath = `${AdminCsDirectoryPaths.PRODUCT_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
         imageDirectory = `${SharedCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
       case ImageType.PRODUCT_HERO:
-        imagePath = `${SharedCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `${SharedCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${AdminCsDirectoryPaths.PRODUCT_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${AdminCsDirectoryPaths.PRODUCT_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
         break;
       default:
-        imagePath = `${SharedCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
-        imageDirectory = `${SharedCollectionPaths.PRODUCTS}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
+        imagePath = `${AdminCsDirectoryPaths.PRODUCT_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}/${sanitizedFileName.fullFileName}`;
+        imageDirectory = `${AdminCsDirectoryPaths.PRODUCT_IMAGES}/${itemId}/${sanitizedFileName.fileNameNoExt}`;
     }
-    const resizedImagesPath = `${imageDirectory}/resized`;
-    const resizedFileNamePrefix = `${sanitizedFileName.fileNameNoExt}_thumb@`;
+    const resizedImagesPath = `${imageDirectory}/${AdminCsDirectoryPaths.RESIZED_IMAGES}`;
+    const resizedFileNamePrefix = `${sanitizedFileName.fileNameNoExt}${AdminCsDirectoryPaths.RESIZED_IMAGE_FILE_PREFIX}`;
     const resizedFileNameExt = `.${sanitizedFileName.fileExt}`;
 
     const imageDirectoryData: ImageDirectoryData = {

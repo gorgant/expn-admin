@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as request from 'request';
-import { sendgridSecret } from './config';
+import { sendgridContactsApiUrl, sendgridSecret } from './config';
 import { AdminCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths';
 import { EmailSubscriber } from '../../../shared-models/subscribers/email-subscriber.model';
 import { BillingDetails } from '../../../shared-models/billing/billing-details.model';
@@ -14,44 +14,14 @@ import { EmailPubMessage } from '../../../shared-models/email/email-pub-message.
 import { PubSub } from '@google-cloud/pubsub';
 import { SubscriptionSource } from '../../../shared-models/subscribers/subscription-source.model';
 import { now } from 'moment';
+import { submitHttpRequest } from '../config/global-helpers';
 
 const pubSub = new PubSub();
 const db = adminFirestore;
 const sendgridApiKey = sendgridSecret;
-const contactsApiUrl = 'https://api.sendgrid.com/v3/marketing/contacts';
+
 const newsletterListId = EmailContactListIds.EXPN_PRIMARY_NEWSLETTER;
 const wildcardParamKey = 'subscriberId'; // Can use any value here, will represent the doc ID
-
-const submitRequest = async (requestOptions: request.Options): Promise<{}> => {
-  // Wrap the request in a promise
-  const responseBody: Promise<string> = new Promise<string> ( async(resolve, reject) => {
-    
-    // Submit the request using the options and body set above
-    request(requestOptions, (error, response, body) => {
-      
-      if (error) {
-        reject(`Error with request to sendgrid: ${error}`);
-        return error;
-      }
-
-      if (response.statusCode >= 400) {
-        reject(`400 status detected from request to sendgrid: ${response.statusCode} ${response.statusMessage}`);
-        functions.logger.log(`Error with request to sendgrid: ${response.statusCode} ${response.statusMessage}`);
-        return new functions.https.HttpsError('internal', `Error with request to sendgrid: ${response.statusCode} ${response.statusMessage}`);        
-      }
-
-      functions.logger.log('Body from request', body);
-
-      functions.logger.log('Response in string form', JSON.stringify(response));
-
-      resolve(body);
-
-    });
-
-  });
-
-  return responseBody;
-}
 
 const getImportStatus = async (jobId: string): Promise<SendgridImportStatusResponse> => {
 
@@ -60,7 +30,7 @@ const getImportStatus = async (jobId: string): Promise<SendgridImportStatusRespo
     return '%' + c.charCodeAt(0).toString(16);
   });
 
-  const requestUrl = `${contactsApiUrl}/imports/${safeUrl}`;
+  const requestUrl = `${sendgridContactsApiUrl}/imports/${safeUrl}`;
 
   const requestOptions: request.Options = {
     method: 'GET',
@@ -74,7 +44,7 @@ const getImportStatus = async (jobId: string): Promise<SendgridImportStatusRespo
 
   functions.logger.log('Checking job status with these options', requestOptions);
 
-  const importStatusResponse: SendgridImportStatusResponse = await submitRequest(requestOptions) as SendgridImportStatusResponse;
+  const importStatusResponse: SendgridImportStatusResponse = await submitHttpRequest(requestOptions) as SendgridImportStatusResponse;
 
     
   functions.logger.log('Got this job status:', importStatusResponse);
@@ -127,7 +97,7 @@ const checkUpdateComplete = async (jobId: string): Promise<boolean> => {
 // Queries sendgrid for a specific email address and returns the user ID
 const getSendgridContactId = async (email: string): Promise<string | null> => {
 
-  const requestUrl = `${contactsApiUrl}/search`;
+  const requestUrl = `${sendgridContactsApiUrl}/search`;
   const requestBody = { 
     query: `email LIKE '${email}'` // accepts most SQL queries such as AND CONTAINS...
   };
@@ -145,7 +115,7 @@ const getSendgridContactId = async (email: string): Promise<string | null> => {
 
   functions.logger.log('Searching SG for contact with these options', requestOptions);
 
-  const searchResponse: SendgridSearchContactsResponse = await submitRequest(requestOptions) as SendgridSearchContactsResponse;
+  const searchResponse: SendgridSearchContactsResponse = await submitHttpRequest(requestOptions) as SendgridSearchContactsResponse;
   
   if (searchResponse.contact_count < 1) {
     functions.logger.log('No contacts found, aborting getSendgridContactId with null value');
@@ -179,7 +149,7 @@ const deleteSendgridContact = async (subscriber: EmailSubscriber): Promise<Sendg
     ids: contactId 
   };
 
-  const requestUrl = contactsApiUrl;
+  const requestUrl = sendgridContactsApiUrl;
   const requestOptions: request.Options = {
     method: 'DELETE',
     url: requestUrl,
@@ -192,7 +162,7 @@ const deleteSendgridContact = async (subscriber: EmailSubscriber): Promise<Sendg
 
   functions.logger.log('Transmitting delete request with these options', requestOptions);
   
-  const sgJobResponse: SendgridStandardJobResponse = await submitRequest(requestOptions) as SendgridStandardJobResponse;
+  const sgJobResponse: SendgridStandardJobResponse = await submitHttpRequest(requestOptions) as SendgridStandardJobResponse;
 
   return sgJobResponse;
 
@@ -202,7 +172,7 @@ const createOrUpdateSendgridContact = async (subscriber: EmailSubscriber, optInR
 
   const firstName = (subscriber.publicUserData.billingDetails as BillingDetails).firstName;
   const email = subscriber.id;
-  const requestUrl = contactsApiUrl;
+  const requestUrl = sendgridContactsApiUrl;
 
   const listIds = [
     newsletterListId,
@@ -236,7 +206,7 @@ const createOrUpdateSendgridContact = async (subscriber: EmailSubscriber, optInR
 
   functions.logger.log('Transmitting SG update with these options', requestOptions);
   
-  const sgJobResponse: SendgridStandardJobResponse = await submitRequest(requestOptions) as SendgridStandardJobResponse;
+  const sgJobResponse: SendgridStandardJobResponse = await submitHttpRequest(requestOptions) as SendgridStandardJobResponse;
 
   return sgJobResponse;
 

@@ -43,7 +43,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   private productionEnvironment: boolean = environment.production;
   private origin: string;
   sanitizedSubscribeButtonContent: SafeHtml;
-  youTubeChannelId = YouTubeChannelIds.SYW;
+  youTubeChannelId = YouTubeChannelIds.EXPN;
 
   constructor(
     private store$: Store<RootStoreState.State>,
@@ -119,13 +119,13 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   private setYouTubeIframeOriginBasedOnEnvironment(): string {
     switch (this.productionEnvironment) {
       case true:
-        this.origin = `https://${PRODUCTION_APPS.sywPublicApp.websiteDomain}`;
+        this.origin = `https://${PRODUCTION_APPS.expnPublicApp.websiteDomain}`;
         break;
       case false:
-        this.origin = `https://${SANDBOX_APPS.sywPublicApp.websiteDomain}`;
+        this.origin = `https://${SANDBOX_APPS.expnPublicApp.websiteDomain}`;
         break;
       default:
-        this.origin = `https://${SANDBOX_APPS.sywPublicApp.websiteDomain}`;
+        this.origin = `https://${SANDBOX_APPS.expnPublicApp.websiteDomain}`;
         break;
     }
     return this.origin;
@@ -231,7 +231,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   }
 
   private getPodcastEpisode(podcastEpisodeUrl: string): Observable<PodcastEpisode> {
-    const podcastId = PODCAST_PATHS.syw.rssFeedPath.split('users:')[1].split('/')[0]; // May change if RSS feed link changes
+    const podcastId = PODCAST_PATHS.expn.rssFeedPath.split('users:')[1].split('/')[0]; // May change if RSS feed link changes
     const episodeId = this.uiService.createOrReverseFirebaseSafeUrl(podcastEpisodeUrl);
 
     const podcastEpisode$ = this.store$.select(PodcastStoreSelectors.selectEpisodeById(episodeId))

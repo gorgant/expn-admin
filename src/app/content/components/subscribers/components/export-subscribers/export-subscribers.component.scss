@@ -1,0 +1,13 @@
+@import '../../../../../variables';
+
+.page-container {
+  margin-top: 32px;
+  margin-bottom: 32px;
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+.load-error {
+  color: $warn;
+  text-align: center;
+}

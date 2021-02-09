@@ -16,6 +16,7 @@ import { currentEnvironmentType } from '../config/environments-config';
 import { Post } from '../../../shared-models/posts/post.model';
 import { assertUID } from '../config/global-helpers';
 import { expnAdminStorage } from '../config/storage-config';
+import { AdminCsDirectoryPaths } from '../../../shared-models/routes-and-paths/cs-directory-paths';
 
 interface ResizeImageDataObject {
   fileName: string;
@@ -39,33 +40,19 @@ const productHeroSizes = [ 500, 1500 ]
 
 const adminStorage = expnAdminStorage;
 
-let blogBucket: Bucket;
-let productsBucket: Bucket;
+const blogBucket = currentEnvironmentType === EnvironmentTypes.PRODUCTION ? 
+  adminStorage.bucket(ProductionCloudStorage.EXPN_ADMIN_BLOG_STORAGE_AF_CF) : 
+  adminStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_BLOG_STORAGE_AF_CF);
 
-const setBucketsBasedOnEnvironment = (): void => {
-
-  switch (currentEnvironmentType) {
-    case EnvironmentTypes.PRODUCTION:
-      blogBucket = adminStorage.bucket(ProductionCloudStorage.EXPN_ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = adminStorage.bucket(ProductionCloudStorage.EXPN_ADMIN_PRODUCTS_STORAGE_AF_CF);
-      break;
-    case EnvironmentTypes.SANDBOX:
-      blogBucket = adminStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = adminStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_PRODUCTS_STORAGE_AF_CF);
-      break;
-    default:
-      blogBucket = adminStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_BLOG_STORAGE_AF_CF);
-      productsBucket = adminStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_PRODUCTS_STORAGE_AF_CF);
-      break;
-  }
-}
+const productsBucket = currentEnvironmentType === EnvironmentTypes.PRODUCTION ? 
+  adminStorage.bucket(ProductionCloudStorage.EXPN_ADMIN_PRODUCTS_STORAGE_AF_CF) : 
+  adminStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_PRODUCTS_STORAGE_AF_CF);
 
 // Create a resize image data object
 const createResizeImageDataObject = async (metadata: ImageMetadata): Promise<ResizeImageDataObject> => {
 
   const imageType = metadata.customMetadata.imageType;
   
-  setBucketsBasedOnEnvironment();
   let bucket: Bucket; // The Storage bucket that contains the file.
 
   // Set bucket based on image type
@@ -103,7 +90,7 @@ const createResizeImageDataObject = async (metadata: ImageMetadata): Promise<Res
   
   const bucketDir = dirname(filePath);
 
-  const workingDir = join(tmpdir(), 'resized'); // Create a working directory
+  const workingDir = join(tmpdir(), AdminCsDirectoryPaths.RESIZED_IMAGES); // Create a working directory
   const tmpFilePath = join(workingDir, fileName) // Create a temp file path
 
   // Used to package and transport data to other functions
@@ -172,9 +159,9 @@ const resizeImgs = async (imageData: ResizeImageDataObject) => {
 
   // Currently this is configured to REPLACE origin file, meaning only final output will exist
   const createMultiSizes = sizes.map(async size => {
-    const thumbName = `${imageData.fileNameNoExt}_thumb@${size}.${imageData.fileExt}`;
+    const thumbName = `${imageData.fileNameNoExt}${AdminCsDirectoryPaths.RESIZED_IMAGE_FILE_PREFIX}${size}.${imageData.fileExt}`;
     const thumbPath = join(imageData.workingDir, thumbName);
-    const destination = join(imageData.bucketDir, "resized", thumbName);
+    const destination = join(imageData.bucketDir, AdminCsDirectoryPaths.RESIZED_IMAGES, thumbName);
     const metadata = {
       ...imageData.existingMetadata, // This includes item id
       resizedImage: 'true',
