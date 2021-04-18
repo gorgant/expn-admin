@@ -1,8 +1,8 @@
 export enum LegalBusinessNames {
   EXPN = 'Explearning, LLC',
-  MDLS = 'Mary Daphne, LLC',
-  SYW = 'Stake Your Wealth LLC',
-  ADVE = 'Advanced English LLC'
+  MDLS = 'Explearning, LLC',
+  SYW = 'Explearning, LLC',
+  ADVE = 'Explearning, LLC'
 }
 
 export enum ShorthandBusinessNames {
