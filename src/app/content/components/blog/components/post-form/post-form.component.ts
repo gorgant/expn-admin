@@ -287,7 +287,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       [PostKeys.BLOG_DOMAIN]: [BlogDomains.EXPN, Validators.required],
       [PostKeys.TITLE]: ['', Validators.required],
       [PostKeys.VIDEO_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/youtu\.be)\S*$/)]],
-      [PostKeys.PODCAST_EPISODE_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/soundcloud\.com)\S*$/)]],
+      [PostKeys.PODCAST_EPISODE_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/anchor\.fm)\S*$/)]],
       [PostKeys.DESCRIPTION]: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],
       [PostKeys.KEYWORDS]: ['', [Validators.required, Validators.maxLength(this.keywordsMaxLength)]],
       [PostKeys.CONTENT]: [{value: '', disabled: false }, Validators.required],

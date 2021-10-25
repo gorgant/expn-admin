@@ -1,41 +1,38 @@
 export enum PodcastVars {
-  PODCAST_QUERY_LIMIT = 40
+  PODCAST_QUERY_LIMIT = '40',
+  PODCAST_ID_SPLIT_CODE = 'anchor.fm/s/'
 }
 
 enum PodcastIds {
-  EXPN_RSS_FEED_ID = '672246926',
-  EXPN_USER_ID = '827686943',
+  EXPN_RSS_FEED_ID = '6d8b762c',
+  EXPN_USER_ID = 'explearning',
   MDLS_RSS_FEED_ID = 'TBD',
   MDLS_USER_ID = 'TBD',
-  SYW_RSS_FEED_ID = '881743030',
-  SYW_USER_ID = '854309119',
-  ADVE_RSS_FEED_ID = '918731671',
-  ADVE_USER_ID = '316228829',
+  SYW_RSS_FEED_ID = '712c5850',
+  SYW_USER_ID = 'stakeyourwealth',
+  ADVE_RSS_FEED_ID = '6d05bdc0',
+  ADVE_USER_ID = 'advanced_english',
 }
 
 export const PODCAST_PATHS = {
   expn: {
-    rssFeedPath: `https://feeds.soundcloud.com/users/soundcloud:users:${PodcastIds.EXPN_RSS_FEED_ID}/sounds.rss`,
-    landingPageUrl: `https://soundcloud.com/user-${PodcastIds.EXPN_USER_ID}`,
-    // tslint:disable-next-line: max-line-length
-    embeddedPlayerUrl: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/users/${PodcastIds.EXPN_RSS_FEED_ID}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=true`
+    rssFeedPath: `https://anchor.fm/s/${PodcastIds.EXPN_RSS_FEED_ID}/podcast/rss`,
+    landingPageUrl: `https://anchor.fm/${PodcastIds.EXPN_USER_ID}`,
+    embeddedPlayerUrl: `https://anchor.fm/${PodcastIds.EXPN_USER_ID}/embed`
   },
   mdls: {
-    rssFeedPath: `https://feeds.soundcloud.com/users/soundcloud:users:${PodcastIds.MDLS_RSS_FEED_ID}/sounds.rss`,
-    landingPageUrl: `https://soundcloud.com/user-${PodcastIds.MDLS_USER_ID}`,
-    // tslint:disable-next-line: max-line-length
-    embeddedPlayerUrl: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/users/${PodcastIds.MDLS_RSS_FEED_ID}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=true`
+    rssFeedPath: `https://anchor.fm/s/${PodcastIds.MDLS_RSS_FEED_ID}/podcast/rss`,
+    landingPageUrl: `https://anchor.fm/${PodcastIds.MDLS_USER_ID}`,
+    embeddedPlayerUrl: `https://anchor.fm/${PodcastIds.MDLS_USER_ID}/embed`
   },
   syw: {
-    rssFeedPath: `https://feeds.soundcloud.com/users/soundcloud:users:${PodcastIds.SYW_RSS_FEED_ID}/sounds.rss`,
-    landingPageUrl: `https://soundcloud.com/user-${PodcastIds.SYW_USER_ID}`,
-    // tslint:disable-next-line: max-line-length
-    embeddedPlayerUrl: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/users/${PodcastIds.SYW_RSS_FEED_ID}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=true`
+    rssFeedPath: `https://anchor.fm/s/${PodcastIds.SYW_RSS_FEED_ID}/podcast/rss`,
+    landingPageUrl: `https://anchor.fm/${PodcastIds.SYW_USER_ID}`,
+    embeddedPlayerUrl: `https://anchor.fm/${PodcastIds.SYW_USER_ID}/embed`
   },
   adve: {
-    rssFeedPath: `https://feeds.soundcloud.com/users/soundcloud:users:${PodcastIds.ADVE_RSS_FEED_ID}/sounds.rss`,
-    landingPageUrl: `https://soundcloud.com/user-${PodcastIds.ADVE_USER_ID}`,
-    // tslint:disable-next-line: max-line-length
-    embeddedPlayerUrl: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/users/${PodcastIds.ADVE_RSS_FEED_ID}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=true`
+    rssFeedPath: `https://anchor.fm/s/${PodcastIds.ADVE_RSS_FEED_ID}/podcast/rss`,
+    landingPageUrl: `https://anchor.fm/${PodcastIds.ADVE_USER_ID}`,
+    embeddedPlayerUrl: `https://anchor.fm/${PodcastIds.ADVE_USER_ID}/embed`
   }
 };

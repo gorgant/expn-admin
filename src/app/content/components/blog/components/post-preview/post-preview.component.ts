@@ -75,7 +75,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
   private getPost() {
 
     this.error$ = this.store$.select(PostStoreSelectors.selectLoadError);
-
+    
     this.post$ = this.store$.select(PostStoreSelectors.selectPostById(this.postId))
     .pipe(
       withLatestFrom(this.store$.select(PostStoreSelectors.selectPostsLoaded)),
@@ -98,10 +98,12 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
 
   // If post data available, patch values into form
   private initializeHeroAndPostContent() {
+
     this.postSubscription = this.post$
       .subscribe(post => {
         console.log('post subscription firing');
         if (post) {
+          // console.log('Post retreived, doing nothing for debugging purposes');
           this.initializeHeroData(post);
           this.sanitizedPostBody = this.sanitizer.sanitize(SecurityContext.HTML, post.content);
           if (post.videoUrl) {
@@ -110,7 +112,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
           }
           if (post.podcastEpisodeUrl) {
             console.log('Podcast url', post.podcastEpisodeUrl);
-            this.configureSoundCloudPlayer(post.podcastEpisodeUrl);
+            this.configureAnchorPlayer(post.podcastEpisodeUrl);
           }
         }
       });
@@ -180,58 +182,40 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
     console.log('subscribe script appended');
   }
 
-  private configureSoundCloudPlayer(podcastEpisodeUrl: string) {
+  private configureAnchorPlayer(podcastEpisodeUrl: string) {
 
     // Fetch episode data to load into player
     this.getPodcastEpisode(podcastEpisodeUrl).subscribe(episode => {
       if (!episode) {
         return;
       }
-      const podcastEpisodeGuid = episode.guid;
-      const baseEmbedUrl = `https://w.soundcloud.com/player/`;
+      const podcastEpisodeUrl = episode.episodeUrl;
+      const podcastEpisodeSlug = podcastEpisodeUrl.split('/').pop();
+      const baseEmbedUrl = `${PODCAST_PATHS.expn.embeddedPlayerUrl}/episodes`;
 
-      // See video parameters here: https://developers.google.com/youtube/player_parameters
-      const episodeParameters = {
-        url: `https%3A//api.soundcloud.com/tracks/${podcastEpisodeGuid}`,
-        color: `%23ff5500`,
-        auto_play: `false`,
-        hide_related: `false`,
-        show_comments: `true`,
-        show_user: `true`,
-        show_reposts: `false`,
-        show_teaser: `true`
-      };
-
-      // Courtesy of https://stackoverflow.com/a/12040639/6572208
-      // Create url parameter string
-      const urlParameters = Object.keys(episodeParameters).map((key) => {
-        return [key, episodeParameters[key]].map(encodeURIComponent).join('=');
-          }).join('&');
-
-      const updatedUrl = `${baseEmbedUrl}?${urlParameters}`;
+      const fullEmbedUrl = `${baseEmbedUrl}/${podcastEpisodeSlug}`;
 
       const embedHtml = `
         <iframe
-          class="soundcloud-iframe"
+          class="anchor-iframe"
           width="100%"
-          height="166"
+          height="100%"
           scrolling="no"
           frameborder="no"
-          allow="autoplay"
-          src="${updatedUrl}"
+          src="${fullEmbedUrl}"
         ></iframe>
       `;
 
       const safePodcastEpisodeLink = this.sanitizer.bypassSecurityTrustHtml(embedHtml);
       this.podcastEpisodeHtml = safePodcastEpisodeLink;
-      console.log('soundcloud data loaded', this.podcastEpisodeHtml);
+      console.log('anchor data loaded', this.podcastEpisodeHtml);
 
     });
 
   }
 
   private getPodcastEpisode(podcastEpisodeUrl: string): Observable<PodcastEpisode> {
-    const podcastId = PODCAST_PATHS.expn.rssFeedPath.split('users:')[1].split('/')[0]; // May change if RSS feed link changes
+    const podcastId = this.uiService.getPodcastId(PODCAST_PATHS.expn.rssFeedPath);
     const episodeId = this.uiService.createOrReverseFirebaseSafeUrl(podcastEpisodeUrl);
 
     const podcastEpisode$ = this.store$.select(PodcastStoreSelectors.selectEpisodeById(episodeId))
@@ -260,7 +244,11 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
       actionMessage: 'Read More',
       isPost: true
     };
-}
+
+    if (post && !this.titleSet) {
+      this.titleSet = true;
+    }
+  }
 
   private handlePostError() {
     this.errorSubscription = this.error$.subscribe(error => {

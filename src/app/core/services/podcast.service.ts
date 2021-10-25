@@ -87,7 +87,7 @@ export class PodcastService {
     return this.getPodcastContainerDoc(podcastId).collection<PodcastEpisode>(
       SharedCollectionPaths.PODCAST_FEED_EPISODES, ref => ref
         .orderBy(this.podcastEpisodeQueryField, 'desc') // Ensures most recent podcasts come first
-        .limit(this.podcastEpisodeQueryLimit) // Limit results to most recent for faster page load
+        .limit(+this.podcastEpisodeQueryLimit) // Limit results to most recent for faster page load
     );
   }
 

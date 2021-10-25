@@ -35,7 +35,7 @@ export const catchErrors = async (promise: Promise<any>) => {
     return await promise;
   } catch(err) {
     functions.logger.log('Unknown error', err);
-    throw new functions.https.HttpsError('unknown', err)
+    throw new functions.https.HttpsError('unknown', err as string)
   }
 }
 
