@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { catchError, takeUntil, map, take, tap } from 'rxjs/operators';
 import { throwError, Observable, of } from 'rxjs';
 import { PodcastEpisode, PodcastEpisodeKeys } from 'shared-models/podcast/podcast-episode.model';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';

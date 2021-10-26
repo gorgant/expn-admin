@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { map, tap, take, catchError } from 'rxjs/operators';
 import { Observable, zip, from, throwError } from 'rxjs';
 import { GeographicData } from 'shared-models/forms-and-components/geography/geographic-data.model';

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { UiService } from 'src/app/core/services/ui.service';
-import * as firebase from 'firebase/app';
-import 'firebase/auth';
+import * as firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 import { from, Observable, Subject, throwError, combineLatest, of } from 'rxjs';
 import { now } from 'moment';
 import { AuthData } from 'shared-models/auth/auth-data.model';

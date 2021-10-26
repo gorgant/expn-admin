@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import * as firebase from 'firebase/app';
+import * as firebase from 'firebase/compat/app';
 import { BehaviorSubject, Subject, throwError } from 'rxjs';
-import { UploadMetadata } from '@angular/fire/storage/interfaces';
+import { UploadMetadata } from '@angular/fire/compat/storage/interfaces';
 import { environment } from 'src/environments/environment';
 import { ProductionCloudStorage, SandboxCloudStorage } from 'shared-models/environments/env-vars.model';
 import { ImageType } from 'shared-models/images/image-type.model';
@@ -14,7 +14,7 @@ import { AdminFunctionNames } from 'shared-models/routes-and-paths/fb-function-n
 import { ImageDirectoryData } from 'shared-models/images/image-directory-data.model';
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 import { SanitizedFileName } from 'shared-models/images/sanitized-file-name.model';
-import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { take, tap, catchError } from 'rxjs/operators';
 import { AdminCsDirectoryPaths } from 'shared-models/routes-and-paths/cs-directory-paths';
 
@@ -320,7 +320,7 @@ export class ImageService {
 
       console.log('Fetching file with this path', filePath);
       const url: string = await this.getItemFileRef(filePath, imageType).getDownloadURL()
-        .catch(error => console.log(error));
+        .catch(error => console.log(error)) as string;
       console.log('Url retreivied', url);
       collection[key] = url;
       return collection;

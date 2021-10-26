@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { map, takeUntil, catchError, take } from 'rxjs/operators';
 import { Observable, throwError, from } from 'rxjs';
 import { AuthService } from './auth.service';

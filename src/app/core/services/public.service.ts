@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { catchError, tap, take } from 'rxjs/operators';
 
-import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { throwError, Observable } from 'rxjs';
 import { GeographyListService } from './geography-list.service';
 import { Post } from 'shared-models/posts/post.model';

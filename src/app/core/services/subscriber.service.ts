@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { Observable, throwError } from 'rxjs';
 import { takeUntil, map, catchError, take, tap } from 'rxjs/operators';
 import { EmailSubscriber } from 'shared-models/subscribers/email-subscriber.model';
 import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 import { ExportSubscribersParams } from 'shared-models/subscribers/export-subscriber-params.model';
 import { AdminFunctionNames } from 'shared-models/routes-and-paths/fb-function-names';
-import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { SubCountData } from 'shared-models/subscribers/sub-count-data.model';
 
 @Injectable({

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { Observable, throwError, from, of } from 'rxjs';
 import { takeUntil, map, catchError } from 'rxjs/operators';
 import { ContactForm } from 'shared-models/user/contact-form.model';

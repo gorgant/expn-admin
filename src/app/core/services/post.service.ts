@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { map, takeUntil, catchError, switchMap, take, tap } from 'rxjs/operators';
 import { Observable, throwError, from, of } from 'rxjs';
-import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
+import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/compat/storage';
 import { now } from 'moment';
 import { PublicService } from './public.service';
 import { ImageService } from './image.service';
@@ -12,7 +12,7 @@ import { Post } from 'shared-models/posts/post.model';
 import { ImageType } from 'shared-models/images/image-type.model';
 import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
 import { AdminFunctionNames } from 'shared-models/routes-and-paths/fb-function-names';
-import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 @Injectable({
   providedIn: 'root'

@@ -13,7 +13,7 @@ const getProductEmailTemplateIdFromProductId = (order: Order): string => {
     return template;
   } catch(error) {
     functions.logger.log(`Error fetching email template from product id ${order.productId}`, error);
-    return error;
+    return error as string;
   }
 }
 

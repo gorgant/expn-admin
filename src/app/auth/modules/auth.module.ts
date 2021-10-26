@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { AuthRoutingModule } from './auth-routing.module';
 import { LoginComponent } from '../components/login/login.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { ResetPasswordDialogueComponent } from '../components/reset-password-dialogue/reset-password-dialogue.component';
 
 @NgModule({

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { Product } from 'shared-models/products/product.model';
 import { Observable, throwError } from 'rxjs';
 import * as firestore from '@google-cloud/firestore';

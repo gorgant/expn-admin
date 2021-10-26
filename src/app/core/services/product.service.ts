@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { Observable, throwError, from, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { takeUntil, map, catchError, switchMap, take } from 'rxjs/operators';
 import { UiService } from './ui.service';
-import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
+import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/compat/storage';
 import { ImageService } from './image.service';
 import { PublicService } from './public.service';
 import { Product } from 'shared-models/products/product.model';

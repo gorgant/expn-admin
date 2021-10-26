@@ -1,10 +1,10 @@
 // Currently not using this but keeping for potential future use, need to add providers to app.module
 
 // import { Injectable, NgZone } from '@angular/core';
-// import { AngularFirestore } from '@angular/fire/firestore';
+// import { AngularFirestore } from '@angular/fire/compat/firestore';
 // import { environment } from 'src/environments/environment';
-// import { AngularFireAuth } from '@angular/fire/auth';
-// import { AngularFireFunctions } from '@angular/fire/functions';
+// import { AngularFireAuth } from '@angular/fire/compat/auth';
+// import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 
 // Courtesy of https://stackoverflow.com/a/51922426/6572208
