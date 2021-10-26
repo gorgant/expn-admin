@@ -1,5 +1,5 @@
 // Import material theming functions
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 // Copied from theme.scss
 $expn-primary: (
@@ -68,14 +68,14 @@ $expn-accent: (
     )
 );
 
-$theme-primary: mat-palette($expn-primary);
-$theme-accent:  mat-palette($expn-accent);
-$theme-warn:    mat-palette($mat-red);
+$theme-primary: mat.define-palette($expn-primary);
+$theme-accent:  mat.define-palette($expn-accent);
+$theme-warn:    mat.define-palette(mat.$red-palette);
 
 // Create your Sass color vars (will be available in all the project)
-$primary: mat-color($theme-primary);
-$accent: mat-color($theme-accent);
-$warn: mat-color($theme-warn);
+$primary: mat.get-color-from-palette($theme-primary);
+$accent: mat.get-color-from-palette($theme-accent);
+$warn: mat.get-color-from-palette($theme-warn);
 
 $font-weight-light: 300;
 $font-weight-regular: 400;
