@@ -4,10 +4,12 @@ import { ContactFormKeys } from 'shared-models/user/contact-form.model';
 export const SUBSCRIBE_VALIDATION_MESSAGES = {
   [BillingKeys.FIRST_NAME]: [
     { type: 'required', message: 'First name is required.'},
+    { type: 'forbiddenName', message: 'Name cannot contain punctuation.' }
   ],
   [BillingKeys.EMAIL]: [
     { type: 'required', message: 'Email is required.'},
     { type: 'email', message: 'Not a valid email.'},
+    { type: 'forbiddenEmail', message: 'Email domain blocked. Please choose a different email.' }
   ],
 };
 

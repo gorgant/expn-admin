@@ -16,6 +16,13 @@ const executeActions = async (emailData: EmailPubMessage) => {
     throw new functions.https.HttpsError('internal', errMsg);
   }
 
+  // Terminate email requests to invalid domains
+  if (emailData.subscriber?.id.includes('qq.com')) {
+    const errMsg: string = `Invalid email domain ${emailData.subscriber.id}. Terminating send request.`;
+    functions.logger.log(errMsg);
+    throw new functions.https.HttpsError('internal', errMsg);
+  }
+
   const emailCategory = emailData.emailCategory;
 
   switch(emailCategory) {
