@@ -18,21 +18,25 @@ export const PODCAST_PATHS = {
   expn: {
     rssFeedPath: `https://anchor.fm/s/${PodcastIds.EXPN_RSS_FEED_ID}/podcast/rss`,
     landingPageUrl: `https://anchor.fm/${PodcastIds.EXPN_USER_ID}`,
-    embeddedPlayerUrl: `https://anchor.fm/${PodcastIds.EXPN_USER_ID}/embed`
+    embeddedPlayerUrl: `https://podcasters.spotify.com/pod/show/${PodcastIds.EXPN_USER_ID}/embed/episodes`,
+    anchorRssFeedEpisodeUrl: `https://anchor.fm/${PodcastIds.EXPN_USER_ID}/episodes` // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
   },
   mdls: {
     rssFeedPath: `https://anchor.fm/s/${PodcastIds.MDLS_RSS_FEED_ID}/podcast/rss`,
     landingPageUrl: `https://anchor.fm/${PodcastIds.MDLS_USER_ID}`,
-    embeddedPlayerUrl: `https://anchor.fm/${PodcastIds.MDLS_USER_ID}/embed`
+    embeddedPlayerUrl: `https://podcasters.spotify.com/pod/show/${PodcastIds.MDLS_USER_ID}/embed/episodes`,
+    anchorRssFeedEpisodeUrl: `https://anchor.fm/${PodcastIds.MDLS_USER_ID}/episodes` // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
   },
   syw: {
     rssFeedPath: `https://anchor.fm/s/${PodcastIds.SYW_RSS_FEED_ID}/podcast/rss`,
     landingPageUrl: `https://anchor.fm/${PodcastIds.SYW_USER_ID}`,
-    embeddedPlayerUrl: `https://anchor.fm/${PodcastIds.SYW_USER_ID}/embed`
+    embeddedPlayerUrl: `https://podcasters.spotify.com/pod/show/${PodcastIds.SYW_USER_ID}/embed/episodes`,
+    anchorRssFeedEpisodeUrl: `https://anchor.fm/${PodcastIds.SYW_USER_ID}/episodes` // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
   },
   adve: {
     rssFeedPath: `https://anchor.fm/s/${PodcastIds.ADVE_RSS_FEED_ID}/podcast/rss`,
     landingPageUrl: `https://anchor.fm/${PodcastIds.ADVE_USER_ID}`,
-    embeddedPlayerUrl: `https://anchor.fm/${PodcastIds.ADVE_USER_ID}/embed`
+    embeddedPlayerUrl: `https://podcasters.spotify.com/pod/show/${PodcastIds.ADVE_USER_ID}/embed/episodes`,
+    anchorRssFeedEpisodeUrl: `https://anchor.fm/${PodcastIds.ADVE_USER_ID}/episodes` // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
   }
 };

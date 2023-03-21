@@ -8,6 +8,7 @@ export enum PostKeys {
   FEATURED = 'featured',
   KEYWORDS = 'keywords',
   PODCAST_EPISODE_URL = 'podcastEpisodeUrl',
+  PODCAST_ANCHOR_RSS_FEED_URL = 'podcastRssFeedUrl', // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
   PUBLISHED_DATE = 'publishedDate',
   TITLE = 'title',
   VIDEO_URL = 'videoUrl',
@@ -36,5 +37,6 @@ export interface Post extends BlogIndexPostRef {
   [PostKeys.VIDEO_URL]?: string;
   readyToPublish?: boolean;
   [PostKeys.PODCAST_EPISODE_URL]?: string;
+  [PostKeys.PODCAST_ANCHOR_RSS_FEED_URL]?: string;
   scheduledPublishTime?: number | null;
 }

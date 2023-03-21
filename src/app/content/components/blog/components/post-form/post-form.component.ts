@@ -24,6 +24,7 @@ import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collect
 import { ActionConfData } from 'shared-models/forms-and-components/action-conf-data.model';
 import { ActionConfirmDialogueComponent } from 'src/app/shared/components/action-confirm-dialogue/action-confirm-dialogue.component';
 import { PostVars } from 'shared-models/posts/post-vars.model';
+import { PODCAST_PATHS } from 'shared-models/podcast/podcast-vars.model';
 
 @Component({
   selector: 'app-post-form',
@@ -287,7 +288,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       [PostKeys.BLOG_DOMAIN]: [BlogDomains.EXPN, Validators.required],
       [PostKeys.TITLE]: ['', Validators.required],
       [PostKeys.VIDEO_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/youtu\.be)\S*$/)]],
-      [PostKeys.PODCAST_EPISODE_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/anchor\.fm)\S*$/)]],
+      [PostKeys.PODCAST_EPISODE_URL]: ['', [Validators.pattern(/^\S*(?:https\:\/\/podcasters\.spotify\.com\/pod\/show\/)\S*$/)]],
       [PostKeys.DESCRIPTION]: ['', [Validators.required, Validators.maxLength(this.descriptionMaxLength)]],
       [PostKeys.KEYWORDS]: ['', [Validators.required, Validators.maxLength(this.keywordsMaxLength)]],
       [PostKeys.CONTENT]: [{value: '', disabled: false }, Validators.required],
@@ -347,12 +348,14 @@ export class PostFormComponent implements OnInit, OnDestroy {
     this.adminUser$
       .pipe(take(1))
       .subscribe(publicUser => {
+        
         const post: Post = {
           [PostKeys.BLOG_DOMAIN]: this[PostKeys.BLOG_DOMAIN].value,
           author: publicUser.displayName ?? publicUser.email,
           authorId: publicUser.id,
           [PostKeys.VIDEO_URL]: this[PostKeys.VIDEO_URL].value,
           [PostKeys.PODCAST_EPISODE_URL]: this[PostKeys.PODCAST_EPISODE_URL].value,
+          [PostKeys.PODCAST_ANCHOR_RSS_FEED_URL]: `${PODCAST_PATHS.expn.anchorRssFeedEpisodeUrl}/${this[PostKeys.PODCAST_EPISODE_URL].value.split('/').pop()}`, // This is needed until the RSS feed adopts the new spotify url format
           [PostKeys.DESCRIPTION]: this[PostKeys.DESCRIPTION].value,
           [PostKeys.KEYWORDS]: this[PostKeys.KEYWORDS].value,
           [PostKeys.CONTENT]: this[PostKeys.CONTENT].value,

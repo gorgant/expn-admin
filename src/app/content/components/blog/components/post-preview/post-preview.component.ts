@@ -182,27 +182,28 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
     console.log('subscribe script appended');
   }
 
-  private configureAnchorPlayer(podcastEpisodeUrl: string) {
+  private configureAnchorPlayer(episodeUrl: string) {
 
     // Fetch episode data to load into player
-    this.getPodcastEpisode(podcastEpisodeUrl).subscribe(episode => {
+    this.getPodcastEpisode(episodeUrl).subscribe(episode => {
       if (!episode) {
+        console.log(`No podcast episode found matching the url: ${episodeUrl}`);
         return;
       }
       const podcastEpisodeUrl = episode.episodeUrl;
       const podcastEpisodeSlug = podcastEpisodeUrl.split('/').pop();
-      const baseEmbedUrl = `${PODCAST_PATHS.expn.embeddedPlayerUrl}/episodes`;
+      const baseEmbedUrl = `${PODCAST_PATHS.expn.embeddedPlayerUrl}`;
 
       const fullEmbedUrl = `${baseEmbedUrl}/${podcastEpisodeSlug}`;
 
       const embedHtml = `
-        <iframe
-          class="anchor-iframe"
-          width="100%"
-          height="100%"
-          scrolling="no"
-          frameborder="no"
+        <iframe 
+          class="spotify-iframe" 
           src="${fullEmbedUrl}"
+          height="100%" 
+          width="100%" 
+          frameborder="0" 
+          scrolling="no" 
         ></iframe>
       `;
 
@@ -216,7 +217,7 @@ export class PostPreviewComponent implements OnInit, OnDestroy {
 
   private getPodcastEpisode(podcastEpisodeUrl: string): Observable<PodcastEpisode> {
     const podcastId = this.uiService.getPodcastId(PODCAST_PATHS.expn.rssFeedPath);
-    const episodeId = this.uiService.createOrReverseFirebaseSafeUrl(podcastEpisodeUrl);
+    const episodeId = this.uiService.createOrReverseFirebaseSafeUrl(podcastEpisodeUrl.split('/').pop().toLowerCase()); // This matches the ID format as specified in the updatePodcastFeedCache function
 
     const podcastEpisode$ = this.store$.select(PodcastStoreSelectors.selectEpisodeById(episodeId))
       .pipe(
