@@ -80,6 +80,7 @@ export const sendWelcomeEmail = async (subscriber: EmailSubscriber) => {
       remoteCoachUrl: EmailWebsiteLinks.REMOTE_COACH_URL,
       replyEmailAddress: fromEmail,
       webcoursesUrl: EmailWebsiteLinks.WEBCOURSES_URL,
+      academyUrl: EmailWebsiteLinks.ACADEMY_URL,
       downloadableUrl: DownloadableUrls.EXPN_DOWNLOADABLE,
       youTubeChannelUrl: SocialUrls.EXPN_YOUTUBE
     },

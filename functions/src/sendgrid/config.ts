@@ -4,6 +4,7 @@ import * as sendGridMail from '@sendgrid/mail';
 import { publicAppUrl } from '../config/environments-config';
 import { PublicAppRoutes } from '../../../shared-models/routes-and-paths/app-routes.model';
 import { ProductIdList } from '../../../shared-models/products/product-id-list.model';
+import { AcademyUrls } from '../../../shared-models/routes-and-paths/academy-urls.model';
 
 // Iniitialize Cloud Firestore Database
 export const db = adminFirestore;
@@ -33,13 +34,15 @@ const confirmationSlugWithSlahPrefeix = PublicAppRoutes.SUB_CONFIRMATION;
 const optInConfirmationUrlNoParams = `https://${appUrl}${confirmationSlugWithSlahPrefeix}`;
 const webCoursesSlugWithSlashPrefix = PublicAppRoutes.WEBCOURSES;
 const webcoursesUrl = `https://${appUrl}${webCoursesSlugWithSlashPrefix}`;
+const academyUrl = AcademyUrls.ACADEMY_SIGNUP;
 
 
 export const EmailWebsiteLinks = {
   BLOG_URL: blogUrl,
   REMOTE_COACH_URL: remoteCoachUrl,
   OPT_IN_CONFIRMATION_URL_NO_PARAMS: optInConfirmationUrlNoParams,
-  WEBCOURSES_URL: webcoursesUrl
+  WEBCOURSES_URL: webcoursesUrl,
+  ACADEMY_URL: academyUrl
 };
 
 export const sendgridContactsApiUrl = 'https://api.sendgrid.com/v3/marketing/contacts';
