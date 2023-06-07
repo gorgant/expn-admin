@@ -5,6 +5,7 @@ import { SubCountData } from '../../../shared-models/subscribers/sub-count-data.
 import { adminFirestore } from '../config/db-config';
 import { assertUID } from '../config/global-helpers';
 import { getSendgridContactCount } from '../sendgrid/get-sendgrid-sub-count';
+import { getSendgridGlobalSuppressionCount } from '../sendgrid/get-sendgrid-global-suppression-count';
 
 const adminDb = adminFirestore;
 
@@ -21,7 +22,7 @@ const getDbSubscriberCount = async () => {
   // Could also use filter here, but this is a cool way to create a new array of the actual sub (rather than the docRef)
   const dbUnsubCount = subCollection.docs.reduce((acc: EmailSubscriber[], subscriberSnap) => {
     const subscriber = subscriberSnap.data() as EmailSubscriber;
-    if (subscriber.globalUnsubscribe) {
+    if (subscriber.globalUnsubscribe?.unsubscribeDate) {
       acc.concat(subscriber);      
     }
     return acc;
@@ -37,14 +38,16 @@ export const getAllSubCounts = async (): Promise<SubCountData> => {
   const {dbSubCount, dbUnsubCount} = await getDbSubscriberCount();
 
   const sgSubCount = await getSendgridContactCount();
+  const sgSuppressionCount = await getSendgridGlobalSuppressionCount();
+  const sgSubCountMinusSuppressions = sgSubCount - sgSuppressionCount;
 
   const subCountData: SubCountData = {
     databaseSubCount: dbSubCount,
-    sendGridSubCount: sgSubCount,
+    sendGridSubCount: sgSubCountMinusSuppressions,
     databaseUnsubCount: dbUnsubCount
   }
 
-  functions.logger.log('Fetched this sub count data', subCountData);
+  functions.logger.log('Fetched this combined sub count data', subCountData);
 
   return subCountData;
 }

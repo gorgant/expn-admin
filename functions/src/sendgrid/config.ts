@@ -46,3 +46,4 @@ export const EmailWebsiteLinks = {
 };
 
 export const sendgridContactsApiUrl = 'https://api.sendgrid.com/v3/marketing/contacts';
+export const sendgridSuppressionsApiUrl = 'https://api.sendgrid.com/v3/suppression';

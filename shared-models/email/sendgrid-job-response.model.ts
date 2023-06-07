@@ -56,3 +56,8 @@ export interface SendgridGetContactCountResponse {
   contact_count: number;
   billable_count: number;
 }
+
+export interface SendgridGlobalSuppressionObject {
+  created: number;
+  email: string;
+}

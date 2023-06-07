@@ -16,9 +16,6 @@
     <mat-error *ngFor="let validation of dateRangeValidationMessages.endDate">
       <mat-error *ngIf="endDate.hasError(validation.type) && endDate.invalid && (endDate.dirty || endDate.touched)">{{ validation.message }}</mat-error>
     </mat-error>
-  
-    <!-- <mat-error *ngIf="startDate.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-    <mat-error *ngIf="endDate.hasError('matEndDateInvalid')">Invalid end date</mat-error> -->
   </mat-form-field>
   <form [formGroup]="dateRangeForm">
     <mat-form-field fxLayoutAlign="center center">
@@ -27,6 +24,7 @@
         <mat-error *ngIf="queryLimit.hasError(validation.type) && queryLimit.invalid && (queryLimit.dirty || queryLimit.touched)">{{ validation.message }}</mat-error>
       </mat-error>
     </mat-form-field>
+    <mat-checkbox fxLayoutAlign="center center" matInput formControlName="includeUnconfirmedSubs">Include Unconfirmed Subs</mat-checkbox>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions fxLayoutAlign="center center" fxLayout="column" fxLayoutGap="16px" fxLayout.gt-sm="row">

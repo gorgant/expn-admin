@@ -27,13 +27,27 @@ const reportsBucket = currentEnvironmentType === EnvironmentTypes.PRODUCTION ?
 
 const generateSubCsv = async (exportParams: ExportSubscribersParams): Promise<string> => {
   const subCollectionPath = AdminCollectionPaths.SUBSCRIBERS;
-  const subCollection = await adminDb.collection(subCollectionPath)
-    .orderBy(`${EmailSubscriberKeys.CREATED_DATE}`, 'desc')
-    .where(`${EmailSubscriberKeys.CREATED_DATE}`, '<=', exportParams.endDate)
-    .where(`${EmailSubscriberKeys.CREATED_DATE}`, '>=', exportParams.startDate)
-    .limit(exportParams.limit)
-    .get()
-    .catch(err => {functions.logger.log(`Error fetching subscriber collection from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+  let subCollection;
+  if (exportParams.includeUnconfirmedSubs) {
+    functions.logger.log('User chose to include unconfirmed subs');
+    subCollection = await adminDb.collection(subCollectionPath)
+      .orderBy(`${EmailSubscriberKeys.CREATED_DATE}`, 'desc')
+      .where(`${EmailSubscriberKeys.CREATED_DATE}`, '<=', exportParams.endDate)
+      .where(`${EmailSubscriberKeys.CREATED_DATE}`, '>=', exportParams.startDate)
+      .limit(exportParams.limit)
+      .get()
+      .catch(err => {functions.logger.log(`Error fetching subscriber collection from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+  } else {
+    functions.logger.log('User chose to exclude unconfirmed subs');
+    subCollection = await adminDb.collection(subCollectionPath)
+      .orderBy(`${EmailSubscriberKeys.CREATED_DATE}`, 'desc')
+      .where(`${EmailSubscriberKeys.CREATED_DATE}`, '<=', exportParams.endDate)
+      .where(`${EmailSubscriberKeys.CREATED_DATE}`, '>=', exportParams.startDate)
+      .where(`${EmailSubscriberKeys.OPT_IN_CONFIRMED}`, '==', true)
+      .limit(exportParams.limit)
+      .get()
+      .catch(err => {functions.logger.log(`Error fetching subscriber collection from admin database:`, err); throw new functions.https.HttpsError('internal', err);});
+  }
 
   if (subCollection.empty) {
     const errMsg = 'No subscribers found with the current filter settings.';
