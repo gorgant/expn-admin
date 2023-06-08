@@ -61,6 +61,7 @@ const generateSubCsv = async (exportParams: ExportSubscribersParams): Promise<st
 
     const subExportData: ExportSubscriberData = {
       id: subscriber.id,
+      firstName: subscriber.publicUserData.billingDetails?.firstName ? subscriber.publicUserData.billingDetails.firstName : '',
       createdDate: subscriber.createdDate,
       modifiedDate: subscriber[EmailSubscriberKeys.MODIFIED_DATE],
       lastSubSource: subscriber.lastSubSource.toString(),

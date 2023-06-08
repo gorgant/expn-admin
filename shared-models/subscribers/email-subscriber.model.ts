@@ -6,7 +6,8 @@ export enum EmailSubscriberKeys {
   SUBSCRIPTION_SOURCES = 'subscriptionSources',
   MODIFIED_DATE = 'modifiedDate',
   CREATED_DATE = 'createdDate',
-  OPT_IN_CONFIRMED = 'optInConfirmed'
+  OPT_IN_CONFIRMED = 'optInConfirmed',
+  OPT_IN_TIMESTAMP = 'optInTimestamp'
 }
 
 export interface EmailSubscriber {
@@ -20,7 +21,7 @@ export interface EmailSubscriber {
   groupUnsubscribes?: GroupUnsubscribeRecordList;
   globalUnsubscribe?: UnsubscribeRecord;
   [EmailSubscriberKeys.OPT_IN_CONFIRMED]?: boolean;
-  optInTimestamp?: number;
+  [EmailSubscriberKeys.OPT_IN_TIMESTAMP]?: number;
   sendgridContactId?: string;
 }
 

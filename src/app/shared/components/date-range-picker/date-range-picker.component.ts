@@ -31,7 +31,7 @@ export class DateRangePickerComponent implements OnInit {
   }
 
   initForm() {
-    this.maxDate = new Date(now());
+    this.maxDate = new Date(now() + (1000 * 60 * 60 *24)); // Allow an additional 24 hours to include the current day
     console.log('Max date:', this.maxDate);
     this.dateRangeForm = this.fb.group({
       startDate: [new Date(now() - (1000 * 60 * 60 * 24 * 7)), Validators.required],

@@ -55,6 +55,7 @@ export const sendContactFormConfirmationEmail = async (contactForm: ContactForm)
       contactFormMessage: contactForm.message, // Message sent by the user,
       blogUrl: EmailWebsiteLinks.BLOG_URL,
       remoteCoachUrl: EmailWebsiteLinks.REMOTE_COACH_URL,
+      academyUrl: EmailWebsiteLinks.ACADEMY_URL,
       replyEmailAddress: fromEmail
     },
     categories

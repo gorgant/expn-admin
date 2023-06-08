@@ -1,5 +1,6 @@
 export interface ExportSubscriberData {
   id: string;
+  firstName: string;
   createdDate: number;
   modifiedDate: number;
   lastSubSource: string;
