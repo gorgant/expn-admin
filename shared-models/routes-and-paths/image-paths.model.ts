@@ -4,18 +4,18 @@ export enum AdminImagePaths {
 }
 
 export enum PublicImagePaths {
-  HOME = 'assets/images/background/home@1500.jpg',
-  ABOUT_ME = 'assets/images/background/about_me@1500.jpg',
-  BLOG = 'assets/images/background/blog@1500.jpg',
-  REMOTE_COACH = 'assets/images/background/remote_coach@1500.jpg',
-  PODCAST = 'assets/images/background/podcast@1500.jpg',
-  CONTACT = 'assets/images/background/contact@1500.jpg',
-  POST_HERO = 'assets/images/background/post_hero_fallback_image.jpg',
-  FOUNDER_AVATAR = 'assets/images/avatar/founder_avatar.png',
-  FOUNDER_AVATAR_2 = 'assets/images/avatar/founder_avatar_2.png',
-  CHECKOUT_AVATAR = 'assets/images/avatar/checkout_avatar.jpg',
+  HOME = 'assets/images/background/home@1500.webp',
+  ABOUT_ME = 'assets/images/background/about_me@1500.webp',
+  BLOG = 'assets/images/background/blog@1500.webp',
+  REMOTE_COACH = 'assets/images/background/remote_coach@1500.webp',
+  PODCAST = 'assets/images/background/podcast@1500.webp',
+  CONTACT = 'assets/images/background/contact@1500.webp',
+  POST_HERO = 'assets/images/background/post_hero_fallback_image.webp',
+  FOUNDER_AVATAR_MDR = 'assets/images/avatar/founder_avatar_MDR.png',
+  FOUNDER_AVATAR_GCR = 'assets/images/avatar/founder_avatar_GCR.png',
+  CHECKOUT_AVATAR = 'assets/images/avatar/checkout_avatar.webp',
   FOUNDER_SIGNATURE = 'assets/images/avatar/founder_signature.png',
-  LINK_SHARE_IMAGE = 'assets/images/background/link_share_image@1500.jpg',
+  LINK_SHARE_IMAGE = 'assets/images/background/link_share_image@1500.webp',
 }
 
 export enum PublicTestamonialImagePaths {

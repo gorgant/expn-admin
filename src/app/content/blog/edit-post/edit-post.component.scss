@@ -1,0 +1,81 @@
+@import '../../../variables';
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  gap: 32px;
+
+  margin: 64px 0;
+
+}
+
+.page-header {
+  font-weight: $font-weight-medium;
+  font-size: 3em;
+}
+
+app-image-uploader {
+  padding: 0 16px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  
+  width: 100%;
+  max-width: 800px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  margin-top: 32px;
+
+
+}
+
+mat-form-field {
+  width: 100%;
+  line-height: 1.5em;
+}
+
+.input-icon {
+  vertical-align: bottom;
+  padding-right: 8px;
+}
+
+ckeditor {
+  width: 100%;
+  
+}
+
+.form-actions-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+
+  width: 100%;
+  margin-top: 16px;
+}
+
+.submit-button, .cancel-button {
+  width: 100%;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    width: $desktop-button-width;
+  }
+}
+
+
+
+
+:host ::ng-deep .ck-editor__editable_inline {
+
+  @include post-content-styles();
+}
+
+

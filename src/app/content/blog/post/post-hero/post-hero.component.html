@@ -1,0 +1,22 @@
+<div class="hero-background-image" [style.backgroundImage]="$stylesObject()">
+
+  <div class="hero-content-container">
+    
+    <div class="hero-text-container">
+      <div class="hero-title" >{{ $post().title }}</div>
+    </div>
+
+  </div>
+
+  <div class="hero-action-container">
+    <div class="hero-actions" fxLayout="column" fxLayoutAlign="end center">
+      <div class="hero-action-message" (click)=scrollToTextStart()> {{ ACTION_MESSAGE }}</div>
+      <mat-icon class="hero-down-icon">keyboard_arrow_down</mat-icon>
+    </div>
+  </div>
+
+</div>
+<div class="description-container">
+  <div class="description">{{ $post().description }}</div>
+</div>
+<div #contentStartTag></div>

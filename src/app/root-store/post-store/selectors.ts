@@ -1,63 +1,174 @@
-import { State } from './state';
-import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
-import * as fromPosts from './reducer';
-import { Post } from 'shared-models/posts/post.model';
-import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
+import { createFeatureSelector, createSelector, MemoizedSelector } from "@ngrx/store";
+import { PostState } from "./state";
+import { AdminStoreFeatureKeys } from "../../../../shared-models/store/feature-keys.model";
+import { Post } from "../../../../shared-models/posts/post.model";
 
-const getIsLoading = (state: State): boolean => state.isLoading;
-const getIsSaving = (state: State): boolean => state.isSaving;
-const getIsDeleting = (state: State): boolean => state.isDeleting;
-const getIsTogglingPublished = (state: State): boolean => state.isTogglingPublished;
-const getIsTogglingFeatured = (state: State): boolean => state.isTogglingFeatured;
-const getLoadError = (state: State): any => state.loadError;
-const getSaveError = (state: State): any => state.saveError;
-const getDeleteError = (state: State): any => state.deleteError;
-const getPostsLoaded = (state: State): boolean => state.postsLoaded;
+const selectPostState = createFeatureSelector<PostState>(AdminStoreFeatureKeys.POST);
 
-export const selectPostState: MemoizedSelector<object, State>
-= createFeatureSelector<State>(AdminFeatureNames.POSTS);
+const getCreatePostError = (state: PostState) => state.createPostError;
+const getCreatePostProcessing = (state: PostState) => state.createPostProcessing;
+const getCreatePostBoilerplateError = (state: PostState) => state.createPostBoilerplateError;
+const getCreatePostBoilerplateProcessing = (state: PostState) => state.createPostBoilerplateProcessing;
+const getDeletePostError = (state: PostState) => state.deletePostError;
+const getDeletePostProcessing = (state: PostState) => state.deletePostProcessing;
+const getFetchPostBoilerplateError = (state: PostState) => state.fetchPostBoilerplateError;
+const getFetchPostBoilerplateProcessing = (state: PostState) => state.fetchPostBoilerplateProcessing;
+const getFetchSinglePostError = (state: PostState) => state.fetchSinglePostError;
+const getFetchSinglePostProcessing = (state: PostState) => state.fetchSinglePostProcessing;
+const getPostBoilerplateData = (state: PostState) => state.postBoilerplateData;
+const getPostImageDownloadUrl = (state: PostState) => state.postImageDownloadUrl;
+const getPublishPostError = (state: PostState) => state.publishPostError;
+const getPublishPostProcessing = (state: PostState) => state.publishPostProcessing;
+const getResizePostImageError = (state: PostState) => state.resizePostImageError;
+const getResizePostImageProcessing = (state: PostState) => state.resizePostImageProcessing;
+const getResizePostImageSucceeded = (state: PostState) => state.postHeroImageData;
+const getToggleFeaturedPostError = (state: PostState) => state.toggleFeaturedPostError;
+const getToggleFeaturedPostProcessing = (state: PostState) => state.toggleFeaturedPostProcessing;
+const getUnpublishPostError = (state: PostState) => state.unpublishPostError;
+const getUnpublishPostProcessing = (state: PostState) => state.unpublishPostProcessing;
+const getUpdatePostBoilerplateError = (state: PostState) => state.updatePostBoilerplateError;
+const getUpdatePostBoilerplateProcessing = (state: PostState) => state.updatePostBoilerplateProcessing;
+const getUpdatePostError = (state: PostState) => state.updatePostError;
+const getUpdatePostProcessing = (state: PostState) => state.updatePostProcessing;
+const getUploadPostImageError = (state: PostState) => state.uploadPostImageError;
+const getUploadPostImageProcessing = (state: PostState) => state.uploadPostImageProcessing;
 
-export const selectAllPosts: (state: object) => Post[] = createSelector(
+export const selectCreatePostBoilerplateError = createSelector(
   selectPostState,
-  fromPosts.selectAll
+  getCreatePostBoilerplateError
 );
 
-export const selectPostById: (postId: string) => MemoizedSelector<object, Post>
-= (postId: string) => createSelector(
+export const selectCreatePostBoilerplateProcessing = createSelector(
   selectPostState,
-  postsState => postsState.entities[postId]
+  getCreatePostBoilerplateProcessing
 );
 
-export const selectLoadError: MemoizedSelector<object, any> = createSelector(
+export const selectCreatePostError = createSelector(
   selectPostState,
-  getLoadError
+  getCreatePostError
 );
 
-export const selectSaveError: MemoizedSelector<object, any> = createSelector(
+export const selectCreatePostProcessing = createSelector(
   selectPostState,
-  getSaveError
+  getCreatePostProcessing
 );
 
-export const selectDeleteError: MemoizedSelector<object, any> = createSelector(
+export const selectDeletePostError = createSelector(
   selectPostState,
-  getDeleteError
+  getDeletePostError
 );
 
-export const selectIsLoading: MemoizedSelector<object, boolean>
-= createSelector(selectPostState, getIsLoading);
+export const selectDeletePostProcessing = createSelector(
+  selectPostState,
+  getDeletePostProcessing
+);
 
-export const selectIsSaving: MemoizedSelector<object, boolean>
-= createSelector(selectPostState, getIsSaving);
+export const selectFetchPostBoilerplateError = createSelector(
+  selectPostState,
+  getFetchPostBoilerplateError
+);
 
-export const selectIsDeleting: MemoizedSelector<object, boolean>
-= createSelector(selectPostState, getIsDeleting);
+export const selectFetchPostBoilerplateProcessing = createSelector(
+  selectPostState,
+  getFetchPostBoilerplateProcessing
+);
 
-export const selectIsTogglingPublished: MemoizedSelector<object, boolean>
-= createSelector(selectPostState, getIsTogglingPublished);
+export const selectFetchSinglePostError = createSelector(
+  selectPostState,
+  getFetchSinglePostError
+);
 
-export const selectIsTogglingFeatured: MemoizedSelector<object, boolean>
-= createSelector(selectPostState, getIsTogglingFeatured);
+export const selectFetchSinglePostProcessing = createSelector(
+  selectPostState,
+  getFetchSinglePostProcessing
+);
 
-export const selectPostsLoaded: MemoizedSelector<object, boolean>
-= createSelector(selectPostState, getPostsLoaded);
+export const selectPostBoilerplateData = createSelector(
+  selectPostState,
+  getPostBoilerplateData
+);
 
+export const selectPostById: (postId: string) => MemoizedSelector<object, Post | undefined> = (postId: string) => createSelector(
+  selectPostState,
+  postState => postState.entities[postId]
+);
+
+export const selectPostImageDownloadUrl = createSelector(
+  selectPostState,
+  getPostImageDownloadUrl
+);
+
+export const selectPublishPostError = createSelector(
+  selectPostState,
+  getPublishPostError
+);
+
+export const selectPublishPostProcessing = createSelector(
+  selectPostState,
+  getPublishPostProcessing
+);
+
+export const selectResizePostImageError = createSelector(
+  selectPostState,
+  getResizePostImageError
+);
+
+export const selectResizePostImageProcessing = createSelector(
+  selectPostState,
+  getResizePostImageProcessing
+);
+
+export const selectResizePostImageSucceeded = createSelector(
+  selectPostState,
+  getResizePostImageSucceeded
+);
+
+export const selectToggleFeaturedPostError = createSelector(
+  selectPostState,
+  getToggleFeaturedPostError
+);
+
+export const selectToggleFeaturedPostProcessing = createSelector(
+  selectPostState,
+  getToggleFeaturedPostProcessing
+);
+
+export const selectUnpublishPostError = createSelector(
+  selectPostState,
+  getUnpublishPostError
+);
+
+export const selectUnpublishPostProcessing = createSelector(
+  selectPostState,
+  getUnpublishPostProcessing
+);
+
+export const selectUpdatePostBoilerplateError = createSelector(
+  selectPostState,
+  getUpdatePostBoilerplateError
+);
+
+export const selectUpdatePostBoilerplateProcessing = createSelector(
+  selectPostState,
+  getUpdatePostBoilerplateProcessing
+);
+
+export const selectUpdatePostError = createSelector(
+  selectPostState,
+  getUpdatePostError
+);
+
+export const selectUpdatePostProcessing = createSelector(
+  selectPostState,
+  getUpdatePostProcessing
+);
+
+export const selectUploadPostImageError = createSelector(
+  selectPostState,
+  getUploadPostImageError
+);
+
+export const selectUploadPostImageProcessing = createSelector(
+  selectPostState,
+  getUploadPostImageProcessing
+);

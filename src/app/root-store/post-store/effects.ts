@@ -1,224 +1,271 @@
-import { Injectable } from '@angular/core';
-import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Observable, of } from 'rxjs';
-import { Action, Store } from '@ngrx/store';
-import * as postFeatureActions from './actions';
-import { switchMap, map, catchError, mergeMap, tap, concatMap, exhaustMap } from 'rxjs/operators';
-import { PostService } from 'src/app/core/services/post.service';
-import { RootStoreState } from '..';
+import { Injectable, inject } from "@angular/core";
+import { FirebaseError } from "@angular/fire/app";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { of } from "rxjs";
+import { catchError, concatMap, map, switchMap } from "rxjs/operators";
+import * as PostStoreActions from './actions';
+import { PostService } from "../../core/services/post.service";
+import { ImageService } from "../../core/services/image.service";
 
 @Injectable()
 export class PostStoreEffects {
-  constructor(
-    private postService: PostService,
-    private actions$: Actions,
-    private store$: Store<RootStoreState.State>,
-  ) { }
 
-  @Effect()
-  singlePostRequestedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.SinglePostRequested>(
-      postFeatureActions.ActionTypes.SINGLE_POST_REQUESTED
-    ),
-    switchMap(action =>
-      this.postService.fetchSinglePost(action.payload.postId)
-        .pipe(
+  private actions$ = inject(Actions);
+  private imageService = inject(ImageService);
+  private postService = inject(PostService);
+
+  constructor() { }
+
+  createPostEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.createPostRequested),
+      concatMap(action => 
+        this.postService.createPost(action.post).pipe(
           map(post => {
-            if (!post) {
-              throw new Error('Post not found');
-            }
-            return new postFeatureActions.SinglePostLoaded({ post });
+            return PostStoreActions.createPostCompleted({post});
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.createPostFailed({error: fbError}));
           })
         )
-    )
+      ),
+    ),
   );
 
-  @Effect()
-  allPostsRequestedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.AllPostsRequested>(
-      postFeatureActions.ActionTypes.ALL_POSTS_REQUESTED
-    ),
-    switchMap(action =>
-      this.postService.fetchAllPosts()
-        .pipe(
-          map(posts => {
-            if (!posts) {
-              throw new Error('Posts not found');
-            }
-            return new postFeatureActions.AllPostsLoaded({ posts });
+  createPostBoilerplateEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.createPostBoilerplateRequested),
+      concatMap(action => 
+        this.postService.createPostBoilerplate(action.postBoilerplateContent).pipe(
+          map(postBoilerplateData => {
+            return PostStoreActions.createPostBoilerplateCompleted({postBoilerplateData});
           }),
           catchError(error => {
-            return of(new postFeatureActions.LoadFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.createPostBoilerplateFailed({error: fbError}));
           })
         )
-    )
+      ),
+    ),
   );
 
-  @Effect()
-  deletePostEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.DeletePostRequested>(
-      postFeatureActions.ActionTypes.DELETE_POST_REQUESTED
-    ),
-    concatMap(action => this.postService.deletePost(action.payload.postId)
-      .pipe(
+  deletePostEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.deletePostRequested),
+      concatMap(action => 
+        this.postService.deletePost(action.postId).pipe(
           map(postId => {
-            if (!postId) {
-              throw new Error('Error deleting post');
-            }
-            return new postFeatureActions.DeletePostComplete({postId});
+            return PostStoreActions.deletePostCompleted({postId});
           }),
           catchError(error => {
-            return of(new postFeatureActions.DeleteFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.deletePostFailed({error: fbError}));
           })
         )
+      ),
     ),
   );
 
-  @Effect()
-  updatePostEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.UpdatePostRequested>(
-      postFeatureActions.ActionTypes.UPDATE_POST_REQUESTED
+  fetchPostBoilerplateEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.fetchPostBoilerplateRequested),
+      switchMap(action => 
+        this.postService.fetchPostBoilerplate().pipe(
+          map(postBoilerplateData => {
+            return PostStoreActions.fetchPostBoilerplateCompleted({postBoilerplateData});
+          }),
+          catchError(error => {
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.fetchPostBoilerplateFailed({error: fbError}));
+          })
+        )
+      ),
     ),
-    concatMap(action => this.postService.updatePost(action.payload.post)
-      .pipe(
+  );
+
+  fetchSinglePostEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.fetchSinglePostRequested),
+      switchMap(action => 
+        this.postService.fetchSinglePost(action.postId).pipe(
           map(post => {
-            if (!post) {
-              throw new Error('Error updating post');
-            }
-            return new postFeatureActions.UpdatePostComplete({ post });
+            return PostStoreActions.fetchSinglePostCompleted({post});
           }),
           catchError(error => {
-            return of(new postFeatureActions.SaveFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.fetchSinglePostFailed({error: fbError}));
           })
         )
+      ),
     ),
   );
 
-  @Effect()
-  rollbackPostEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.RollbackPostRequested>(
-      postFeatureActions.ActionTypes.ROLLBACK_POST_REQUESTED
-    ),
-    concatMap(action => this.postService.rollbackPost(action.payload.post)
-      .pipe(
-          map(post => {
-            if (!post) {
-              throw new Error('Error rolling back post');
-            }
-            return new postFeatureActions.RollbackPostComplete({ post });
+  publishPostEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.publishPostRequested),
+      concatMap(action => 
+        this.postService.publishPost(action.postId).pipe(
+          map(postId => {
+            return PostStoreActions.publishPostCompleted({postId});
           }),
           catchError(error => {
-            return of(new postFeatureActions.SaveFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.publishPostFailed({error: fbError}));
           })
         )
+      ),
     ),
   );
 
-  @Effect()
-  togglePublishedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.TogglePublishedRequested>(
-      postFeatureActions.ActionTypes.TOGGLE_PUBLISHED_REQUESTED
-    ),
-    concatMap(action => this.postService.togglePublishPost(action.payload.post)
-      .pipe(
-          tap(post => {
-            if (!post) {
-              throw new Error('Error publishing post');
-            }
-            return this.store$.dispatch(new postFeatureActions.UpdatePostRequested({post}));
+  resizePostImageEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.resizePostImageRequested),
+      concatMap(action => 
+        this.imageService.resizePostImage(action.postImageMetadata).pipe(
+          map(postHeroImageData => {
+            return PostStoreActions.resizePostImageCompleted({postHeroImageData});
           }),
-          map(post => new postFeatureActions.TogglePublishedComplete()),
           catchError(error => {
-            return of(new postFeatureActions.PublicUpdateFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.resizePostImageFailed({error: fbError}));
           })
         )
+      ),
     ),
   );
 
-  @Effect()
-  toggleFeaturedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.ToggleFeaturedRequested>(
-      postFeatureActions.ActionTypes.TOGGLE_FEATURED_REQUESTED
-    ),
-    concatMap(action => this.postService.togglePostFeatured(action.payload.post)
-      .pipe(
-          tap(post => {
-            if (!post) {
-              throw new Error('Error toggling post featured');
-            }
-            return this.store$.dispatch(new postFeatureActions.UpdatePostRequested({post}));
+  toggleFeaturedPostEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.toggleFeaturedPostRequested),
+      concatMap(action => 
+        this.postService.toggleFeaturedPost(action.postId).pipe(
+          map(postId => {
+            return PostStoreActions.toggleFeaturedPostCompleted({postId});
           }),
-          map(post => new postFeatureActions.ToggleFeaturedComplete()),
           catchError(error => {
-            return of(new postFeatureActions.PublicUpdateFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.toggleFeaturedPostFailed({error: fbError}));
           })
         )
+      ),
     ),
   );
 
-  @Effect()
-  refreshPublicBlogIndexEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.RefreshPublicBlogIndexRequested>(
-      postFeatureActions.ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_REQUESTED
-    ),
-    exhaustMap(action => this.postService.refreshBlogIndex()
-      .pipe(
-          map(response => {
-            if (!response) {
-              throw new Error('Error refreshing blog index');
-            }
-            return  new postFeatureActions.RefreshPublicBlogIndexComplete();
+  unpublishPostEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.unpublishPostRequested),
+      concatMap(action => 
+        this.postService.unpublishPost(action.postId).pipe(
+          map(postId => {
+            return PostStoreActions.unpublishPostCompleted({postId});
           }),
           catchError(error => {
-            return of(new postFeatureActions.PublicUpdateFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.unpublishPostFailed({error: fbError}));
           })
         )
+      ),
     ),
   );
 
-  @Effect()
-  refreshPublicBlogCacheEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.RefreshPublicBlogCacheRequested>(
-      postFeatureActions.ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_REQUESTED
-    ),
-    exhaustMap(action => this.postService.refreshBlogCache()
-      .pipe(
-          map(response => {
-            if (!response) {
-              throw new Error('Error refreshing blog cache');
-            }
-            return  new postFeatureActions.RefreshPublicBlogCacheComplete();
+  updatePostBoilerplateEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.updatePostBoilerplateRequested),
+      concatMap(action => 
+        this.postService.updatePostBoilerplate(action.postBoilerplateUpdates).pipe(
+          map(postBoilerplateUpdates => {
+            return PostStoreActions.updatePostBoilerplateCompleted({postBoilerplateUpdates});
           }),
           catchError(error => {
-            return of(new postFeatureActions.PublicUpdateFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.updatePostBoilerplateFailed({error: fbError}));
           })
         )
+      ),
     ),
   );
 
-  @Effect()
-  refreshPublicFeaturedPostsCacheEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<postFeatureActions.RefreshPublicFeaturedPostsCacheRequested>(
-      postFeatureActions.ActionTypes.REFRESH_PUBLIC_FEATURED_POSTS_CACHE_REQUESTED
-    ),
-    exhaustMap(action => this.postService.refreshFeaturedPostsCache()
-      .pipe(
-          map(response => {
-            if (!response) {
-              throw new Error('Error refreshing featured posts cache');
-            }
-            return  new postFeatureActions.RefreshPublicFeaturedPostsCacheComplete();
+  updatePostEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.updatePostRequested),
+      concatMap(action => 
+        this.postService.updatePost(action.postUpdates).pipe(
+          map(postUpdates => {
+            return PostStoreActions.updatePostCompleted({postUpdates});
           }),
           catchError(error => {
-            return of(new postFeatureActions.PublicUpdateFailed({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.updatePostFailed({error: fbError}));
           })
         )
+      ),
     ),
   );
 
-
+  uploadPostImageEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(PostStoreActions.uploadPostImageRequested),
+      concatMap(action => 
+        this.imageService.uploadPostImageAndGetDownloadUrl(action.postImageResizeData).pipe(
+          map(postImageDownloadUrl => {
+            return PostStoreActions.uploadPostImageCompleted({postImageDownloadUrl});
+          }),
+          catchError(error => {
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(PostStoreActions.uploadPostImageFailed({error: fbError}));
+          })
+        )
+      ),
+    ),
+  );
 
 }

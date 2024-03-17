@@ -1,74 +1,24 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
-import { MatSidenav } from '@angular/material/sidenav';
+import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './navigation/header/header.component';
+import { FooterComponent } from './navigation/footer/footer.component';
+import { SidenavComponent } from './navigation/sidenav/sidenav.component';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { UiService } from './core/services/ui.service';
-import { AuthService } from './core/services/auth.service';
-import { Store } from '@ngrx/store';
-import { RootStoreState, UserStoreSelectors, AuthStoreSelectors, AuthStoreActions, UserStoreActions } from './root-store';
-import { withLatestFrom } from 'rxjs/operators';
-import { ShorthandBusinessNames } from 'shared-models/forms-and-components/legal-vars.model';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent, SidenavComponent, MatSidenavModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
-  title = `Admin - ${ShorthandBusinessNames.EXPN}`;
-  appVersion = '2.1.2';
+export class AppComponent {
+  
+  uiService = inject(UiService);
 
-  @ViewChild('sidenav', { static: true }) sidenav: MatSidenav;
-
-  constructor(
-    private uiService: UiService,
-    private authService: AuthService,
-    private store$: Store<RootStoreState.State>,
-  ) {}
-
-  ngOnInit() {
-    this.configureSideNav();
-    this.configureAuthDetection();
+  ngOnInit(): void {
+    this.uiService.configureAppCheck();
   }
-
-  // Handles sideNav clicks
-  private configureSideNav() {
-    this.uiService.sideNavSignal$.subscribe(signal => {
-      this.toggleSideNav();
-    });
-  }
-
-  // Opens and closes sidenav
-  private toggleSideNav() {
-    if (this.sidenav.opened) {
-      this.sidenav.close();
-    } else {
-      this.sidenav.open();
-    }
-  }
-
-  private configureAuthDetection() {
-    this.authService.initAuthListener();
-    this.authService.authStatus
-    .pipe(
-      withLatestFrom(
-        this.store$.select(UserStoreSelectors.selectUserIsLoading),
-        this.store$.select(AuthStoreSelectors.selectIsAuth)
-      )
-    )
-    .subscribe(([userId, userIsLoading, isAuth]) => {
-      // These if statements determine how to load user data
-      if (userId && !userIsLoading && !isAuth) {
-        // Fires only when app is loaded and user is already logged in
-        this.store$.dispatch( new AuthStoreActions.AuthenticationComplete());
-        this.store$.dispatch( new UserStoreActions.UserDataRequested({userId}));
-      } else if (userId && !userIsLoading && isAuth) {
-        // Fires only when user logged in via Google Auth
-        this.store$.dispatch( new UserStoreActions.UserDataRequested({userId}));
-      } else if (!userId && isAuth) {
-        // Fires only when logout detected on separate client, logs out user automatically
-        this.authService.logout();
-        this.store$.dispatch(new AuthStoreActions.SetUnauthenticated());
-      }
-    });
-  }
-
 }

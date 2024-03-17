@@ -1,0 +1,65 @@
+@import "../../variables";
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+}
+
+.auth-user-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  
+  width: 100%;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    width: $desktop-form-width-standard;
+  }
+  
+}
+
+.hide {
+  display: none;
+}
+
+mat-form-field {
+  width: 100%;
+  
+}
+
+.input-icon {
+  vertical-align: bottom;
+  padding-right: 8px;
+}
+
+.forgot-password-container {
+  color: $primary;
+  font-weight: $font-weight-light;
+  align-self: flex-start;
+}
+
+.submit-button, .post-reset-button {
+  margin-top: 24px;
+  width: $mobile-button-width;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    width: $desktop-button-width;
+  }
+
+}
+
+.check-inbox-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.check-inbox-message {
+  @include default-text-style(32px);
+}

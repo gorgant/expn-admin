@@ -1,0 +1,27 @@
+@import "../../variables";
+
+mat-list-item {
+  opacity: $inactive-item-opacity;
+}
+
+.active-list-item {
+  @include accent-opacity(0.1);
+
+  .list-item-icon {
+    color: $accent;
+  }
+
+  .list-item-title {
+    color: $accent;
+  }
+}
+
+.academy-button-container {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.academy-button {
+  background-color: $acdmy-button-color !important;
+  color: white !important;
+}

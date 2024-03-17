@@ -1,101 +1,114 @@
-import { Action } from '@ngrx/store';
-import { AuthData } from 'shared-models/auth/auth-data.model';
-import { AuthenticateUserType } from 'shared-models/auth/authenticate-user-type.model';
-import { AdminUser } from 'shared-models/user/admin-user.model';
+import { FirebaseError } from "@angular/fire/app";
+import { createAction, props } from "@ngrx/store";
+import { PasswordConfirmationData } from "../../../../shared-models/auth/password-confirmation-data.model";
+import { AuthFormData, AuthResultsData } from "../../../../shared-models/auth/auth-data.model";
 
+// AuthGuard
 
-export enum ActionTypes {
-  // REGISTER_USER_REQUESTED = '[Auth] Register User Requested',
-  // REGISTER_USER_COMPLETE = '[Auth] Register User Complete',
-  AUTHENTICATION_REQUESTED = '[Auth] Authentication Requested',
-  AUTHENTICATION_COMPLETE = '[Auth] Authentication Complete',
-  SET_AUTHENTICATED = '[Auth] Set Authenticated',
-  SET_UNAUTHENTICATED = '[Auth] Set Unauthenticated',
-  UPDATE_EMAIL_REQUESTED = '[Auth] Update Email Requested',
-  UPDATE_EMAIL_COMPLETE = '[Auth] Update Email Complete',
-  UPDATE_PASSWORD_REQUESTED = '[Auth] Update Password Requested',
-  UPDATE_PASSWORD_COMPLETE = '[Auth] Update Password Complete',
-  RESET_PASSWORD_REQUESTED = '[Auth] Reset Password Requested',
-  RESET_PASSWORD_COMPLETE = '[Auth] Password Reset Email Submitted',
-  AUTH_LOAD_ERROR = '[Auth] Load Failure'
-}
+export const authGuardValidated = createAction(
+  '[Auth Guard] AuthGuard Validated'
+);
 
-// export class RegisterUserRequested implements Action {
-//   readonly type = ActionTypes.REGISTER_USER_REQUESTED;
+export const authGuardFailed = createAction(
+  '[Auth Guard] AuthGuard Failed',
+  props<{error: FirebaseError}>()
+);
 
-//   constructor(public payload: { authData: AuthData }) {}
-// }
+// Confirm Password
 
-// export class RegisterUserComplete implements Action {
-//   readonly type = ActionTypes.REGISTER_USER_COMPLETE;
-// }
+export const confirmPasswordRequested = createAction(
+  '[Edit Email Component] Confirm Password Requested',
+  props<{confirmPasswordData: PasswordConfirmationData}>()
+);
 
-export class AuthenticationRequested implements Action {
-  readonly type = ActionTypes.AUTHENTICATION_REQUESTED;
+export const confirmPasswordCompleted = createAction(
+  '[Auth Service] Confirm Password Complete',
+  props<{passwordConfirmed: boolean}>()
+);
 
-  // Auth data optional here bc Google Login doesn't require any
-  constructor(public payload: { authData?: AuthData, requestType: AuthenticateUserType }) {}
-}
+export const confirmPasswordFailed = createAction(
+  '[Auth Service] Confirm Password Failed',
+  props<{error: FirebaseError}>()
+);
 
-export class AuthenticationComplete implements Action {
-  readonly type = ActionTypes.AUTHENTICATION_COMPLETE;
-}
+// Detect Cached User
 
-export class SetAuthenticated implements Action {
-  readonly type = ActionTypes.SET_AUTHENTICATED;
-}
+export const detectCachedUserRequested = createAction(
+  '[App Component] Detected Cached User Requested'
+);
 
-export class SetUnauthenticated implements Action {
-  readonly type = ActionTypes.SET_UNAUTHENTICATED;
-}
+export const detectCachedUserCompleted = createAction(
+  '[App Component] Detected Cached User Completed',
+  props<{authResultsData: AuthResultsData | null}>()
+);
 
-export class UpdateEmailRequested implements Action {
-  readonly type = ActionTypes.UPDATE_EMAIL_REQUESTED;
+export const detectCachedUserFailed = createAction(
+  '[App Component] Detected Cached User Failed',
+  props<{error: FirebaseError}>()
+);
 
-  constructor(public payload: { user: AdminUser, password: string, newEmail: string }) {}
-}
+// Email Auth
 
-export class UpdateEmailComplete implements Action {
-  readonly type = ActionTypes.UPDATE_EMAIL_COMPLETE;
-}
+export const emailAuthRequested = createAction(
+  '[Login Form] Email Auth Requested',
+  props<{authData: AuthFormData}>()
+);
 
-export class UpdatePasswordRequested implements Action {
-  readonly type = ActionTypes.UPDATE_PASSWORD_REQUESTED;
+export const emailAuthCompleted = createAction(
+  '[Auth Service] Email Auth Completed',
+  props<{authResultsData: AuthResultsData}>()
+);
 
-  constructor(public payload: { user: AdminUser, oldPassword: string, newPassword: string }) {}
-}
+export const emailAuthFailed = createAction(
+  '[Auth Service] Email Auth Failed',
+  props<{error: FirebaseError}>()
+);
 
-export class UpdatePasswordComplete implements Action {
-  readonly type = ActionTypes.UPDATE_PASSWORD_COMPLETE;
-}
+// Logout
 
-export class ResetPasswordRequested implements Action {
-  readonly type = ActionTypes.RESET_PASSWORD_REQUESTED;
+export const logout = createAction(
+  '[Top Nav] Logout'
+);
 
-  constructor(public payload: { email: string }) {}
-}
+// Purge Auth State
 
-export class ResetPasswordComplete implements Action {
-  readonly type = ActionTypes.RESET_PASSWORD_COMPLETE;
-}
+export const purgeAuthState = createAction(
+  '[AppWide] Purge Auth State'
+); 
 
-export class LoadErrorDetected implements Action {
-  readonly type = ActionTypes.AUTH_LOAD_ERROR;
-  constructor(public payload: { error: string }) {}
-}
+// Purge Auth State Errors
 
-export type Actions =
-  // RegisterUserRequested |
-  // RegisterUserComplete |
-  AuthenticationRequested |
-  AuthenticationComplete |
-  SetAuthenticated |
-  SetUnauthenticated |
-  UpdateEmailRequested |
-  UpdateEmailComplete |
-  UpdatePasswordRequested |
-  UpdatePasswordComplete |
-  ResetPasswordRequested |
-  ResetPasswordComplete |
-  LoadErrorDetected
-  ;
+export const purgeAuthStateErrors = createAction(
+  '[AppWide] Purge Auth State Errors'
+); 
+
+// Reload Auth Data
+export const reloadAuthDataRequested = createAction(
+  '[Login Form | Signup Form | Login With Third Party] Reload AuthData Requested'
+);
+
+export const reloadAuthDataCompleted = createAction(
+  '[Auth Service] Reload AuthData Completed',
+  props<{authResultsData: AuthResultsData}>()
+);
+
+export const reloadAuthDataFailed = createAction(
+  '[Auth Service] Reload AuthData Failed',
+  props<{error: FirebaseError}>()
+);
+
+// Reset Password
+export const resetPasswordRequested = createAction(
+  '[Login Form | Profile Component] Reset Password Requested',
+  props<{email: string}>()
+);
+
+export const resetPasswordCompleted = createAction(
+  '[Auth Service] Reset Password Completed',
+  props<{resetSubmitted: boolean}>()
+);
+
+export const resetPasswordFailed = createAction(
+  '[Auth Service] Reset Password Failed',
+  props<{error: FirebaseError}>()
+);

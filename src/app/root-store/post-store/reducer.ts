@@ -1,174 +1,403 @@
-import { initialState, State, featureAdapter } from './state';
-import { Actions, ActionTypes } from './actions';
+import {
+  createReducer,
+  on
+} from '@ngrx/store';
+import * as  PostStoreActions from './actions';
+import { featureAdapter, initialPostState } from './state';
+import { PostBoilerplate } from '../../../../shared-models/posts/post-boilerplate.model';
 
-export function featureReducer(state = initialState, action: Actions): State {
-  switch (action.type) {
+export const postStoreReducer = createReducer(
+  initialPostState,
 
-    case ActionTypes.SINGLE_POST_REQUESTED: {
-      return {
-        ...state,
-        isLoading: true,
-        loadError: null
-      };
+  // Create Post
+
+  on(PostStoreActions.createPostRequested, (state, action) => {
+    return {
+      ...state,
+      createPostProcessing: true,
+      createPostError: null
     }
-
-    case ActionTypes.SINGLE_POST_LOADED: {
-      return featureAdapter.addOne(
-        action.payload.post, {
-          ...state,
-          isLoading: false,
-          loadError: null
-        }
-      );
+  }),
+  on(PostStoreActions.createPostCompleted, (state, action) => {
+    return featureAdapter.addOne(
+      action.post, {
+        ...state,
+        createPostProcessing: false,
+      }
+    );
+  }),
+  on(PostStoreActions.createPostFailed, (state, action) => {
+    return {
+      ...state,
+      createPostProcessing: false,
+      createPostError: action.error
     }
+  }),
 
-    case ActionTypes.ALL_POSTS_REQUESTED: {
-      return {
-        ...state,
-        isLoading: true,
-        loadError: null
-      };
+  // Create Post Boilerplate
+
+  on(PostStoreActions.createPostBoilerplateRequested, (state, action) => {
+    return {
+      ...state,
+      createPostBoilerplateProcessing: true,
+      createPostBoilerplateError: null,
+      postBoilerplateData: null,
     }
-
-    case ActionTypes.ALL_POSTS_LOADED: {
-      return featureAdapter.setAll(
-        action.payload.posts, {
-          ...state,
-          isLoading: false,
-          loadError: null,
-          postsLoaded: true
-        }
-      );
+  }),
+  on(PostStoreActions.createPostBoilerplateCompleted, (state, action) => {
+    return {
+      ...state,
+      createPostBoilerplateProcessing: false,
+      createPostBoilerplateError: null,
+      postBoilerplateData: action.postBoilerplateData,
     }
-
-    case ActionTypes.UPDATE_POST_REQUESTED:
-      return {
-        ...state,
-        isSaving: true,
-        saveError: null
-      };
-
-    case ActionTypes.UPDATE_POST_COMPLETE:
-      return featureAdapter.upsertOne(
-        action.payload.post,
-        {
-          ...state,
-          isSaving: false,
-          saveError: null
-        }
-      );
-
-    case ActionTypes.ROLLBACK_POST_REQUESTED:
-      return {
-        ...state,
-        isSaving: true,
-        saveError: null
-      };
-
-    case ActionTypes.ROLLBACK_POST_COMPLETE:
-      return featureAdapter.addOne(
-        action.payload.post,
-        {
-          ...state,
-          isSaving: false,
-          saveError: null
-        }
-      );
-
-    case ActionTypes.DELETE_POST_REQUESTED:
-      return {
-        ...state,
-        isDeleting: true,
-        deleteError: null
-      };
-
-    case ActionTypes.DELETE_POST_COMPLETE:
-      return featureAdapter.removeOne(
-        action.payload.postId,
-        {
-          ...state,
-          isDeleting: false,
-          deleteError: null
-        }
-      );
-
-    case ActionTypes.TOGGLE_PUBLISHED_REQUESTED:
-      return {
-        ...state,
-        isTogglingPublished: true,
-      };
-
-    case ActionTypes.TOGGLE_PUBLISHED_COMPLETE:
-      return {
-        ...state,
-        isTogglingPublished: false,
-      };
-
-    case ActionTypes.TOGGLE_FEATURED_REQUESTED:
-      return {
-        ...state,
-        isTogglingFeatured: true,
-      };
-
-    case ActionTypes.TOGGLE_FEATURED_COMPLETE:
-      return {
-        ...state,
-        isTogglingFeatured: false,
-      };
-
-    case ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_COMPLETE:
-      return {
-        ...state
-      };
-
-    case ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_COMPLETE:
-      return {
-        ...state
-      };
-
-    case ActionTypes.REFRESH_PUBLIC_FEATURED_POSTS_CACHE_COMPLETE:
-      return {
-        ...state
-      };
-
-    case ActionTypes.LOAD_FAILED: {
-      return {
-        ...state,
-        isLoading: false,
-        loadError: action.payload.error
-      };
+  }),
+  on(PostStoreActions.createPostBoilerplateFailed, (state, action) => {
+    return {
+      ...state,
+      createPostBoilerplateProcessing: false,
+      createPostBoilerplateError: action.error,
+      postBoilerplateData: null,
     }
+  }),
 
-    case ActionTypes.SAVE_FAILED: {
-      return {
+  // Delete Post
+
+  on(PostStoreActions.deletePostRequested, (state, action) => {
+    return {
+      ...state,
+      deletePostProcessing: true,
+      deletePostError: null
+    }
+  }),
+  on(PostStoreActions.deletePostCompleted, (state, action) => {
+    return featureAdapter.removeOne(
+      action.postId, {
         ...state,
-        isSaving: false,
-        saveError: action.payload.error
-      };
+        deletePostProcessing: false,
+      }
+    );
+  }),
+  on(PostStoreActions.deletePostFailed, (state, action) => {
+    return {
+      ...state,
+      deletePostProcessing: false,
+      deletePostError: action.error
     }
+  }),
 
-    case ActionTypes.DELETE_FAILED: {
-      return {
+  // Fetch Post Boilerplate
+
+  on(PostStoreActions.fetchPostBoilerplateRequested, (state, action) => {
+    return {
+      ...state,
+      fetchPostBoilerplateProcessing: true,
+      fetchPostBoilerplateError: null,
+      postBoilerplateData: null,
+    }
+  }),
+  on(PostStoreActions.fetchPostBoilerplateCompleted, (state, action) => {
+    return {
+      ...state,
+      fetchPostBoilerplateProcessing: false,
+      fetchPostBoilerplateError: null,
+      postBoilerplateData: action.postBoilerplateData,
+    }
+  }),
+  on(PostStoreActions.fetchPostBoilerplateFailed, (state, action) => {
+    return {
+      ...state,
+      fetchPostBoilerplateProcessing: false,
+      fetchPostBoilerplateError: action.error,
+      postBoilerplateData: null,
+    }
+  }),
+
+  // Fetch Single Post
+
+  on(PostStoreActions.fetchSinglePostRequested, (state, action) => {
+    return {
+      ...state,
+      fetchSinglePostProcessing: true,
+      fetchSinglePostError: null
+    }
+  }),
+  on(PostStoreActions.fetchSinglePostCompleted, (state, action) => {
+    return featureAdapter.upsertOne(
+      action.post, {
         ...state,
-        isDeleting: false,
-        deleteError: action.payload.error
-      };
+        fetchSinglePostProcessing: false,  
+      }
+    );
+  }),
+  on(PostStoreActions.fetchSinglePostFailed, (state, action) => {
+    return {
+      ...state,
+      fetchSinglePostProcessing: false,
+      fetchSinglePostError: action.error
     }
+  }),
 
-    case ActionTypes.PUBLIC_UPDATE_FAILED: {
-      return {
+  // Publish Post
+
+  on(PostStoreActions.publishPostRequested, (state, action) => {
+    return {
+      ...state,
+      publishPostProcessing: true,
+      publishPostError: null
+    }
+  }),
+
+  on(PostStoreActions.publishPostCompleted, (state, action) => {
+    return {
+      ...state,
+      publishPostProcessing: false,
+      publishPostError: null
+    }
+  }),
+
+  on(PostStoreActions.publishPostFailed, (state, action) => {
+    return {
+      ...state,
+      publishPostProcessing: false,
+      publishPostError: action.error
+    }
+  }),
+
+  // Purge Post Image Data
+
+  on(PostStoreActions.purgePostImageData, (state, action) => {
+    return {
+      ...state,
+      postHeroImageData: null,
+      postImageDownloadUrl: null
+    }
+  }),
+
+  // Purge Post State
+
+  on(PostStoreActions.purgePostState, (state, action) => {
+    return featureAdapter.removeAll(
+      {
         ...state,
-        isTogglingPublished: false,
-        isTogglingFeatured: false,
-        publicUpdateError: action.payload.error
-      };
-    }
+        backupPostCollectionError: null,
+        backupPostCollectionProcessing: false,
+        createPostBoilerplateError: null,
+        createPostBoilerplateProcessing: false,
+        createPostError: null,
+        createPostProcessing: false,
+        deletePostError: null,
+        deletePostProcessing: false,
+        fetchPostBoilerplateError: null,
+        fetchPostBoilerplateProcessing: false,
+        fetchSinglePostError: null,
+        fetchSinglePostProcessing: false,
+        publishPostError: null,
+        publishPostProcessing: false,
+        resizePostImageError: null,
+        resizePostImageProcessing: false,
+        toggleFeaturedPostError: null,
+        toggleFeaturedPostProcessing: false,
+        unpublishPostError: null,
+        unpublishPostProcessing: false,
+        updatePostBoilerplateError: null,
+        updatePostBoilerplateProcessing: false,
+        updatePostError: null,
+        updatePostProcessing: false,
+        uploadPostImageError: null,
+        uploadPostImageProcessing: false,
 
-    default: {
-      return state;
+        postBoilerplateData: null,
+        postHeroImageData: null,
+        postImageDownloadUrl: null,
+      }
+    );
+  }),
+
+  // Purge Post State Errors
+
+  on(PostStoreActions.purgePostStateErrors, (state, action) => {
+    return {
+      ...state,
+      backupPostCollectionError: null,
+      createPostBoilerplateError: null,
+      createPostError: null,
+      deletePostError: null,
+      fetchPostBoilerplateError: null,
+      fetchSinglePostError: null,
+      publishPostError: null,
+      resizePostImageError: null,
+      toggleFeaturedPostError: null,
+      unpublishPostError: null,
+      updatePostBoilerplateError: null,
+      updatePostError: null,
+      uploadPostImageError: null,
     }
-  }
-}
+  }),
+
+  // Resize Post Image
+
+  on(PostStoreActions.resizePostImageRequested, (state, action) => {
+    return {
+      ...state,
+      resizePostImageProcessing: true,
+      resizePostImageError: null,
+      postHeroImageData: null
+    }
+  }),
+
+  on(PostStoreActions.resizePostImageCompleted, (state, action) => {
+    return {
+      ...state,
+      resizePostImageProcessing: false,
+      resizePostImageError: null,
+      postHeroImageData: action.postHeroImageData
+    }
+  }),
+
+  on(PostStoreActions.resizePostImageFailed, (state, action) => {
+    return {
+      ...state,
+      resizePostImageProcessing: false,
+      resizePostImageError: action.error,
+      postHeroImageData: null
+    }
+  }),    
+
+  // Toggle Featured Post
+
+  on(PostStoreActions.toggleFeaturedPostRequested, (state, action) => {
+    return {
+      ...state,
+      toggleFeaturedPostProcessing: true,
+      toggleFeaturedPostError: null
+    }
+  }),
+
+  on(PostStoreActions.toggleFeaturedPostCompleted, (state, action) => {
+    return {
+      ...state,
+      toggleFeaturedPostProcessing: false,
+      toggleFeaturedPostError: null
+    }
+  }),
+
+  on(PostStoreActions.toggleFeaturedPostFailed, (state, action) => {
+    return {
+      ...state,
+      toggleFeaturedPostProcessing: false,
+      toggleFeaturedPostError: action.error
+    }
+  }),  
+
+  // Unpublish Post
+
+  on(PostStoreActions.unpublishPostRequested, (state, action) => {
+    return {
+      ...state,
+      unpublishPostProcessing: true,
+      unpublishPostError: null
+    }
+  }),
+
+  on(PostStoreActions.unpublishPostCompleted, (state, action) => {
+    return {
+      ...state,
+      unpublishPostProcessing: false,
+      unpublishPostError: null
+    }
+  }),
+
+  on(PostStoreActions.unpublishPostFailed, (state, action) => {
+    return {
+      ...state,
+      unpublishPostProcessing: false,
+      unpublishPostError: action.error
+    }
+  }),
+
+  // Update Post
+
+  on(PostStoreActions.updatePostRequested, (state, action) => {
+    return {
+      ...state,
+      updatePostProcessing: true,
+      updatePostError: null
+    }
+  }),
+  on(PostStoreActions.updatePostCompleted, (state, action) => {
+    return featureAdapter.updateOne(
+      action.postUpdates, {
+        ...state,
+        updatePostProcessing: false,
+      }
+    )
+  }),
+  on(PostStoreActions.updatePostFailed, (state, action) => {
+    return {
+      ...state,
+      updatePostProcessing: false,
+      updatePostError: action.error
+    }
+  }),
+
+  // Update Post Boilerplate
+
+  on(PostStoreActions.updatePostBoilerplateRequested, (state, action) => {
+    return {
+      ...state,
+      updatePostBoilerplateProcessing: true,
+      updatePostBoilerplateError: null,
+      postBoilerplateData: null,
+    }
+  }),
+  on(PostStoreActions.updatePostBoilerplateCompleted, (state, action) => {
+    return {
+      ...state,
+      updatePostBoilerplateProcessing: false,
+      updatePostBoilerplateError: null,
+      postBoilerplateData: action.postBoilerplateUpdates
+    }
+  }),
+  on(PostStoreActions.updatePostBoilerplateFailed, (state, action) => {
+    return {
+      ...state,
+      updatePostBoilerplateProcessing: false,
+      updatePostBoilerplateError: action.error,
+      postBoilerplateData: null,
+    }
+  }),
+
+  // Upload Post Image
+
+  on(PostStoreActions.uploadPostImageRequested, (state, action) => {
+    return {
+      ...state,
+      uploadPostImageProcessing: true,
+      uploadPostImageError: null,
+      postImageDownloadUrl: null
+    }
+  }),
+
+  on(PostStoreActions.uploadPostImageCompleted, (state, action) => {
+    return {
+      ...state,
+      uploadPostImageProcessing: false,
+      uploadPostImageError: null,
+      postImageDownloadUrl: action.postImageDownloadUrl
+    }
+  }),
+
+  on(PostStoreActions.uploadPostImageFailed, (state, action) => {
+    return {
+      ...state,
+      uploadPostImageProcessing: false,
+      uploadPostImageError: action.error,
+      postImageDownloadUrl: null
+    }
+  }),  
+
+);
 
 // Exporting a variety of selectors in the form of a object from the entity adapter
 export const {

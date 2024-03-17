@@ -1,24 +1,49 @@
-@import './app/variables';
+// Custom themeing guide: https://indepth.dev/tutorials/angular/angular-material-theming-system-complete-guide
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+// Plus imports for other components in your app.
+@use "./styles/themes/light";
+@use "./styles/typography/config" as typography;
 
 // Custom brand font (converted at: https://onlinefontconverter.com/)
 @font-face {
   font-family: 'HarlowSolid';
-  src: url(assets/fonts/HarlowSolid.woff2) format('woff2'),
-       url(assets/fonts/HarlowSolid.woff) format('woff'),
-       url(assets/fonts/HarlowSolid.ttf) format('truetype');
+  font-display: swap; // Use system font until actual font loads
+  unicode-range: U+000-5FF; // Load only latin glyphs
+  src: local('HarlowSolid'),
+       url(/assets/fonts/HarlowSolid.woff2) format('woff2'),
+       url(/assets/fonts/HarlowSolid.woff) format('woff'),
+       url(/assets/fonts/HarlowSolid.ttf) format('truetype');
 }
 
-html, body { 
-  height: 100%; 
-  min-width: $min-screen-width;
-}
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
 
-body { 
-  margin: 0; 
-  font-family: 'Roboto', sans-serif, "Helvetica Neue", arial; 
-}
 
-// Set the ck editor (and not the caption of images) min height
-.ck-editor__editable:not(.ck-editor__nested-editable) {
-  min-height: 400px;
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes(light.$expn-admin-light-theme);
+@include mat.all-component-typographies(typography.$expn-admin-typography);
+
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;}
+// This app-root config must be used in conjunction with the app.component.scss .app-content { width: 100% } setting
+app-root {display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%;}
+
+
+// For full-screen dialog components, dialog config must use this custom class
+.full-screen-dialog {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important; /* Optional: if you want to remove border radius */
 }

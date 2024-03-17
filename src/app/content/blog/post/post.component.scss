@@ -1,0 +1,32 @@
+@import "../../../variables";
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+
+  margin-bottom: 32px;
+}
+
+app-post-hero {
+  width: 100%;
+}
+
+app-post-video-player {
+  width: 100%;
+}
+
+app-post-podcast-player {
+  width: 100%;
+}
+
+app-post-content {
+  width: 100%;
+}
+
+.blog-button {
+  width: 90%;
+  max-width: $desktop-button-width;
+}

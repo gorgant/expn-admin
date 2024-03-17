@@ -1,0 +1,30 @@
+<div class="component-container" color="primary">
+    <a class="logo" [routerLink]="APP_ROUTES.HOME" >{{ ADMIN_TITLE }}</a>
+
+    <!-- This defer logic prevents flickering of desktop nav items  -->
+    @defer {
+      @if (this.uiService.$navItemsVisible()) {
+        @if (uiService.$screenIsMobile()) {
+          <!-- Menu Icon: Only display if screen is sm or less -->
+          <div class="menu-button-container" (click)="uiService.toggleSidenav()">
+            <mat-icon>menu</mat-icon>
+          </div>
+        } @else {
+          <div class="nav-items-container">
+              
+            <a class="nav-item" routerLinkActive="nav-item-active" [routerLink]="APP_ROUTES.BLOG">{{ BLOG_LINK_VALUE }}</a>
+      
+            <a class="nav-item" routerLinkActive="nav-item-active" [routerLink]="APP_ROUTES.SUBSCRIBERS">{{ SUBSCRIBERS_LINK_VALUE }}</a>
+          
+            <a class="nav-item" routerLinkActive="nav-item-active" [routerLink]="APP_ROUTES.ACCOUNT">{{ ACCOUNT_LINK_VALUE }}</a>
+            
+          </div>
+        }
+      }
+    } @placeholder {
+      <div class="menu-button-container" (click)="uiService.toggleSidenav()">
+        <mat-icon>menu</mat-icon>
+      </div>
+    }
+    
+</div>

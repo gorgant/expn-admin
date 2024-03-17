@@ -1,0 +1,21 @@
+@import '../../variables';
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 40px;
+
+  width: 100%;
+  margin-top: 64px;
+  margin-bottom: 64px;
+}
+
+.action-button {
+  width: $mobile-button-width;
+  
+  @media screen and (min-width: $mobile-cutoff-width) {
+    width: $desktop-button-width;
+  }
+}

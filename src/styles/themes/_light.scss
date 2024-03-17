@@ -1,0 +1,22 @@
+@use "sass:map";
+@use "@angular/material" as mat;
+
+@use "../pallets/primary";
+@use "../pallets/accent";
+@use "../pallets/warn";
+
+@use "../typography/config" as typography;
+
+$expn-admin-light-palette-primary: mat.define-palette(primary.$expn-admin-primary);
+$expn-admin-light-palette-accent: mat.define-palette(accent.$expn-admin-accent);
+$expn-admin-light-palette-warn: mat.define-palette(warn.$expn-admin-warn);
+
+$expn-admin-light-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $expn-admin-light-palette-primary,
+      accent: $expn-admin-light-palette-accent,
+      warn: $expn-admin-light-palette-warn,
+    ),
+  )
+);

@@ -1,0 +1,9 @@
+<div class="component-container">
+  @if (!$deletePostCycleInit()) {
+    <button class="toggle-delete-button" mat-icon-button (click)="onDeletePost()" [disabled]="serverRequestProcessing$ | async">
+      <mat-icon>delete</mat-icon>
+    </button>
+  } @else {
+    <app-processing-spinner [$spinnerDiameter]="32" [$spinnerMessage]="EMPTY_SPINNER_MESSAGE"></app-processing-spinner>
+  }
+</div>

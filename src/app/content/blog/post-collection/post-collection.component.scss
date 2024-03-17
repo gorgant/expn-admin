@@ -1,0 +1,40 @@
+@import "../../../variables";
+
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  width: 100%;
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.post-collection-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  align-items: flex-start;
+
+  grid-gap: 32px 24px; /* Column and row gaps */
+
+  width: 100%;
+  max-width: 1200px;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Flexible columns */
+  }
+
+
+}
+
+app-post-thumbnail {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  
+  width: 100%;
+}

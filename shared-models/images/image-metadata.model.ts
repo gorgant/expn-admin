@@ -1,12 +1,15 @@
+import { UploadMetadata } from 'firebase/storage';
 import { ImageType } from './image-type.model';
 
-export interface ImageMetadata {
+export interface PostImageMetadata extends UploadMetadata {
   contentType: File['type'];
   customMetadata: {
-    itemId: string;
+    fileExt: string;
+    fileNameNoExt: string;
+    filePath: string;
     imageType: ImageType;
-    resizedImage?: boolean;
-    imageSize?: number;
-    filePath?: string;
+    postId: string;
+    resizedImage: string;
+    storageBucket: string;
   };
 }

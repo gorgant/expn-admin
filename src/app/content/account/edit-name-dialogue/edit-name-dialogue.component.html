@@ -1,0 +1,28 @@
+<div class="content-container">
+
+  <div class="dialogue-title">{{ EDIT_NAME_TITLE_VALUE }}</div>
+
+  <div class="dialogue-form">
+    <form [formGroup]="nameForm">
+
+      <!-- Display Name -->
+      <mat-form-field>
+        <input [formControl]="displayName" matInput type="text" placeholder="Display Name">
+      </mat-form-field>
+
+    </form>
+  </div>
+
+  <div class="actions-container">
+    @if (!(userUpdateProcessing$ | async)) {
+      <button [disabled]="nameForm.invalid && (nameForm.dirty || nameForm.touched)" mat-raised-button color="primary" type="submit" (click)="onSubmit()">{{ SAVE_BUTTON_VALUE }}</button>
+    }
+    @if (!(userUpdateProcessing$ | async)) {
+      <button mat-stroked-button color="primary" [mat-dialog-close] type="button">{{ CANCEL_BUTTON_VALUE }}</button>
+    }
+    @if ((userUpdateProcessing$ | async)) {
+      <app-processing-spinner></app-processing-spinner>
+    }
+  </div>
+
+</div>

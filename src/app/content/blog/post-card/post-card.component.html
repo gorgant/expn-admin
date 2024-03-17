@@ -1,0 +1,53 @@
+<div class="component-container mat-elevation-z4">
+  <div class="thumbnail-and-content-container">
+    <a class="thumbnail" (click)="onPreviewPost()">
+      <!-- lazyload images -->
+      @defer (on viewport){
+        <img appMatElevation class="post-image " [src]="$thumbnailSrc()" [alt]="$blogIndexRef().title">
+      } @placeholder {
+        <div>Loading...</div>
+      }
+    </a>
+    <div class="content-container">
+      <a class="title" [matTooltip]="$blogIndexRef().title" matTooltipPosition="above" matTooltipShowDelay="500" (click)="onPreviewPost()">{{ $blogIndexRef().title }}</a>
+      <div class="last-modified-by">{{ MODIFIED_BY_FIELD_VALUE }} {{ $blogIndexRef().authorName }} &bull; {{ $lastModifiedTimestamp() | date }}</div>
+    </div>
+  </div>
+
+  <div class="actions">
+
+    @if ($blogIndexRef().published) {
+      <div class="published-post-actions-container">
+        <app-unpublish-post-button [$blogIndexRef]="$blogIndexRef()"></app-unpublish-post-button>
+        <app-toggle-featured-post-button [$post]="$blogIndexRef()"></app-toggle-featured-post-button>
+      </div>
+    } @else {
+      <div class="unpublished-post-actions-container">
+        <app-publish-post-button [$blogIndexRef]="$blogIndexRef()"></app-publish-post-button>
+        <div class="edit-schedule-delete-container">
+          <button class="edit-button" mat-icon-button (click)="onEditPost()" [disabled]="serverRequestProcessing$ | async">
+            <mat-icon>edit</mat-icon>
+          </button>
+          @if ($scheduledAutopublishTimestamp()) {
+            <button class="schedule-button" mat-icon-button (click)="onSchedulePost()" [disabled]="serverRequestProcessing$ | async">
+              <mat-icon class="autopublish-active">alarm</mat-icon>
+            </button>
+          } @else {
+            <button class="schedule-button" mat-icon-button (click)="onSchedulePost()" [disabled]="serverRequestProcessing$ | async">
+              <mat-icon class="autopublish-inactive">history_toggle_off</mat-icon>
+            </button>
+          }
+          <app-delete-post-button [$blogIndexRef]="$blogIndexRef()"></app-delete-post-button>
+        </div>
+      </div>
+    }
+
+  </div>
+
+  @if ($scheduledAutopublishTimestamp()) {
+    <div class="scheduled-autopublish-timestamp">
+      {{ $scheduledAutopublishTimestamp() | date: 'fullDate' }}
+    </div>
+  }
+
+</div>

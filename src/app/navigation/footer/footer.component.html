@@ -1,0 +1,12 @@
+<div class="component-container">
+  <div class="footer-base">
+    <div class="legal-container">
+      <div class="copyright" (click)="toggleShowAppVersion()">&copy; {{ LEGAL_BUSINESS_NAME }}, All Rights Reserved {{ currentDate | date: 'yyyy' }}</div>
+    </div>
+    @if ($showAppVersion()) {
+      <div>{{ uiService.appVersion }}</div>
+    }
+  </div>
+</div>
+
+

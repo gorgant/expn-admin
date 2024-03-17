@@ -1,29 +1,8 @@
-<!-- <div class="hero-background-image" [style.backgroundImage]="stylesObject$ | async" fxLayout="column" fxLayoutAlign="center center" [fxLayoutAlign.gt-sm]="heroBackgroundImageAlignValue"> -->
-<div class="hero-background-image" [style.backgroundImage]="stylesObject" fxLayout="column" fxLayoutAlign="center center" [fxLayoutAlign.gt-sm]="heroBackgroundImageAlignValue">
-
-  <div class="hero-content-container" [ngClass]="{'post-hero-content-container': isPost}" [fxFlex]="heroContentContainerMobileFlexValue" fxLayout="column" fxLayoutAlign="end center" [fxFlex.gt-sm]="heroContentContainerFlexValue" [fxLayoutAlign.gt-sm]="heroContentContainerAlignValue">
-    <div class="hero-text-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutAlign.gt-sm="center start">
-      <h1 class="hero-title" >{{ pageTitle }}</h1>
-      <p *ngIf="pageSubtitle" class="hero-subtitle">{{ pageSubtitle }}</p>
-    </div>
-
-    <!-- Only Active for Home Page -->
-    <div class="hero-button-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxLayoutGap.gt-sm="64px" >
-      <ng-content select=".hero-button"></ng-content>
-    </div>
-
-  </div>
-
-  <!-- Only Active for About Me Page -->
-  <div class="about-me-blurb-container">
-    <ng-content select=".about-me-blurb"></ng-content>
-  </div>
-  
-  <div class="hero-action-container" [fxFlex]="heroActionContainerMobileFlexValue" fxLayout="column" fxLayoutAlign="end center" [fxFlex.gt-sm]="heroActionContainerFlexValue">
-    <div class="hero-actions" fxLayout="column" fxLayoutAlign="end center">
-      <div class="hero-action-message" (click)=scrollToTextStart()> {{ actionMessage }}</div>
-      <mat-icon class="hero-down-icon">keyboard_arrow_down</mat-icon>
-    </div>
-  </div>
+<div class="blog-post-header">
+  <img [src]="DEFAULT_POST_IMAGE_URL" alt="Blog Post Image" class="background-image">
+  <div class="image-overlay"></div> <!-- Overlay element -->
+  <div class="title-container">
+    <h1 class="post-title">Blog Post Title</h1>
+    <h2 class="post-subtitle">Your Subtitle Here</h2>
 </div>
-<div #contentStartTag></div>
+</div>

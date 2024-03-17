@@ -1,0 +1,29 @@
+@import "../../../../variables";
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.post-body {
+  padding: $text-block-padding;
+  width: 100%;
+  max-width: $text-block-max-width;
+
+  padding: 0 24px;
+  box-sizing: border-box;
+
+  
+ 
+  ::ng-deep {
+
+    @include post-content-styles();
+
+  }
+
+  
+
+}

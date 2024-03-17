@@ -1,0 +1,121 @@
+@import '../../../../variables';
+
+.hero-background-image {
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  height: 93vh;
+  
+  background-color: #cccccc;
+  background-position: 75%;
+  
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    background-position: top;  
+  }
+
+}
+
+.hero-content-container {
+  flex: 60;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    flex: 55;
+    
+    align-items: flex-start;
+
+    margin-left: 100px;
+  }
+}
+
+.hero-text-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+
+  max-width: 650px;
+}
+
+.hero-title {
+  color: white;
+  text-align: center;
+  font-size: 3em;
+  font-weight: $font-weight-light;
+  line-height: 1.2em;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    font-size: 4.5em;
+  }
+}
+
+.hero-action-container {
+
+  flex: 40;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+
+  width: 100%;
+  font-size: 22px;
+  color: white;
+  margin-bottom: 16px;
+  text-align: center;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    flex: 45;
+  }
+}
+
+.hero-actions {
+  opacity: $active-item-opacity;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    opacity: $inactive-item-opacity;
+  }
+}
+
+.hero-actions:hover {
+  opacity: $active-item-opacity;
+  cursor: pointer;
+}
+
+.hero-action-message:hover {
+  text-decoration: underline;
+}
+
+.description-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+}
+
+.description {
+  margin: 32px 16px;
+
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: $font-weight-light;
+  line-height: 1.2em;
+  max-width: 1000px;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    font-size: 2em;
+  }
+}

@@ -1,0 +1,13 @@
+<div class="component-container">
+  @if ($combinedPostData().post && $combinedPostData().postBoilerplate) {
+    <app-post-hero [$post]="$combinedPostData().post!"></app-post-hero>
+    @defer () {
+      <app-post-video-player [$post]="$combinedPostData().post!"></app-post-video-player>
+      <app-post-podcast-player [$post]="$combinedPostData().post!"></app-post-podcast-player>
+    }
+    <app-post-content [$post]="$combinedPostData().post!" [$postBoilerplate]="$combinedPostData().postBoilerplate!"></app-post-content>
+    <a class="blog-button" [routerLink]="APP_ROUTES.BLOG" mat-raised-button color="primary">{{ VIEW_MORE_POSTS_BUTTON_VALUE }}</a>
+  } @else {
+    <app-processing-spinner [$spinnerMessage]="'Post loading...'" [$spinnerMargin]="'32px 0'"></app-processing-spinner>
+  }
+</div>

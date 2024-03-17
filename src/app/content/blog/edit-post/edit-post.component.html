@@ -1,0 +1,91 @@
+<div class="component-container">
+  @if ($isNewPost()) {
+    <app-processing-spinner [$spinnerMessage]="'Initializing new post, please wait...'" [$spinnerMargin]="'64px 0'"></app-processing-spinner>
+  }
+
+  @if (!$isNewPost() && !$localPost()) {
+    <app-processing-spinner [$spinnerMessage]="'Loading post, please wait...'" [$spinnerMargin]="'64px 0'"></app-processing-spinner>
+  }
+
+  @if (!$isNewPost() && $localPost()) {
+    <!-- <div class="page-header">{{ EDIT_POST_PAGE_HEADER }}</div> -->
+    
+    <app-image-uploader [$post]="$localPost()!"></app-image-uploader>
+    
+    <form class="form-container" [formGroup]="postForm">
+
+      <mat-form-field color="accent">
+        <input [formControl]="title" matInput type="text">
+        <mat-icon class="input-icon" matPrefix>edit</mat-icon>
+        <mat-label class="input-placeholder">{{ POST_TITLE_FIELD_VALUE }}</mat-label>
+        @if (title.invalid && (title.dirty || title.touched)) {
+          <mat-error>{{ titleErrorMessage }} <span style="float: right;">{{ title.value.length }} / {{ TITLE_MAX_LENGTH }}</span></mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field color="accent">
+        <input [formControl]="videoUrl" matInput type="text">
+        <mat-icon class="input-icon" matPrefix>videocam</mat-icon>
+        <mat-label class="input-placeholder">{{ VIDEO_URL_FIELD_VALUE }}</mat-label>
+        @if (videoUrl.invalid && (videoUrl.dirty || videoUrl.touched)) {
+          <mat-error>{{ videoUrlErrorMessage }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field color="accent">
+        <input [formControl]="podcastEpisodeUrl" matInput type="text">
+        <mat-icon class="input-icon" matPrefix>volume_up</mat-icon>
+        <mat-label class="input-placeholder">{{ PODCAST_EPISODE_URL_FIELD_VALUE }}</mat-label>
+        @if (podcastEpisodeUrl.invalid && (podcastEpisodeUrl.dirty || podcastEpisodeUrl.touched)) {
+          <mat-error>{{ podcastEpisodeUrlErrorMessage }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field color="accent">
+        <textarea [formControl]="description" matInput type="text" cdkTextareaAutosize></textarea>
+        <mat-icon class="input-icon" matPrefix>description</mat-icon>
+        <mat-label class="input-placeholder">{{ POST_DESCRIPTION_FIELD_VALUE }}</mat-label>
+        <mat-hint align="end">{{ description.value ? description.value.length : 0 }} / {{ DESCRIPTION_MAX_LENGTH }}</mat-hint>
+        @if (description.invalid && (description.dirty || description.touched)) {
+          <mat-error>{{ descriptionErrorMessage }} <span style="float: right;">{{ description.value ? description.value.length : 0 }} / {{ DESCRIPTION_MAX_LENGTH }}</span></mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field color="accent">
+        <textarea [formControl]="keywords" matInput type="text" cdkTextareaAutosize></textarea>
+        <mat-icon class="input-icon" matPrefix>keyboard</mat-icon>
+        <mat-label class="input-placeholder">{{ POST_KEYWORDS_FIELD_VALUE }}</mat-label>
+        <mat-hint align="end">{{ keywords.value ? keywords.value.length : 0 }} / {{ KEYWORDS_MAX_LENGTH }}</mat-hint>
+        @if (keywords.invalid && (keywords.dirty || keywords.touched)) {
+          <mat-error>{{ keywordsErrorMessage }} <span style="float: right;">{{ keywords.value ? keywords.value.length : 0 }} / {{ KEYWORDS_MAX_LENGTH }}</span></mat-error>
+        }
+      </mat-form-field>
+
+      <ckeditor [editor]="Editor" [formControl]="content" #postEditor></ckeditor>
+      @if (content.invalid && (content.dirty || content.touched)) {
+        <mat-error>{{ contentErrorMessage }} </mat-error>
+      }
+
+      <div class="form-actions-container">
+        @if (!(updatePostProcessing$ | async)) {
+          <button class="submit-button" mat-raised-button color="primary" (click)="onSubmitPostForm()">
+            {{ SUBMIT_BUTTON_VALUE }}
+          </button>
+          <button class="cancel-button" mat-stroked-button color="warn" (click)="onDiscardChanges()">
+            {{ DISCARD_EDITS_BUTTON_VALUE }}
+          </button>
+        }
+      </div>
+
+      @if ((updatePostProcessing$ | async) && !$discardEditsRequested()) {
+        <app-processing-spinner [$spinnerMessage]="'Saving post, please wait...'" [$spinnerMargin]="'16px 0'"></app-processing-spinner>
+      }
+
+      @if ((updatePostProcessing$ | async) && $discardEditsRequested()) {
+        <app-processing-spinner [$spinnerMessage]="'Discarding edits, please wait...'" [$spinnerMargin]="'16px 0'"></app-processing-spinner>
+      }
+
+    </form>
+  }
+
+</div>

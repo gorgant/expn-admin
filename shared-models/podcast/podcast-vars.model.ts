@@ -1,9 +1,11 @@
+import { SocialUrlPrefixes } from "../meta/social-urls.model";
+
 export enum PodcastVars {
   PODCAST_QUERY_LIMIT = '40',
   PODCAST_ID_SPLIT_CODE = 'anchor.fm/s/'
 }
 
-enum PodcastIds {
+export enum PodcastIds {
   EXPN_RSS_FEED_ID = '6d8b762c',
   EXPN_USER_ID = 'explearning',
   MDLS_RSS_FEED_ID = 'TBD',
@@ -17,26 +19,22 @@ enum PodcastIds {
 export const PODCAST_PATHS = {
   expn: {
     rssFeedPath: `https://anchor.fm/s/${PodcastIds.EXPN_RSS_FEED_ID}/podcast/rss`,
-    landingPageUrl: `https://anchor.fm/${PodcastIds.EXPN_USER_ID}`,
-    embeddedPlayerUrl: `https://podcasters.spotify.com/pod/show/${PodcastIds.EXPN_USER_ID}/embed/episodes`,
-    anchorRssFeedEpisodeUrl: `https://anchor.fm/${PodcastIds.EXPN_USER_ID}/episodes` // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
+    embeddedPlayerUrl: `${SocialUrlPrefixes.SPOTIFY_PODCAST}/${PodcastIds.EXPN_USER_ID}/embed/episodes`,
+    publicLandingPage: `${SocialUrlPrefixes.SPOTIFY_PODCAST}/${PodcastIds.EXPN_USER_ID}`,
   },
   mdls: {
     rssFeedPath: `https://anchor.fm/s/${PodcastIds.MDLS_RSS_FEED_ID}/podcast/rss`,
-    landingPageUrl: `https://anchor.fm/${PodcastIds.MDLS_USER_ID}`,
-    embeddedPlayerUrl: `https://podcasters.spotify.com/pod/show/${PodcastIds.MDLS_USER_ID}/embed/episodes`,
-    anchorRssFeedEpisodeUrl: `https://anchor.fm/${PodcastIds.MDLS_USER_ID}/episodes` // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
+    embeddedPlayerUrl: `${SocialUrlPrefixes.SPOTIFY_PODCAST}/${PodcastIds.MDLS_USER_ID}/embed/episodes`,
+    publicLandingPage: `${SocialUrlPrefixes.SPOTIFY_PODCAST}/${PodcastIds.MDLS_USER_ID}`,
   },
   syw: {
     rssFeedPath: `https://anchor.fm/s/${PodcastIds.SYW_RSS_FEED_ID}/podcast/rss`,
-    landingPageUrl: `https://anchor.fm/${PodcastIds.SYW_USER_ID}`,
-    embeddedPlayerUrl: `https://podcasters.spotify.com/pod/show/${PodcastIds.SYW_USER_ID}/embed/episodes`,
-    anchorRssFeedEpisodeUrl: `https://anchor.fm/${PodcastIds.SYW_USER_ID}/episodes` // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
+    embeddedPlayerUrl: `${SocialUrlPrefixes.SPOTIFY_PODCAST}/${PodcastIds.SYW_USER_ID}/embed/episodes`,
+    publicLandingPage: `${SocialUrlPrefixes.SPOTIFY_PODCAST}/${PodcastIds.SYW_USER_ID}`,
   },
   adve: {
     rssFeedPath: `https://anchor.fm/s/${PodcastIds.ADVE_RSS_FEED_ID}/podcast/rss`,
-    landingPageUrl: `https://anchor.fm/${PodcastIds.ADVE_USER_ID}`,
-    embeddedPlayerUrl: `https://podcasters.spotify.com/pod/show/${PodcastIds.ADVE_USER_ID}/embed/episodes`,
-    anchorRssFeedEpisodeUrl: `https://anchor.fm/${PodcastIds.ADVE_USER_ID}/episodes` // Temporarily(?) different from new podcasters.spotify.com url, might eventually be updated to new spotify url
+    embeddedPlayerUrl: `${SocialUrlPrefixes.SPOTIFY_PODCAST}/${PodcastIds.ADVE_USER_ID}/embed/episodes`,
+    publicLandingPage: `${SocialUrlPrefixes.SPOTIFY_PODCAST}/${PodcastIds.ADVE_USER_ID}`,
   }
 };

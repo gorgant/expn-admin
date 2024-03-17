@@ -1,119 +1,51 @@
 @import '../../../variables';
 
-.hero-background-image {
-  background-color: #cccccc;
-  height: 93vh;
-  background-position: top;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.hero-content-container {
-  margin-left: 86px;
-  padding-left: 16px;
-  padding-right: 16px;
-  max-width: 100%; // Ensures padding doesn't cause side-scroll on smallest devices
-}
-
-.about-me-blurb-container {
-  margin-left: 86px;
-  padding-left: 16px;
-  padding-right: 16px;
-  max-width: 100%; // Ensures padding doesn't cause side-scroll on smallest devices
-}
-
-.post-hero-content-container {
-  margin-left: 0px;
-  text-align: center;
-}
-
-.hero-text-container {
-  color: white;
-  max-width: 600px;
-}
-
-.hero-title {
-  font-size: 60px;
-  font-weight: $font-weight-light;
-}
-
-.hero-subtitle {
-  font-size: 24px;
-  font-weight: $font-weight-light;
+.blog-post-header {
+  position: relative;
   width: 100%;
-  margin-top: 0px;
+  height: 300px; /* Adjust as needed */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-:host ::ng-deep .hero-button-container {
-  margin-top: 32px;
-}
-
-:host ::ng-deep .hero-button {
-  background-color: $primary;
-  color: white;
-  font-size: 20px;
-  padding: 8px;
-  width: 200px;
-}
-
-:host ::ng-deep .hero-button:hover {
-  background-color: $accent;
-}
-
-.hero-action-container {
+.background-image {
+  position: absolute;
   width: 100%;
-  font-size: 22px;
-  color: white;
-  margin-bottom: 16px;
+  max-width: $desktop-screen-width;
+  object-fit: cover;
+  opacity: 0.7; /* Adjust opacity as needed */
+}
+
+.image-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: black; /* Overlay color */
+  opacity: 0.5; /* Adjust this value for darker/lighter overlay */
+  z-index: 1;
+}
+
+.title-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
+  z-index: 2;
 }
 
-.hero-actions {
-  opacity: $inactive-item-opacity;
-}
-
-.hero-actions:hover {
-  opacity: $active-item-opacity;
-  cursor: pointer;
+.post-title {
+  margin-bottom: 0.5em; /* Adjust spacing between title and subtitle */
   
+  color: white;
+  font-size: 4em;
+  font-weight: $font-weight-light;
 }
 
-.hero-action-message:hover {
-  text-decoration: underline;
-}
-
-@media screen and (max-width: $mobile-cutoff-width) {
-
-  .hero-background-image {
-    background-position: 75%; // Center MD's face on mobile screens (requires MD to be on right side of image)
-  }
-
-  .hero-content-container {
-    margin-left: 0px;
-  }
-
-  .about-me-blurb-container {
-    margin-left: 0px;
-  }
-
-  .hero-text-container {
-    text-align: center;
-  }
-
-  .hero-title {
-    font-size: 42px;
-  }
-
-  .hero-subtitle {
-    font-size: 16px;
-  }
-
-  :host ::ng-deep .hero-button {
-    width: auto;
-    font-size: 16px;
-  }
-
-  .hero-actions {
-    opacity: $active-item-opacity;
-  }
+.post-subtitle {
+  color: white;
+  font-weight: $font-weight-light;
+  font-size: 2em;
 }

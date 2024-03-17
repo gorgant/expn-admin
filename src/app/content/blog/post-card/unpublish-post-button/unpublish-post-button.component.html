@@ -1,0 +1,7 @@
+<div class="component-container">
+  @if (!$unpublishPostCycleInit()) {
+    <button class="toggle-publish-button" mat-raised-button color="primary" (click)="onUnpublishPost()" [disabled]="serverRequestProcessing$ | async">{{ UNPUBLISH_BUTTON_VALUE }}</button>
+  } @else {
+    <app-processing-spinner [$spinnerDiameter]="32" [$spinnerMessage]="EMPTY_SPINNER_MESSAGE"></app-processing-spinner>
+  }
+</div>

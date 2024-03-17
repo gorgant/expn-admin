@@ -1,0 +1,67 @@
+<div class="content-container">
+  <div class="dialogue-title">{{ SCHEDULE_POST_TITLE }}</div>
+  <div class="dialogue-content">
+
+    <div class="date-picker-container">
+      <mat-form-field>
+        <mat-label>{{ SELECT_DATE_FIELD_VALUE }}</mat-label>
+        <input matInput [matDatepicker]="dp" [formControl]="scheduledDate">
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp></mat-datepicker>
+        @if (scheduledDate.invalid && (scheduledDate.dirty || scheduledDate.touched)) {
+          <mat-error>{{ scheduledDateErrorMessage }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="hours-and-minutes-container">
+      <mat-form-field class="duration-field">
+        <mat-label>{{ HOUR_FIELD_VALUE }}</mat-label>
+        <input [formControl]="scheduledHours" matInput type="number">
+        <mat-hint>{{SCHEDULED_HOURS_MIN}} - {{SCHEDULED_HOURS_MAX}}</mat-hint>
+        @if (scheduledHours.invalid && (scheduledHours.dirty || scheduledHours.touched)) {
+          <mat-error>{{ scheduledHoursErrorMessage }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="duration-field">
+        <mat-label>{{ MINUTES_FIELD_VALUE }}</mat-label>
+        <input [formControl]="scheduledMinutes" matInput type="number">
+        <mat-hint>{{SCHEDULED_MINUTES_MIN}} - {{SCHEDULED_MINUTES_MAX}}</mat-hint>
+        @if (scheduledMinutes.invalid && (scheduledMinutes.dirty || scheduledMinutes.touched)) {
+          <mat-error>{{ scheduledMinutesErrorMessage }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    @if(scheduleForm.valid) {
+      <div class="current-date-time-display-container">
+        <div class="current-date-time-header">{{ SCHEDULE_POST_BLURB }}:</div>
+        <div class="current-date-time-value">
+          {{ calculateCurrentDateTimeFromInputs() | date: 'fullDate' }} {{ calculateCurrentDateTimeFromInputs() | date: 'shortTime' }}
+        </div>
+      </div>
+    }
+  </div>
+  <div class="actions-container">
+    @if (!(combinedFetchAndUpdatePostProcessing$ | async)) {
+      <button mat-raised-button color="primary" (click)="onSchedulePost()" [disabled]="(scheduleForm.invalid && (scheduleForm.dirty || scheduleForm.touched))">
+        {{ CONFIRM_BUTTON_VALUE }}
+      </button>
+      <button mat-stroked-button color="primary" (click)="onCancel()">
+        {{ CANCEL_BUTTON_VALUE }}
+      </button>
+      @if (blogIndexRef.scheduledAutopublishTimestamp) {
+        <button mat-button color="warn" (click)="onUnschedulPost()">
+          {{ UNSCHEDULE_BUTTON_VALUE }}
+        </button>
+      }
+    
+    }
+
+    @if ((combinedFetchAndUpdatePostProcessing$ | async)) {
+      <app-processing-spinner [$spinnerMessage]="'Scheduling post, please wait...'" [$spinnerMargin]="'16px 0'"></app-processing-spinner>
+    }
+
+  </div>
+</div>

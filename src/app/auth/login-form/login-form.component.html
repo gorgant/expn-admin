@@ -1,0 +1,32 @@
+<div class="component-container">
+  <form class="auth-user-form" [ngClass]="$showResetMessage() ? 'hide' : ''" [formGroup]="authForm" (ngSubmit)="onSubmit()">
+    <mat-form-field color="accent">
+      <input class="email-input" color="accent" matInput [formControl]="email" type="email">
+      <mat-icon class="input-icon" matPrefix>email</mat-icon>
+      <mat-label class="input-placeholder">{{ EMAIL_FIELD_VALUE }}</mat-label>
+      @if (email.invalid && (email.dirty || email.touched)) {
+        <mat-error>{{ emailErrorMessage }}</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field color="accent">
+      <input [formControl]="password" matInput type="password">
+      <mat-icon class="input-icon" matPrefix>lock</mat-icon>
+      <mat-label class="input-placeholder">{{ PASSWORD_FIELD_VALUE }}</mat-label>
+      @if (password.invalid && (password.dirty || password.touched)) {
+        <mat-error>{{ passwordErrorMessage }}</mat-error>
+      }
+    </mat-form-field>
+    <div class="forgot-password-container">
+      <button class="reset-password-button" mat-button color="primary" type="button" (click)="onResetPassword()">{{ FORGOT_PASSWORD_BLURB }}</button>
+    </div>
+    <button class="submit-button" [disabled]="(email.invalid && (email.dirty || email.touched))" type="submit" mat-raised-button color="primary">{{ LOG_IN_BUTTON_VALUE }}</button>
+  </form>
+  @if ($showResetMessage()) {
+    <div class="check-inbox-container">
+      <h2 class="check-inbox-message">
+        {{ CHECK_INBOX_BLURB }}
+      </h2>
+      <button class="post-reset-button" mat-raised-button color="primary" (click)="onRestoreLoginScreen()">{{ LOG_IN_BUTTON_VALUE }}</button>
+    </div>
+  }
+</div>

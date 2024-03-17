@@ -1,0 +1,19 @@
+@import "../../../variables";
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  
+  width: 100%;
+}
+
+.processing-spinner {
+  @include processing-spinner-styles();
+}
+
+.spinner-message {
+  @include default-text-style();
+}

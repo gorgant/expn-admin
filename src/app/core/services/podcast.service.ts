@@ -1,101 +1,90 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { catchError, takeUntil, map, take, tap } from 'rxjs/operators';
-import { throwError, Observable, of } from 'rxjs';
-import { PodcastEpisode, PodcastEpisodeKeys } from 'shared-models/podcast/podcast-episode.model';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
-import { AuthService } from './auth.service';
+import { Injectable, inject } from '@angular/core';
+import { CollectionReference, DocumentReference, Firestore, Query, Timestamp, collection, collectionData, doc, docData, orderBy, query } from '@angular/fire/firestore';
 import { UiService } from './ui.service';
-import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
-import { PodcastVars } from 'shared-models/podcast/podcast-vars.model';
+import { PodcastEpisode, PodcastEpisodeKeys } from '../../../../shared-models/podcast/podcast-episode.model';
+import { SharedCollectionPaths } from '../../../../shared-models/routes-and-paths/fb-collection-paths.model';
+import { Observable, catchError, map, shareReplay, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PodcastService {
 
-  private podcastEpisodeQueryField = PodcastEpisodeKeys.PUB_DATE;
-  private podcastEpisodeQueryLimit = PodcastVars.PODCAST_QUERY_LIMIT;
+  private firestore = inject(Firestore);
+  private uiService = inject(UiService);
 
-  constructor(
-    private afs: AngularFirestore,
-    private authService: AuthService,
-    private uiService: UiService,
-    @Inject(PLATFORM_ID) private platformId,
-  ) { }
+  constructor() { }
 
-  fetchPodcastContainer(podcastId) {
-    const podcastDoc = this.getPodcastContainerDoc(podcastId);
-    return podcastDoc.valueChanges()
+  fetchAllPodcastEpisodes(podcastContainerId: string) {
+    const podcastEpisodeCollectionRef = this.getPodcastEpisodeCollectionByDate(podcastContainerId);
+    const podcastEpisodeCollectionDataRequest = collectionData(podcastEpisodeCollectionRef) as Observable<PodcastEpisode[]>;
+
+    return podcastEpisodeCollectionDataRequest
       .pipe(
-        takeUntil(this.authService.unsubTrigger$),
-        map(podcast => {
-          console.log('Fetched podcast container');
-          return podcast;
+        map(podcastEpisodes => {
+          if (!podcastEpisodes) {
+            throw new Error(`Error fetching podcastEpisodes`);
+          }
+          const podcastEpisodesWithUpdatedTimestamps = podcastEpisodes.map(podcastEpisode => {
+            const formattedPodcastEpisodes: PodcastEpisode = {
+              ...podcastEpisode,
+              [PodcastEpisodeKeys.PUBLISHED_TIMESTAMP]: (podcastEpisode[PodcastEpisodeKeys.PUBLISHED_TIMESTAMP] as Timestamp).toMillis(),
+              [PodcastEpisodeKeys.LAST_MODIFIED_TIMESTAMP]: (podcastEpisode[PodcastEpisodeKeys.LAST_MODIFIED_TIMESTAMP] as Timestamp).toMillis(),
+            };
+            return formattedPodcastEpisodes;
+          });
+          console.log(`Fetched all ${podcastEpisodesWithUpdatedTimestamps.length} podcastEpisodes`);
+          return podcastEpisodesWithUpdatedTimestamps;
         }),
+        shareReplay(),
         catchError(error => {
-          this.uiService.showSnackBar(error, 5000);
-          return throwError(error);
+          this.uiService.showSnackBar(error.message, 10000);
+          console.log('Error fetching podcastEpisodes', error);
+          return throwError(() => new Error(error));
         })
       );
   }
 
-  fetchAllPodcastEpisodes(podcastId: string): Observable<PodcastEpisode[]> {
+  fetchSinglePodcastEpisode(podcastContainerId: string, podcastEpisodeId: string): Observable<PodcastEpisode> {
+    const podcastEpisodeRef = this.getPodcastEpisodeDoc(podcastContainerId, podcastEpisodeId);
+    const podcastEpisode = docData(podcastEpisodeRef);
 
-    // Otherwise, fetch from database
-    const episodeCollection = this.getEpisodesCollection(podcastId);
-    return episodeCollection.valueChanges()
+    return podcastEpisode
       .pipe(
-        takeUntil(this.authService.unsubTrigger$),
-        map(episodes => {
-          console.log(`Fetched all ${episodes.length} episodes`, episodes);
-          return episodes;
+        // If logged out, this triggers unsub of this observable
+        map(podcastEpisode => {
+          if (!podcastEpisode) {
+            throw new Error(`Error fetching podcastEpisode with id: ${podcastContainerId}`);
+          }
+          const formattedPodcastEpisode: PodcastEpisode = {
+            ...podcastEpisode,
+            [PodcastEpisodeKeys.PUBLISHED_TIMESTAMP]: (podcastEpisode[PodcastEpisodeKeys.PUBLISHED_TIMESTAMP] as Timestamp).toMillis(),
+            [PodcastEpisodeKeys.LAST_MODIFIED_TIMESTAMP]: (podcastEpisode[PodcastEpisodeKeys.LAST_MODIFIED_TIMESTAMP] as Timestamp).toMillis(),
+          };
+          console.log(`Fetched single podcastEpisode`, formattedPodcastEpisode);
+          return formattedPodcastEpisode;
         }),
+        shareReplay(),
         catchError(error => {
-          this.uiService.showSnackBar(error, 5000);
-          return throwError(error);
+          this.uiService.showSnackBar(error.message, 10000);
+          console.log(`Error fetching podcastEpisode`, error);
+          return throwError(() => new Error(error));
         })
       );
   }
 
-  fetchSinglePodcastEpisode(podcastId: string, episodeId: string): Observable<PodcastEpisode> {
-
-    // Otherwise, fetch from database
-    const episodeDoc = this.getEpisodeDoc(podcastId, episodeId);
-    return episodeDoc.valueChanges()
-      .pipe(
-        take(1),
-        map(episode => {
-          console.log('Fetched single episode');
-          return episode;
-        }),
-        catchError(error => {
-          this.uiService.showSnackBar(error, 5000);
-          return throwError(error);
-        })
-      );
+  private getPodcastEpisodeCollection(podcastContainerId: string): CollectionReference<PodcastEpisode> {
+    return collection(this.firestore, `${SharedCollectionPaths.PODCAST_CONTAINERS}/${podcastContainerId}/${SharedCollectionPaths.PODCAST_EPISODES}`) as CollectionReference<PodcastEpisode>;
   }
 
-  private getPodcastContainerCollection(): AngularFirestoreCollection<PodcastEpisode> {
-    return this.afs.collection<PodcastEpisode>(SharedCollectionPaths.PODCAST_FEED_CACHE);
+  private getPodcastEpisodeCollectionByDate(podcastContainerId: string): Query<PodcastEpisode> {
+    const podcastEpisodeCollectionRef = collection(this.firestore, `${SharedCollectionPaths.PODCAST_CONTAINERS}/${podcastContainerId}/${SharedCollectionPaths.PODCAST_EPISODES}`) as CollectionReference<PodcastEpisode>;
+    const collectionRefOrderedByIndex = query(podcastEpisodeCollectionRef, orderBy(PodcastEpisodeKeys.PUBLISHED_TIMESTAMP, 'desc'));
+    return collectionRefOrderedByIndex;
   }
 
-  private getPodcastContainerDoc(podcastId: string): AngularFirestoreDocument<PodcastEpisode> {
-    return this.getPodcastContainerCollection().doc<PodcastEpisode>(podcastId);
-  }
-
-  private getEpisodesCollection(podcastId: string): AngularFirestoreCollection<PodcastEpisode> {
-    return this.getPodcastContainerDoc(podcastId).collection<PodcastEpisode>(
-      SharedCollectionPaths.PODCAST_FEED_EPISODES, ref => ref
-        .orderBy(this.podcastEpisodeQueryField, 'desc') // Ensures most recent podcasts come first
-        .limit(+this.podcastEpisodeQueryLimit) // Limit results to most recent for faster page load
-    );
-  }
-
-  private getEpisodeDoc(podcastId: string, episodeId: string): AngularFirestoreDocument<PodcastEpisode> {
-    return this.getEpisodesCollection(podcastId).doc<PodcastEpisode>(episodeId);
+  private getPodcastEpisodeDoc(podcastContainerId: string, podcastEpisodeId: string): DocumentReference<PodcastEpisode> {
+    return doc(this.getPodcastEpisodeCollection(podcastContainerId), podcastEpisodeId);
   }
 
 }
-
-
-

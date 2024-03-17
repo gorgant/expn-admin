@@ -1,13 +1,11 @@
-import { EmailCategories } from './email-vars.model';
-import { EmailSubscriber } from '../subscribers/email-subscriber.model';
+import { EmailIdentifiers } from './email-vars.model';
 import { ContactForm } from '../user/contact-form.model';
-import { Order } from '../orders/order.model';
-import { WebpageLoadFailureData } from '../ssr/webpage-load-failure-data.model';
+import { EmailUserData } from './email-user-data.model';
+import { OptInCountComparisonData } from './opt-in-count-comparison-data';
 
 export interface EmailPubMessage {
-  emailCategory: EmailCategories;
-  subscriber?: EmailSubscriber;
   contactForm?: ContactForm;
-  order?: Order;
-  webpageLoadFailureData?: WebpageLoadFailureData;
+  emailIdentifier: EmailIdentifiers;
+  emailUserData: EmailUserData;
+  optInCountComparisonData?: OptInCountComparisonData
 }

@@ -1,0 +1,40 @@
+<div class="component-container">
+
+  <div class="actions-container">
+    <button class="create-post-button" mat-raised-button color="primary" (click)="onCreateNewPost()"> {{ CREATE_POST_BUTTON_VALUE }} </button>
+    <button class="edit-post-boilerplate-button" mat-stroked-button color="primary" (click)="onEditPostBoilerplate()"> {{ EDIT_POST_BOILERPLATE_BUTTON_VALUE }} </button>
+  </div>
+
+
+  <mat-tab-group mat-align-tabs="center" mat-stretch-tabs dynamicHeight>
+    
+    <mat-tab [label]="UNPUBLISHED_TAB_LABEL">
+      @if ((allBlogIndexRefs$ | async) && unpublishedBlogIndexRefs$ | async; as unpublishedBlogIndexRefs) {
+        <app-post-collection [$blogIndexRefs]="unpublishedBlogIndexRefs"></app-post-collection>
+      } @else {
+        <app-processing-spinner [$spinnerMessage]="'Loading posts...'" [$spinnerMargin]="'32px 0'"></app-processing-spinner>
+      }
+    </mat-tab>
+    
+    <mat-tab [label]="PUBLISHED_TAB_LABEL">
+      <div class="filter-toggle-container">
+        <mat-slide-toggle [(ngModel)]="filterFeaturedPosts">Filter Featured Posts</mat-slide-toggle>
+      </div>
+      @if (!filterFeaturedPosts) {
+        @if ((allBlogIndexRefs$ | async) && publishedBlogIndexRefs$ | async; as publishedBlogIndexRefs) {
+          <app-post-collection [$blogIndexRefs]="publishedBlogIndexRefs"></app-post-collection>
+        } @else {
+          <app-processing-spinner [$spinnerMessage]="'Loading posts...'" [$spinnerMargin]="'32px 0'"></app-processing-spinner>
+        }
+      } @else {
+        @if ((allBlogIndexRefs$ | async) && featuredBlogIndexRefs$ | async; as featuredBlogIndexRefs) {
+          <app-post-collection [$blogIndexRefs]="featuredBlogIndexRefs"></app-post-collection>
+        } @else {
+          <app-processing-spinner [$spinnerMessage]="'Loading posts...'" [$spinnerMargin]="'32px 0'"></app-processing-spinner>
+        }
+      }
+    </mat-tab>
+  
+  </mat-tab-group>
+
+</div>

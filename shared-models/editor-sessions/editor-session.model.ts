@@ -1,18 +1,23 @@
-import { SharedCollectionPaths, AdminCollectionPaths, PublicCollectionPaths } from '../routes-and-paths/fb-collection-paths';
+import { SharedCollectionPaths, AdminCollectionPaths, PublicCollectionPaths } from '../routes-and-paths/fb-collection-paths.model';
+import { Timestamp } from '@angular/fire/firestore';
+import { GoogleCloudFunctionsTimestamp } from '../firestore/google-cloud-functions-timestamp.model';
 
 export enum EditorSessionKeys {
+  ACTIVE = 'active',
+  ACTIVATED_TIMESTAMP = 'activatedTimestamp',
   DOC_ID = 'docId',
   DOC_COLLECTION_PATH = 'docCollectionPath',
-  ACTIVE = 'active'
+  ID = 'id',
+  LAST_MODIFIED_TIMESTAMP = 'lastModifiedTimestamp',
 }
 
 export interface EditorSession {
-  id: string;
+  [EditorSessionKeys.ACTIVE]: boolean;
+  [EditorSessionKeys.ACTIVATED_TIMESTAMP]: number | Timestamp | GoogleCloudFunctionsTimestamp;
   [EditorSessionKeys.DOC_ID]: string;
   [EditorSessionKeys.DOC_COLLECTION_PATH]: SharedCollectionPaths | AdminCollectionPaths | PublicCollectionPaths;
-  [EditorSessionKeys.ACTIVE]: boolean;
-  activatedTimestamp: number;
-  lastModifiedTimestamp: number;
+  [EditorSessionKeys.ID]: boolean;
+  [EditorSessionKeys.LAST_MODIFIED_TIMESTAMP]: number | Timestamp | GoogleCloudFunctionsTimestamp;
 }
 
 export enum EditorSessionVars {

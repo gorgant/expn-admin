@@ -1,0 +1,31 @@
+@import "../../variables";
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 52px;
+
+  padding: 16px;
+}
+
+.header {
+  font-family: $logo-font-family;
+  font-size: $logo-font-mobile-size;
+
+  // Removes the hyperlink effects
+  text-decoration: none;
+  color: $primary;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+      font-size: 4em;
+  }
+}
+
+.subheader {
+  text-align: center;
+  font-size: 2em;
+  color: $font-subheader-color;
+  font-weight: 300;
+}

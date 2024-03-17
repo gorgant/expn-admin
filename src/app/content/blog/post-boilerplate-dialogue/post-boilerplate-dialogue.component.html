@@ -1,0 +1,26 @@
+<div class="component-container">
+  <div class="header">Post Boilerplate</div>
+  <div class="sub-header">This boilerplate content will be dynamically appended to all blog posts. Updates to this boilerplate will be automatically reflected in all posts.</div>
+  <form class="form-container" [formGroup]="postBoilerplateForm">
+    <ckeditor [editor]="Editor" [formControl]="content" #postBoilerplateEditor [disabled]="$updatePostBoilerplateCycleInit()"></ckeditor>
+  
+    <div class="form-actions-container">
+      @if (!$updatePostBoilerplateCycleInit()) {
+        <button class="submit-button" mat-raised-button color="primary" (click)="onSubmitPostBoilerplateForm()">
+          {{ SUBMIT_BUTTON_VALUE }}
+        </button>
+        <button class="cancel-button" mat-stroked-button color="warn" (click)="onDiscardChanges()">
+          {{ DISCARD_EDITS_BUTTON_VALUE }}
+        </button>
+      } 
+
+      @if ($updatePostBoilerplateCycleInit() && !$discardEditsRequested()) {
+        <app-processing-spinner [$spinnerMessage]="'Saving boilerplate, please wait...'" [$spinnerMargin]="'64px 0'"></app-processing-spinner>
+      }
+
+      @if ($updatePostBoilerplateCycleInit() && $discardEditsRequested()) {
+        <app-processing-spinner [$spinnerMessage]="'Discarding edits, please wait...'" [$spinnerMargin]="'64px 0'"></app-processing-spinner>
+      }
+    </div>
+  </form>
+</div>

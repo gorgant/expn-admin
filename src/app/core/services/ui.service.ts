@@ -1,127 +1,174 @@
-import { Injectable } from '@angular/core';
-import { Subject, Observable, throwError, BehaviorSubject } from 'rxjs';
+import { Injectable, PLATFORM_ID, Signal, inject, signal } from '@angular/core';
 import { MatSnackBarConfig, MatSnackBar } from '@angular/material/snack-bar';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { take, map, catchError } from 'rxjs/operators';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
-import { GeographicData } from 'shared-models/forms-and-components/geography/geographic-data.model';
-import { SharedCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
-import { PodcastVars } from 'shared-models/podcast/podcast-vars.model';
+import { tap } from 'rxjs/operators';
+import { NavigationEnd, Router } from '@angular/router';
+import { DOCUMENT, Location, isPlatformBrowser } from '@angular/common';
+import { SnackbarActions } from '../../../../shared-models/utils/snackbar-actions.model';
+import { MatButton } from '@angular/material/button';
+import { AdminAppRoutes } from '../../../../shared-models/routes-and-paths/app-routes.model';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class UiService {
 
-  sideNavSignal$ = new Subject<void>();
-  screenIsMobile$ = new BehaviorSubject(true);
+  private APP_VERSION = '3.0.0';
 
-  constructor(
-    private snackbar: MatSnackBar,
-    private afs: AngularFirestore,
-    private breakpointObserver: BreakpointObserver,
-  ) {
+  $isServerPlatform = signal(false);
+
+  private history: string[] = [];
+  private $privateScreenIsMobile = signal(false);
+  private window: Window | undefined;
+
+  private $privateRouteGuardProcessing = signal(false); // Accessed by route guards to update UI loading symbol
+  private $privateSideNavVisible = signal(false);
+  private $privateNavItemsVisibile = signal(false);
+
+  private snackbar = inject(MatSnackBar);
+  private breakpointObserver = inject(BreakpointObserver);
+  private router = inject(Router);
+  private document = inject(DOCUMENT);
+  private location = inject(Location);
+  private platformId = inject(PLATFORM_ID);
+
+  constructor() {
+    this.setPlatformType();
+    this.monitorNavItemsVisibility();
     this.monitorScreenSize();
-   }
-
-  dispatchSideNavClick() {
-    this.sideNavSignal$.next();
+    this.monitorNavigationHistory();
+    if (!this.$isServerPlatform()) {
+      this.window = this.document.defaultView as Window;
+    }
   }
 
-  showSnackBar(message: string, duration: number, action: string = 'Dismiss', ) {
+  setPlatformType() {
+    if(!isPlatformBrowser(this.platformId)) {
+      this.$isServerPlatform.set(true);
+    }
+  }
+
+  get appVersion() {
+    return this.APP_VERSION;
+  }
+
+  configureAppCheck() {
+    if (this.$isServerPlatform()) {
+      console.log('Server platform detected, canceling configureAppCheck functionality');
+      return;
+    }
+    // Enable the debug token if running in localhost
+    if (location.hostname === "localhost") {
+      console.log('local host detected, enabling appcheck debug token');
+      (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    }
+  }
+
+  toggleSidenav($event?: MouseEvent, matButton?: MatButton) {
+    this.$privateSideNavVisible.set(!this.$privateSideNavVisible());
+  }
+
+  get $sideNavVisible() {
+    return this.$privateSideNavVisible.asReadonly();
+  }
+
+  private monitorNavItemsVisibility() {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        const currentUrl = event.urlAfterRedirects;
+        if (currentUrl.includes(AdminAppRoutes.AUTH_LOGIN)) {
+          this.$privateNavItemsVisibile.set(false);
+        } else {
+          this.$privateNavItemsVisibile.set(true);
+        }
+        console.log('Current URL:', currentUrl);
+      }
+    });
+  }
+
+  get $navItemsVisible() {
+    return this.$privateNavItemsVisibile.asReadonly();
+  }
+
+  showSnackBar(message: string, duration: number, action: SnackbarActions = SnackbarActions.DISMISS) {
     const config = new MatSnackBarConfig();
     config.duration = duration;
     config.panelClass = ['custom-snack-bar']; // CSS managed in global styles.css
 
     const snackBarRef = this.snackbar.open(message, action, config);
 
+    // Perform an action based on the action input
     snackBarRef.onAction().subscribe(() => {
-      snackBarRef.dismiss();
+
+      switch (action) {
+        case SnackbarActions.DISMISS:
+          snackBarRef.dismiss();
+          break;
+        default:
+          snackBarRef.dismiss();
+          break;
+      }
     });
   }
 
-  fetchGeographicData(): Observable<GeographicData> {
-    const geographicDataDoc = this.afs.collection(SharedCollectionPaths.PUBLIC_RESOURCES)
-      .doc<GeographicData>(SharedCollectionPaths.GEOGRAPHIC_DATA);
-
-    return geographicDataDoc.valueChanges()
-      .pipe(
-        take(1),
-        map(geographicData => {
-          console.log('Fetched geographic data', geographicData);
-          return geographicData;
-        }),
-        catchError(error => {
-          this.showSnackBar(error, 5000);
-          return throwError(error);
-        })
-      );
-  }
-
-  monitorScreenSize() {
+  private monitorScreenSize() {
     this.breakpointObserver.observe(['(max-width: 959px)'])
-      .subscribe((state: BreakpointState) => {
-        if (state.matches) {
-          console.log('Mobile screen detected');
-          this.screenIsMobile$.next(true);
-        } else {
-          console.log('Desktop screen detected');
-          this.screenIsMobile$.next(false);
-        }
-      });
+      .pipe(
+        tap((state: BreakpointState) => {
+          if (state.matches) {
+            console.log('Mobile screen detected');
+            this.$privateScreenIsMobile.set(true);
+          } else {
+            console.log('Desktop screen detected');
+            this.$privateScreenIsMobile.set(false);
+          }
+        })
+      )
+      .subscribe();
 
   }
 
-  // Remove spaces from url string
-  removeSpacesFromString(stringWithSpaces: string): string {
-    return stringWithSpaces.replace(/\s/g, '');
-  }
-
-  // Replace spaces with dashes and set lower case
-  convertToFriendlyUrlFormat(stringWithSpaces: string): string {
-    return stringWithSpaces.split(' ').join('-').toLowerCase();
-  }
-
-  // Firebase can't handle back slashes
-  createOrReverseFirebaseSafeUrl = (url: string, reverse?: boolean): string => {
-    if (reverse) {
-      const urlWithSlashes = url.replace(/~1/g, '/'); // Revert to normal url
-      return urlWithSlashes;
+  get screenWidth(): number | undefined {
+    if (this.$isServerPlatform() || !this.window) {
+      console.log('Server platform detected, canceling screenWidth functionality');
+      return undefined;
     }
-    const removedProtocol = url.split('//').pop() as string;
-    const replacedSlashes = removedProtocol.replace(/\//g, '~1');
-    return replacedSlashes;
+    return this.window.innerWidth;
   }
 
-  getPodcastId = (podcastRssUrl: string): string => {
-    return podcastRssUrl.split(PodcastVars.PODCAST_ID_SPLIT_CODE)[1].split('/')[0];
+  get $screenIsMobile(): Signal<boolean> {
+    return this.$privateScreenIsMobile.asReadonly();
   }
 
-  /**
-   * Rounds a number to the nearest digits desired
-   * @param numb Number to round
-   * @param digitsToRoundTo Number of digits desired
-   */
-  // Courtesy of: https://stackoverflow.com/questions/15762768/javascript-math-round-to-two-decimal-places
-  generateRoundedNumber(numb: number, digitsToRoundTo: number) {
-    let n = numb;
-    let digits = digitsToRoundTo;
-    let negative = false;
-    if (digits === undefined) {
-        digits = 0;
-    }
-    if ( n < 0) {
-      negative = true;
-      n = n * -1;
-    }
-    const multiplicator = Math.pow(10, digits);
-    n = parseFloat((n * multiplicator).toFixed(11));
-    n = parseFloat((Math.round(n) / multiplicator).toFixed(2));
-    if ( negative ) {
-        n = parseFloat((n * -1).toFixed(2));
-    }
-    return n;
+  // Used to avoid a back naviagation request when no navigation history available (e.g., user just loaded app)
+  private monitorNavigationHistory() {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.history.push(event.urlAfterRedirects);
+      }
+    });
   }
 
+  // Courtesy of https://nils-mehlhorn.de/posts/angular-navigate-back-previous-page
+  routeUserToPreviousPage(): void {
+    if (this.$isServerPlatform()) {
+      console.log('Server platform detected, canceling routeUserToPreviousPage functionality');
+      return;
+    }
+    this.history.pop();
+    if (this.history.length > 0) {
+      this.location.back();
+    } else {
+      this.router.navigateByUrl('/');
+    }
+  }
 
+  set routeGuardProcessing(isProcessing: boolean) {
+    this.$privateRouteGuardProcessing.set(isProcessing);
+  }
+
+  get $routeGuardProcessing(): Signal<boolean> {
+    return this.$privateRouteGuardProcessing.asReadonly();
+  }
 }

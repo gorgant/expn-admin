@@ -1,0 +1,7 @@
+<div class="component-container">
+  <div class="post-collection-grid">
+    @for (blogIndexRef of $blogIndexRefs(); track blogIndexRef.id) {
+      <app-post-card [$blogIndexRef]="blogIndexRef"></app-post-card>
+    }
+  </div>
+</div>

@@ -1,9 +1,43 @@
 @import "../../../variables";
 
-.section-header {
-  color: $primary;
+.content-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 32px;
+  
+  margin-top: 24px;
+}
+
+.dialogue-title {
+  @include default-header-style($font-weight-regular);
+}
+
+.dialogue-content {
+  padding: 0 32px;
+  box-sizing: border-box; // Prevents side padding from pushing content outside the window width
+
+  @include default-text-style($font-weight-regular);
+}
+
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  
+  margin-top: 16px;
+  padding: 0 32px;
+  box-sizing: border-box; // Prevents side padding from pushing content outside the window width
+  width: 100%;
 }
 
 button {
-  margin: 16px;
+  width: 100%;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    width: $desktop-button-width;
+  }
 }

@@ -1,0 +1,17 @@
+<div class="component-container">
+  @defer {
+    @if ($youtubeVideoId() && !uiService.$isServerPlatform()) {
+      <youtube-player [videoId]="$youtubeVideoId()" [width]="$videoPlayerWidth()" [height]="$videoPlayerHeight()" [playerVars]="$videoPlayerOptions()" #ytVideoPlayerApi></youtube-player>
+      <div class="subscribe-button-container" [ngStyle]="{'max-width': $subscribeButtonContainerWidth()}">
+        @if (uiService.$screenIsMobile()) {
+          <div class="subscribe-caption">(subscribe below for the latest videos)</div>
+        } @else {
+          <div class="subscribe-caption">Subscribe on YouTube for the latest videos --></div>
+        }
+        <div class="g-ytsubscribe subscribe-button" [attr.data-channelid]="YOUTUBE_CHANNEL_ID" data-layout="full" data-count="default"></div>
+      </div>
+    }
+  } @placeholder {
+    <app-processing-spinner [$spinnerMessage]="'Video loading...'"></app-processing-spinner>
+  }
+</div>

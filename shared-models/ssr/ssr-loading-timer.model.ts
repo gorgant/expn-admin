@@ -1,0 +1,1 @@
+export const SSR_LOADING_TIMER_DURATION = 50;

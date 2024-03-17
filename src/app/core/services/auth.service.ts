@@ -1,124 +1,124 @@
-import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { UiService } from 'src/app/core/services/ui.service';
-import * as firebase from 'firebase/compat/app';
-import 'firebase/compat/auth';
-import { from, Observable, Subject, throwError, combineLatest, of } from 'rxjs';
-import { now } from 'moment';
-import { AuthData } from 'shared-models/auth/auth-data.model';
-import { AdminUser } from 'shared-models/user/admin-user.model';
-import { AdminAppRoutes } from 'shared-models/routes-and-paths/app-routes.model';
-import { take, map, catchError, switchMap } from 'rxjs/operators';
+import { Injectable, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { Auth, authState, signOut, signInWithEmailAndPassword, sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential, User, reload, deleteUser, AuthCredential } from '@angular/fire/auth';
+import { UiService } from './ui.service';
+import { from, Observable, Subject, throwError } from 'rxjs';
+import { take, map, catchError, switchMap, takeUntil, filter, shareReplay } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { AdminAppRoutes } from '../../../../shared-models/routes-and-paths/app-routes.model';
+import { PasswordConfirmationData } from '../../../../shared-models/auth/password-confirmation-data.model';
+import { AuthFormData, AuthResultsData } from '../../../../shared-models/auth/auth-data.model';
+import { AuthStoreActions, PodcastEpisodeStoreActions, PostStoreActions, UserStoreActions } from '../../root-store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  authStatus = new Subject<string>();
   private ngUnsubscribe$: Subject<void> = new Subject();
+  
+  private router = inject(Router);
+  private uiService = inject(UiService);
+  private auth = inject(Auth);
+  private store$ = inject(Store);
+  private authCheckInitialized = signal(false);
 
-  constructor(
-    private router: Router,
-    private afAuth: AngularFireAuth,
-    private uiService: UiService,
-    private route: ActivatedRoute,
-  ) { }
+  constructor() {
 
-  // Listen for user, if exists, initiatle auth success actions, otherwise initiate logout actions
-  initAuthListener(): void {
-    this.afAuth.authState.subscribe(user => {
-      if (user) {
-        this.authSuccessActions(user);
-      } else {
-        this.postLogoutActions();
-      }
-    });
-  }
-
-  // Currently, registration is not available (done with admin console)
-  registerUser(authData: AuthData): Observable<AdminUser> {
-
-    const authResponse = from(this.afAuth.createUserWithEmailAndPassword(
-      authData.email,
-      authData.password
-    ));
-
-    return authResponse.pipe(
-      take(1),
-      map(creds => {
-        const adminUser: AdminUser = {
-          id: creds.user.uid,
-          displayName: authData.name,
-          email: authData.email,
-          lastAuthenticated: now(),
-          createdDate: now()
-        };
-        console.log('Public user registered', adminUser);
-        return adminUser;
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error registering user', error);
-        return throwError(error);
-      })
-    );
-  }
-
-  // Currently, Google Login is not available (done with admin console)
-  loginWithGoogle(): Observable<AdminUser> {
-
-    const authResponse = from(this.afAuth.signInWithPopup(
-      new firebase.default.auth.GoogleAuthProvider()
-    ));
-
-    return authResponse.pipe(
-      take(1),
-      map(creds => {
-        const newUser = creds.additionalUserInfo.isNewUser; // Check if this is a new user
-        const adminUser: AdminUser = {
-          displayName: creds.user.displayName,
-          email: creds.user.email,
-          avatarUrl: creds.user.photoURL,
-          id: creds.user.uid,
-          isNewUser: newUser,
-          lastAuthenticated: now()
-        };
-        if (newUser) {
-          adminUser.createdDate = now();
+    // If auth credentials are ever removed (eg. on a separate browser), immediately route user to login (disable for prod prelaunch mode)
+    authState(this.auth)
+      .subscribe(authState => {
+        if (!authState && this.authCheckInitialized()) {
+          console.log('Auth state auto logout initialized')
+          this.router.navigate([AdminAppRoutes.AUTH_LOGIN]);
+          this.logout();
         }
-        return adminUser;
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error registering user', error);
-        return throwError(error);
-      })
-    );
+        this.authCheckInitialized.set(true); // prevents this logout from triggering on the initial load, which was canceling out the returnUrl param from the Authguard
+      });
   }
 
-  loginWithEmail(authData: AuthData): Observable<Partial<AdminUser>> {
+  // Confirm User Password
+  confirmPassword(passwordConfirmationData: PasswordConfirmationData): Observable<boolean> {
 
-    const authResponse = from(this.afAuth.signInWithEmailAndPassword(
-      authData.email,
-      authData.password
-    ));
+    const userCredentials = this.getUserCredentials(passwordConfirmationData.email, passwordConfirmationData.password);
+
+    const authResponse = from(
+      authState(this.auth).pipe(
+        take(1),
+        switchMap(authUser => {
+          const reauthResults = reauthenticateWithCredential(authUser!, userCredentials);
+          return reauthResults;
+        }),
+        map(reauthResults => {
+          if (!reauthResults) {
+            console.log('Password confirmation failed');
+            throw new Error('Password confirmation failed');
+          }
+          console.log('Password confirmed');
+          return true;
+        }),
+        catchError(error => {
+          let errorMessage = error.message;
+          if (errorMessage.includes('wrong-password')) {
+            errorMessage = 'Invalid password. Please try again.';
+          }
+          this.uiService.showSnackBar(errorMessage, 10000);
+          console.log('Error confirming password in auth', error);
+          return throwError(() => new Error(error));
+        })
+      )
+    );
+
+    return authResponse;
+  }
+
+  // Detect cached user data
+  fetchAuthData(): Observable<AuthResultsData | null> {
+    return authState(this.auth)
+      .pipe(
+        takeUntil(this.unsubTrigger$),
+        map(creds => {
+          if (creds) {
+            console.log('Fetched cached user data', creds);
+            const authResultsData: AuthResultsData = {
+              id: creds.uid,
+              email: creds.email as string,
+            }
+            return authResultsData;
+          }
+          return null;
+        }),
+        shareReplay(),
+      );
+  }
+
+  loginWithEmail(authData: AuthFormData): Observable<AuthResultsData> {
+
+    const authResponse = from(
+      signInWithEmailAndPassword(this.auth, authData.email, authData.password)
+    );
+
+    console.log('Submitting auth request to FB');
 
     return authResponse.pipe(
       take(1),
       map(creds => {
         // Create a partial user object to log last authenticated
-        const partialUser: Partial<AdminUser> = {
-          id: creds.user.uid,
-          lastAuthenticated: now()
+        const authResultsData: AuthResultsData = {
+          email: creds.user?.email as string,
+          id: creds.user?.uid as string,
         };
-        return partialUser;
+        console.log('User authorized, returning partial user data', authResultsData);
+        return authResultsData;
       }),
       catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error registering user', error);
-        return throwError(error);
+        let errorMessage = error.message;
+        if (errorMessage.includes('wrong-password') || errorMessage.includes('user-not-found')) {
+          errorMessage = 'Invalid login credentials. Please try again.';
+        }
+        this.uiService.showSnackBar(errorMessage, 10000);
+        console.log('Error authenticating user', error);
+        return throwError(() => new Error(error));
       })
     );
 
@@ -126,66 +126,46 @@ export class AuthService {
 
   logout(): void {
     this.preLogoutActions();
-    this.afAuth.signOut();
-    // Post logout actions carried out by auth listener once logout detected
+    
+    signOut(this.auth);
   }
 
-  updateEmail(publicUser: AdminUser, password: string, newEmail: string): Observable<{userData: AdminUser, userId: string}> {
-
-    const credentials = this.getUserCredentials(publicUser.email, password);
-
-    return from(this.afAuth.currentUser)
-      .pipe(
-        take(1),
+  reloadAuthData(): Observable<AuthResultsData> {
+    const authResponse = from(
+      authState(this.auth).pipe(
+        filter(user => !!user),
         switchMap(user => {
-          return combineLatest(of(user), from(user.reauthenticateAndRetrieveDataWithCredential(credentials)));
+          return reload(user!);
         }),
-        switchMap(([user, userCreds]) => {
-          return user.updateEmail(newEmail);
+        switchMap(empty => {
+          return authState(this.auth);
         }),
-        map(empt => {
-          const newUserData: AdminUser = {
-            ...publicUser,
-            email: newEmail
+        filter(user => !!user),
+        map(user => {
+          console.log('Auth data reloaded', user);
+          const authResultsData: AuthResultsData = {
+            displayName: user?.displayName?.split(' ')[0] as string,
+            email: user?.email as string,
+            id: user?.uid as string
           };
-          this.uiService.showSnackBar(`Email successfully updated: ${newEmail}`, 5000);
-          return {userData: newUserData, userId: publicUser.id};
+          return authResultsData;
         }),
+        shareReplay(),
         catchError(error => {
-          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-          console.log('Error updating email', error);
-          return throwError(error);
+          this.uiService.showSnackBar(error.message, 10000);
+          console.log('Error reloading auth data', error);
+          return throwError(() => new Error(error));
         })
-      );
+      )
+    )
+
+    return authResponse;
   }
 
-  updatePassword(publicUser: AdminUser, oldPassword: string, newPassword: string): Observable<string> {
-    const credentials = this.getUserCredentials(publicUser.email, oldPassword);
-
-    return from(this.afAuth.currentUser)
-      .pipe(
-        take(1),
-        switchMap(user => {
-          return combineLatest(of(user), from(user.reauthenticateAndRetrieveDataWithCredential(credentials)));
-        }),
-        switchMap(([user, userCreds]) => {
-          return user.updatePassword(newPassword);
-        }),
-        map(empt => {
-          this.uiService.showSnackBar(`Password successfully updated`, 5000);
-          return 'success';
-        }),
-        catchError(error => {
-          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-          console.log('Error updating password', error);
-          return throwError(error);
-        })
-      );
-  }
-
-  sendResetPasswordEmail(email: string): Observable<string> {
-
-    const authResponse = from(this.afAuth.sendPasswordResetEmail(email));
+  sendResetPasswordEmail(email: string): Observable<boolean> {
+    const authResponse = from(
+      sendPasswordResetEmail(this.auth, email)
+    );
 
     return authResponse.pipe(
       take(1),
@@ -193,12 +173,12 @@ export class AuthService {
         this.uiService.showSnackBar(
           `Password reset link sent to ${email}. Please check your email for instructions.`, 10000
         );
-        return 'success';
+        return true;
       }),
       catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
+        this.uiService.showSnackBar(error.message, 10000);
         console.log('Error sending reset password email', error);
-        return throwError(error);
+        return throwError(() => new Error(error));
       })
     );
   }
@@ -207,33 +187,25 @@ export class AuthService {
     return this.ngUnsubscribe$;
   }
 
-  private getUserCredentials(email: string, password: string): firebase.default.auth.AuthCredential {
-    const credentials = firebase.default.auth.EmailAuthProvider.credential(
+  private getUserCredentials(email: string, password: string): AuthCredential {
+
+    const credentials = EmailAuthProvider.credential(
       email,
       password
     );
+    
     return credentials;
-  }
-
-  private authSuccessActions(user: firebase.default.User): void {
-    this.authStatus.next(user.uid);
-    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
-    if (returnUrl && returnUrl !== '/') {
-      this.router.navigate([returnUrl]);
-    } else {
-      this.router.navigate([AdminAppRoutes.HOME]);
-    }
   }
 
   private preLogoutActions(): void {
     this.ngUnsubscribe$.next(); // Send signal to Firebase subscriptions to unsubscribe
     this.ngUnsubscribe$.complete(); // Send signal to Firebase subscriptions to unsubscribe
-    // Reinitialize the unsubscribe subject in case page isn't refreshed after logout (which means auth wouldn't reset)
-    this.ngUnsubscribe$ = new Subject<void>();
-    this.router.navigate([AdminAppRoutes.LOGIN]);
+    this.ngUnsubscribe$ = new Subject<void>(); // Reinitialize the unsubscribe subject in case page isn't refreshed after logout (which means auth wouldn't reset)
+    this.store$.dispatch(AuthStoreActions.purgeAuthState());
+    this.store$.dispatch(PodcastEpisodeStoreActions.purgePodcastEpisodeState());
+    this.store$.dispatch(PostStoreActions.purgePostState());
+    this.store$.dispatch(UserStoreActions.purgeUserState());
+
   }
 
-  private postLogoutActions(): void {
-    this.authStatus.next(null);
-  }
 }

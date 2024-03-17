@@ -1,207 +1,116 @@
-import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
-import { Observable, from, throwError, Subject } from 'rxjs';
-import { map, takeUntil, catchError, take } from 'rxjs/operators';
-import { AuthService } from 'src/app/core/services/auth.service';
-import { AdminUser } from 'shared-models/user/admin-user.model';
-import { AdminCollectionPaths } from 'shared-models/routes-and-paths/fb-collection-paths';
+import { Injectable, inject } from '@angular/core';
+import { collection, doc, docData, DocumentReference, CollectionReference, Firestore } from '@angular/fire/firestore';
+import { Functions, httpsCallableData }  from '@angular/fire/functions';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map, shareReplay, switchMap, take, takeUntil } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
-import { EditorSession, EditorSessionKeys } from 'shared-models/editor-sessions/editor-session.model';
-import { EditorSessionService } from './editor-session.service';
+import { Timestamp } from '@angular/fire/firestore';
+import { HelperService } from './helpers.service';
+import { AdminUser, AdminUserKeys, GoogleCloudFunctionsAdminUser } from '../../../../shared-models/user/admin-user.model';
+import { AdminUserUpdateData } from '../../../../shared-models/user/user-update.model';
+import { AdminFunctionNames } from '../../../../shared-models/routes-and-paths/fb-function-names.model';
+import { AdminCollectionPaths } from '../../../../shared-models/routes-and-paths/fb-collection-paths.model';
+import { PublicUserExportRequestParams } from '../../../../shared-models/user/public-user-exports.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private editorSessionUnsubTrigger$: Subject<void> = new Subject();
+  private firestore = inject(Firestore);
+  private functions = inject(Functions);
+  private authService = inject(AuthService);
+  private uiService = inject(UiService);
+  private helperService = inject(HelperService);
 
-  constructor(
-    private db: AngularFirestore,
-    private authService: AuthService,
-    // private editorSessionService: EditorSessionService,
-    private uiService: UiService
-  ) { }
+  constructor() { }
 
-  fetchUserData(userId: string): Observable<AdminUser> {
-    const userDoc = this.getUserDoc(userId);
-    return userDoc
-      .valueChanges()
+  exportSubscribers(exportParams: PublicUserExportRequestParams): Observable<string> {
+    console.log('exportSubscribers call registered');
+    const exportSubscribersHttpCall: (exportParamsData: PublicUserExportRequestParams) => 
+      Observable<string> = httpsCallableData(this.functions, AdminFunctionNames.ON_CALL_EXPORT_PUBLIC_USERS);
+
+    return exportSubscribersHttpCall(exportParams)
+      .pipe(
+        take(1),
+        map(downloadUrl => {
+          console.log(`Exported subscribers`, downloadUrl);
+          return downloadUrl;
+        }),
+        catchError(error => {
+          console.log('Error exporting subscribers', error);
+          this.uiService.showSnackBar('Hmm, something went wrong. Refresh the page and try again.', 10000);
+          return throwError(() => new Error(error));
+        })
+      );
+  }
+
+  fetchAdminUser(adminUserId: string): Observable<AdminUser> {
+    const adminUserDoc = docData(this.getAdminUserDoc(adminUserId));
+    return adminUserDoc
       .pipe(
         // If logged out, this triggers unsub of this observable
         takeUntil(this.authService.unsubTrigger$),
-        map(user => {
-          console.log('Fetched user', user);
-          return user;
+        map(adminUser => {
+          if (!adminUser) {
+            throw new Error(`Error fetching adminUser with id: ${adminUserId}`, );
+          }
+          const formattedUser: AdminUser = {
+            ...adminUser,
+            createdTimestamp: (adminUser[AdminUserKeys.CREATED_TIMESTAMP] as Timestamp).toMillis(),
+            lastAuthenticatedTimestamp: (adminUser.lastAuthenticatedTimestamp as Timestamp).toMillis(),
+            lastModifiedTimestamp: (adminUser.lastModifiedTimestamp as Timestamp).toMillis(),
+          };
+          console.log(`Fetched single adminUser`, formattedUser);
+          return formattedUser;
         }),
+        shareReplay(),
         catchError(error => {
-          console.log('Error fetching user', error);
-          return throwError(error);
+          console.log('Error fetching adminUser', error);
+          this.uiService.showSnackBar('Hmm, something went wrong. Refresh the page and try again.', 10000);
+          return throwError(() => new Error(error));
         })
       );
   }
 
-  storeUserData(user: AdminUser | Partial<AdminUser>): Observable<string> {
-    const userDoc = this.getUserDoc(user.id) as AngularFirestoreDocument<AdminUser | Partial<AdminUser>>;
-    // Use set here because may be generating a new user or updating existing user
-    const fbResponse = from(userDoc.set(user, {merge: true}));
-    return fbResponse.pipe(
-      take(1),
-      map(empty => {
-        console.log('User data stored in database');
-        return user.id;
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error storing user data', error);
-        return throwError(error);
-      })
-    );
-  }
+  updateAdminUser(adminUserUpdateData: AdminUserUpdateData): Observable<AdminUser> {
+    console.log('updateAdminUser call registered');
+    const updateAdminUserHttpCall: (adminUserUpdateData: AdminUserUpdateData) => 
+      Observable<GoogleCloudFunctionsAdminUser> = httpsCallableData(this.functions, AdminFunctionNames.ON_CALL_UPDATE_ADMIN_USER);
 
-  fetchCurrentEditorSession(sessionId: string): Observable<EditorSession> {
-    const editorSessionDoc = this.getEditorSessionDoc(sessionId);
-    return editorSessionDoc
-      .valueChanges()
+    return updateAdminUserHttpCall(adminUserUpdateData)
       .pipe(
-        // If logged out, this triggers unsub of this observable
-        takeUntil(this.editorSessionUnsubTrigger$),
-        map(editorSession => {
-          console.log('Fetched editor session', editorSession);
-          return editorSession;
+        take(1),
+        map(updatedAdminUser => {
+          // Timestamps from Google Cloud Functions are a static object, so they need to be converted differently
+          const formattedUser: AdminUser = {
+            ...updatedAdminUser,
+            createdTimestamp: this.helperService.convertGoogleCloudTimestampToMs(updatedAdminUser[AdminUserKeys.CREATED_TIMESTAMP]),
+            lastAuthenticatedTimestamp: this.helperService.convertGoogleCloudTimestampToMs(updatedAdminUser.lastAuthenticatedTimestamp),
+            lastModifiedTimestamp: this.helperService.convertGoogleCloudTimestampToMs(updatedAdminUser.lastModifiedTimestamp),
+          };
+          console.log(`Updated single adminUser`, formattedUser);
+          return formattedUser;
         }),
         catchError(error => {
-          console.log('Error fetching user', error);
-          return throwError(error);
+          console.log('Error updating adminUser', error);
+          this.uiService.showSnackBar('Hmm, something went wrong. Refresh the page and try again.', 10000);
+          return throwError(() => new Error(error));
         })
       );
   }
 
-  createEditorSession(newEditorSession: EditorSession): Observable<EditorSession> {
-    const fbResponse = from(this.getEditorSessionDoc(newEditorSession.id).set(newEditorSession));
-    return fbResponse.pipe(
-      take(1),
-      map(empty => {
-        console.log('Editor session created', newEditorSession);
-        return newEditorSession;
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error creating editor session', error);
-        return throwError(error);
-      })
-    );
+  private getAdminUserCollection(): CollectionReference<AdminUser> {
+    return collection(this.firestore, AdminCollectionPaths.ADMIN_USERS) as CollectionReference<AdminUser>;
   }
 
-  updateEditorSession(currentEditorSession: EditorSession | Partial<EditorSession>): Observable<EditorSession | Partial<EditorSession>> {
-    const fbResponse = from(this.getEditorSessionDoc(currentEditorSession.id).update(currentEditorSession));
-    return fbResponse.pipe(
-      take(1),
-      map(empty => {
-        console.log('Editor session updated', currentEditorSession);
-        return currentEditorSession;
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error updating editor session', error);
-        return throwError(error);
-      })
-    );
+  private getAdminUserDoc(adminUserId: string): DocumentReference<AdminUser> {
+    return doc(this.getAdminUserCollection(), adminUserId);
   }
 
-  deleteEditorSession(sessionId: string): Observable<string> {
-    const fbResponse = from(this.getEditorSessionDoc(sessionId).delete());
-    return fbResponse.pipe(
-      take(1),
-      map(empty => {
-        console.log('Editor session deleted', sessionId);
-        return sessionId;
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error deleting editor session', error);
-        return throwError(error);
-      })
-    );
-  }
-
-  fetchActiveEditorSessions(editorSession: EditorSession): Observable<EditorSession[]> {
-    const activeEditorSessions = this.getActiveEditorSessionsCollection(editorSession);
-    return activeEditorSessions.valueChanges()
-      .pipe(
-        takeUntil(this.editorSessionUnsubTrigger$),
-        map(editorSessions => {
-          console.log('Fetched all active editor sessions', editorSessions);
-          return editorSessions;
-        }),
-        catchError(error => {
-          this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-          console.log('Error fetching all posts', error);
-          return throwError(error);
-        })
-      );
-  }
-
-  // Loop through all active editor sessions and mark them inactive
-  disconnectAllActiveEditorSessions(currentSession: EditorSession, activeEditorSessions: EditorSession[]): Observable<string> {
-    const batch = this.db.firestore.batch();
-
-    const sessionsToDeactivate: EditorSession[] = activeEditorSessions.filter(session => session.id !== currentSession.id);
-
-    sessionsToDeactivate.forEach(session => {
-      const sessionDocRef = this.db.firestore.collection(AdminCollectionPaths.EDITOR_SESSIONS).doc(session.id);
-      const sessionUpdate: Partial<EditorSession> = {
-        active: false
-      };
-      batch.update(sessionDocRef, sessionUpdate);
-    });
-
-    const fbResponse = from(batch.commit());
-    return fbResponse.pipe(
-      take(1),
-      map(empty => {
-        console.log('All other active sessions disconnected');
-        return 'Batch update succeeded';
-      }),
-      catchError(error => {
-        this.uiService.showSnackBar('Error performing action. Changes not saved.', 10000);
-        console.log('Error disconnecting active editor sessions', error);
-        return throwError(error);
-      })
-    );
-  }
-
-  unsubscribeEditorSessionObservables() {
-    this.editorSessionUnsubTrigger$.next(); // Send signal to Firebase subscriptions to unsubscribe
-    this.editorSessionUnsubTrigger$.complete(); // Send signal to Firebase subscriptions to unsubscribe
-    // Reinitialize the unsubscribe subject in case page isn't refreshed after logout (which means auth wouldn't reset)
-    this.editorSessionUnsubTrigger$ = new Subject<void>();
-  }
-
-  private getUserDoc(userId: string): AngularFirestoreDocument<AdminUser> {
-    return this.getUserCollection().doc<AdminUser>(userId);
-  }
-
-  private getUserCollection(): AngularFirestoreCollection<AdminUser> {
-    return this.db.collection<AdminUser>(AdminCollectionPaths.ADMIN_USERS);
-  }
-
-  private getEditorSessionDoc(sessionId: string): AngularFirestoreDocument<EditorSession> {
-    return this.getEditorSessionCollection().doc<EditorSession>(sessionId);
-  }
-
-  private getEditorSessionCollection(): AngularFirestoreCollection<EditorSession> {
-    return this.db.collection<EditorSession>(AdminCollectionPaths.EDITOR_SESSIONS);
-  }
-
-  // Get active editor sessions that match the doc paramters of the current editor session
-  private getActiveEditorSessionsCollection(editorSession: EditorSession): AngularFirestoreCollection<EditorSession> {
-    return this.db.collection<EditorSession>(AdminCollectionPaths.EDITOR_SESSIONS, ref =>
-      ref
-        .where(`${EditorSessionKeys.DOC_ID}`, '==', `${editorSession[EditorSessionKeys.DOC_ID]}`)
-        .where(`${EditorSessionKeys.DOC_COLLECTION_PATH}`, '==', `${editorSession[EditorSessionKeys.DOC_COLLECTION_PATH]}`)
-        .where(`${EditorSessionKeys.ACTIVE}`, '==', true)
-      );
-  }
-
+ 
+  
 }
+
+

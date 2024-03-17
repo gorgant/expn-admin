@@ -1,0 +1,9 @@
+<div class="component-container">
+  @defer () {
+    @if ($podcastEpisodeHtml()) {
+      <div class="podcast-body" [innerHTML]="$podcastEpisodeHtml()"></div>
+    }
+  } @placeholder { 
+    <app-processing-spinner [$spinnerMessage]="'Podcast loading...'"></app-processing-spinner>
+  }
+</div>

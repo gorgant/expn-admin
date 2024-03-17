@@ -1,0 +1,12 @@
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.podcast-body {
+  width: 100%;
+  max-width: 1000px;
+}

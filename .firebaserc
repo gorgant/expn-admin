@@ -1,6 +1,24 @@
 {
   "projects": {
-    "default": "explearning-admin",
-    "sandbox-admin": "explearning-sandbox-admin"
-  }
+    "production": "explearning-admin",
+    "development": "explearning-sandbox-admin",
+    "default": "explearning-admin"
+  },
+  "targets": {
+    "explearning-admin": {
+      "hosting": {
+        "expn-admin": [
+          "explearning-admin"
+        ]
+      }
+    },
+    "explearning-sandbox-admin": {
+      "hosting": {
+        "expn-admin": [
+          "expn-sandbox-admin"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PageHeroComponent } from './page-hero.component';
 
@@ -6,14 +6,12 @@ describe('PageHeroComponent', () => {
   let component: PageHeroComponent;
   let fixture: ComponentFixture<PageHeroComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ PageHeroComponent ]
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [PageHeroComponent]
     })
     .compileComponents();
-  }));
-
-  beforeEach(() => {
+    
     fixture = TestBed.createComponent(PageHeroComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

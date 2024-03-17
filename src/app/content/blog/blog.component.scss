@@ -1,0 +1,48 @@
+@import '../../variables';
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 32px;
+
+  width: 100%;
+  margin-top: 32px;
+  
+}
+
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+
+  width: 100%;
+}
+
+.create-post-button, .edit-post-boilerplate-button {
+  width: $mobile-button-width;
+  
+  @media screen and (min-width: $mobile-cutoff-width) {
+    width: $desktop-button-width;
+  }
+}
+
+mat-tab-group {
+  width: 100%;
+  max-width: 1200px;
+  padding-bottom: 16px;
+}
+
+.filter-toggle-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 32px;
+  margin-bottom: 32px;
+  width: 100%;
+}

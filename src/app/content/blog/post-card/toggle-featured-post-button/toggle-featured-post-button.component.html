@@ -1,0 +1,15 @@
+<div class="component-container">
+  @if (!$toggleFeaturedPostCycleInit()) {
+    @if ($post().featured) {
+      <button mat-icon-button (click)="onToggleFeaturedPost()" [disabled]="serverRequestProcessing$ | async">
+        <mat-icon>star</mat-icon>
+      </button>
+    } @else {
+      <button mat-icon-button (click)="onToggleFeaturedPost()" [disabled]="serverRequestProcessing$ | async">
+        <mat-icon>star_border</mat-icon>
+      </button>
+    }
+  } @else {
+    <app-processing-spinner [$spinnerDiameter]="32" [$spinnerMessage]="EMPTY_SPINNER_MESSAGE"></app-processing-spinner>
+  }
+</div>

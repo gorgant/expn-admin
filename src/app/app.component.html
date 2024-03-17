@@ -1,12 +1,14 @@
-<div class="container" fxLayout="column" fxLayoutAlign="center center">
-  <app-header></app-header>
-  <mat-sidenav-container fxFlex="1">
-    <mat-sidenav #sidenav mode="over" [fixedInViewport]="true" position="end" autoFocus="false">
+<div class="app-content">
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav mode="over" [fixedInViewport]="true" position="end" autoFocus="false" [opened]="uiService.$sideNavVisible()">
       <app-sidenav></app-sidenav>
     </mat-sidenav>
-    <mat-sidenav-content fxLayoutAlign="center center">
-      <router-outlet></router-outlet>
+    <mat-sidenav-content>
+      <div class="header-and-router-outlet">
+        <app-header></app-header>
+        <router-outlet></router-outlet>
+      </div>
+      <app-footer></app-footer>
     </mat-sidenav-content>
   </mat-sidenav-container>
-  <app-footer [appVersion]="appVersion"></app-footer>
 </div>

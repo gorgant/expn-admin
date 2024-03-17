@@ -1,0 +1,23 @@
+@if ((userData$ | async); as user) {
+  <div class="component-container">
+    <div class="actions-container">
+      <div class="action-item menu-item" >
+        <div class="icon-container">
+          <mat-icon class="item-icon">face</mat-icon>
+          <span class="item-text">{{ user.displayName || 'No Display Name!' }} </span>
+        </div>
+        <button class="edit-button" mat-button color="primary" (click)="onEditName()">{{ EDIT_BUTTON_VALUE }}</button>
+      </div>
+      <div class="action-item menu-item">
+        <div class="icon-container">
+          <mat-icon class="item-icon">lock</mat-icon>
+          <span class="item-text"> ********* </span>
+        </div>
+        <button class="edit-button" mat-button color="primary" (click)="onEditPassword()">{{ EDIT_BUTTON_VALUE }}</button>
+      </div>
+    </div>
+    <div class="logout-container">
+      <button mat-stroked-button color="warn" class="logout-button" (click)="onLogout()">{{ LOGOUT_BUTTON_VALUE }}</button>
+    </div>
+  </div>
+}

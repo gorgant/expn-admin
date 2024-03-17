@@ -1,148 +1,132 @@
-import { Injectable } from '@angular/core';
-import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Observable, of } from 'rxjs';
-import { Action, Store } from '@ngrx/store';
-import * as authFeatureActions from './actions';
-import * as userFeatureActions from '../user-store/actions';
-import { switchMap, map, catchError, tap, concatMap } from 'rxjs/operators';
-import { AuthService } from 'src/app/core/services/auth.service';
-import { RootStoreState } from '..';
-import { AuthenticateUserType } from 'shared-models/auth/authenticate-user-type.model';
-
+import { Injectable, inject } from "@angular/core";
+import { FirebaseError } from "@angular/fire/app";
+import { catchError, concatMap, map, switchMap, tap } from "rxjs/operators";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { of } from "rxjs";
+import * as AuthStoreActions from "./actions";
+import { AuthService } from "../../core/services/auth.service";
 
 @Injectable()
 export class AuthStoreEffects {
-  constructor(
-    private actions$: Actions,
-    private authService: AuthService,
-    private store$: Store<RootStoreState.State>,
-  ) { }
 
-  @Effect()
-  authenticationRequestedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<authFeatureActions.AuthenticationRequested>(
-      authFeatureActions.ActionTypes.AUTHENTICATION_REQUESTED
-    ),
-    switchMap(action => {
+  private actions$ = inject(Actions);
+  private authService = inject(AuthService);
 
-      // If email auth, retrieve additional user data from FB
-      if (action.payload.requestType === AuthenticateUserType.EMAIL_AUTH) {
-        return this.authService.loginWithEmail(action.payload.authData)
-          .pipe(
-            // Load user data into the store (skip info update that happens in Google login)
-            tap(partialUser => {
-              if (!partialUser) {
-                throw new Error('User data not found');
-              }
-              this.store$.dispatch(new userFeatureActions.StoreUserDataRequested({userData: partialUser}));
-              // If email login, payload is a firebaseUser, but all we need is the uid
-              // this.store$.dispatch(new userFeatureActions.UserDataRequested({userId: fbUser.uid}))
-            }),
-            map(partialUser => new authFeatureActions.AuthenticationComplete()),
-            catchError(error => {
-              return of(new authFeatureActions.LoadErrorDetected({ error }));
-            })
-          );
-      }
+  constructor() { }
 
-      // If Google login, treat like user registration
-      if (action.payload.requestType === AuthenticateUserType.GOOGLE_AUTH) {
-       return this.authService.loginWithGoogle()
-        .pipe(
-          // Load user data into the store
-          tap(userData => {
-            if (!userData) {
-              throw new Error('User data not found');
-            }
-            // Add or update user info in database (will trigger a subsequent user store update request in User Store)
-            this.store$.dispatch(new userFeatureActions.StoreUserDataRequested({userData}));
+  confirmPasswordEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(AuthStoreActions.confirmPasswordRequested),
+      switchMap(action => 
+        this.authService.confirmPassword(action.confirmPasswordData).pipe(
+          map(passwordConfirmed => {
+            return AuthStoreActions.confirmPasswordCompleted({passwordConfirmed});
           }),
-          map(userCreds => new authFeatureActions.AuthenticationComplete()),
           catchError(error => {
-            return of(new authFeatureActions.LoadErrorDetected({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(AuthStoreActions.confirmPasswordFailed({error: fbError}));
           })
-        );
-      }
-
-    })
+        )
+      ),
+    ),
   );
 
-  @Effect()
-  updateEmailRequestedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<authFeatureActions.UpdateEmailRequested>(
-      authFeatureActions.ActionTypes.UPDATE_EMAIL_REQUESTED
-    ),
-    concatMap(action =>
-      this.authService.updateEmail(
-        action.payload.user,
-        action.payload.password,
-        action.payload.newEmail
-        )
-        .pipe(
-          // Update email in the main database (separate from the User database)
-          tap(response => {
-            if (!response) {
-              throw new Error('No response from updateEmail function');
-            }
-            return this.store$.dispatch(
-              new userFeatureActions.StoreUserDataRequested(
-                {userData: response.userData}
-              )
-            );
+  detectCachedUserEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(AuthStoreActions.detectCachedUserRequested),
+      concatMap(action => 
+        this.authService.fetchAuthData().pipe(
+          map(authResultsData => {
+            return AuthStoreActions.detectCachedUserCompleted({authResultsData});
           }),
-          map(response => new authFeatureActions.UpdateEmailComplete()),
           catchError(error => {
-            return of(new authFeatureActions.LoadErrorDetected({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(AuthStoreActions.detectCachedUserFailed({error: fbError}));
           })
         )
+      )
     )
   );
 
-  @Effect()
-  updatePasswordRequestedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<authFeatureActions.UpdatePasswordRequested>(
-      authFeatureActions.ActionTypes.UPDATE_PASSWORD_REQUESTED
-    ),
-    concatMap(action =>
-      this.authService.updatePassword(
-        action.payload.user,
-        action.payload.oldPassword,
-        action.payload.newPassword
-        )
-        .pipe(
-          map(response => {
-            if (!response) {
-              throw new Error('No response from updatePassword function');
-            }
-            return new authFeatureActions.UpdatePasswordComplete();
+  emailAuthEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(AuthStoreActions.emailAuthRequested),
+      switchMap(action => 
+        this.authService.loginWithEmail(action.authData).pipe(
+          map(authResultsData => {
+            return AuthStoreActions.emailAuthCompleted({authResultsData});
           }),
           catchError(error => {
-            return of(new authFeatureActions.LoadErrorDetected({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(AuthStoreActions.emailAuthFailed({error: fbError}));
           })
         )
-    )
+      ),
+    ),
   );
 
-  @Effect()
-  resetPasswordRequestedEffect$: Observable<Action> = this.actions$.pipe(
-    ofType<authFeatureActions.ResetPasswordRequested>(
-      authFeatureActions.ActionTypes.RESET_PASSWORD_REQUESTED
+  logoutEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(AuthStoreActions.logout),
+      tap(action => {
+        this.authService.logout();
+      })
     ),
-    concatMap(action =>
-      this.authService.sendResetPasswordEmail(
-        action.payload.email
-        )
-        .pipe(
-          map(response => {
-            if (!response) {
-              throw new Error('No response from sendResetPasswordEmail function');
-            }
-            return new authFeatureActions.ResetPasswordComplete();
+    {dispatch: false}
+  );
+
+  reloadAuthDataEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(AuthStoreActions.reloadAuthDataRequested),
+      switchMap(action => 
+        this.authService.reloadAuthData().pipe(
+          map(authResultsData => {
+            return AuthStoreActions.reloadAuthDataCompleted({authResultsData});
           }),
           catchError(error => {
-            return of(new authFeatureActions.LoadErrorDetected({ error }));
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(AuthStoreActions.reloadAuthDataFailed({error: fbError}));
           })
         )
-    )
+      ),
+    ),
   );
+
+  resetPasswordEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(AuthStoreActions.resetPasswordRequested),
+      concatMap(action => 
+        this.authService.sendResetPasswordEmail(action.email).pipe(
+          map(resetSubmitted => {
+            return AuthStoreActions.resetPasswordCompleted({resetSubmitted});
+          }),
+          catchError(error => {
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(AuthStoreActions.resetPasswordFailed({error: fbError}));
+          })
+        )
+      ),
+    ),
+  );
+
 }

@@ -1,0 +1,68 @@
+@use '@angular/material' as mat;
+
+$heading-font-family: "Roboto, sans-serif";
+$body-font-family: "Roboto, sans-serif";
+
+// Font sizes suggested by Google bard: https://g.co/bard/share/f92b812cd2e2
+$expn-admin-typography: mat.define-typography-config(
+  $headline-1:
+    mat.define-typography-level(
+      96px,
+      $font-family: $heading-font-family,
+    ),
+  $headline-2:
+    mat.define-typography-level(
+      60px,
+      $font-family: $heading-font-family,
+      ),
+  $headline-3:
+    mat.define-typography-level(
+      48px,
+      $font-family: $heading-font-family,
+    ),
+  $headline-4:
+    mat.define-typography-level(
+      34px,
+      $font-family: $heading-font-family,
+    ),
+  $headline-5:
+    mat.define-typography-level(
+      24px,
+      $font-family: $heading-font-family,
+    ),
+  $headline-6:
+    mat.define-typography-level(
+      20px,
+      $font-family: $heading-font-family,
+    ),
+  $subtitle-1:
+    mat.define-typography-level(
+      16px,
+      $font-family: $body-font-family,
+    ),
+  $subtitle-2:
+    mat.define-typography-level(
+      14px,
+      $font-family: $body-font-family,
+    ),  
+  $body-1:
+    mat.define-typography-level(
+      16px,
+      $font-family: $body-font-family,
+    ),
+  $body-2:
+    mat.define-typography-level(
+      14px,
+      $font-family: $body-font-family,
+    ),
+  $caption:
+    mat.define-typography-level(
+      12px,
+      $font-family: $body-font-family,
+    ),
+  $button:
+    mat.define-typography-level(
+      14px,
+      $font-family: $body-font-family,
+    ),
+);

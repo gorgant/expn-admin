@@ -1,0 +1,9 @@
+<div class="content-container">
+  <app-auth-header></app-auth-header>
+  <div class="login-options" [ngClass]="!(authOrUserUpdateProcessing$ | async) && !(userData$ | async) ? '' : 'hide'">
+    <app-login-form></app-login-form>
+  </div>
+  @if (authOrUserUpdateProcessing$ | async) {
+    <app-processing-spinner [$spinnerMessage]="AUTH_PROCESSING_BLURB"></app-processing-spinner>
+  }
+</div>

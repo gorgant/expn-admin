@@ -1,0 +1,119 @@
+@import "../../variables";
+
+.component-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: $primary;
+}
+
+.logo {
+  font-family: $logo-font-family;
+  font-size: $logo-font-mobile-size;
+
+  // Removes the hyperlink effects
+  text-decoration: none;
+  color: white;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+      font-size: $logo-font-default-size;
+  }
+}
+
+.nav-items-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+}
+
+// Target all items except logo
+.nav-item {
+  margin-top: 10px;
+  font-size: 1.1em;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  opacity: $inactive-item-opacity;
+
+  // Removes the hyperlink effects
+  text-decoration: none;
+  color: white;
+}
+
+.nav-item-active {
+  opacity: $active-item-opacity;
+  font-weight: $font-weight-medium;
+}
+
+.nav-item:hover {
+  opacity: $active-item-opacity;
+}
+
+.menu-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+
+  width: 100%;
+  // padding: 8px;
+
+  color: white;
+}
+
+::ng-deep {
+  .mat-mdc-button-ripple,
+  .mdc-button__ripple {
+    display: none !important;
+  }
+}
+
+
+
+
+// Below are Hover animations inspired by: https://codepen.io/maheshambure21/pen/QwXaRw
+
+// // This makes the padding around the text regular (default is 32px)
+// .contact {
+//   line-height: 16px;
+//   padding: 8px;
+//   border: 1px white solid;
+// }
+
+// Configure nav items to properly display the hover animation
+.nav-item {
+  padding-bottom: 8px;
+  position: relative;
+}
+
+// Constuct content that will be activated on hover
+.nav-item:not(.contact):after {
+  transition: all 400ms;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 0%;
+  content: '.';
+  color: transparent;
+  background: white;
+  height: 1px;
+}
+
+// Make underline visibile on hover
+.nav-item:not(.contact):hover:after {
+  width: 100%;
+}
+
+// Keep underline visible if active item
+.nav-item-active.nav-item:not(.contact):after {
+  width: 100%;
+}

@@ -1,0 +1,30 @@
+@import '../../../../variables';
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 32px
+}
+
+.subscribe-button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+
+  width: 100%;
+  padding: 0 16px;
+
+  @media screen and (min-width: $mobile-cutoff-width) {
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+  }
+}
+
+.subscribe-caption {
+  font-style: italic;
+}

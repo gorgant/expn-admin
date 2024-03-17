@@ -1,0 +1,6 @@
+<div class="spinner-container" [style.margin]="$spinnerMargin()">
+  <mat-spinner class="processing-spinner" [diameter]="$spinnerDiameter()"></mat-spinner>
+  @if ($spinnerMessage() !== EMPTY_MESSAGE) {
+    <div class="spinner-message">{{ $spinnerMessage() || DEFAULT_SPINNER_MESSAGE }}</div>
+  }
+</div>

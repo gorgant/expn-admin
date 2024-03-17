@@ -1,177 +1,228 @@
-import { Action } from '@ngrx/store';
-import { Update } from '@ngrx/entity';
-import { Post } from 'shared-models/posts/post.model';
+import { createAction, props } from "@ngrx/store";
+import { Post, PostHeroImageData } from "../../../../shared-models/posts/post.model";
+import { FirebaseError } from "@angular/fire/app";
+import { Update } from "@ngrx/entity";
+import { PostImageResizeData } from "../../../../shared-models/images/post-image-data.model";
+import { PostImageMetadata } from "../../../../shared-models/images/image-metadata.model";
+import { PostBoilerplate } from "../../../../shared-models/posts/post-boilerplate.model";
 
-export enum ActionTypes {
-  SINGLE_POST_REQUESTED = '[Posts] Single Post Requested',
-  SINGLE_POST_LOADED = '[Posts] Single Post Loaded',
-  ALL_POSTS_REQUESTED = '[Posts] All Posts Requested',
-  ALL_POSTS_LOADED = '[Posts] All Posts Loaded',
-  UPDATE_POST_REQUESTED = '[Posts] Update Post Requested',
-  UPDATE_POST_COMPLETE = '[Posts] Update Post Complete',
-  ROLLBACK_POST_REQUESTED = '[Posts] Rollback Post Requested',
-  ROLLBACK_POST_COMPLETE = '[Posts] Rollback Post Complete',
-  DELETE_POST_REQUESTED = '[Posts] Delete Post Requested',
-  DELETE_POST_COMPLETE = '[Posts] Delete Post Complete',
-  TOGGLE_PUBLISHED_REQUESTED = '[Posts] Toggle Post Published Requested',
-  TOGGLE_PUBLISHED_COMPLETE = '[Posts] Toggle Post Published Complete',
-  TOGGLE_FEATURED_REQUESTED = '[Posts] Toggle Post Featured Requested',
-  TOGGLE_FEATURED_COMPLETE = '[Posts] Toggle Post Featured Complete',
-  REFRESH_PUBLIC_BLOG_INDEX_REQUESTED = '[Posts] Refresh Public Blog Index Requested',
-  REFRESH_PUBLIC_BLOG_INDEX_COMPLETE = '[Posts] Refresh Public Blog Index Complete',
-  REFRESH_PUBLIC_BLOG_CACHE_REQUESTED = '[Posts] Refresh Public Blog Cache Requested',
-  REFRESH_PUBLIC_BLOG_CACHE_COMPLETE = '[Posts] Refresh Public Blog Cache Complete',
-  REFRESH_PUBLIC_FEATURED_POSTS_CACHE_REQUESTED = '[Posts] Refresh Public Featured Posts Cache Requested',
-  REFRESH_PUBLIC_FEATURED_POSTS_CACHE_COMPLETE = '[Posts] Refresh Public Featured Posts Cache Complete',
-  LOAD_FAILED = '[Posts] Load Failed',
-  SAVE_FAILED = '[Posts] Save Failed',
-  DELETE_FAILED = '[Posts] Delete Failed',
-  PUBLIC_UPDATE_FAILED = '[Posts] Public Update Failed'
-}
+// Create Post
 
-export class SinglePostRequested implements Action {
-  readonly type = ActionTypes.SINGLE_POST_REQUESTED;
-  constructor(public payload: { postId: string }) {}
-}
+export const createPostRequested = createAction(
+  '[Edit Post] Create Post Requested',
+  props<{post: Post}>()
+);
 
-export class SinglePostLoaded implements Action {
-  readonly type = ActionTypes.SINGLE_POST_LOADED;
-  constructor(public payload: { post: Post }) {}
-}
+export const createPostCompleted = createAction(
+  '[Post Service] Create Post Completed',
+  props<{post: Post}>()
+);
 
-export class AllPostsRequested implements Action {
-  readonly type = ActionTypes.ALL_POSTS_REQUESTED;
-}
+export const createPostFailed = createAction(
+  '[Post Service] Create Post Failed',
+  props<{error: FirebaseError}>()
+);
 
-export class AllPostsLoaded implements Action {
-  readonly type = ActionTypes.ALL_POSTS_LOADED;
-  constructor(public payload: { posts: Post[] }) {}
-}
+// Create Post Boilerplate
 
-export class UpdatePostRequested implements Action {
-  readonly type = ActionTypes.UPDATE_POST_REQUESTED;
+export const createPostBoilerplateRequested = createAction(
+  '[Edit Post] Create Post Boilerplate Requested',
+  props<{postBoilerplateContent: string}>()
+);
 
-  constructor(public payload: { post: Post }) {}
-}
+export const createPostBoilerplateCompleted = createAction(
+  '[Post Service] Create Post Boilerplate Completed',
+  props<{postBoilerplateData: PostBoilerplate}>()
+);
 
-export class UpdatePostComplete implements Action {
-  readonly type = ActionTypes.UPDATE_POST_COMPLETE;
+export const createPostBoilerplateFailed = createAction(
+  '[Post Service] Create Post Boilerplate Failed',
+  props<{error: FirebaseError}>()
+);
 
-  constructor(public payload: { post: Post }) {}
-}
+// Delete Post
 
-export class RollbackPostRequested implements Action {
-  readonly type = ActionTypes.ROLLBACK_POST_REQUESTED;
+export const deletePostRequested = createAction(
+  '[Edit Post] Delete Post Requested',
+  props<{postId: string}>()
+);
 
-  constructor(public payload: { post: Post }) {}
-}
+export const deletePostCompleted = createAction(
+  '[Post Service] Delete Post Completed',
+  props<{postId: string}>()
+);
 
-export class RollbackPostComplete implements Action {
-  readonly type = ActionTypes.ROLLBACK_POST_COMPLETE;
+export const deletePostFailed = createAction(
+  '[Post Service] Delete Post Failed',
+  props<{error: FirebaseError}>()
+);
 
-  constructor(public payload: { post: Post }) {}
-}
+// Fetch Post Boilerplate
 
-export class DeletePostRequested implements Action {
-  readonly type = ActionTypes.DELETE_POST_REQUESTED;
+export const fetchPostBoilerplateRequested = createAction(
+  '[Edit Post] Fetch PostBoilerplate Requested',
+);
 
-  constructor(public payload: { postId: string }) {}
-}
+export const fetchPostBoilerplateCompleted = createAction(
+  '[Post Service] Fetch PostBoilerplate Completed',
+  props<{postBoilerplateData: PostBoilerplate}>()
+);
 
-export class DeletePostComplete implements Action {
-  readonly type = ActionTypes.DELETE_POST_COMPLETE;
+export const fetchPostBoilerplateFailed = createAction(
+  '[Post Service] Fetch PostBoilerplate Failed',
+  props<{error: FirebaseError}>()
+);
 
-  constructor(public payload: {postId: string}) {}
-}
+// Fetch Single Post
 
-export class TogglePublishedRequested implements Action {
-  readonly type = ActionTypes.TOGGLE_PUBLISHED_REQUESTED;
+export const fetchSinglePostRequested = createAction(
+  '[Post Component] Fetch Single Post Requested',
+  props<{postId: string}>()
+);
 
-  constructor(public payload: { post: Post }) {}
-}
+export const fetchSinglePostCompleted = createAction(
+  '[Post Service] Fetch Single Post Completed',
+  props<{post: Post}>()
+);
 
-export class TogglePublishedComplete implements Action {
-  readonly type = ActionTypes.TOGGLE_PUBLISHED_COMPLETE;
-}
+export const fetchSinglePostFailed = createAction(
+  '[Post Service] Fetch Single Post Failed',
+  props<{error: FirebaseError}>()
+);
 
-export class ToggleFeaturedRequested implements Action {
-  readonly type = ActionTypes.TOGGLE_FEATURED_REQUESTED;
+// Publish Post
 
-  constructor(public payload: { post: Post }) {}
-}
+export const publishPostRequested = createAction(
+  '[Blog Dashboard] Publish Post Requested',
+  props<{postId: string}>()
+);
 
-export class ToggleFeaturedComplete implements Action {
-  readonly type = ActionTypes.TOGGLE_FEATURED_COMPLETE;
-}
+export const publishPostCompleted = createAction(
+  '[Post Service] Publish Post Completed',
+  props<{postId: string}>()
+);
 
-export class RefreshPublicBlogIndexRequested implements Action {
-  readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_REQUESTED;
-}
+export const publishPostFailed = createAction(
+  '[Post Service] Publish Post Failed',
+  props<{error: FirebaseError}>()
+);
 
-export class RefreshPublicBlogIndexComplete implements Action {
-  readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_INDEX_COMPLETE;
-}
+// Purge Post Image Data
 
-export class RefreshPublicBlogCacheRequested implements Action {
-  readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_REQUESTED;
-}
+export const purgePostImageData = createAction(
+  '[Image Uploader] Purge Post Image Data'
+);
 
-export class RefreshPublicBlogCacheComplete implements Action {
-  readonly type = ActionTypes.REFRESH_PUBLIC_BLOG_CACHE_COMPLETE;
-}
+// Purge Post State
 
-export class RefreshPublicFeaturedPostsCacheRequested implements Action {
-  readonly type = ActionTypes.REFRESH_PUBLIC_FEATURED_POSTS_CACHE_REQUESTED;
-}
+export const purgePostState = createAction(
+  '[AppWide] Purge Post State'
+);
 
-export class RefreshPublicFeaturedPostsCacheComplete implements Action {
-  readonly type = ActionTypes.REFRESH_PUBLIC_FEATURED_POSTS_CACHE_COMPLETE;
-}
+// Purge Post State Errors
 
+export const purgePostStateErrors = createAction(
+  '[AppWide] Purge Post State Errors'
+);
 
-export class LoadFailed implements Action {
-  readonly type = ActionTypes.LOAD_FAILED;
-  constructor(public payload: { error: string }) {}
-}
+// Resize Post Image Requested
 
-export class SaveFailed implements Action {
-  readonly type = ActionTypes.SAVE_FAILED;
-  constructor(public payload: { error: string }) {}
-}
+export const resizePostImageRequested = createAction(
+  '[Image Uploader] resizePostImage Requested',
+  props<{postImageMetadata: PostImageMetadata}>()
+);
 
-export class DeleteFailed implements Action {
-  readonly type = ActionTypes.DELETE_FAILED;
-  constructor(public payload: { error: string }) {}
-}
+export const resizePostImageCompleted = createAction(
+  '[Image Service] resizePostImage Completed',
+  props<{postHeroImageData: PostHeroImageData}>()
+);
 
-export class PublicUpdateFailed implements Action {
-  readonly type = ActionTypes.PUBLIC_UPDATE_FAILED;
-  constructor(public payload: { error: string }) {}
-}
+export const resizePostImageFailed = createAction(
+  '[Image Service] resizePostImage Failed',
+  props<{error: FirebaseError}>()
+);
 
-export type Actions =
-  SinglePostRequested |
-  SinglePostLoaded |
-  AllPostsRequested |
-  AllPostsLoaded |
-  UpdatePostRequested |
-  UpdatePostComplete |
-  RollbackPostRequested |
-  RollbackPostComplete |
-  DeletePostRequested |
-  DeletePostComplete |
-  TogglePublishedRequested |
-  TogglePublishedComplete |
-  ToggleFeaturedRequested |
-  ToggleFeaturedComplete |
-  RefreshPublicBlogIndexRequested |
-  RefreshPublicBlogIndexComplete |
-  RefreshPublicBlogCacheRequested |
-  RefreshPublicBlogCacheComplete |
-  RefreshPublicFeaturedPostsCacheRequested |
-  RefreshPublicFeaturedPostsCacheComplete |
-  LoadFailed |
-  SaveFailed |
-  DeleteFailed |
-  PublicUpdateFailed
-  ;
+// Toggle Featured Post
+
+export const toggleFeaturedPostRequested = createAction(
+  '[Blog Dashboard] Toggle Featured Post Requested',
+  props<{postId: string}>()
+);
+
+export const toggleFeaturedPostCompleted = createAction(
+  '[Post Service] Toggle Featured Post Completed',
+  props<{postId: string}>()
+);
+
+export const toggleFeaturedPostFailed = createAction(
+  '[Post Service] Toggle Featured Post Failed',
+  props<{error: FirebaseError}>()
+);
+
+// Unpublish Post
+
+export const unpublishPostRequested = createAction(
+  '[Blog Dashboard] Unpublish Post Requested',
+  props<{postId: string}>()
+);
+
+export const unpublishPostCompleted = createAction(
+  '[Post Service] Unpublish Post Completed',
+  props<{postId: string}>()
+);
+
+export const unpublishPostFailed = createAction(
+  '[Post Service] Unpublish Post Failed',
+  props<{error: FirebaseError}>()
+);
+
+// Update Post
+
+export const updatePostRequested = createAction(
+  '[Edit Post] Update Post Requested',
+  props<{postUpdates: Post}>()
+);
+
+export const updatePostCompleted = createAction(
+  '[Post Service] Update Post Completed',
+  props<{postUpdates: Update<Post>}>()
+);
+
+export const updatePostFailed = createAction(
+  '[Post Service] Update Post Failed',
+  props<{error: FirebaseError}>()
+);
+
+// Update Post Boilerplate
+
+export const updatePostBoilerplateRequested = createAction(
+  '[Edit Post] Update PostBoilerplate Requested',
+  props<{postBoilerplateUpdates: PostBoilerplate}>()
+);
+
+export const updatePostBoilerplateCompleted = createAction(
+  '[Post Service] Update PostBoilerplate Completed',
+  props<{postBoilerplateUpdates: PostBoilerplate}>()
+);
+
+export const updatePostBoilerplateFailed = createAction(
+  '[Post Service] Update PostBoilerplate Failed',
+  props<{error: FirebaseError}>()
+);
+
+// Upload Post Image
+
+export const uploadPostImageRequested = createAction(
+  '[Image Uploader] Upload Post Image Requested',
+  props<{postImageResizeData: PostImageResizeData}>()
+);
+
+export const uploadPostImageCompleted = createAction(
+  '[Image Service] Upload Post Image Completed',
+  props<{postImageDownloadUrl: string}>()
+);
+
+export const uploadPostImageFailed = createAction(
+  '[Image Service] Upload Post Image Failed',
+  props<{error: FirebaseError}>()
+);

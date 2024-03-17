@@ -1,0 +1,27 @@
+<mat-nav-list>
+
+  <a mat-list-item 
+    routerLinkActive="active-list-item"
+    [routerLink]="APP_ROUTES.BLOG"
+    (click)="uiService.toggleSidenav()">
+    <mat-icon class="list-item-icon" matListItemIcon>subscriptions</mat-icon>
+    <div class="list-item-title" matListItemTitle>{{ BLOG_LINK_VALUE }}</div>
+  </a>
+
+  <a mat-list-item 
+    routerLinkActive="active-list-item"
+    [routerLink]="APP_ROUTES.SUBSCRIBERS"
+    (click)="uiService.toggleSidenav()">
+    <mat-icon class="list-item-icon" matListItemIcon>people</mat-icon>
+    <div class="list-item-title" matListItemTitle>{{ SUBSCRIBERS_LINK_VALUE }}</div>
+  </a>
+
+  <a mat-list-item 
+    routerLinkActive="active-list-item"
+    [routerLink]="APP_ROUTES.ACCOUNT"
+    (click)="uiService.toggleSidenav()">
+    <mat-icon class="list-item-icon" matListItemIcon>people</mat-icon>
+    <div class="list-item-title" matListItemTitle>{{ ACCOUNT_LINK_VALUE }}</div>
+  </a>
+
+</mat-nav-list>

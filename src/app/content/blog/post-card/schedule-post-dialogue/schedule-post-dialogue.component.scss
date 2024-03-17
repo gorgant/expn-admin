@@ -1,0 +1,75 @@
+@import "../../../../variables";
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 32px;
+
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.dialogue-title {
+  @include default-header-style($font-weight-regular);
+}
+
+.dialogue-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 32px;
+
+  @include default-text-style($font-weight-regular);
+}
+
+
+.hours-and-minutes-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+
+  width: 250px;
+
+}
+
+.duration-field {
+  flex: 0.5;
+}
+
+.current-date-time-display-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+
+  margin-top: 16px;
+}
+
+.current-date-time-header {
+  font-weight: $font-weight-medium;
+}
+
+
+
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  
+  margin-top: 16px;
+  padding: 0 32px;
+  box-sizing: border-box; // Prevents side padding from pushing content outside the window width
+  width: 100%;
+}
+
+button {
+  width: 100%;
+}

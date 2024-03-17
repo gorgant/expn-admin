@@ -1,0 +1,7 @@
+<div class="component-container">
+  @if (!$publishPostCycleInit()) {
+    <button class="toggle-publish-button" mat-raised-button color="primary" (click)="onPublishPost()" [disabled]="(serverRequestProcessing$ | async) || !$blogIndexRef().readyToPublish">{{ PUBLISH_BUTTON_VALUE }}</button>
+  } @else {
+    <app-processing-spinner [$spinnerDiameter]="32" [$spinnerMessage]="EMPTY_SPINNER_MESSAGE"></app-processing-spinner>
+  }
+</div>

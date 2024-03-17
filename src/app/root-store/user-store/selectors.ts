@@ -1,49 +1,48 @@
-import { State } from './state';
-import { MemoizedSelector, createFeatureSelector, createSelector } from '@ngrx/store';
-import { AdminUser } from 'shared-models/user/admin-user.model';
-import { AdminFeatureNames } from 'shared-models/ngrx-store/feature-names';
-import { EditorSession } from 'shared-models/editor-sessions/editor-session.model';
+import { createFeatureSelector, createSelector } from "@ngrx/store";
+import { UserState } from "./state";
+import { AdminStoreFeatureKeys } from "../../../../shared-models/store/feature-keys.model";
 
-const getError = (state: State): any => state.error;
-const getUserIsLoading = (state: State): boolean => state.isLoading;
-const getUserLoaded = (state: State): boolean => state.userLoaded;
-const getUser = (state: State): AdminUser => state.user;
-const getIsCreatingServerEditorSession = (state: State): boolean => state.isCreatingEditorSession;
-const getServerEditorSessionCreated = (state: State): boolean => state.serverEditorSessionCreated;
-const getServerEditorSession = (state: State): EditorSession => state.serverEditorSession;
-const getIsLoadingServerEditorSession = (state: State): boolean => state.isLoadingServerEditorSession;
-const getActiveEditorSessions = (state: State): EditorSession[] => state.activeEditorSessions;
-const getActiveEditorSessionsLoaded = (state: State): boolean => state.activeEditorSessionsLoaded;
-const getIsLoadingActiveEditorSessions = (state: State): boolean => state.isLoadingActiveEditorSessions;
+const selectUserState = createFeatureSelector<UserState>(AdminStoreFeatureKeys.USER);
 
-export const selectUserState: MemoizedSelector<object, State>
-= createFeatureSelector<State>(AdminFeatureNames.USER);
+const getExportSubscribersError = (state: UserState) => state.exportSubscribersError;
+const getExportSubscribersProcessing = (state: UserState) => state.exportSubscribersProcessing;
+const getFetchAdminUserError = (state: UserState) => state.fetchAdminUserError;
+const getFetchAdminUserProcessing = (state: UserState) => state.fetchAdminUserProcessing;
+const getUpdateAdminUserError = (state: UserState) => state.updateAdminUserError;
+const getUpdateAdminUserProcessing = (state: UserState) => state.updateAdminUserProcessing;
+const getAdminUserData = (state: UserState) => state.adminUserData;
 
-export const selectUser: MemoizedSelector<object, AdminUser> = createSelector(selectUserState, getUser);
+export const selectExportSubscribersError = createSelector(
+  selectUserState,
+  getExportSubscribersError
+);
 
-export const selectUserIsLoading: MemoizedSelector<object, boolean>
-= createSelector(selectUserState, getUserIsLoading);
+export const selectExportSubscribersProcessing = createSelector(
+  selectUserState,
+  getExportSubscribersProcessing
+);
 
-export const selectUserLoaded: MemoizedSelector<object, boolean>
-= createSelector(selectUserState, getUserLoaded);
+export const selectFetchAdminUserError = createSelector(
+  selectUserState,
+  getFetchAdminUserError
+);
 
-export const selectIsLoadingServerEditorSession: MemoizedSelector<object, boolean>
-= createSelector(selectUserState, getIsLoadingServerEditorSession);
+export const selectFetchAdminUserProcessing = createSelector(
+  selectUserState,
+  getFetchAdminUserProcessing
+);
 
-export const selectServerEditorSessionCreated: MemoizedSelector<object, boolean>
-= createSelector(selectUserState, getServerEditorSessionCreated);
+export const selectUpdateAdminUserError = createSelector(
+  selectUserState,
+  getUpdateAdminUserError
+);
 
-export const selectServerEditorSession: MemoizedSelector<object, EditorSession> = createSelector(selectUserState, getServerEditorSession);
+export const selectUpdateAdminUserProcessing = createSelector(
+  selectUserState,
+  getUpdateAdminUserProcessing
+);
 
-export const selectIsCreatingServerEditorSession: MemoizedSelector<object, boolean>
-= createSelector(selectUserState, getIsCreatingServerEditorSession);
-
-export const selectActiveEditorSessions: MemoizedSelector<object, EditorSession[]>
-= createSelector(selectUserState, getActiveEditorSessions);
-
-
-export const selectIsLoadingActiveEditorSessions: MemoizedSelector<object, boolean>
-= createSelector(selectUserState, getIsLoadingActiveEditorSessions);
-
-export const selectActiveEditorSessionsLoaded: MemoizedSelector<object, boolean>
-= createSelector(selectUserState, getActiveEditorSessionsLoaded);
+export const selectAdminUserData = createSelector(
+  selectUserState,
+  getAdminUserData
+);
