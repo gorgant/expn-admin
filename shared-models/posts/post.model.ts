@@ -32,7 +32,7 @@ export interface BlogIndexRef {
   [PostKeys.AUTHOR_ID]: string;
   [PostKeys.AUTHOR_NAME]: string;
   [PostKeys.CREATED_TIMESTAMP]: number | Timestamp | GoogleCloudFunctionsTimestamp;
-  [PostKeys.FEATURED]: boolean | null; // TODO: remove null after migration
+  [PostKeys.FEATURED]: boolean;
   [PostKeys.ID]: string;
   [PostKeys.HERO_IMAGES]: PostHeroImageData;
   [PostKeys.LAST_MODIFIED_TIMESTAMP]: number | Timestamp | GoogleCloudFunctionsTimestamp;

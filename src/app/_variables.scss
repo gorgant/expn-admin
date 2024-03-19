@@ -2,7 +2,7 @@
 // Import material theming functions
 
 // Copied from theme.scss
-$expn-public-primary: (
+$expn-primary: (
   50 : #e4f2fe,
   100 : #bce0fb,
   200 : #90cbf9,
@@ -36,7 +36,7 @@ $expn-public-primary: (
 );
 
 
-$expn-public-accent: (
+$expn-accent: (
   50 : #e7e9fe,
   100 : #c2c9fd,
   200 : #99a5fc,
@@ -70,7 +70,7 @@ $expn-public-accent: (
 );
 
 // Consider swapping this for something more distinct
-$expn-public-warn: (
+$expn-warn: (
   50 : #fdece4,
   100 : #fbcfbd,
   200 : #f8b091,
@@ -103,8 +103,8 @@ $expn-public-warn: (
   )
 );
 
-$theme-primary: mat.define-palette($expn-public-primary);
-$theme-accent:  mat.define-palette($expn-public-accent);
+$theme-primary: mat.define-palette($expn-primary);
+$theme-accent:  mat.define-palette($expn-accent);
 $theme-warn:    mat.define-palette(mat.$red-palette);
 
 // Create your Sass color vars (will be available in all the project)

@@ -4,7 +4,7 @@ $heading-font-family: "Roboto, sans-serif";
 $body-font-family: "Roboto, sans-serif";
 
 // Font sizes suggested by Google bard: https://g.co/bard/share/f92b812cd2e2
-$expn-admin-typography: mat.define-typography-config(
+$expn-typography: mat.define-typography-config(
   $headline-1:
     mat.define-typography-level(
       96px,

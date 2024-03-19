@@ -34,8 +34,11 @@ export enum PublicFunctionNames {
   ON_PUB_DELETE_SG_CONTACT = 'onPubDeleteSgContact',
   ON_PUB_DISPATCH_EMAIL = 'onPubDispatchEmail',
   ON_PUB_REMOVE_USER_FROM_SG_CONTACT_LIST = 'onPubRemoveUserFromSgContactList',
+  ON_REQ_PURGE_UNVERIFIED_PUBLIC_USERS = 'onReqPurgeUnverifiedPublicUsers',
   ON_REQ_SG_EMAIL_WEBHOOK_ENDPOINT = 'onReqSgEmailWebhookEndpoint',
   ON_REQ_UPDATE_PODCAST_FEED_CACHE = 'onReqUpdatePodcastFeedCache',
+
+  ON_REQ_PURGE_AUTH_USERS = 'onReqPurgeAuthUsers',
 }
 
 export enum PublicTopicNames {

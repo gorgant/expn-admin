@@ -16,6 +16,8 @@
   font-family: $logo-font-family;
   font-size: $logo-font-mobile-size;
 
+  min-width: 300px;
+  
   // Removes the hyperlink effects
   text-decoration: none;
   color: white;

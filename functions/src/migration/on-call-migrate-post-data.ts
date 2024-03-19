@@ -38,7 +38,7 @@ const convertOldPostToNewPost = (oldPost: OldPost): Post => {
     [PostKeys.CREATED_TIMESTAMP]: convertMillisToTimestamp(oldPost.modifiedDate) as any,
     [PostKeys.CONTENT]: oldPost.content,
     [PostKeys.DESCRIPTION]: oldPost.description,
-    [PostKeys.FEATURED]: oldPost.featured ? oldPost.featured : null,
+    [PostKeys.FEATURED]: oldPost.featured ? oldPost.featured : false,
     [PostKeys.HERO_IMAGES]: {
       imageUrlLarge: oldPost.imageProps ? oldPost.imageProps.srcset.split(' ')[2] : AdminImagePaths.HERO_PLACEHOLDER,
       imageUrlSmall: oldPost.imageProps ? oldPost.imageProps.srcset.split(' ')[0] : AdminImagePaths.HERO_PLACEHOLDER,
