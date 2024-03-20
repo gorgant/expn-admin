@@ -116,7 +116,7 @@ export const AdminEmailAddresses = {
   ADVE_ADMIN: `greg@${WebDomains.ADVE_EMAIL}`,
   ADVE_GREG: `greg@${WebDomains.ADVE_EMAIL}`,
   ADVE_DEFAULT: `hello@${WebDomains.ADVE_EMAIL}`,
-  ADVE_MD: `greg@${WebDomains.ADVE_EMAIL}`,
+  ADVE_MD: `md@${WebDomains.ADVE_EMAIL}`,
   ADVE_TEST_1: `greg+test1@${WebDomains.ADVE_EMAIL}`,
   EXPN_ADMIN: `greg@${WebDomains.EXPN_EMAIL}`,
   EXPN_GREG: `greg@${WebDomains.EXPN_EMAIL}`,
@@ -126,25 +126,29 @@ export const AdminEmailAddresses = {
   MDLS_ADMIN: `greg@${WebDomains.EXPN_EMAIL}`,
   MDLS_GREG: `greg@${WebDomains.MDLS_EMAIL}`,
   MDLS_DEFAULT: `hello@${WebDomains.MDLS_EMAIL}`,
-  MDLS_MD: `greg@${WebDomains.MDLS_EMAIL}`,
+  MDLS_MD: `md@${WebDomains.MDLS_EMAIL}`,
   MDLS_TEST_1: `greg+test1@${WebDomains.MDLS_EMAIL}`,
   SYW_ADMIN: `greg@${WebDomains.EXPN_EMAIL}`,
   SYW_GREG: `greg@${WebDomains.SYW_EMAIL}`,
   SYW_DEFAULT: `hello@${WebDomains.SYW_EMAIL}`,
-  SYW_MD: `greg@${WebDomains.SYW_EMAIL}`,
+  SYW_MD: `md@${WebDomains.SYW_EMAIL}`,
   SYW_TEST_1: `greg+test1@${WebDomains.SYW_EMAIL}`,
 };
 
-export type SgContactCustomFieldData = {
+// By setting this to partial, it allows any number of properties with the type SgContactCustomFieldIds (vs requiring all of the SgContactCustomFieldIds properties)
+export type SgContactCustomFieldData = Partial<{
   [key in SgContactCustomFieldIds]: string | number | Date;
-}
+}>;
 
 // Sendgrid uses these custom IDs for the custom fields
 // To get these ids use postman GET https://api.sendgrid.com/v3/marketing/field_definitions
 export enum SgContactCustomFieldIds {
-  APP_CREATED_TIMESTAMP = 'e2_D',
-  APP_OPT_IN_TIMESTAMP = 'e3_D',
-  APP_UID = 'e1_T',
+  EXPN_APP_CREATED_TIMESTAMP = 'e2_D',
+  EXPN_APP_OPT_IN_TIMESTAMP = 'e3_D',
+  EXPN_APP_UID = 'e1_T',
+  ADVE_APP_CREATED_TIMESTAMP = 'e4_D',
+  ADVE_APP_OPT_IN_TIMESTAMP = 'e5_D',
+  ADVE_APP_UID = 'e3_T',
 }
 
 export enum SgWebhookSignatureVerificationKeys {
