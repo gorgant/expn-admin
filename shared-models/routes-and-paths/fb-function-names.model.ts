@@ -5,6 +5,7 @@ export enum AdminFunctionNames {
   ON_CALL_DELETE_POST = 'onCallDeletePost',
   ON_CALL_EXPORT_PUBLIC_USERS = 'onCallExportPublicUsers',
   ON_CALL_PUBLISH_POST = 'onCallPublishPost',
+  ON_CALL_PROCESS_PUBLIC_USER_IMPORT_DATA = 'onCallProcessPublicUserImportData',
   ON_CALL_RESIZE_POST_IMAGE = 'onCallResizePostImage',
   ON_CALL_TOGGLE_FEATURED_POST = 'onCallToggleFeaturedPost',
   ON_CALL_UNPUBLISH_POST = 'onCallUnpublishPost',
@@ -12,6 +13,8 @@ export enum AdminFunctionNames {
   ON_CALL_UPDATE_POST = 'onCallUpdatePost',
   ON_CALL_UPDATE_POST_BOILERPLATE = 'onCallUpdatePostBoilerplate',
   ON_DELETE_PURGE_ADMIN_USER_DATA = 'onDeletePurgeAdminUserData',
+  ON_PUB_IMPORT_PUBLIC_USERS_TO_DB = 'onPubImportPublicUsersToDb',
+  ON_PUB_PARSE_PUBLIC_USER_IMPORT_DATA = 'onPubParsePublicUserImportData',
   ON_REQ_PUBLISH_SCHEDULED_POSTS = 'onReqPublishScheduledPosts',
   ON_REQ_PURGE_EXPIRED_PUBLIC_USER_REPORTS = 'onReqPurgeExpiredPublicUserReports',
 
@@ -22,7 +25,8 @@ export enum AdminFunctionNames {
 }
 
 export enum AdminTopicNames {
-  RESIZE_POST_IMAGE_TOPIC = 'resize-post-image-topic',
+  IMPORT_PUBLIC_USERS_TO_DB_TOPIC = 'import-public-users-to-db-topic',
+  PARSE_PUBLIC_USER_IMPORT_DATA_TOPIC = 'parse-public-user-import-data-topic',
 }
 
 export enum PublicFunctionNames {
@@ -46,5 +50,5 @@ export enum PublicTopicNames {
   DELETE_SG_CONTACT_TOPIC = 'delete-sg-contact-topic',
   DISPATCH_EMAIL_TOPIC = 'dispatch-email-topic',
   REMOVE_USER_FROM_SG_CONTACT_LIST_TOPIC = 'remove-user-from-sg-contact-list-topic',
-  RESET_SG_CONTACT_OPT_IN_STATUS = 'reset-sg-contact-opt-in-status',
+  RESET_SG_CONTACT_OPT_IN_STATUS_TOPIC = 'reset-sg-contact-opt-in-status-topic',
 }

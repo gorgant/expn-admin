@@ -2,7 +2,7 @@ import { Component, inject, input, signal } from '@angular/core';
 import { AdminImagePaths } from '../../../../../../shared-models/routes-and-paths/image-paths.model';
 import { GlobalFieldValues } from '../../../../../../shared-models/content/string-vals.model';
 import { PostImageResizeData } from '../../../../../../shared-models/images/post-image-data.model';
-import { Observable, Subscription, catchError, combineLatest, filter, map, switchMap, tap, throwError, withLatestFrom } from 'rxjs';
+import { Observable, Subscription, catchError, combineLatest, filter, map, switchMap, take, tap, throwError, withLatestFrom } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { UiService } from '../../../../core/services/ui.service';
 import { HelperService } from '../../../../core/services/helpers.service';
@@ -173,7 +173,7 @@ export class ImageUploaderComponent {
     this.$postImageResizeDataSubmitted.set(false);
     this.$resizePostImageSubmitted.set(false);
     this.$resizePostImageCycleInit.set(false);
-    this.$resizePostImageCycleComplete.set(true);
+    this.$resizePostImageCycleComplete.set(false);
     
     this.store$.dispatch(PostStoreActions.purgePostImageData());
     this.store$.dispatch(PostStoreActions.purgePostStateErrors());
@@ -208,7 +208,7 @@ export class ImageUploaderComponent {
         imageType: ImageType.POST_HERO,
         postId: this.$post()[PostKeys.ID] as string,
         resizedImage: 'false',
-        storageBucket: this.getPublicUsersBucketBasedOnEnvironment()
+        storageBucket: this.getBlogStorageBucketBasedOnEnvironment()
       }
     };
 
@@ -228,13 +228,23 @@ export class ImageUploaderComponent {
     return filePath;
   }
 
-  private getPublicUsersBucketBasedOnEnvironment(): string {
+  private getBlogStorageBucketBasedOnEnvironment(): string {
     const storageBucket = this.helperService.isProductionEnvironment() ? ProductionCloudStorage.EXPN_ADMIN_BLOG_STORAGE_GS_PREFIX : SandboxCloudStorage.EXPN_ADMIN_BLOG_STORAGE_GS_PREFIX;
     return storageBucket;
   }
 
   ngOnDestroy(): void {
     this.processPostImageSubscription?.unsubscribe();
+
+    this.combinedUploadPostImageError$
+      .pipe(
+        take(1),
+        map(error => {
+          if (error) {
+            this.store$.dispatch(PostStoreActions.purgePostStateErrors());
+          }
+        })
+      )
   }
 
 

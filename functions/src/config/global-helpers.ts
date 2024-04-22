@@ -115,12 +115,10 @@ export const fetchPublicUserByEmail = async (email: string, userCollection: Fire
 
   // Return empty if user doesn't exist
   if (userCollectionRef.empty) {
-    logger.log(`publicUser with email '${email}' doesn't exist in database`);
     return undefined;
   }
 
   const existingUser = userCollectionRef.docs[0].data() as PublicUser;
-  logger.log(`Found user with this data`, existingUser);
 
   return existingUser;
 }

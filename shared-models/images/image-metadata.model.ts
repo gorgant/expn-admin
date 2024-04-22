@@ -1,4 +1,4 @@
-import { UploadMetadata } from 'firebase/storage';
+import { UploadMetadata } from '@angular/fire/storage';
 import { ImageType } from './image-type.model';
 
 export interface PostImageMetadata extends UploadMetadata {

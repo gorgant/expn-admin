@@ -123,12 +123,12 @@ export const AdminEmailAddresses = {
   EXPN_DEFAULT: `hello@${WebDomains.EXPN_EMAIL}`,
   EXPN_MD: `md@${WebDomains.EXPN_EMAIL}`,
   EXPN_TEST_1: `greg+test1@${WebDomains.EXPN_EMAIL}`,
-  MDLS_ADMIN: `greg@${WebDomains.EXPN_EMAIL}`,
+  MDLS_ADMIN: `greg@${WebDomains.MDLS_EMAIL}`,
   MDLS_GREG: `greg@${WebDomains.MDLS_EMAIL}`,
   MDLS_DEFAULT: `hello@${WebDomains.MDLS_EMAIL}`,
   MDLS_MD: `md@${WebDomains.MDLS_EMAIL}`,
   MDLS_TEST_1: `greg+test1@${WebDomains.MDLS_EMAIL}`,
-  SYW_ADMIN: `greg@${WebDomains.EXPN_EMAIL}`,
+  SYW_ADMIN: `greg@${WebDomains.SYW_EMAIL}`,
   SYW_GREG: `greg@${WebDomains.SYW_EMAIL}`,
   SYW_DEFAULT: `hello@${WebDomains.SYW_EMAIL}`,
   SYW_MD: `md@${WebDomains.SYW_EMAIL}`,
@@ -149,6 +149,12 @@ export enum SgContactCustomFieldIds {
   ADVE_APP_CREATED_TIMESTAMP = 'e4_D',
   ADVE_APP_OPT_IN_TIMESTAMP = 'e5_D',
   ADVE_APP_UID = 'e3_T',
+  MDLS_APP_CREATED_TIMESTAMP = 'e1_D',
+  MDLS_APP_OPT_IN_TIMESTAMP = 'e2_D',
+  MDLS_APP_UID = 'e3_T',
+  SYW_APP_CREATED_TIMESTAMP = 'tbd1',
+  SYW_APP_OPT_IN_TIMESTAMP = 'tbd2',
+  SYW_APP_UID = 'tbd3',
 }
 
 export enum SgWebhookSignatureVerificationKeys {
@@ -156,7 +162,10 @@ export enum SgWebhookSignatureVerificationKeys {
   EXPN_SANDBOX_KEY = `MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOWbxrGVfoh0liFoPOYl9mDURv0t1bZH1WA+yNBOjV1T547pYTBI6WuF3+gpteFEq8+WRH5tbpCpsnLuGP5VxCA==`,
   ADVE_PRODUCTION_KEY = `MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKPSuFTMPBQ/Sef21sR1o6dqouXwy8dbkB+QiQKfuZD0Y8R5P3CkjXlV5A7bqf4gEf83S64FbiOm4Hwgkf7eY8g==`,
   ADVE_SANDBOX_KEY = `MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKPSuFTMPBQ/Sef21sR1o6dqouXwy8dbkB+QiQKfuZD0Y8R5P3CkjXlV5A7bqf4gEf83S64FbiOm4Hwgkf7eY8g==`,
-
+  MDLS_PRODUCTION_KEY = `MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1z8cAjZxK8XBXSLOqaOl7CAfBWXQkXyjlxDiEYn9zSEZujQkIhLcKHrngLAkUfo9VKqDVvxlV50OtG6Uj9pMmw==`,
+  MDLS_SANDBOX_KEY = `MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1z8cAjZxK8XBXSLOqaOl7CAfBWXQkXyjlxDiEYn9zSEZujQkIhLcKHrngLAkUfo9VKqDVvxlV50OtG6Uj9pMmw==`,
+  SYW_PRODUCTION_KEY = `tbd3`,
+  SYW_SANDBOX_KEY = `tbd4`,
 }
 
 export const ANONYMOUS_EMAIL_ID = 'anonymousEmailId';

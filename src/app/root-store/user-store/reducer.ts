@@ -25,7 +25,7 @@ export const userStoreReducer = createReducer(
     return {
       ...state,
       exportSubscribersProcessing: false,
-      exportDownloadUrl: action.downloadUrl
+      exportDownloadUrl: action.exportDownloadUrl
     }
   }),
   on(UserStoreActions.exportSubscribersFailed, (state, action) => {
@@ -60,24 +60,69 @@ export const userStoreReducer = createReducer(
     }
   }),
 
-  // Purge Auth State Data
+  // Process Public User Import Data
+
+  on(UserStoreActions.processPublicUserImportDataRequested, (state, action) => {
+    return {
+      ...state,
+      processPublicUserImportDataProcessing: true,
+      processPublicUserImportDataError: null
+    }
+  }),
+  on(UserStoreActions.processPublicUserImportDataCompleted, (state, action) => {
+    return {
+      ...state,
+      processPublicUserImportDataProcessing: false,
+    }
+  }),
+  on(UserStoreActions.processPublicUserImportDataFailed, (state, action) => {
+    return {
+      ...state,
+      processPublicUserImportDataProcessing: false,
+      processPublicUserImportDataError: action.error
+    }
+  }),
+
+  // Purge Export Download Url
+
+  on(UserStoreActions.purgeExportDownloadUrl, (state, action) => {
+    return {
+      ...state,
+      exportDownloadUrl: null,
+    }
+  }),
+
+  // Purge Import Download Url
+
+  on(UserStoreActions.purgeImportDownloadUrl, (state, action) => {
+    return {
+      ...state,
+      publicUserImportDataDownloadUrl: null,
+    }
+  }),
+
+  // Purge User State Data
   
   on(UserStoreActions.purgeUserState, (state, action) => {
     return {
       ...state,
+      exportSubscribersError: null,
+      exportSubscribersProcessing: false,
       fetchAdminUserError: null,
       fetchAdminUserProcessing: false,
       updateAdminUserError: null,
       updateAdminUserProcessing: false,
       adminUserData: null,
+      exportDownloadUrl: null,
     }
   }),
 
-  // Purge Auth State Errors
+  // Purge User State Errors
 
   on(UserStoreActions.purgeUserStateErrors, (state, action) => {
     return {
       ...state,
+      exportSubscribersError: null,
       fetchAdminUserError: null,
       updateAdminUserError: null,
     }
@@ -104,6 +149,30 @@ export const userStoreReducer = createReducer(
       ...state,
       updateAdminUserProcessing: false,
       updateAdminUserError: action.error
+    }
+  }),
+
+  // Upload Public User Import Data
+
+  on(UserStoreActions.uploadPublicUserImportDataRequested, (state, action) => {
+    return {
+      ...state,
+      uploadPublicUserImportDataProcessing: true,
+      uploadPublicUserImportDataError: null
+    }
+  }),
+  on(UserStoreActions.uploadPublicUserImportDataCompleted, (state, action) => {
+    return {
+      ...state,
+      uploadPublicUserImportDataProcessing: false,
+      publicUserImportDataDownloadUrl: action.publicUserImportDataDownloadUrl
+    }
+  }),
+  on(UserStoreActions.uploadPublicUserImportDataFailed, (state, action) => {
+    return {
+      ...state,
+      uploadPublicUserImportDataProcessing: false,
+      uploadPublicUserImportDataError: action.error
     }
   }),
 

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { collection, doc, docData, DocumentReference, CollectionReference, Firestore } from '@angular/fire/firestore';
 import { Functions, httpsCallableData }  from '@angular/fire/functions';
-import { Observable, throwError } from 'rxjs';
+import { Observable, from, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, take, takeUntil } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { UiService } from './ui.service';
@@ -12,35 +12,47 @@ import { AdminUserUpdateData } from '../../../../shared-models/user/user-update.
 import { AdminFunctionNames } from '../../../../shared-models/routes-and-paths/fb-function-names.model';
 import { AdminCollectionPaths } from '../../../../shared-models/routes-and-paths/fb-collection-paths.model';
 import { PublicUserExportRequestParams } from '../../../../shared-models/user/public-user-exports.model';
+import { PublicUserImportData, PublicUserImportMetadata } from '../../../../shared-models/user/public-user-import-data.model';
+import { Storage, StorageReference, UploadTask, getDownloadURL, ref, uploadBytesResumable } from '@angular/fire/storage';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
+  private authService = inject(AuthService);
   private firestore = inject(Firestore);
   private functions = inject(Functions);
-  private authService = inject(AuthService);
-  private uiService = inject(UiService);
   private helperService = inject(HelperService);
+  private uiService = inject(UiService);
+  private storage = inject(Storage);
 
   constructor() { }
 
   exportSubscribers(exportParams: PublicUserExportRequestParams): Observable<string> {
     console.log('exportSubscribers call registered');
     const exportSubscribersHttpCall: (exportParamsData: PublicUserExportRequestParams) => 
-      Observable<string> = httpsCallableData(this.functions, AdminFunctionNames.ON_CALL_EXPORT_PUBLIC_USERS);
+      Observable<string | null> = httpsCallableData(this.functions, AdminFunctionNames.ON_CALL_EXPORT_PUBLIC_USERS);
+
+    const filterErrMsg = 'No subscribers match the current filter settings';
 
     return exportSubscribersHttpCall(exportParams)
       .pipe(
         take(1),
         map(downloadUrl => {
+          if (!downloadUrl) {
+            throw new Error(filterErrMsg);
+          }
           console.log(`Exported subscribers`, downloadUrl);
-          return downloadUrl;
+          return downloadUrl as string;
         }),
         catchError(error => {
           console.log('Error exporting subscribers', error);
-          this.uiService.showSnackBar('Hmm, something went wrong. Refresh the page and try again.', 10000);
+          if ((error as Error).message == filterErrMsg) {
+            this.uiService.showSnackBar(filterErrMsg, 10000);
+          } else {
+            this.uiService.showSnackBar('Hmm, something went wrong. Refresh the page and try again.', 10000);
+          }
           return throwError(() => new Error(error));
         })
       );
@@ -74,6 +86,34 @@ export class UserService {
       );
   }
 
+  private async fetchDownloadUrl(storageRef: StorageReference, task?: UploadTask): Promise<string> {
+    if (task) {
+      await task;
+      console.log(`File uploaded to this path`, storageRef.fullPath);
+    }
+    const url = await getDownloadURL(storageRef);
+    return url;
+  }
+
+  processPublicUserImportData(publicUserImportMetaData: PublicUserImportMetadata): Observable<string> {
+    console.log('processPublicUserImportData call registered');
+    const processPublicUserImportDataHttpCall: (publicUserImportMetaData: PublicUserImportMetadata) => 
+      Observable<string> = httpsCallableData(this.functions, AdminFunctionNames.ON_CALL_PROCESS_PUBLIC_USER_IMPORT_DATA);
+
+    return processPublicUserImportDataHttpCall(publicUserImportMetaData)
+      .pipe(
+        take(1),
+        map(pubSubResponse => {
+          return pubSubResponse;
+        }),
+        catchError(error => {
+          console.log('Error processing publicUserImportData', error);
+          this.uiService.showSnackBar('Hmm, something went wrong. Refresh the page and try again.', 10000);
+          return throwError(() => new Error(error));
+        })
+      );
+  }
+
   updateAdminUser(adminUserUpdateData: AdminUserUpdateData): Observable<AdminUser> {
     console.log('updateAdminUser call registered');
     const updateAdminUserHttpCall: (adminUserUpdateData: AdminUserUpdateData) => 
@@ -95,6 +135,29 @@ export class UserService {
         }),
         catchError(error => {
           console.log('Error updating adminUser', error);
+          this.uiService.showSnackBar('Hmm, something went wrong. Refresh the page and try again.', 10000);
+          return throwError(() => new Error(error));
+        })
+      );
+  }
+
+  uploadPublicUserImportDataAndGetDownloadUrl(publicUserImportData: PublicUserImportData): Observable<string> {
+
+    const filePath = publicUserImportData.importMetadata.customMetadata.filePath;
+    const storageBucket = publicUserImportData.importMetadata.customMetadata.storageBucket;
+    const pathWithBucket = `${storageBucket}/${filePath}`;
+    const storageRef = ref(this.storage, pathWithBucket);
+    const task = uploadBytesResumable(storageRef, publicUserImportData.file, publicUserImportData.importMetadata);
+
+    return from(this.fetchDownloadUrl(storageRef, task))
+      .pipe(
+        map(downloadUrl => {
+          console.log(`Fetched download url`, downloadUrl);
+          return downloadUrl;
+        }),
+        shareReplay(),
+        catchError(error => {
+          console.log('Error fetching download url', error);
           this.uiService.showSnackBar('Hmm, something went wrong. Refresh the page and try again.', 10000);
           return throwError(() => new Error(error));
         })

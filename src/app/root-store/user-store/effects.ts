@@ -19,8 +19,8 @@ export class UserStoreEffects {
       ofType(UserStoreActions.exportSubscribersRequested),
       switchMap(action => 
         this.userService.exportSubscribers(action.exportParams).pipe(
-          map(downloadUrl => {
-            return UserStoreActions.exportSubscribersCompleted({downloadUrl});
+          map(exportDownloadUrl => {
+            return UserStoreActions.exportSubscribersCompleted({exportDownloadUrl});
           }),
           catchError(error => {
             const fbError: FirebaseError = {
@@ -56,6 +56,27 @@ export class UserStoreEffects {
     ),
   );
 
+  processPublicUserImportDataEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(UserStoreActions.processPublicUserImportDataRequested),
+      concatMap(action => 
+        this.userService.processPublicUserImportData(action.publicUserImportMetadata).pipe(
+          map(pubSubResponse => {
+            return UserStoreActions.processPublicUserImportDataCompleted({pubSubResponse});
+          }),
+          catchError(error => {
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(UserStoreActions.processPublicUserImportDataFailed({error: fbError}));
+          })
+        )
+      ),
+    ),
+  );
+
   updateAdminUserEffect$ = createEffect(() => this.actions$
     .pipe(
       ofType(UserStoreActions.updateAdminUserRequested),
@@ -71,6 +92,27 @@ export class UserStoreEffects {
               name: error.name
             };
             return of(UserStoreActions.updateAdminUserFailed({error: fbError}));
+          })
+        )
+      ),
+    ),
+  );
+
+  uploadPublicUserImportDataEffect$ = createEffect(() => this.actions$
+    .pipe(
+      ofType(UserStoreActions.uploadPublicUserImportDataRequested),
+      concatMap(action => 
+        this.userService.uploadPublicUserImportDataAndGetDownloadUrl(action.publicUserImportData).pipe(
+          map(publicUserImportDataDownloadUrl => {
+            return UserStoreActions.uploadPublicUserImportDataCompleted({publicUserImportDataDownloadUrl});
+          }),
+          catchError(error => {
+            const fbError: FirebaseError = {
+              code: error.code,
+              message: error.message,
+              name: error.name
+            };
+            return of(UserStoreActions.uploadPublicUserImportDataFailed({error: fbError}));
           })
         )
       ),

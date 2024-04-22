@@ -1,6 +1,11 @@
 <div class="component-container">
-  <button class="action-button" mat-raised-button color="primary" (click)="onBackupPostCollection()">Back Up Post Collection</button>
+
+  <button class="export-subscribers-button" mat-raised-button color="primary" (click)="onExportSubscribers()">{{ EXPORT_PUBLIC_USERS_BUTTON_VALUE }}</button>
+
+  <app-import-public-users></app-import-public-users>
+
+  <!-- <button class="action-button" mat-raised-button color="primary" (click)="onBackupPostCollection()">Back Up Post Collection</button>
   <button class="action-button" mat-raised-button color="primary" (click)="onMigratePostData()">Migrate Posts</button>
   <button class="action-button" mat-raised-button color="accent" (click)="onBackupPublicUserCollection()">Back Up Public User Collection</button>
-  <button class="action-button" mat-raised-button color="accent" (click)="onMigratePublicUserData()">Migrate Public Users</button>
+  <button class="action-button" mat-raised-button color="accent" (click)="onMigratePublicUserData()">Migrate Public Users</button> -->
 </div>

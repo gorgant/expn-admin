@@ -1,25 +1,19 @@
-@import '../../variables';
+@import "../../../variables";
 
-.component-container {
+.content-container {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  gap: 40px;
+  gap: 32px;
 
-  width: 100%;
-  margin-top: 64px;
-  margin-bottom: 64px;
+  margin-top: 32px;
 }
 
-.export-subscribers-button {
+button {
   width: $mobile-button-width;
 
   @media screen and (min-width: $mobile-cutoff-width) {
     width: $desktop-button-width; 
   }
-}
-
-app-import-public-users {
-  width: 100%;
 }

@@ -6,10 +6,15 @@ export interface UserState {
   exportSubscribersProcessing: boolean,
   fetchAdminUserError: FirebaseError | Error | null,
   fetchAdminUserProcessing: boolean,
+  processPublicUserImportDataError: FirebaseError | Error | null,
+  processPublicUserImportDataProcessing: boolean,
   updateAdminUserError: FirebaseError | Error | null,
   updateAdminUserProcessing: boolean,
+  uploadPublicUserImportDataError: FirebaseError | Error | null,
+  uploadPublicUserImportDataProcessing: boolean,
   adminUserData: AdminUser | null,
   exportDownloadUrl: string | null,
+  publicUserImportDataDownloadUrl: string | null,
 }
 
 export const initialUserState: UserState = {
@@ -17,8 +22,13 @@ export const initialUserState: UserState = {
   exportSubscribersProcessing: false,
   fetchAdminUserError: null,
   fetchAdminUserProcessing: false,
+  processPublicUserImportDataError: null,
+  processPublicUserImportDataProcessing: false,
   updateAdminUserError: null,
   updateAdminUserProcessing: false,
+  uploadPublicUserImportDataError: null,
+  uploadPublicUserImportDataProcessing: false,
   adminUserData: null,
   exportDownloadUrl: null,
+  publicUserImportDataDownloadUrl: null,
 }

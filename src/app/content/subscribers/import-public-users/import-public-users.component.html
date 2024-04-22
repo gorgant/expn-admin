@@ -1,0 +1,9 @@
+<div class="content-container">
+  <input #documentInput style="display: none" type="file" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" id="file" (change)="onSubmit($event)">
+  @if (!(combinedHandlePublicUserImportDataProcessing$ | async) && !$processPublicUserImportDataCycleInit()) {
+    <button mat-raised-button color="primary" (click)="documentInput.click()">{{ IMPORT_PUBLIC_USERS_BUTTON_VALUE }}</button>
+  }
+  @if ((combinedHandlePublicUserImportDataProcessing$ | async) || $processPublicUserImportDataCycleInit()) {
+    <app-processing-spinner></app-processing-spinner>
+  }
+</div>    

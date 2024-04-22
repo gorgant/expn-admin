@@ -9,7 +9,7 @@ import { EnvironmentTypes, ProductionCloudStorage, SandboxCloudStorage } from '.
 import { adminFirestore } from '../config/db-config';
 import { SharedCollectionPaths } from '../../../shared-models/routes-and-paths/fb-collection-paths.model';
 import { Timestamp } from '@google-cloud/firestore';
-import { publicStorage } from '../config/storage-config';
+import { adminStorage } from '../config/storage-config';
 import { PostImageMetadata } from '../../../shared-models/images/image-metadata.model';
 import { AdminCsDirectoryPaths, RESIZED_IMAGE_FILE_PREFIX } from '../../../shared-models/routes-and-paths/cs-directory-paths.model';
 import { BlogIndexRef, DefaultPostHeroImageSizeObject, Post, PostHeroImageData } from '../../../shared-models/posts/post.model';
@@ -20,8 +20,8 @@ const defaultImageSizes: DefaultPostHeroImageSizeObject = {
 };
 
 const adminBlogStorageBucket = currentEnvironmentType === EnvironmentTypes.PRODUCTION ? 
-  publicStorage.bucket(ProductionCloudStorage.EXPN_ADMIN_BLOG_STORAGE_NO_PREFIX) :
-  publicStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_BLOG_STORAGE_NO_PREFIX);
+  adminStorage.bucket(ProductionCloudStorage.EXPN_ADMIN_BLOG_STORAGE_NO_PREFIX) :
+  adminStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_BLOG_STORAGE_NO_PREFIX);
 
 // Exit if file is not an image.
 const objectIsValidCheck = (imageMetaData: PostImageMetadata): boolean => {
@@ -34,17 +34,17 @@ const objectIsValidCheck = (imageMetaData: PostImageMetadata): boolean => {
 
 const resizeImage = async (imageMetaData: PostImageMetadata): Promise<PostHeroImageData> => {
   
-  const originalImagefilePath = imageMetaData.customMetadata.filePath;
-  const originalImageFileName = basename(originalImagefilePath);
+  const originalImageFilePath = imageMetaData.customMetadata.filePath;
+  const originalImageFileName = basename(originalImageFilePath);
   const originalImageFileNameNoExt = imageMetaData.customMetadata.fileNameNoExt;
   const postId = imageMetaData.customMetadata.postId;
   const contentType = imageMetaData.contentType;
   
-  const sourceDir = dirname(originalImagefilePath);
+  const sourceDir = dirname(originalImageFilePath);
   const workingDir = join(tmpdir(), AdminCsDirectoryPaths.POST_IMAGES, postId);
   const tmpFilePath = join(workingDir, originalImageFileName);
 
-  const existingMetadata = await adminBlogStorageBucket.file(originalImagefilePath).getMetadata();   // Extracts existing metadata
+  const existingMetadata = await adminBlogStorageBucket.file(originalImageFilePath).getMetadata();   // Extracts existing metadata
   logger.log(`Fetched this existing metadata from cloud storage:`, existingMetadata);
 
   // 1. Ensure directory exists
@@ -53,10 +53,10 @@ const resizeImage = async (imageMetaData: PostImageMetadata): Promise<PostHeroIm
     
 
   // 2. Download Source File
-  await adminBlogStorageBucket.file(originalImagefilePath).download({
+  await adminBlogStorageBucket.file(originalImageFilePath).download({
     destination: tmpFilePath
   })
-    .catch(err => {logger.log(`Error retrieving file at ${originalImagefilePath}:`, err); throw new HttpsError('internal', err);});
+    .catch(err => {logger.log(`Error retrieving file at ${originalImageFilePath}:`, err); throw new HttpsError('internal', err);});
   logger.log('Image downloaded locally to', tmpFilePath);
 
   // 3. Resize the images
@@ -114,9 +114,9 @@ const resizeImage = async (imageMetaData: PostImageMetadata): Promise<PostHeroIm
   }
 
   // 4. Delete original image in source directory
-  const deleteOriginalImage = adminBlogStorageBucket.file(originalImagefilePath).delete()
+  const deleteOriginalImage = adminBlogStorageBucket.file(originalImageFilePath).delete()
     .catch(err => {logger.log(`Error deleting original image:`, err); throw new HttpsError('internal', err);});
-  logger.log('Original file deleted', originalImagefilePath);
+  logger.log('Original file deleted', originalImageFilePath);
 
   await deleteOriginalImage;
 

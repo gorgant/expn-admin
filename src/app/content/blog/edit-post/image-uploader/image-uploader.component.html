@@ -1,5 +1,4 @@
 <div class="content-container">
-  <!-- <img class="post-image" [src]="(serverPost$ | async)?.heroImages?.imageUrlLarge || DEFAULT_POST_IMAGE" > -->
   <img class="post-image" [src]="$post().heroImages.imageUrlLarge" >
   <input #imageInput style="display: none" type="file" accept="image/*" id="file" (change)="onSubmit($event)">
   @if (!(combinedUploadPostImageProcessing$ | async) && !$resizePostImageCycleInit()) {

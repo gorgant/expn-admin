@@ -1,11 +1,11 @@
 import { logger } from "firebase-functions/v2";
 import { CallableOptions, CallableRequest, HttpsError, onCall } from "firebase-functions/v2/https";
-import { PublicUserExportData, PublicUserExportRequestParams } from "../../../shared-models/user/public-user-exports.model";
+import { PublicUserExportData, PublicUserExportRequestParams, PublicUserExportRequestParamsKeys } from "../../../shared-models/user/public-user-exports.model";
 import { adminStorage } from "../config/storage-config";
 import { currentEnvironmentType } from "../config/environments-config";
-import { EnvironmentTypes, PRODUCTION_APPS, ProductionCloudStorage, SANDBOX_APPS, SandboxCloudStorage } from "../../../shared-models/environments/env-vars.model";
+import { EnvironmentTypes, PRODUCTION_APPS, ProductionCloudStorage, SANDBOX_APPS, SandboxCloudStorage, SecretsManagerKeyNames } from "../../../shared-models/environments/env-vars.model";
 import { PublicCollectionPaths } from "../../../shared-models/routes-and-paths/fb-collection-paths.model";
-import { publicFirestore } from "../config/db-config";
+import { getPublicFirestoreWithAdminCreds } from "../config/db-config";
 import { PublicUser, PublicUserKeys } from "../../../shared-models/user/public-user.model";
 import { Timestamp } from '@google-cloud/firestore';
 import { join } from 'path';
@@ -14,39 +14,46 @@ import { AdminCsDirectoryPaths } from "../../../shared-models/routes-and-paths/c
 import { AsyncParser } from '@json2csv/node';
 import * as fs from 'fs-extra';
 import { DateTime } from "luxon";
+import { convertMillisToTimestamp } from "../config/global-helpers";
 
 const reportsBucket = currentEnvironmentType === EnvironmentTypes.PRODUCTION ? 
   adminStorage.bucket(ProductionCloudStorage.EXPN_ADMIN_REPORTS_STORAGE_NO_PREFIX) : 
   adminStorage.bucket(SandboxCloudStorage.EXPN_ADMIN_REPORTS_STORAGE_NO_PREFIX);
 
-const generateSubCsv = async (exportParams: PublicUserExportRequestParams): Promise<string> => {
+const generateSubCsv = async (exportParams: PublicUserExportRequestParams): Promise<string | null> => {
+  const publicFirestoreWithAdminCreds = getPublicFirestoreWithAdminCreds();
+  
   const publicUserCollectionPath = PublicCollectionPaths.PUBLIC_USERS;
   let publicUserCollection;
-  if (exportParams.includeUnconfirmedSubs) {
-    logger.log('User chose to include unconfirmed subs');
-    publicUserCollection = await publicFirestore.collection(publicUserCollectionPath)
+
+  // Only export verified publicUsers (client optionally includes optOuts)
+  if (exportParams[PublicUserExportRequestParamsKeys.INCLUDE_OPT_OUTS]) {
+    logger.log('Fetching publicUsers including optOuts');
+    publicUserCollection = await publicFirestoreWithAdminCreds.collection(publicUserCollectionPath)
       .orderBy(`${PublicUserKeys.CREATED_TIMESTAMP}`, 'desc')
-      .where(`${PublicUserKeys.CREATED_TIMESTAMP}`, '<=', exportParams.endDate)
-      .where(`${PublicUserKeys.CREATED_TIMESTAMP}`, '>=', exportParams.startDate)
-      .limit(exportParams.limit)
+      .where(`${PublicUserKeys.CREATED_TIMESTAMP}`, '<=', convertMillisToTimestamp(exportParams[PublicUserExportRequestParamsKeys.END_DATE]))
+      .where(`${PublicUserKeys.CREATED_TIMESTAMP}`, '>=', convertMillisToTimestamp(exportParams[PublicUserExportRequestParamsKeys.START_DATE]))
+      .where(`${PublicUserKeys.EMAIL_VERIFIED}`, '==', true)
+      .limit(exportParams[PublicUserExportRequestParamsKeys.LIMIT])
       .get()
-      .catch(err => {logger.log(`Error fetching subscriber collection from public database:`, err); throw new HttpsError('internal', err);});
+      .catch(err => {logger.log(`Error fetching publicUser collection from public database:`, err); throw new HttpsError('internal', err);});
   } else {
-    logger.log('User chose to exclude unconfirmed subs');
-    publicUserCollection = await publicFirestore.collection(publicUserCollectionPath)
+    logger.log('Fetching publicUsers excluding optOuts');
+    publicUserCollection = await publicFirestoreWithAdminCreds.collection(publicUserCollectionPath)
       .orderBy(`${PublicUserKeys.CREATED_TIMESTAMP}`, 'desc')
-      .where(`${PublicUserKeys.CREATED_TIMESTAMP}`, '<=', exportParams.endDate)
-      .where(`${PublicUserKeys.CREATED_TIMESTAMP}`, '>=', exportParams.startDate)
+      .where(`${PublicUserKeys.CREATED_TIMESTAMP}`, '<=', convertMillisToTimestamp(exportParams[PublicUserExportRequestParamsKeys.END_DATE]))
+      .where(`${PublicUserKeys.CREATED_TIMESTAMP}`, '>=', convertMillisToTimestamp(exportParams[PublicUserExportRequestParamsKeys.START_DATE]))
       .where(`${PublicUserKeys.EMAIL_OPT_IN_CONFIRMED}`, '==', true)
-      .limit(exportParams.limit)
+      .where(`${PublicUserKeys.EMAIL_VERIFIED}`, '==', true)
+      .limit(exportParams[PublicUserExportRequestParamsKeys.LIMIT])
       .get()
-      .catch(err => {logger.log(`Error fetching subscriber collection from public database:`, err); throw new HttpsError('internal', err);});
+      .catch(err => {logger.log(`Error fetching publicUser collection from public database:`, err); throw new HttpsError('internal', err);});
   }
 
   if (publicUserCollection.empty) {
-    const errMsg = 'No subscribers found with the current filter settings.';
+    const errMsg = 'No publicUsers found with the current filter settings.';
     logger.log(`${errMsg} Terminating function`); 
-    throw new HttpsError('internal', errMsg);
+    return null;
   }
   
   const transformedUserData: PublicUserExportData[] = []
@@ -70,7 +77,7 @@ const generateSubCsv = async (exportParams: PublicUserExportRequestParams): Prom
     transformedUserData.push(publicUserExportData);
   });
 
-  logger.log(`Generating sub CSV with ${transformedUserData.length} public users`);
+  logger.log(`Generating sub CSV with ${transformedUserData.length} publicUsers`);
   const parser = new AsyncParser();
   const parsedCSV = await parser.parse(transformedUserData).promise();
 
@@ -100,7 +107,7 @@ const uploadCsvToCloudStorage = async (subCsv: string): Promise<string> => {
 }
 
 // Courtesy of https://stackoverflow.com/a/42959262/6572208
-// Requires the "signBlob" permission in Service Account
+// Requires the "signBlob" permission in Service Account (@developer.gserviceaccount.com for Gen2 functions, @appspot.gserviceaccount.com for Gen1 functions)
 const fetchDownloadUrl = async (filePath: string): Promise<string> => {
 
   const signedResponse = await reportsBucket.file(filePath).getSignedUrl(
@@ -113,7 +120,7 @@ const fetchDownloadUrl = async (filePath: string): Promise<string> => {
 
   const downloadUrl = signedResponse[0];
 
-  logger.log('Returning this download url', downloadUrl);
+  logger.log('Returning this download url to publicUser report', downloadUrl);
 
   return downloadUrl;
 
@@ -122,6 +129,10 @@ const fetchDownloadUrl = async (filePath: string): Promise<string> => {
 const executeActions = async (exportParams: PublicUserExportRequestParams) => {
 
   const subCsv = await generateSubCsv(exportParams);
+
+  if (!subCsv) {
+    return null;
+  }
 
   const filePath = await uploadCsvToCloudStorage(subCsv);
 
@@ -133,10 +144,11 @@ const executeActions = async (exportParams: PublicUserExportRequestParams) => {
 
 /////// DEPLOYABLE FUNCTIONS ///////
 const callableOptions: CallableOptions = {
-  enforceAppCheck: true
+  enforceAppCheck: true,
+  secrets: [SecretsManagerKeyNames.ALTERNATE_PROJECT_SERVICE_ACCOUNT_CREDS]
 };
 
-export const onCallExportPublicUsers = onCall(callableOptions, async (request: CallableRequest<PublicUserExportRequestParams>): Promise<string> => {
+export const onCallExportPublicUsers = onCall(callableOptions, async (request: CallableRequest<PublicUserExportRequestParams>): Promise<string | null> => {
   const exportParams = request.data;
   logger.log('onCallExportPublicUsers requested with this data:', exportParams);
 

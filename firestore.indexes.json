@@ -1,33 +1,4 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "subscribers",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "optInConfirmed",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdDate",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "subscribers",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "optInConfirmed",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "optInTimestamp",
-          "order": "ASCENDING"
-        }
-      ]
-    }
-  ],
+  "indexes": [],
   "fieldOverrides": []
 }

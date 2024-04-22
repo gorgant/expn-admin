@@ -1,0 +1,47 @@
+<div class="content-container">
+  <div class="dialogue-title">{{ EXPORT_PUBLIC_USERS_TITLE }}</div>
+  <div class="dialogue-content">
+
+    <mat-form-field class="date-range-picker-field">
+      <mat-label>{{ SELECT_DATE_RANGE_FIELD_VALUE }}</mat-label>
+      <mat-date-range-input [formGroup]="exportForm" [rangePicker]="picker">
+        <input matStartDate [formControl]="startDate" [placeholder]="START_DATE_FORM_VALUE">
+        <input matEndDate [formControl]="endDate" [placeholder]="END_DATE_FORM_VALUE">
+      </mat-date-range-input>
+      <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+
+      @if (startDate.hasError('matStartDateInvalid')) {
+        <mat-error>Invalid start date</mat-error>
+      }
+      @if (endDate.hasError('matEndDateInvalid')) {
+        <mat-error>Invalid end date</mat-error>
+      }
+    </mat-form-field>
+      
+    <mat-form-field class="limit-export-count-field">
+      <mat-label>{{MAX_EXPORT_COUNT_FIELD_VALUE}}</mat-label>
+      <input [formControl]="limit" matInput type="number">
+      @if (limit.invalid && (limit.dirty || limit.touched)) {
+        <mat-error>{{ limitErrorMessage }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-checkbox class="toggle-include-opt-outs-field" [formControl]="includeOptOuts">{{ INCLUDE_OPT_OUTS_FIELD_VAULE }}</mat-checkbox>
+
+    @if($localExportDownloadUrl(); as downloadUrl) {
+      <a class="download-button" mat-raised-button color="accent" [href]="downloadUrl" target="_self" download>{{ DOWNLOAD_REPORT }}</a>
+    }
+
+  </div>
+  <div class="actions-container">
+    @if(!(exportSubscribersProcessing$ | async)) {
+      <button mat-raised-button color="primary" (click)="onExportSubscribers()">{{ EXPORT_BUTTON_VALUE }}</button>
+      <button mat-stroked-button color="primary" [mat-dialog-close]="false" cdkFocusInitial="false" [disabled]="(exportSubscribersProcessing$ | async)">{{ CANCEL }}</button>
+    } @else {
+      <app-processing-spinner></app-processing-spinner>
+    }
+  </div>
+
+</div>

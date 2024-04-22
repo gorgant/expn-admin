@@ -18,13 +18,20 @@ export type PublicUserExportData = Required<Pick<
   PublicUserKeys.ONBOARDING_WELCOME_EMAIL_SENT
   >>
 
+
+export enum PublicUserExportRequestParamsKeys {
+  END_DATE = 'endDate',
+  LIMIT = 'limit',
+  INCLUDE_OPT_OUTS = 'includeOptOuts',
+  START_DATE = 'startDate',
+}
 export interface PublicUserExportRequestParams {
-  startDate: number;
-  endDate: number;
-  limit: number;
-  includeUnconfirmedSubs: boolean;
+  [PublicUserExportRequestParamsKeys.END_DATE]: number;
+  [PublicUserExportRequestParamsKeys.INCLUDE_OPT_OUTS]: boolean;
+  [PublicUserExportRequestParamsKeys.LIMIT]: number;
+  [PublicUserExportRequestParamsKeys.START_DATE]: number;
 }
 
 export enum PublicUserExportVars {
-  SUB_REPORT_EXPIRATION = 1000 * 60 * 60 * 24 * 3, // 3 Days in MS
+  SUB_REPORT_EXPIRATION = 1000 * 60 * 60 * 24 * 365, // 1 year in MS
 }
