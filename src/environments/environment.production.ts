@@ -7,7 +7,7 @@ export const environment = {
     projectId: "explearning-admin",
     storageBucket: "explearning-admin.appspot.com",
     messagingSenderId: "4522010229",
-    appId: "1:4522010229:web:0764f6ceaa15bb13"
+    appId: "1:4522010229:web:fd6099a99a1bad87687a3c"
   },
   reCaptchaEnterpriseProviderKey: '6LeQrmgpAAAAAPbv9yAn9XeGMypTf14ULhUqdRk4',
   appCheckDebugTokenActive: false

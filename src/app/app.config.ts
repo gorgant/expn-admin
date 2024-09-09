@@ -1,4 +1,4 @@
-import { ApplicationConfig, isDevMode, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { APP_ROUTES } from './app.routes';
@@ -26,17 +26,15 @@ export const appConfig: ApplicationConfig = {
     provideRouter(APP_ROUTES), 
 
     // Angularfire Providers
-    importProvidersFrom(
-      provideFirebaseApp(() => initializeApp(environment.firebase)),
-      provideFirestore(() => getFirestore()),
-      provideFunctions(() => getFunctions()),
-      provideStorage(() => getStorage()),
-      provideAuth(() => getAuth()),
-      provideAppCheck(() => {
-        const provider = new ReCaptchaEnterpriseProvider(environment.reCaptchaEnterpriseProviderKey);
-        return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
-      })
-    ),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
+    provideFunctions(() => getFunctions()),
+    provideStorage(() => getStorage()),
+    provideAuth(() => getAuth()),
+    provideAppCheck(() => {
+      const provider = new ReCaptchaEnterpriseProvider(environment.reCaptchaEnterpriseProviderKey);
+      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
+    }),
 
     // NGRX Providers
     provideStore(reducers, {
