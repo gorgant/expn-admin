@@ -22,7 +22,7 @@
     "@angular/platform-browser": "^18.2.3",
     "@angular/platform-browser-dynamic": "^18.2.3",
     "@angular/router": "^18.2.3",
-    "@angular/youtube-player": "^17.3.0",
+    "@angular/youtube-player": "^18.2.3",
     "@ckeditor/ckeditor5-angular": "^7.0.1",
     "@ckeditor/ckeditor5-build-classic": "^41.2.0",
     "@ckeditor/ckeditor5-core": "^41.2.0",
