@@ -7,11 +7,11 @@
 
 @use "../typography/config" as typography;
 
-$expn-light-palette-primary: mat.define-palette(primary.$expn-primary);
-$expn-light-palette-accent: mat.define-palette(accent.$expn-accent);
-$expn-light-palette-warn: mat.define-palette(warn.$expn-warn);
+$expn-light-palette-primary: mat.m2-define-palette(primary.$expn-primary);
+$expn-light-palette-accent: mat.m2-define-palette(accent.$expn-accent);
+$expn-light-palette-warn: mat.m2-define-palette(warn.$expn-warn);
 
-$expn-light-theme: mat.define-light-theme(
+$expn-light-theme: mat.m2-define-light-theme(
   (
     color: (
       primary: $expn-light-palette-primary,
