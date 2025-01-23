@@ -74,7 +74,7 @@ export const PostFormVars = {
 
 export const YOUTUBE_VIDEO_URL_VALIDATION_REGEX = /^((https:\/\/www\.youtube\.com)|(https:\/\/youtu\.be))/;
 
-export const SPOTIFY_PODCAST_EPISODE_URL_VALIDATION_REGEX = /^(?:https:\/\/podcasters\.spotify\.com\/pod\/show\/|https:\/\/open\.spotify\.com\/episode\/)\S+$/;
+export const SPOTIFY_PODCAST_EPISODE_URL_VALIDATION_REGEX = /^(?:https:\/\/podcasters\.spotify\.com\/pod\/show\/|https:\/\/creators\.spotify\.com\/pod\/show\/)\S+$/;
 
 
 

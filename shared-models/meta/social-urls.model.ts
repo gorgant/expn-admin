@@ -32,5 +32,5 @@ export enum SocialUrlPrefixes {
   YOUTUBE_CHANNEL = 'https://www.youtube.com/channel',
   YOUTUBE_VIDEO = 'https://youtu.be',
   YOUTUBE_VIDEO_LONG = 'https://www.youtube.com',
-  SPOTIFY_PODCAST = 'https://podcasters.spotify.com/pod/show'
+  SPOTIFY_PODCAST = 'https://creators.spotify.com/pod/show'
 }

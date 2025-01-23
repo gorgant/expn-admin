@@ -29,9 +29,11 @@ export class PostPodcastPlayerComponent implements OnInit {
 
     const podcastEpisodeUrl = episodeUrl;
     const podcastEpisodeSlug = podcastEpisodeUrl.split('/').pop();
-    const baseEmbedUrl = `${PODCAST_PATHS.expn.embeddedPlayerUrl}`;
+    console.log('Extracted this podcastEpisodeSlug', podcastEpisodeSlug);
+    const baseEmbedUrl = `${PODCAST_PATHS.adve.embeddedPlayerUrl}`;
 
     const fullEmbedUrl = `${baseEmbedUrl}/${podcastEpisodeSlug}`;
+    console.log('Generated this podcastEpisodeUrl', fullEmbedUrl);
 
     const embedHtml = `
       <iframe 
