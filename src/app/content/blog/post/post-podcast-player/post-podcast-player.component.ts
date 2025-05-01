@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, input, signal } from '@angular/core';
+import { Component, OnInit, inject, input, signal } from '@angular/core';
 import { Post, PostKeys } from '../../../../../../shared-models/posts/post.model';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PODCAST_PATHS } from '../../../../../../shared-models/podcast/podcast-vars.model';
@@ -25,24 +25,43 @@ export class PostPodcastPlayerComponent implements OnInit {
     }
   }
 
+  private extractSpotifyEpisodeId(url: string): string | null {
+    try {
+      const parsedUrl = new URL(url);
+      const pathnameParts = parsedUrl.pathname.split('/');
+      if (pathnameParts[1] === 'episode' && pathnameParts[2]) {
+        return pathnameParts[2];
+      }
+    } catch (e) {
+      console.error('Invalid URL:', e);
+    }
+    return null;
+  }
+
   private configureSpotifyPlayer(episodeUrl: string) {
 
-    const podcastEpisodeUrl = episodeUrl;
-    const podcastEpisodeSlug = podcastEpisodeUrl.split('/').pop();
-    console.log('Extracted this podcastEpisodeSlug', podcastEpisodeSlug);
-    const baseEmbedUrl = `${PODCAST_PATHS.adve.embeddedPlayerUrl}`;
-
-    const fullEmbedUrl = `${baseEmbedUrl}/${podcastEpisodeSlug}`;
+    const podcastEpisodeId = this.extractSpotifyEpisodeId(episodeUrl);
+    if (podcastEpisodeId === null) {
+      console.error('Invalid Spotify episode URL. Aborting iframe construction.', episodeUrl);
+      return;
+    }
+    console.log('Extracted this podcastEpisodeId', podcastEpisodeId);
+    const baseEmbedUrl = `${PODCAST_PATHS.expn.embeddedPlayerUrl}`;
+    const fullEmbedUrl = `${baseEmbedUrl}/${podcastEpisodeId}`;
     console.log('Generated this podcastEpisodeUrl', fullEmbedUrl);
 
     const embedHtml = `
       <iframe 
-        class="spotify-iframe" 
-        src="${fullEmbedUrl}"
-        height="100%" 
+        style="border-radius:12px" 
+        src="${fullEmbedUrl}" 
         width="100%" 
-        frameborder="0" 
-        scrolling="no" 
+        height="200" 
+        frameBorder="0" 
+        allowfullscreen="" 
+        allow="autoplay; 
+        clipboard-write; 
+        encrypted-media; 
+        loading="lazy"
       ></iframe>
     `;
 

@@ -14,7 +14,7 @@ import { AdminAppRoutes } from '../../../../shared-models/routes-and-paths/app-r
 })
 export class UiService {
 
-  private APP_VERSION = '3.0.6';
+  private APP_VERSION = '3.0.7';
 
   $isServerPlatform = signal(false);
 
